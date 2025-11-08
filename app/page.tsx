@@ -33,7 +33,7 @@ export default function Home() {
         image="/banner-2.png"
         alt="Classic Sweets Banner"
         bgColor="brown"
-        height="h-16"
+        height="h-20 md:h-28"
       />
       
       <ProductSection 
@@ -48,7 +48,7 @@ export default function Home() {
         image="/banner-3.png"
         alt="Premium Sweets Banner"
         bgColor="red"
-        height="h-16"
+        height="h-20 md:h-28"
       />
       
       <ProductSection 
