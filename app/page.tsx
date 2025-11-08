@@ -1,6 +1,7 @@
 import React from 'react';
 import Header from '@/components/Header';
 import Navigation from '@/components/Navigation';
+import Cart from '@/components/Cart';
 import HeroSection from '@/components/HeroSection';
 import FeaturedCollection from '@/components/sections/FeaturedCollection';
 import AboutSection from '@/components/sections/AboutSection';
@@ -9,22 +10,27 @@ import ProductSection from '@/components/sections/ProductSection';
 import InstagramSection from '@/components/sections/InstagramSection';
 import Footer from '@/components/Footer';
 import DecorativeBanner from '@/components/DecorativeBanner';
-import { featuredProducts, categories, instagramPosts } from '@/lib/data';
+import { featuredProducts, categories, instagramPosts, getClassicProducts, getPremiumProducts } from '@/lib/data';
 
 export default function Home() {
-  // Placeholder products - will be replaced with actual data
-  const classicProducts = featuredProducts.slice(0, 8);
-  const premiumProducts = featuredProducts.slice(0, 8);
+  // Get classic and premium products
+  const classicProducts = getClassicProducts();
+  const premiumProducts = getPremiumProducts();
 
   return (
     <main className="min-h-screen bg-white">
       <Header />
       <Navigation />
+      <Cart />
       <HeroSection />
       
-      <FeaturedCollection products={featuredProducts.slice(0, 8)} />
+      <div id="featured">
+        <FeaturedCollection products={featuredProducts.slice(0, 8)} />
+      </div>
       
-      <AboutSection />
+      <div id="about">
+        <AboutSection />
+      </div>
       
       <CategoriesSection categories={categories} />
       
@@ -36,12 +42,14 @@ export default function Home() {
         height="h-20 md:h-28"
       />
       
-      <ProductSection 
-        title="CLASSIC SWEETS"
-        subtitle="Traditional sweets made with authentic recipes"
-        products={classicProducts}
-        bgColor="beige"
-      />
+      <div id="sweets">
+        <ProductSection 
+          title="CLASSIC SWEETS"
+          subtitle="Traditional sweets made with authentic recipes"
+          products={classicProducts}
+          bgColor="beige"
+        />
+      </div>
       
       {/* Decorative Banner - 3rd Image */}
       <DecorativeBanner 
