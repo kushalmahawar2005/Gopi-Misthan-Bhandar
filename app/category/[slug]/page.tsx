@@ -1,36 +1,57 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect, Suspense } from 'react';
 import { useParams } from 'next/navigation';
-import { categories, getProductsByCategory, getAllProducts } from '@/lib/data';
+import { fetchCategoryBySlug, fetchProducts } from '@/lib/api';
 import ProductCard from '@/components/ProductCard';
+import ProductListCard from '@/components/ProductListCard';
 import Header from '@/components/Header';
 import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
 import Cart from '@/components/Cart';
 import { FiGrid, FiList, FiChevronDown, FiX } from 'react-icons/fi';
+import { Product, Category } from '@/types';
 
 type SortOption = 'default' | 'price-low' | 'price-high' | 'name';
 
-export default function CategoryPage() {
+function CategoryContent() {
   const params = useParams();
   const slug = params.slug as string;
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [sortBy, setSortBy] = useState<SortOption>('default');
   const [showSortMenu, setShowSortMenu] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const [category, setCategory] = useState<Category | null>(null);
+  const [products, setProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const category = categories.find(cat => cat.slug === slug);
-  const allProductsInCategory = getProductsByCategory(slug);
+  useEffect(() => {
+    loadData();
+  }, [slug]);
+
+  const loadData = async () => {
+    try {
+      const [categoryData, productsData] = await Promise.all([
+        fetchCategoryBySlug(slug),
+        fetchProducts({ category: slug }),
+      ]);
+      setCategory(categoryData);
+      setProducts(productsData);
+    } catch (error) {
+      console.error('Error loading data:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   // Filter and sort products
   const filteredAndSortedProducts = useMemo(() => {
-    let products = [...allProductsInCategory];
+    let filtered = [...products];
 
     // Search filter
     if (searchQuery) {
       const query = searchQuery.toLowerCase();
-      products = products.filter(product =>
+      filtered = filtered.filter(product =>
         product.name.toLowerCase().includes(query) ||
         product.description.toLowerCase().includes(query)
       );
@@ -39,20 +60,44 @@ export default function CategoryPage() {
     // Sort
     switch (sortBy) {
       case 'price-low':
-        products.sort((a, b) => a.price - b.price);
+        filtered.sort((a, b) => a.price - b.price);
         break;
       case 'price-high':
-        products.sort((a, b) => b.price - a.price);
+        filtered.sort((a, b) => b.price - a.price);
         break;
       case 'name':
-        products.sort((a, b) => a.name.localeCompare(b.name));
+        filtered.sort((a, b) => a.name.localeCompare(b.name));
         break;
       default:
         break;
     }
 
-    return products;
-  }, [allProductsInCategory, searchQuery, sortBy]);
+    return filtered;
+  }, [products, searchQuery, sortBy]);
+
+  const sortOptions: { value: SortOption; label: string }[] = [
+    { value: 'default', label: 'Default' },
+    { value: 'price-low', label: 'Price: Low to High' },
+    { value: 'price-high', label: 'Price: High to Low' },
+    { value: 'name', label: 'Name: A to Z' },
+  ];
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-white">
+        <Header />
+        <Navigation />
+        <Cart />
+        <div className="flex items-center justify-center min-h-[60vh]">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-red mx-auto mb-4"></div>
+            <p className="text-gray-600">Loading...</p>
+          </div>
+        </div>
+        <Footer />
+      </div>
+    );
+  }
 
   if (!category) {
     return (
@@ -69,13 +114,6 @@ export default function CategoryPage() {
     );
   }
 
-  const sortOptions: { value: SortOption; label: string }[] = [
-    { value: 'default', label: 'Default' },
-    { value: 'price-low', label: 'Price: Low to High' },
-    { value: 'price-high', label: 'Price: High to Low' },
-    { value: 'name', label: 'Name: A to Z' },
-  ];
-
   return (
     <div className="min-h-screen bg-white">
       <Header />
@@ -84,7 +122,7 @@ export default function CategoryPage() {
 
       {/* Category Header */}
       <div className="bg-gradient-to-r from-primary-red to-primary-darkRed py-12 md:py-16 px-4">
-        <div className="max-w-7xl mx-auto text-center">
+        <div className="w-full text-center">
           <h1 className="text-4xl md:text-5xl font-bold font-serif text-white mb-4">
             {category.name}
           </h1>
@@ -95,7 +133,7 @@ export default function CategoryPage() {
       </div>
 
       {/* Filters and Controls */}
-      <div className="max-w-7xl mx-auto px-4 md:px-8 py-6 border-b border-gray-200">
+      <div className="w-full px-4 py-6 border-b border-gray-200">
         <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
           {/* Search */}
           <div className="flex-1 w-full md:w-auto">
@@ -112,42 +150,23 @@ export default function CategoryPage() {
                   onClick={() => setSearchQuery('')}
                   className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
                 >
-                  <FiX className="w-5 h-5" />
+                  <FiX className="w-4 h-4" />
                 </button>
               )}
             </div>
           </div>
 
-          {/* View Mode and Sort */}
-          <div className="flex items-center gap-4">
-            {/* View Mode Toggle */}
-            <div className="flex items-center gap-2 border border-gray-300 rounded-lg overflow-hidden">
-              <button
-                onClick={() => setViewMode('grid')}
-                className={`p-2 ${viewMode === 'grid' ? 'bg-primary-red text-white' : 'bg-white text-gray-600 hover:bg-gray-50'} transition-colors`}
-                aria-label="Grid view"
-              >
-                <FiGrid className="w-5 h-5" />
-              </button>
-              <button
-                onClick={() => setViewMode('list')}
-                className={`p-2 ${viewMode === 'list' ? 'bg-primary-red text-white' : 'bg-white text-gray-600 hover:bg-gray-50'} transition-colors`}
-                aria-label="List view"
-              >
-                <FiList className="w-5 h-5" />
-              </button>
-            </div>
-
-            {/* Sort Dropdown */}
+          {/* Sort and View Toggle */}
+          <div className="flex items-center gap-3">
+            {/* Sort */}
             <div className="relative">
               <button
                 onClick={() => setShowSortMenu(!showSortMenu)}
-                className="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+                className="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors text-sm"
               >
-                <span className="text-sm font-medium">Sort: {sortOptions.find(opt => opt.value === sortBy)?.label}</span>
+                Sort: {sortOptions.find(opt => opt.value === sortBy)?.label}
                 <FiChevronDown className={`w-4 h-4 transition-transform ${showSortMenu ? 'rotate-180' : ''}`} />
               </button>
-
               {showSortMenu && (
                 <>
                   <div
@@ -162,8 +181,8 @@ export default function CategoryPage() {
                           setSortBy(option.value);
                           setShowSortMenu(false);
                         }}
-                        className={`w-full text-left px-4 py-2 text-sm hover:bg-gray-50 transition-colors ${
-                          sortBy === option.value ? 'bg-primary-red/10 text-primary-red font-bold' : ''
+                        className={`w-full text-left px-4 py-2 text-sm hover:bg-gray-50 first:rounded-t-lg last:rounded-b-lg ${
+                          sortBy === option.value ? 'bg-primary-red text-white' : 'text-gray-700'
                         }`}
                       >
                         {option.label}
@@ -173,17 +192,37 @@ export default function CategoryPage() {
                 </>
               )}
             </div>
+
+            {/* View Toggle */}
+            <div className="flex items-center gap-1 border border-gray-300 rounded-lg p-1">
+              <button
+                onClick={() => setViewMode('grid')}
+                className={`p-2 rounded transition-colors ${
+                  viewMode === 'grid' ? 'bg-primary-red text-white' : 'text-gray-600 hover:bg-gray-100'
+                }`}
+              >
+                <FiGrid className="w-4 h-4" />
+              </button>
+              <button
+                onClick={() => setViewMode('list')}
+                className={`p-2 rounded transition-colors ${
+                  viewMode === 'list' ? 'bg-primary-red text-white' : 'text-gray-600 hover:bg-gray-100'
+                }`}
+              >
+                <FiList className="w-4 h-4" />
+              </button>
+            </div>
           </div>
         </div>
 
         {/* Results Count */}
         <div className="mt-4 text-sm text-gray-600">
-          Showing {filteredAndSortedProducts.length} of {allProductsInCategory.length} products
+          Showing {filteredAndSortedProducts.length} of {products.length} products
         </div>
       </div>
 
       {/* Products Grid/List */}
-      <div className="max-w-7xl mx-auto px-4 md:px-8 py-8 md:py-12">
+      <div className="w-full px-4 py-8 md:py-12">
         {filteredAndSortedProducts.length === 0 ? (
           <div className="text-center py-16">
             <p className="text-xl text-gray-600 mb-4">No products found</p>
@@ -193,18 +232,34 @@ export default function CategoryPage() {
           <div
             className={
               viewMode === 'grid'
-                ? 'grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6'
-                : 'grid grid-cols-1 gap-6'
+                ? 'grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-3 gap-3 md:gap-4 lg:gap-5'
+                : 'space-y-4'
             }
           >
-            {filteredAndSortedProducts.map((product) => (
-              <ProductCard key={product.id} product={product} />
-            ))}
+            {filteredAndSortedProducts.map((product) =>
+              viewMode === 'grid' ? (
+                <ProductCard key={product.id} product={product} />
+              ) : (
+                <ProductListCard key={product.id} product={product} />
+              )
+            )}
           </div>
         )}
       </div>
 
       <Footer />
     </div>
+  );
+}
+
+export default function CategoryPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-white flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-red"></div>
+      </div>
+    }>
+      <CategoryContent />
+    </Suspense>
   );
 }

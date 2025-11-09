@@ -1,70 +1,172 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
-import Link from 'next/link';
-import { FiArrowRight } from 'react-icons/fi';
+import { FiChevronLeft, FiChevronRight } from 'react-icons/fi';
+import { fetchHeroSlides, HeroSlide } from '@/lib/api';
 
 const HeroSection = () => {
-  const handleScrollToSection = (sectionId: string) => {
-    const element = document.getElementById(sectionId);
-    if (element) {
-      element.scrollIntoView({ behavior: 'smooth' });
+  const [slides, setSlides] = useState<HeroSlide[]>([]);
+  const [currentSlide, setCurrentSlide] = useState(0);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    loadSlides();
+  }, []);
+
+  const loadSlides = async () => {
+    try {
+      const slidesData = await fetchHeroSlides();
+      setSlides(slidesData.length > 0 ? slidesData : getDefaultSlides());
+    } catch (error) {
+      console.error('Error loading hero slides:', error);
+      setSlides(getDefaultSlides());
+    } finally {
+      setLoading(false);
     }
   };
 
-  return (
-    <div className="w-full h-[500px] md:h-[600px] lg:h-[700px] relative overflow-hidden">
-      <Image
-        src="https://picsum.photos/seed/hero/1200/600"
-        alt="Gopi Misthan Bhandar - Traditional Indian Sweets"
-        fill
-        className="object-cover object-center"
-        priority
-        sizes="100vw"
-      />
-      
-      {/* Overlay */}
-      <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/50 to-black/30" />
-      
-      {/* Content */}
-      <div className="absolute inset-0 flex items-center justify-center md:justify-start">
-        <div className="max-w-7xl mx-auto px-4 md:px-8 w-full">
-          <div className="max-w-2xl text-white">
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold font-serif mb-4 md:mb-6 leading-tight">
-              Serving Tradition &<br />
-              <span className="text-primary-yellow">Sweetness Since 1968</span>
-            </h1>
-            <p className="text-lg md:text-xl mb-6 md:mb-8 font-roboto text-gray-200 leading-relaxed">
-              Authentic Indian sweets, snacks, and namkeen from the heart of Neemuch. 
-              Experience the taste of tradition with every bite.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4">
-              <button
-                onClick={() => handleScrollToSection('featured')}
-                className="bg-primary-red text-white px-8 py-4 rounded-lg font-bold font-serif text-lg hover:bg-primary-darkRed transition-all duration-300 transform hover:scale-105 flex items-center justify-center gap-2 shadow-lg"
-              >
-                Explore Our Collection
-                <FiArrowRight className="w-5 h-5" />
-              </button>
-              <button
-                onClick={() => handleScrollToSection('about')}
-                className="bg-transparent border-2 border-white text-white px-8 py-4 rounded-lg font-bold font-serif text-lg hover:bg-white hover:text-black transition-all duration-300 flex items-center justify-center gap-2"
-              >
-                Our Story
-              </button>
-            </div>
+  // Default slides as fallback
+  const getDefaultSlides = (): HeroSlide[] => [
+    {
+      id: '1',
+      image: '/1.jpg',
+      title: 'Gopi Misthan Bhandar',
+      order: 0,
+      isActive: true,
+    },
+    {
+      id: '2',
+      image: '/banner-2.png',
+      title: 'Classic Sweets Collection',
+      order: 1,
+      isActive: true,
+    },
+    {
+      id: '3',
+      image: '/banner-3.png',
+      title: 'Premium Sweets Collection',
+      order: 2,
+      isActive: true,
+    },
+  ];
+
+  // Auto-slide functionality
+  useEffect(() => {
+    if (slides.length === 0) return;
+    
+    const interval = setInterval(() => {
+      setCurrentSlide((prev) => (prev + 1) % slides.length);
+    }, 5000); // Change slide every 5 seconds
+
+    return () => clearInterval(interval);
+  }, [slides.length]);
+
+  const nextSlide = () => {
+    if (slides.length === 0) return;
+    setCurrentSlide((prev) => (prev + 1) % slides.length);
+  };
+
+  const prevSlide = () => {
+    if (slides.length === 0) return;
+    setCurrentSlide((prev) => (prev - 1 + slides.length) % slides.length);
+  };
+
+  const goToSlide = (index: number) => {
+    if (index >= 0 && index < slides.length) {
+      setCurrentSlide(index);
+    }
+  };
+
+  if (loading) {
+    return (
+      <section className="w-full h-[500px] md:h-[450px] lg:h-[500px] relative overflow-hidden bg-gray-100">
+        <div className="flex items-center justify-center h-full">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-red mx-auto mb-4"></div>
+            <p className="text-gray-600">Loading...</p>
           </div>
         </div>
+      </section>
+    );
+  }
+
+  if (slides.length === 0) {
+    return null;
+  }
+
+  return (
+    <section className="w-full h-[500px] md:h-[450px] lg:h-[500px] relative overflow-hidden">
+      {/* Slides */}
+      <div className="relative w-full h-full">
+        {slides.map((slide, index) => (
+          <div
+            key={slide.id}
+            className={`absolute inset-0 transition-opacity duration-700 ${
+              index === currentSlide ? 'opacity-100 z-10' : 'opacity-0 z-0'
+            }`}
+          >
+            <Image
+              src={slide.image}
+              alt={slide.title || `Hero slide ${index + 1}`}
+              fill
+              className="object-cover object-center"
+              priority={index === 0}
+              sizes="100vw"
+            />
+            
+            {/* Overlay Content (if title exists) */}
+            {slide.title && (
+              <div className="absolute inset-0 bg-black/30 flex items-center justify-center z-10">
+                <div className="text-center text-white px-4 max-w-4xl">
+                  <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold font-serif">
+                    {slide.title}
+                  </h1>
+                </div>
+              </div>
+            )}
+          </div>
+        ))}
       </div>
-      
-      {/* Scroll Indicator */}
-      <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 animate-bounce">
-        <div className="w-6 h-10 border-2 border-white rounded-full flex items-start justify-center p-2">
-          <div className="w-1 h-3 bg-white rounded-full"></div>
+
+      {/* Navigation Arrows */}
+      {slides.length > 1 && (
+        <>
+          <button
+            onClick={prevSlide}
+            className="absolute left-4 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white text-gray-800 p-2 rounded-full shadow-lg transition-all z-20 opacity-70 hover:opacity-100"
+            aria-label="Previous slide"
+          >
+            <FiChevronLeft className="w-5 h-5 md:w-6 md:h-6" />
+          </button>
+          <button
+            onClick={nextSlide}
+            className="absolute right-4 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white text-gray-800 p-2 rounded-full shadow-lg transition-all z-20 opacity-70 hover:opacity-100"
+            aria-label="Next slide"
+          >
+            <FiChevronRight className="w-5 h-5 md:w-6 md:h-6" />
+          </button>
+        </>
+      )}
+
+      {/* Slider Dots */}
+      {slides.length > 1 && (
+        <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-20 flex gap-2">
+          {slides.map((_, index) => (
+            <button
+              key={index}
+              onClick={() => goToSlide(index)}
+              className={`w-2 h-2 rounded-full transition-all ${
+                index === currentSlide
+                  ? 'bg-white w-8'
+                  : 'bg-white/50 hover:bg-white/75'
+              }`}
+              aria-label={`Go to slide ${index + 1}`}
+            />
+          ))}
         </div>
-      </div>
-    </div>
+      )}
+    </section>
   );
 };
 

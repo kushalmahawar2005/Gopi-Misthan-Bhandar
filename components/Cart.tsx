@@ -3,6 +3,7 @@
 import React from 'react';
 import { useCart } from '@/context/CartContext';
 import Image from 'next/image';
+import Link from 'next/link';
 import { FiX, FiMinus, FiPlus, FiShoppingBag } from 'react-icons/fi';
 
 const Cart: React.FC = () => {
@@ -126,14 +127,13 @@ const Cart: React.FC = () => {
                   ₹{getTotalPrice().toLocaleString()}
                 </span>
               </div>
-              <button
-                className="w-full bg-primary-red text-white py-3 px-6 rounded-lg font-bold font-serif hover:bg-primary-darkRed transition-colors"
-                onClick={() => {
-                  alert('Checkout functionality will be implemented in backend phase!');
-                }}
+              <Link
+                href="/checkout"
+                className="block w-full bg-primary-red text-white py-3 px-6 rounded-lg font-bold font-serif hover:bg-primary-darkRed transition-colors text-center"
+                onClick={closeCart}
               >
                 Proceed to Checkout
-              </button>
+              </Link>
             </div>
           )}
         </div>

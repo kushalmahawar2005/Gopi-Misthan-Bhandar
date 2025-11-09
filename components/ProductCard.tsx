@@ -5,7 +5,8 @@ import { Product } from '@/types';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useCart } from '@/context/CartContext';
-import { FiShoppingCart, FiEye, FiHeart, FiSearch } from 'react-icons/fi';
+import { useWishlist } from '@/context/WishlistContext';
+import { FiShoppingCart, FiEye, FiHeart } from 'react-icons/fi';
 
 interface ProductCardProps {
   product: Product;
@@ -14,9 +15,10 @@ interface ProductCardProps {
 
 const ProductCard: React.FC<ProductCardProps> = ({ product, showAddToCart = true }) => {
   const { addToCart } = useCart();
+  const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
   const [isHovered, setIsHovered] = useState(false);
   const [isAdding, setIsAdding] = useState(false);
-  const [isFavorite, setIsFavorite] = useState(false);
+  const isFavorite = isInWishlist(product.id);
 
   const handleAddToCart = async (e: React.MouseEvent) => {
     e.preventDefault();
@@ -29,11 +31,11 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, showAddToCart = true
   return (
     <Link href={`/product/${product.id}`} className="group block">
       <div 
-        className="flex flex-col w-full items-center cursor-pointer transition-transform duration-300 hover:scale-[1.02]"
+        className="flex flex-col w-full items-center cursor-pointer "
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
       >
-        <div className="relative h-[200px] md:h-[220px] lg:h-[340px] w-full mb-2 overflow-hidden  shadow-md group-hover:shadow-xl transition-shadow">
+        <div className="relative h-[200px] md:h-[280px] lg:h-[300px] xl:h-[320px] w-full mb-2 overflow-hidden  shadow-md group-hover:shadow-xl transition-shadow">
           <Image
             src={product.image && product.image.trim() !== '' ? product.image : `https://picsum.photos/seed/product${product.id}/240/240`}
             alt={product.name}
@@ -43,46 +45,57 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, showAddToCart = true
           />
           
           {/* Dark overlay background - appears on hover */}
-          <div className={`absolute inset-0 bg-black/40 transition-opacity duration-300 ${isHovered ? 'opacity-100' : 'opacity-0'}`}></div>
+          <div className={`absolute inset-0  transition-opacity duration-300 ${isHovered ? 'opacity-100' : 'opacity-0'}`}></div>
           
-          {/* Wishlist Button - Top Right - Circular Icon Button */}
-          <button
-            onClick={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              setIsFavorite(!isFavorite);
-            }}
-            className={`absolute top-3 right-3 w-9 h-9 md:w-10 md:h-10 bg-black/70 hover:bg-black/90 backdrop-blur-sm text-white rounded-full flex items-center justify-center transition-all duration-300 hover:scale-110 z-10 shadow-lg ${isHovered ? 'opacity-100' : 'opacity-0'} group-hover:opacity-100`}
-            aria-label="Add to wishlist"
-          >
-            <FiHeart className={`w-4 h-4 md:w-5 md:h-5 transition-colors ${isFavorite ? 'fill-red-500 text-red-500' : ''}`} />
-          </button>
-
-          {/* Quick View Button - Center - Circular Icon Button */}
-          <Link
-            href={`/product/${product.id}`}
-            onClick={(e) => e.stopPropagation()}
-            className={`absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-9 h-9 md:w-10 md:h-10 bg-black/70 hover:bg-black/90 backdrop-blur-sm text-white rounded-full flex items-center justify-center transition-all duration-300 hover:scale-110 z-10 shadow-lg ${isHovered ? 'opacity-100 scale-100' : 'opacity-0 scale-95'} group-hover:opacity-100 group-hover:scale-100`}
-            aria-label="Quick view"
-          >
-            <FiSearch className="w-4 h-4 md:w-5 md:h-5" />
-          </Link>
-
-          {/* Add to Cart Button - Bottom Right - Circular Icon Button */}
-          {showAddToCart && (
+          {/* Icons Stack - Top Right - Vertical Layout - Slides from Right */}
+          <div className={`absolute top-3 right-3 flex flex-col gap-2 z-10 transition-all duration-500 ease-out ${
+            isHovered 
+              ? 'opacity-100 translate-x-0' 
+              : 'opacity-0 translate-x-full'
+          } group-hover:opacity-100 group-hover:translate-x-0`}>
+            {/* Wishlist Button - Top */}
             <button
-              onClick={handleAddToCart}
-              disabled={isAdding}
-              className={`absolute bottom-3 right-3 w-9 h-9 md:w-10 md:h-10 bg-black/70 hover:bg-primary-red backdrop-blur-sm text-white rounded-full flex items-center justify-center transition-all duration-300 hover:scale-110 disabled:opacity-50 z-10 shadow-lg ${isHovered ? 'opacity-100' : 'opacity-0'} group-hover:opacity-100`}
-              aria-label="Add to cart"
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                if (isFavorite) {
+                  removeFromWishlist(product.id);
+                } else {
+                  addToWishlist(product);
+                }
+              }}
+              className="w-9 h-9 md:w-10 md:h-10 bg-white hover:bg-gray-100 text-black flex items-center justify-center transition-all duration-300 hover:scale-110 shadow-lg"
+              aria-label={isFavorite ? 'Remove from wishlist' : 'Add to wishlist'}
             >
-              {isAdding ? (
-                <span className="text-sm font-bold">✓</span>
-              ) : (
-                <FiShoppingCart className="w-4 h-4 md:w-5 md:h-5" />
-              )}
+              <FiHeart className={`w-4 h-4 md:w-5 md:h-5 transition-colors ${isFavorite ? 'fill-red-500 text-red-500' : 'text-black'}`} />
             </button>
-          )}
+
+            {/* Quick View Button - Below Heart */}
+            <Link
+              href={`/product/${product.id}`}
+              onClick={(e) => e.stopPropagation()}
+              className="w-9 h-9 md:w-10 md:h-10 bg-white hover:bg-gray-100 text-black  flex items-center justify-center transition-all duration-300 hover:scale-110 shadow-lg"
+              aria-label="Quick view"
+            >
+              <FiEye className="w-4 h-4 md:w-5 md:h-5 text-black" />
+            </Link>
+
+            {/* Add to Cart Button - Below Quick View */}
+            {showAddToCart && (
+              <button
+                onClick={handleAddToCart}
+                disabled={isAdding}
+                className="w-9 h-9 md:w-10 md:h-10 bg-white hover:bg-primary-red hover:text-white text-black  flex items-center justify-center transition-all duration-300 hover:scale-110 disabled:opacity-50 shadow-lg"
+                aria-label="Add to cart"
+              >
+                {isAdding ? (
+                  <span className="text-sm font-bold text-green-600">✓</span>
+                ) : (
+                  <FiShoppingCart className="w-4 h-4 md:w-5 md:h-5" />
+                )}
+              </button>
+            )}
+          </div>
         </div>
         {/* Brand Name */}
         <p className="text-black text-[10px] md:text-xs font-serif mb-1 text-center font-normal px-2">GOPI MISTHAN BHANDAR</p>

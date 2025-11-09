@@ -1,35 +1,50 @@
 import React from 'react';
 import { InstagramPost } from '@/types';
 import Image from 'next/image';
+import Link from 'next/link';
 
 interface InstagramSectionProps {
-  posts: InstagramPost[];
+  instaBooks: InstagramPost[];
+  instaPosts: Array<{
+    _id: string;
+    imageUrl: string;
+    caption?: string;
+    instagramUrl: string;
+  }>;
 }
 
-const InstagramSection: React.FC<InstagramSectionProps> = ({ posts }) => {
-  // Text overlays for each card (matching 2nd image style)
-  const overlayTexts: { [key: string]: string } = {
-    'Hampers': 'Filled with flavours of Joy & Celebration',
-    'Gifting': 'LUXURY GIFTING with a taste of tradition',
-    'Milk Cake': 'And that seemed to ground an idea',
-    'Dry Fruits': 'DIY Mithai Box',
-  };
-
+const InstagramSection: React.FC<InstagramSectionProps> = ({ instaBooks, instaPosts }) => {
   return (
-    <section className="py-12 md:py-16 px-4 bg-white">
-      <div className="max-w-7xl mx-auto">
+    <section className="py-12 md:py-16 px-4 bg-white w-full">
+      <div className="w-full">
+        {/* INSTABOOK Section - Videos Only */}
         <h2 className="text-center text-2xl md:text-3xl font-serif text-black mb-12 md:mb-16 font-medium">
           INSTABOOK
         </h2>
         
-        {/* Main 5 Cards Row */}
+        {/* InstaBook Videos Row */}
         <div className="flex justify-center gap-4 md:gap-6 lg:gap-8 flex-wrap mb-16">
-          {posts.map((post) => (
-            <div key={post.id} className="relative flex flex-col items-center group cursor-pointer">
-              {/* Card Image/Video Container */}
-              <div className="relative w-[160px] md:w-[180px] lg:w-[200px] h-[280px] md:h-[320px] lg:h-[360px] rounded-lg overflow-hidden">
-                {post.isVideo && post.image && post.image.trim() !== '' ? (
-                  /* Video Element with Autoplay */
+          {instaBooks.map((item) => (
+            <div key={item.id} className="relative flex flex-col items-center group">
+              {/* Video Container */}
+              <div className="relative w-[160px] md:w-[180px] lg:w-[230px] h-[280px] md:h-[320px] lg:h-[375px] rounded-lg overflow-hidden">
+                {item.isInstagramReel ? (
+                  // Instagram Reel - Link to Instagram
+                  <Link
+                    href={item.image}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="w-full h-full bg-gradient-to-br from-purple-500 via-pink-500 to-orange-500 flex items-center justify-center group"
+                  >
+                    <div className="text-center text-white p-4">
+                      <svg className="w-16 h-16 mx-auto mb-2 opacity-80 group-hover:opacity-100 transition-opacity" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.947.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.073-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+                      </svg>
+                      <p className="text-sm font-medium">View on Instagram</p>
+                    </div>
+                  </Link>
+                ) : (
+                  // Uploaded Video
                   <video
                     autoPlay
                     loop
@@ -37,24 +52,15 @@ const InstagramSection: React.FC<InstagramSectionProps> = ({ posts }) => {
                     playsInline
                     className="absolute inset-0 w-full h-full object-cover"
                   >
-                    <source src={post.image} type="video/mp4" />
+                    <source src={item.image} type="video/mp4" />
                   </video>
-                ) : (
-                  <Image
-                    src={post.image && post.image.trim() !== '' ? post.image : `https://picsum.photos/seed/instagram${post.id}/200/360`}
-                    alt={post.label}
-                    fill
-                    className="object-cover object-center"
-                    sizes="(max-width: 768px) 160px, (max-width: 1024px) 180px, 200px"
-                    priority={post.id === '1'}
-                  />
                 )}
                 
-                {/* Text Overlay (if exists) */}
-                {overlayTexts[post.label] && (
+                {/* Overlay Text (if exists) */}
+                {item.overlayText && (
                   <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/40 to-transparent flex items-end z-10">
                     <p className="text-white text-xs md:text-sm font-serif px-4 pb-4 font-medium leading-relaxed">
-                      {overlayTexts[post.label]}
+                      {item.overlayText}
                     </p>
                   </div>
                 )}
@@ -62,30 +68,36 @@ const InstagramSection: React.FC<InstagramSectionProps> = ({ posts }) => {
               
               {/* Label Below Card */}
               <p className="text-black text-sm md:text-base font-serif mt-4 text-center font-medium">
-                {post.label}
+                {item.label}
               </p>
             </div>
           ))}
         </div>
 
-        {/* Follow Us Section */}
+        {/* INSTAPOST Section - Instagram Posts with Links */}
         <h3 className="text-center text-xl md:text-2xl font-serif text-black mb-8 md:mb-12 font-medium">
           Follow Us on Instagram
         </h3>
 
-        {/* Instagram Posts Grid */}
+        {/* Instagram Posts Grid - Clickable */}
         <div className="flex justify-center gap-4 md:gap-6 flex-wrap">
-          {[1, 2, 3, 4].map((item) => (
-            <div key={item} className="relative w-[160px] md:w-[180px] lg:w-[200px] h-[280px] md:h-[320px] lg:h-[360px] rounded-lg overflow-hidden cursor-pointer transition-transform duration-300 hover:scale-105">
+          {instaPosts.map((post) => (
+            <Link
+              key={post._id}
+              href={post.instagramUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="relative w-[160px] md:w-[180px] lg:w-[250px] h-[280px] md:h-[250px] lg:h-[260px] overflow-hidden cursor-pointer transition-transform duration-300 hover:scale-105"
+            >
               <Image
-                src={`https://picsum.photos/seed/igpost${item}/200/360`}
-                alt={`Instagram post ${item}`}
+                src={post.imageUrl || `https://picsum.photos/seed/igpost${post._id}/200/360`}
+                alt={post.caption || 'Instagram post'}
                 fill
                 className="object-cover object-center"
                 sizes="(max-width: 768px) 160px, (max-width: 1024px) 180px, 200px"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent opacity-0 hover:opacity-100 transition-opacity" />
-            </div>
+            </Link>
           ))}
         </div>
       </div>

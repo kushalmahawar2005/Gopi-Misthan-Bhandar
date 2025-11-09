@@ -4,7 +4,7 @@ import { FiPhone, FiMail } from 'react-icons/fi';
 const Header = () => {
   return (
     <div className="bg-primary-red h-8 md:h-10 w-full">
-      <div className="max-w-7xl mx-auto px-4 h-full flex items-center justify-between">
+      <div className="w-full h-full flex items-center justify-between px-4">
         <p className="text-white text-[10px] md:text-xs font-bold font-sans tracking-wide hidden sm:block">
           <span>GOPI MISTHAN BHANDAR </span>
           <span className="text-primary-yellow">NEEMUCH</span>

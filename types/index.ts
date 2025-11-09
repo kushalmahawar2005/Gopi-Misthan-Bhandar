@@ -10,7 +10,7 @@ export interface Product {
   description: string;
   price: number;
   image: string;
-  category: 'sweets' | 'snacks' | 'namkeen' | 'dry-fruit' | 'gifting';
+  category: 'sweets' | 'classic-sweets' | 'premium-sweets' | 'snacks' | 'namkeen' | 'dry-fruit' | 'gifting';
   featured?: boolean;
   sizes?: ProductSize[]; // Array of available sizes/weights
   defaultWeight?: string; // Default weight display
@@ -30,4 +30,6 @@ export interface InstagramPost {
   image: string;
   label: string;
   isVideo?: boolean;
+  isInstagramReel?: boolean;
+  overlayText?: string;
 }

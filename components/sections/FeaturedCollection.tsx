@@ -12,8 +12,8 @@ interface FeaturedCollectionProps {
 
 const FeaturedCollection: React.FC<FeaturedCollectionProps> = ({ products }) => {
   return (
-    <section className="py-12 md:py-20 px-2 md:px-4 bg-gradient-to-b from-white to-gray-50">
-      <div className="max-w-7xl mx-auto">
+    <section className="py-12 md:py-20 px-4 bg-gradient-to-b from-white to-gray-50 w-full">
+      <div className="w-full">
         <div className="text-center mb-12">
           <h2 className="text-xl md:text-2xl lg:text-3xl font-serif text-black mb-1 font-[100]">
             OCCASION FEATURED COLLECTION
@@ -24,7 +24,7 @@ const FeaturedCollection: React.FC<FeaturedCollectionProps> = ({ products }) => 
         </div>
 
         {/* Product Cards Grid */}
-        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 lg:gap-5 mb-12">
+        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-4 xl:grid-cols-4 gap-3 md:gap-4 lg:gap-5 mb-12">
           {products.map((product) => (
             <ProductCard key={product.id} product={product} />
           ))}
@@ -34,10 +34,10 @@ const FeaturedCollection: React.FC<FeaturedCollectionProps> = ({ products }) => 
         <div className="text-center">
           <Link
             href="/products"
-            className="inline-flex items-center gap-2 bg-primary-red text-white px-8 py-3 rounded-lg font-bold font-serif text-lg hover:bg-primary-darkRed transition-all duration-300 transform hover:scale-105 shadow-lg"
+            className="inline-flex items-center gap-2 bg-primary-red text-white px-4 py-3  font-[200] font-poppins text-[13px] hover:bg-primary-darkRed transition-all duration-300 transform hover:scale-105 shadow-lg"
           >
             View All Products
-            <FiArrowRight className="w-5 h-5" />
+            <FiArrowRight className="w-3 h-4" />
           </Link>
         </div>
       </div>
