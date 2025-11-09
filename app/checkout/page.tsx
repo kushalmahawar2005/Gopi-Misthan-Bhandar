@@ -11,8 +11,15 @@ import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
 import Cart from '@/components/Cart';
 import { FiArrowLeft, FiMinus, FiPlus, FiX, FiCreditCard, FiSmartphone, FiTruck } from 'react-icons/fi';
+import Script from 'next/script';
 
 type PaymentMethod = 'cod' | 'upi' | 'card';
+
+declare global {
+  interface Window {
+    Razorpay: any;
+  }
+}
 
 export default function CheckoutPage() {
   const router = useRouter();
@@ -51,6 +58,15 @@ export default function CheckoutPage() {
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('cod');
   const [isPlacingOrder, setIsPlacingOrder] = useState(false);
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
+  const [razorpayLoaded, setRazorpayLoaded] = useState(false);
+  const [deliveryInfo, setDeliveryInfo] = useState<{
+    isServiceable: boolean;
+    deliveryCharge: number;
+    estimatedDays: number;
+    zone: string;
+    message?: string;
+  } | null>(null);
+  const [checkingDelivery, setCheckingDelivery] = useState(false);
 
   // Redirect if cart is empty
   useEffect(() => {
@@ -58,6 +74,67 @@ export default function CheckoutPage() {
       router.push('/products');
     }
   }, [cartItems.length, router]);
+
+  // Load Razorpay script
+  useEffect(() => {
+    if (paymentMethod === 'upi' || paymentMethod === 'card') {
+      const script = document.createElement('script');
+      script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+      script.async = true;
+      script.onload = () => setRazorpayLoaded(true);
+      document.body.appendChild(script);
+
+      return () => {
+        document.body.removeChild(script);
+      };
+    }
+  }, [paymentMethod]);
+
+  // Check delivery serviceability when pincode changes
+  useEffect(() => {
+    if (formData.pincode && formData.pincode.length === 6) {
+      const timer = setTimeout(() => {
+        checkDelivery();
+      }, 500); // Debounce
+      return () => clearTimeout(timer);
+    } else {
+      setDeliveryInfo(null);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [formData.pincode]);
+
+  const checkDelivery = async () => {
+    if (!formData.pincode || formData.pincode.length !== 6) return;
+    
+    setCheckingDelivery(true);
+    try {
+      const subtotal = calculateSubtotal();
+      const response = await fetch(
+        `/api/delivery/check?pincode=${formData.pincode}&amount=${subtotal}`
+      );
+      const data = await response.json();
+      
+      if (data.success) {
+        setDeliveryInfo(data.data);
+        if (!data.data.isServiceable) {
+          setErrors((prev) => ({
+            ...prev,
+            pincode: 'Delivery not available at this pincode',
+          }));
+        } else {
+          setErrors((prev) => {
+            const newErrors = { ...prev };
+            delete newErrors.pincode;
+            return newErrors;
+          });
+        }
+      }
+    } catch (error) {
+      console.error('Error checking delivery:', error);
+    } finally {
+      setCheckingDelivery(false);
+    }
+  };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -119,8 +196,11 @@ export default function CheckoutPage() {
   };
 
   const calculateShipping = () => {
+    if (deliveryInfo) {
+      return deliveryInfo.deliveryCharge;
+    }
     const subtotal = calculateSubtotal();
-    // Free shipping above ₹500
+    // Default: Free shipping above ₹500
     return subtotal >= 500 ? 0 : 50;
   };
 
@@ -190,31 +270,144 @@ export default function CheckoutPage() {
         paymentMethod,
       };
 
-      // Create order via API
-      const response = await fetch('/api/orders', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(orderData),
-      });
+      // Handle payment based on method
+      if (paymentMethod === 'cod') {
+        // Cash on Delivery - Create order directly
+        const response = await fetch('/api/orders', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(orderData),
+        });
 
-      const data = await response.json();
+        const data = await response.json();
 
-      if (!data.success) {
-        alert('Error placing order: ' + data.error);
-        setIsPlacingOrder(false);
-        return;
+        if (!data.success) {
+          alert('Error placing order: ' + data.error);
+          setIsPlacingOrder(false);
+          return;
+        }
+
+        // Store order in localStorage for success page
+        localStorage.setItem('lastOrder', JSON.stringify(data.data));
+
+        // Clear cart
+        clearCart();
+
+        // Redirect to order success page
+        router.push(`/checkout/success?orderId=${data.data.orderNumber}`);
+      } else {
+        // UPI or Card - Use Razorpay
+        if (!razorpayLoaded || !window.Razorpay) {
+          alert('Payment gateway is loading. Please wait...');
+          setIsPlacingOrder(false);
+          return;
+        }
+
+        // First create order in database
+        const orderResponse = await fetch('/api/orders', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            ...orderData,
+            paymentStatus: 'pending',
+          }),
+        });
+
+        const orderResult = await orderResponse.json();
+
+        if (!orderResult.success) {
+          alert('Error creating order: ' + orderResult.error);
+          setIsPlacingOrder(false);
+          return;
+        }
+
+        // Create Razorpay order
+        const paymentResponse = await fetch('/api/payment/create-order', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            amount: calculateTotal(),
+            orderId: orderResult.data.orderNumber,
+            notes: {
+              orderNumber: orderResult.data.orderNumber,
+              customerName: shippingAddress.name,
+              customerEmail: shippingAddress.email,
+            },
+          }),
+        });
+
+        const paymentData = await paymentResponse.json();
+
+        if (!paymentData.success) {
+          alert('Error initiating payment: ' + paymentData.error);
+          setIsPlacingOrder(false);
+          return;
+        }
+
+        // Open Razorpay checkout
+        const options = {
+          key: paymentData.keyId,
+          amount: Math.round(calculateTotal() * 100), // Amount in paise
+          currency: 'INR',
+          name: 'Gopi Misthan Bhandar',
+          description: `Order ${orderResult.data.orderNumber}`,
+          order_id: paymentData.orderId,
+          handler: async function (response: any) {
+            // Verify payment
+            const verifyResponse = await fetch('/api/payment/verify', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                orderId: orderResult.data.orderNumber,
+                paymentId: response.razorpay_payment_id,
+                signature: response.razorpay_signature,
+                razorpayOrderId: response.razorpay_order_id,
+              }),
+            });
+
+            const verifyData = await verifyResponse.json();
+
+            if (verifyData.success) {
+              // Store order in localStorage for success page
+              localStorage.setItem('lastOrder', JSON.stringify(verifyData.order));
+
+              // Clear cart
+              clearCart();
+
+              // Redirect to order success page
+              router.push(`/checkout/success?orderId=${orderResult.data.orderNumber}`);
+            } else {
+              alert('Payment verification failed: ' + verifyData.error);
+              setIsPlacingOrder(false);
+            }
+          },
+          prefill: {
+            name: shippingAddress.name,
+            email: shippingAddress.email,
+            contact: shippingAddress.phone,
+          },
+          theme: {
+            color: '#ba0606',
+          },
+          modal: {
+            ondismiss: function () {
+              setIsPlacingOrder(false);
+            },
+          },
+        };
+
+        const razorpay = new window.Razorpay(options);
+        razorpay.open();
+        setIsPlacingOrder(false); // Reset as Razorpay modal is open
       }
-
-      // Store order in localStorage for success page
-      localStorage.setItem('lastOrder', JSON.stringify(data.data));
-
-      // Clear cart
-      clearCart();
-
-      // Redirect to order success page
-      router.push(`/checkout/success?orderId=${data.data.orderNumber}`);
     } catch (error) {
       console.error('Error placing order:', error);
       alert('Error placing order. Please try again.');
@@ -418,19 +611,48 @@ export default function CheckoutPage() {
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                       Pincode <span className="text-red-500">*</span>
                     </label>
-                    <input
-                      type="text"
-                      name="pincode"
-                      value={formData.pincode}
-                      onChange={handleInputChange}
-                      maxLength={6}
-                      className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-red ${
-                        errors.pincode ? 'border-red-500' : 'border-gray-300'
-                      }`}
-                      required
-                    />
+                    <div className="relative">
+                      <input
+                        type="text"
+                        name="pincode"
+                        value={formData.pincode}
+                        onChange={handleInputChange}
+                        maxLength={6}
+                        className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-red ${
+                          errors.pincode ? 'border-red-500' : 'border-gray-300'
+                        }`}
+                        required
+                        placeholder="Enter 6-digit pincode"
+                      />
+                      {checkingDelivery && (
+                        <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+                          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary-red"></div>
+                        </div>
+                      )}
+                    </div>
                     {errors.pincode && (
                       <p className="text-red-500 text-sm mt-1">{errors.pincode}</p>
+                    )}
+                    {deliveryInfo && deliveryInfo.isServiceable && (
+                      <div className={`mt-2 p-3 rounded-lg text-sm ${
+                        deliveryInfo.deliveryCharge === 0 
+                          ? 'bg-green-50 text-green-800 border border-green-200' 
+                          : 'bg-blue-50 text-blue-800 border border-blue-200'
+                      }`}>
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <p className="font-semibold">{deliveryInfo.message}</p>
+                            <p className="text-xs mt-1">Estimated delivery: {deliveryInfo.estimatedDays} day(s)</p>
+                          </div>
+                          <span className="text-xs bg-white px-2 py-1 rounded capitalize">{deliveryInfo.zone}</span>
+                        </div>
+                      </div>
+                    )}
+                    {deliveryInfo && !deliveryInfo.isServiceable && (
+                      <div className="mt-2 p-3 rounded-lg bg-red-50 text-red-800 border border-red-200 text-sm">
+                        <p className="font-semibold">Delivery not available at this pincode</p>
+                        <p className="text-xs mt-1">Please contact us for delivery options</p>
+                      </div>
                     )}
                   </div>
                 </div>

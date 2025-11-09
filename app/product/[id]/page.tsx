@@ -8,6 +8,7 @@ import { fetchProductById, fetchProducts } from '@/lib/api';
 import { useCart } from '@/context/CartContext';
 import { useWishlist } from '@/context/WishlistContext';
 import ProductCard from '@/components/ProductCard';
+import ProductReviews from '@/components/ProductReviews';
 import Header from '@/components/Header';
 import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
@@ -271,6 +272,13 @@ export default function ProductDetailPage() {
               </button>
             </div>
           </div>
+        </div>
+      </div>
+
+      {/* Product Reviews */}
+      <div className="w-full px-4 py-8 md:py-12">
+        <div className="max-w-7xl mx-auto">
+          <ProductReviews productId={productId} />
         </div>
       </div>
 

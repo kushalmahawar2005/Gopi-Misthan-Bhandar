@@ -11,14 +11,22 @@
     "create-categories": "tsx scripts/createCategories.ts"
   },
   "dependencies": {
+    "@types/nodemailer": "^7.0.3",
     "bcryptjs": "^3.0.3",
     "cloudinary": "^2.8.0",
+    "jspdf": "^3.0.3",
+    "jspdf-autotable": "^5.0.2",
     "mongodb": "^7.0.0",
     "mongoose": "^8.19.3",
     "next": "^14.2.0",
+    "nodemailer": "^7.0.10",
+    "razorpay": "^2.9.6",
     "react": "^18.3.0",
     "react-dom": "^18.3.0",
-    "react-icons": "^5.2.0"
+    "react-icons": "^5.2.0",
+    "react-to-print": "^3.2.0",
+    "recharts": "^3.3.0",
+    "twilio": "^5.10.4"
   },
   "devDependencies": {
     "@types/bcryptjs": "^2.4.6",

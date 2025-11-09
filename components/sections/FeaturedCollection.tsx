@@ -18,7 +18,7 @@ const FeaturedCollection: React.FC<FeaturedCollectionProps> = ({ products }) => 
           <h2 className="text-xl md:text-2xl lg:text-3xl font-serif text-black mb-1 font-[100]">
             OCCASION FEATURED COLLECTION
           </h2>
-          <p className="text-sm md:text-md font-serif text-gray-700 mb-12 max-w-5xl mx-auto leading-relaxed">
+          <p className="text-sm md:text-md font-jost text-gray-700 mb-12 max-w-5xl mx-auto leading-relaxed">
             From traditional treasures to modern delights, find the perfect picks for gifting and celebrating
           </p>
         </div>

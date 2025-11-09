@@ -1,0 +1,43 @@
+{
+  "name": "Gopi Misthan Bhandar",
+  "short_name": "Gopi Sweets",
+  "description": "Traditional Indian Sweets, Snacks, and Namkeen",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#ba0606",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/logo.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/logo.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["food", "shopping", "ecommerce"],
+  "screenshots": [],
+  "shortcuts": [
+    {
+      "name": "Products",
+      "short_name": "Products",
+      "description": "Browse all products",
+      "url": "/products",
+      "icons": [{ "src": "/logo.png", "sizes": "96x96" }]
+    },
+    {
+      "name": "Cart",
+      "short_name": "Cart",
+      "description": "View cart",
+      "url": "/checkout",
+      "icons": [{ "src": "/logo.png", "sizes": "96x96" }]
+    }
+  ]
+}
+

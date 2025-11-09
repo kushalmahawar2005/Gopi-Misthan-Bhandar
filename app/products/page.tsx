@@ -23,6 +23,8 @@ function ProductsContent() {
   const [showSortMenu, setShowSortMenu] = useState(false);
   const [showFilterMenu, setShowFilterMenu] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const [priceRange, setPriceRange] = useState<[number, number]>([0, 10000]);
+  const [maxPrice, setMaxPrice] = useState(10000);
   const [products, setProducts] = useState<Product[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
@@ -47,6 +49,13 @@ function ProductsContent() {
       ]);
       setProducts(productsData);
       setCategories(categoriesData);
+      
+      // Calculate max price
+      if (productsData.length > 0) {
+        const max = Math.max(...productsData.map(p => p.price));
+        setMaxPrice(Math.ceil(max / 1000) * 1000); // Round up to nearest 1000
+        setPriceRange([0, Math.ceil(max / 1000) * 1000]);
+      }
     } catch (error) {
       console.error('Error loading data:', error);
     } finally {
@@ -73,6 +82,11 @@ function ProductsContent() {
       );
     }
 
+    // Price range filter
+    filtered = filtered.filter(product => 
+      product.price >= priceRange[0] && product.price <= priceRange[1]
+    );
+
     // Sort
     switch (sortBy) {
       case 'price-low':
@@ -89,7 +103,7 @@ function ProductsContent() {
     }
 
     return filtered;
-  }, [products, selectedCategory, searchQuery, sortBy]);
+  }, [products, selectedCategory, searchQuery, priceRange, sortBy]);
 
   // Category counts
   const categoryCounts = useMemo(() => {
@@ -176,6 +190,43 @@ function ProductsContent() {
                       {category.name} ({categoryCounts[category.slug] || 0})
                     </button>
                   ))}
+                </div>
+              </div>
+
+              {/* Price Range Filter */}
+              <div className="mb-6">
+                <h3 className="text-sm font-semibold text-gray-700 mb-3">Price Range</h3>
+                <div className="space-y-3">
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="number"
+                      min="0"
+                      max={maxPrice}
+                      value={priceRange[0]}
+                      onChange={(e) => setPriceRange([parseInt(e.target.value) || 0, priceRange[1]])}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-red"
+                      placeholder="Min"
+                    />
+                    <span className="text-gray-500">-</span>
+                    <input
+                      type="number"
+                      min={priceRange[0]}
+                      max={maxPrice}
+                      value={priceRange[1]}
+                      onChange={(e) => setPriceRange([priceRange[0], parseInt(e.target.value) || maxPrice])}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-red"
+                      placeholder="Max"
+                    />
+                  </div>
+                  <div className="text-xs text-gray-600">
+                    ₹{priceRange[0].toLocaleString()} - ₹{priceRange[1].toLocaleString()}
+                  </div>
+                  <button
+                    onClick={() => setPriceRange([0, maxPrice])}
+                    className="w-full px-3 py-2 text-sm text-primary-red hover:bg-red-50 rounded-lg transition-colors"
+                  >
+                    Reset Price
+                  </button>
                 </div>
               </div>
             </div>

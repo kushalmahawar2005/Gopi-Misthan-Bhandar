@@ -38,6 +38,9 @@ export interface IOrder extends Document {
   subtotal: number;
   total: number;
   paymentMethod: 'cod' | 'card' | 'upi';
+  paymentStatus?: 'pending' | 'paid' | 'failed';
+  paymentId?: string;
+  razorpayOrderId?: string;
   status: 'pending' | 'processing' | 'shipped' | 'delivered' | 'cancelled';
   orderNumber: string;
   createdAt: Date;
@@ -87,6 +90,13 @@ const OrderSchema = new Schema<IOrder>(
       enum: ['cod', 'card', 'upi'],
       default: 'cod',
     },
+    paymentStatus: {
+      type: String,
+      enum: ['pending', 'paid', 'failed'],
+      default: 'pending',
+    },
+    paymentId: { type: String },
+    razorpayOrderId: { type: String },
     status: {
       type: String,
       enum: ['pending', 'processing', 'shipped', 'delivered', 'cancelled'],
@@ -99,11 +109,16 @@ const OrderSchema = new Schema<IOrder>(
   }
 );
 
-// Generate order number before saving
+// Generate order number before saving (if not already set)
 OrderSchema.pre('save', async function (next) {
-  if (!this.orderNumber) {
-    const count = await mongoose.models.Order?.countDocuments() || 0;
-    this.orderNumber = `ORD-${Date.now()}-${count + 1}`;
+  if (!this.orderNumber || this.orderNumber.trim() === '') {
+    try {
+      const count = await mongoose.models.Order?.countDocuments() || 0;
+      this.orderNumber = `ORD-${Date.now()}-${count + 1}`;
+    } catch (error) {
+      // Fallback if count fails
+      this.orderNumber = `ORD-${Date.now()}-${Math.floor(Math.random() * 10000)}`;
+    }
   }
   next();
 });

@@ -25,6 +25,8 @@ import {
   FiEye,
   FiInstagram,
   FiGrid,
+  FiStar,
+  FiTruck,
 } from 'react-icons/fi';
 import { useState } from 'react';
 
@@ -56,11 +58,13 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const mainMenuItems = [
     { href: '/admin', icon: FiHome, label: 'Dashboard' },
     { href: '/admin/products', icon: FiPackage, label: 'Products' },
+    { href: '/admin/products/bulk', icon: FiPackage, label: 'Bulk Operations' },
     { href: '/admin/orders', icon: FiShoppingBag, label: 'Orders' },
     { href: '/admin/users', icon: FiUsers, label: 'Users' },
     { href: '/admin/categories', icon: FiFolder, label: 'Categories' },
     { href: '/admin/inventory', icon: FiBox, label: 'Inventory' },
     { href: '/admin/coupons', icon: FiGift, label: 'Coupons' },
+    { href: '/admin/delivery', icon: FiTruck, label: 'Delivery' },
     { href: '/admin/analytics', icon: FiBarChart2, label: 'Analytics' },
     { href: '/admin/settings', icon: FiSettings, label: 'Settings' },
   ];
@@ -73,6 +77,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     { href: '/admin/instabook', icon: FiEye, label: 'InstaBook' },
     { href: '/admin/instapost', icon: FiInstagram, label: 'InstaPost' },
     { href: '/admin/gallery', icon: FiGrid, label: 'Gallery' },
+    { href: '/admin/reviews', icon: FiStar, label: 'Reviews' },
   ];
 
   const isActive = (href: string) => {

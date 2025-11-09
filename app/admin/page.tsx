@@ -11,14 +11,12 @@ import {
   FiTrendingUp,
   FiAlertTriangle,
   FiGift,
-  FiPlus,
-  FiSettings,
-  FiEdit,
   FiEye,
   FiImage,
   FiFile,
-  FiStar,
   FiInstagram,
+  FiSettings,
+  FiEdit,
 } from 'react-icons/fi';
 import Link from 'next/link';
 
@@ -96,14 +94,10 @@ export default function AdminDashboard() {
     { label: 'Shop Now', icon: FiShoppingBag, href: '/admin/products', color: 'bg-green-50 text-green-700 hover:bg-green-100' },
     { label: 'Add Blog', icon: FiFile, href: '/admin/blog/new', color: 'bg-pink-50 text-pink-700 hover:bg-pink-100' },
     { label: 'Categories', icon: FiFolder, href: '/admin/categories', color: 'bg-orange-50 text-orange-700 hover:bg-orange-100' },
-    { label: 'Reviews', icon: FiStar, href: '/admin/reviews', color: 'bg-yellow-50 text-yellow-700 hover:bg-yellow-100' },
     { label: 'InstaBook', icon: FiEye, href: '/admin/instabook', color: 'bg-indigo-50 text-indigo-700 hover:bg-indigo-100' },
     { label: 'InstaPost', icon: FiInstagram, href: '/admin/instapost', color: 'bg-pink-50 text-pink-700 hover:bg-pink-100' },
-    { label: "What's Trending", icon: FiTrendingUp, href: '/admin/featured', color: 'bg-red-50 text-red-700 hover:bg-red-100' },
     { label: 'Add Coupon', icon: FiGift, href: '/admin/coupons/new', color: 'bg-teal-50 text-teal-700 hover:bg-teal-100' },
-    { label: 'Bulk Ops', icon: FiPackage, href: '/admin/products', color: 'bg-gray-50 text-gray-700 hover:bg-gray-100' },
     { label: 'User Roles', icon: FiUsers, href: '/admin/users', color: 'bg-cyan-50 text-cyan-700 hover:bg-cyan-100' },
-    { label: 'SEO & Settings', icon: FiSettings, href: '/admin/settings', color: 'bg-slate-50 text-slate-700 hover:bg-slate-100' },
   ];
 
   const contentCards = [

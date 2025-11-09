@@ -38,6 +38,8 @@ export default function ProfilePage() {
   });
   const [saveLoading, setSaveLoading] = useState(false);
   const [saveMessage, setSaveMessage] = useState('');
+  const [ordersCount, setOrdersCount] = useState(0);
+  const [pendingOrdersCount, setPendingOrdersCount] = useState(0);
 
   // Redirect if not authenticated
   useEffect(() => {
@@ -60,6 +62,44 @@ export default function ProfilePage() {
       });
     }
   }, [user]);
+
+  // Fetch orders count
+  useEffect(() => {
+    if (user) {
+      fetchOrdersCount();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user]);
+
+  const fetchOrdersCount = async () => {
+    try {
+      const userId = user?.id || user?.userId;
+      const userEmail = user?.email;
+
+      // Try to fetch by userId first, then by email
+      let url = '/api/orders';
+      if (userId) {
+        url += `?userId=${userId}`;
+      } else if (userEmail) {
+        url += `?email=${encodeURIComponent(userEmail)}`;
+      } else {
+        return;
+      }
+
+      const response = await fetch(url);
+      const data = await response.json();
+
+      if (data.success && data.data) {
+        const orders = data.data || [];
+        setOrdersCount(orders.length);
+        setPendingOrdersCount(orders.filter((o: any) => 
+          ['pending', 'processing', 'shipped'].includes(o.status?.toLowerCase())
+        ).length);
+      }
+    } catch (error) {
+      console.error('Error fetching orders count:', error);
+    }
+  };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -369,7 +409,7 @@ export default function ProfilePage() {
             <div className="grid md:grid-cols-3 gap-6 mt-8">
               <div className="bg-white rounded-lg shadow-md p-6 text-center">
                 <FiShoppingBag className="w-8 h-8 text-primary-red mx-auto mb-3" />
-                <p className="text-2xl font-bold font-serif">0</p>
+                <p className="text-2xl font-bold font-serif">{ordersCount}</p>
                 <p className="text-gray-600 text-sm">Total Orders</p>
               </div>
               <div className="bg-white rounded-lg shadow-md p-6 text-center">
@@ -379,7 +419,7 @@ export default function ProfilePage() {
               </div>
               <div className="bg-white rounded-lg shadow-md p-6 text-center">
                 <FiPackage className="w-8 h-8 text-primary-red mx-auto mb-3" />
-                <p className="text-2xl font-bold font-serif">0</p>
+                <p className="text-2xl font-bold font-serif">{pendingOrdersCount}</p>
                 <p className="text-gray-600 text-sm">Pending Orders</p>
               </div>
             </div>

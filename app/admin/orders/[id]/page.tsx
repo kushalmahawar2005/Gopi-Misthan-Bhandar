@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Image from 'next/image';
+import { FiDownload } from 'react-icons/fi';
 
 interface Order {
   _id: string;
@@ -114,7 +115,17 @@ export default function OrderDetails() {
 
         <div className="space-y-6">
           <div className="bg-white p-6 rounded-lg shadow">
-            <h2 className="text-xl font-bold mb-4">Order Information</h2>
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-xl font-bold">Order Information</h2>
+              <a
+                href={`/api/orders/${order.orderNumber}/invoice`}
+                download
+                className="flex items-center gap-2 px-4 py-2 bg-primary-red text-white rounded-lg hover:bg-primary-darkRed transition-colors text-sm font-medium"
+              >
+                <FiDownload size={16} />
+                Download Invoice
+              </a>
+            </div>
             <div className="space-y-2">
               <p><span className="font-medium">Order Number:</span> {order.orderNumber}</p>
               <p><span className="font-medium">Status:</span> 

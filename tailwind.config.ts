@@ -26,6 +26,7 @@ const config: Config = {
         sans: ['Inter', 'sans-serif'],
         inder: ['Inder', 'sans-serif'],
         roboto: ['Roboto Slab', 'serif'],
+        jost: ['Jost', 'sans-serif'],
       },
     },
   },

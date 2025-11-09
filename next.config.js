@@ -1,14 +1,12 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  reactStrictMode: true,
   images: {
+    domains: ['res.cloudinary.com', 'via.placeholder.com', 'picsum.photos'],
     remotePatterns: [
       {
         protocol: 'https',
-        hostname: 'www.figma.com',
-      },
-      {
-        protocol: 'https',
-        hostname: '**.figma.com',
+        hostname: 'res.cloudinary.com',
       },
       {
         protocol: 'https',
@@ -18,17 +16,10 @@ const nextConfig = {
         protocol: 'https',
         hostname: 'picsum.photos',
       },
-      {
-        protocol: 'https',
-        hostname: 'fastly.picsum.photos',
-      },
     ],
-    // Increase minimum cache time to reduce frequent fetches
-    minimumCacheTTL: 60,
-    // Disable image optimization to prevent timeout errors with external images
-    // Remove this line when you have your own images hosted locally
-    unoptimized: true,
   },
+  // PWA configuration
+  // Note: For full PWA support, you may want to use next-pwa package
 }
 
 module.exports = nextConfig

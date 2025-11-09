@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { FiTrendingUp, FiDollarSign, FiShoppingBag, FiUsers, FiPackage, FiCalendar } from 'react-icons/fi';
+import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 
 export default function AnalyticsPage() {
   const [stats, setStats] = useState({
@@ -15,6 +16,11 @@ export default function AnalyticsPage() {
     thisMonthRevenue: 0,
     thisMonthOrders: 0,
   });
+  const [revenueData, setRevenueData] = useState<any[]>([]);
+  const [orderData, setOrderData] = useState<any[]>([]);
+  const [categoryData, setCategoryData] = useState<any[]>([]);
+  const [paymentMethodData, setPaymentMethodData] = useState<any[]>([]);
+  const [topProducts, setTopProducts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [timeRange, setTimeRange] = useState('30'); // days
 
@@ -48,6 +54,78 @@ export default function AnalyticsPage() {
       const thisMonthOrders = orders.filter((order: any) => new Date(order.createdAt) >= thisMonth);
       const thisMonthRevenue = thisMonthOrders.reduce((sum: number, order: any) => sum + order.total, 0);
 
+      // Prepare chart data
+      const days = parseInt(timeRange);
+      const chartData: { [key: string]: { date: string; revenue: number; orders: number } } = {};
+      
+      // Initialize all days
+      for (let i = days - 1; i >= 0; i--) {
+        const date = new Date();
+        date.setDate(date.getDate() - i);
+        const dateStr = date.toISOString().split('T')[0];
+        chartData[dateStr] = { date: date.toLocaleDateString('en-IN', { month: 'short', day: 'numeric' }), revenue: 0, orders: 0 };
+      }
+
+      // Fill in actual data
+      orders.forEach((order: any) => {
+        const orderDate = new Date(order.createdAt).toISOString().split('T')[0];
+        if (chartData[orderDate]) {
+          chartData[orderDate].revenue += order.total;
+          chartData[orderDate].orders += 1;
+        }
+      });
+
+      const revenueChartData = Object.values(chartData);
+      const orderChartData = Object.values(chartData);
+
+      // Category-wise revenue
+      const categoryRevenue: { [key: string]: number } = {};
+      orders.forEach((order: any) => {
+        order.items?.forEach((item: any) => {
+          const category = item.category || 'unknown';
+          categoryRevenue[category] = (categoryRevenue[category] || 0) + (item.price * item.quantity);
+        });
+      });
+      const categoryChartData = Object.entries(categoryRevenue).map(([name, value]) => ({
+        name: name.charAt(0).toUpperCase() + name.slice(1),
+        value: Math.round(value),
+      }));
+
+      // Payment method distribution
+      const paymentMethods: { [key: string]: number } = {};
+      orders.forEach((order: any) => {
+        const method = order.paymentMethod || 'cod';
+        paymentMethods[method] = (paymentMethods[method] || 0) + 1;
+      });
+      const paymentChartData = Object.entries(paymentMethods).map(([name, value]) => ({
+        name: name.toUpperCase(),
+        value,
+      }));
+
+      // Top selling products
+      const productSales: { [key: string]: { name: string; quantity: number; revenue: number } } = {};
+      orders.forEach((order: any) => {
+        order.items?.forEach((item: any) => {
+          if (!productSales[item.productId]) {
+            productSales[item.productId] = {
+              name: item.name,
+              quantity: 0,
+              revenue: 0,
+            };
+          }
+          productSales[item.productId].quantity += item.quantity;
+          productSales[item.productId].revenue += item.price * item.quantity;
+        });
+      });
+      const topProductsData = Object.values(productSales)
+        .sort((a, b) => b.quantity - a.quantity)
+        .slice(0, 10);
+
+      setRevenueData(revenueChartData);
+      setOrderData(orderChartData);
+      setCategoryData(categoryChartData);
+      setPaymentMethodData(paymentChartData);
+      setTopProducts(topProductsData);
       setStats({
         totalRevenue,
         totalOrders: orders.length,
@@ -175,21 +253,120 @@ export default function AnalyticsPage() {
         })}
       </div>
 
-      {/* Charts Placeholder */}
+      {/* Charts */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div className="bg-white rounded-lg border border-gray-200 p-6">
           <h3 className="text-lg font-bold text-primary-brown font-serif mb-4">Revenue Trend</h3>
-          <div className="h-64 flex items-center justify-center text-gray-400">
-            <p>Chart will be implemented here</p>
-          </div>
+          <ResponsiveContainer width="100%" height={300}>
+            <LineChart data={revenueData}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="date" />
+              <YAxis />
+              <Tooltip 
+                formatter={(value: any) => `₹${value.toLocaleString()}`}
+                contentStyle={{ backgroundColor: '#fff', border: '1px solid #e5e7eb', borderRadius: '8px' }}
+              />
+              <Legend />
+              <Line 
+                type="monotone" 
+                dataKey="revenue" 
+                stroke="#ba0606" 
+                strokeWidth={2}
+                name="Revenue"
+                dot={{ fill: '#ba0606', r: 4 }}
+              />
+            </LineChart>
+          </ResponsiveContainer>
         </div>
         <div className="bg-white rounded-lg border border-gray-200 p-6">
           <h3 className="text-lg font-bold text-primary-brown font-serif mb-4">Order Trends</h3>
-          <div className="h-64 flex items-center justify-center text-gray-400">
-            <p>Chart will be implemented here</p>
-          </div>
+          <ResponsiveContainer width="100%" height={300}>
+            <BarChart data={orderData}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="date" />
+              <YAxis />
+              <Tooltip 
+                contentStyle={{ backgroundColor: '#fff', border: '1px solid #e5e7eb', borderRadius: '8px' }}
+              />
+              <Legend />
+              <Bar dataKey="orders" fill="#ba0606" name="Orders" radius={[8, 8, 0, 0]} />
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+        <div className="bg-white rounded-lg border border-gray-200 p-6">
+          <h3 className="text-lg font-bold text-primary-brown font-serif mb-4">Revenue by Category</h3>
+          <ResponsiveContainer width="100%" height={300}>
+            <PieChart>
+              <Pie
+                data={categoryData}
+                cx="50%"
+                cy="50%"
+                labelLine={false}
+                label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                outerRadius={80}
+                fill="#8884d8"
+                dataKey="value"
+              >
+                {categoryData.map((entry, index) => {
+                  const colors = ['#ba0606', '#ff6b6b', '#4ecdc4', '#45b7d1', '#f9ca24', '#6c5ce7'];
+                  return <Cell key={`cell-${index}`} fill={colors[index % colors.length]} />;
+                })}
+              </Pie>
+              <Tooltip formatter={(value: any) => `₹${value.toLocaleString()}`} />
+            </PieChart>
+          </ResponsiveContainer>
+        </div>
+        <div className="bg-white rounded-lg border border-gray-200 p-6">
+          <h3 className="text-lg font-bold text-primary-brown font-serif mb-4">Payment Methods</h3>
+          <ResponsiveContainer width="100%" height={300}>
+            <PieChart>
+              <Pie
+                data={paymentMethodData}
+                cx="50%"
+                cy="50%"
+                labelLine={false}
+                label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                outerRadius={80}
+                fill="#8884d8"
+                dataKey="value"
+              >
+                {paymentMethodData.map((entry, index) => {
+                  const colors = ['#ba0606', '#4ecdc4', '#f9ca24'];
+                  return <Cell key={`cell-${index}`} fill={colors[index % colors.length]} />;
+                })}
+              </Pie>
+              <Tooltip />
+            </PieChart>
+          </ResponsiveContainer>
         </div>
       </div>
+
+      {/* Top Products */}
+      {topProducts.length > 0 && (
+        <div className="bg-white rounded-lg border border-gray-200 p-6">
+          <h3 className="text-lg font-bold text-primary-brown font-serif mb-4">Top Selling Products</h3>
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead className="bg-gray-50">
+                <tr>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Product</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Quantity Sold</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Revenue</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-200">
+                {topProducts.map((product, index) => (
+                  <tr key={index} className="hover:bg-gray-50">
+                    <td className="px-4 py-3 text-sm font-medium text-primary-brown">{product.name}</td>
+                    <td className="px-4 py-3 text-sm text-gray-600">{product.quantity}</td>
+                    <td className="px-4 py-3 text-sm font-semibold text-primary-red">₹{product.revenue.toLocaleString()}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
