@@ -165,7 +165,7 @@ export default function BulkImportPage() {
           results.errors.push(`Row ${i + 2}: ${error.message || 'Error processing row'}`);
         }
       }
-
+     
       setUploadingImages(false);
       setImportResults(results);
       setMessage({

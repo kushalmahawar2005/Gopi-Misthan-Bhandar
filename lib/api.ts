@@ -3,7 +3,7 @@ import { Product, Category, InstagramPost } from '@/types';
 // Transform MongoDB document to frontend format
 const transformProduct = (product: any): Product => {
   return {
-    id: product._id?.toString() || product.id,
+    id: product._id ? String(product._id) : product.id,
     name: product.name,
     description: product.description,
     price: product.price,
@@ -20,7 +20,7 @@ const transformProduct = (product: any): Product => {
 
 const transformCategory = (category: any): Category => {
   return {
-    id: category._id?.toString() || category.id,
+    id: category._id ? String(category._id) : category.id,
     name: category.name,
     slug: category.slug,
     image: category.image,
@@ -29,7 +29,7 @@ const transformCategory = (category: any): Category => {
 
 const transformInstaBook = (item: any): InstagramPost => {
   return {
-    id: item._id?.toString() || item.id,
+    id: item._id ? String(item._id) : item.id,
     image: item.videoUrl || item.image || '', // Support old 'image' field for migration
     label: item.label,
     isVideo: true, // InstaBook is always video now
@@ -170,7 +170,7 @@ export const fetchHeroSlides = async (): Promise<HeroSlide[]> => {
     
     if (data.success && data.data) {
       return data.data.map((slide: any) => ({
-        id: slide._id?.toString() || slide.id,
+        id: slide._id ? String(slide._id) : slide.id,
         title: slide.title,
         image: slide.image,
         order: slide.order || 0,

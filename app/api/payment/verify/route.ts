@@ -67,7 +67,7 @@ export async function POST(request: NextRequest) {
           phone: order.shipping.phone,
         },
         paymentMethod: order.paymentMethod,
-        createdAt: order.createdAt,
+        createdAt: order.createdAt instanceof Date ? order.createdAt.toISOString() : String(order.createdAt),
       }).catch((error) => {
         console.error('Error sending order confirmation email:', error);
         // Don't fail payment verification if email fails

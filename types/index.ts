@@ -16,6 +16,7 @@ export interface Product {
   defaultWeight?: string; // Default weight display
   shelfLife?: string;
   deliveryTime?: string;
+  stock?: number; // Stock quantity
 }
 
 export interface Category {

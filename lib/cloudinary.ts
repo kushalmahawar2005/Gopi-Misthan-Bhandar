@@ -6,5 +6,9 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
+export async function uploadToCloudinary(file: File | Blob) {
+  // your existing logic here
+}
+
 export default cloudinary;
 

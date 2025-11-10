@@ -91,13 +91,13 @@ export async function GET(
     doc.text(`₹${tax.toLocaleString()}`, 170, finalY + 22, { align: 'right' });
     
     doc.setFontSize(12);
-    doc.setFont(undefined, 'bold');
+    doc.setFont('helvetica', 'bold');
     doc.text('Total:', 140, finalY + 30);
     doc.text(`₹${order.total.toLocaleString()}`, 170, finalY + 30, { align: 'right' });
 
     // Footer
     doc.setFontSize(8);
-    doc.setFont(undefined, 'normal');
+    doc.setFont('helvetica', 'normal');
     doc.setTextColor(100, 100, 100);
     doc.text('Thank you for your order!', 14, 280);
     doc.text('For queries, contact: info@gopimisthanbhandar.com', 14, 285);

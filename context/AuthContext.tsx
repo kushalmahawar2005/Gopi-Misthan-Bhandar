@@ -50,7 +50,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 userId: payload.userId,
                 email: payload.email,
                 name: payload.name || '',
-                role: payload.role || 'user',
+                role: (payload.role === 'admin' || payload.role === 'user') ? payload.role : 'user',
               });
             }
           })
@@ -61,7 +61,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
               userId: payload.userId,
               email: payload.email,
               name: payload.name || '',
-              role: payload.role || 'user',
+              role: (payload.role === 'admin' || payload.role === 'user') ? payload.role : 'user',
             });
           });
       } else {

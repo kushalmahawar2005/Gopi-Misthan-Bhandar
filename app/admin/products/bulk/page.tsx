@@ -79,7 +79,7 @@ export default function BulkProductsPage() {
 
       const csvContent = [
         csvHeaders.join(','),
-        ...csvRows.map(row => row.join(',')),
+        ...csvRows.map((row: string[]) => row.join(',')),
       ].join('\n');
 
       // Download CSV

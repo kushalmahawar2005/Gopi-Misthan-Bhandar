@@ -40,6 +40,9 @@ export interface CreateOrderParams {
 export const createRazorpayOrder = async (params: CreateOrderParams) => {
   try {
     const razorpay = getRazorpayInstance();
+    if (!razorpay) {
+      return { success: false, error: 'Razorpay instance not initialized' };
+    }
     
     const options = {
       amount: params.amount, // Amount in paise
@@ -59,6 +62,9 @@ export const createRazorpayOrder = async (params: CreateOrderParams) => {
 export const verifyPayment = async (orderId: string, paymentId: string, signature: string) => {
   try {
     const razorpay = getRazorpayInstance();
+    if (!razorpay) {
+      return { success: false, error: 'Razorpay instance not initialized' };
+    }
     const crypto = require('crypto');
     
     const generatedSignature = crypto

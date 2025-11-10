@@ -231,7 +231,7 @@ export default function CheckoutPage() {
         price: item.price,
         quantity: item.quantity,
         image: item.image,
-        weight: item.selectedWeight || item.defaultWeight,
+        weight: item.defaultWeight || (item.sizes && item.sizes.length > 0 ? item.sizes[0].weight : ''),
       }));
 
       // Prepare shipping address
