@@ -22,9 +22,10 @@ const GiftBoxSection: React.FC<GiftBoxSectionProps> = ({ giftBoxes }) => {
   return (
     <section className="py-12 md:py-20 px-4 bg-white w-full">
       <div className="w-full max-w-7xl mx-auto">
-        <h2 className="text-center text-2xl md:text-3xl font-serif text-black mb-12 md:mb-16 font-medium">
+        <h2 className="text-center text-4xl  font-thin font-serif text-black mb-2 md:mb-4 font-medium">
           Gift Box
         </h2>
+        <p className="text-gray-800 text-sm  text-center lg:text-[14px] md:text-base mb-12 leading-relaxed flex-grow">Exquisitely packaged to benefit every occasion, we celebrate your pride, happiness and relationships with absolute grandeur.</p>
         
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
           {giftBoxes.map((item) => (
@@ -43,16 +44,16 @@ const GiftBoxSection: React.FC<GiftBoxSectionProps> = ({ giftBoxes }) => {
               </div>
               
               {/* Details Card - Separate */}
-              <div className="bg-white rounded-lg p-6 shadow-md hover:shadow-xl transition-shadow duration-300 flex flex-col">
-                <h3 className="text-xl md:text-2xl font-serif font-bold text-primary-brown mb-3">
+              <div className='flex flex-col gap-2'>
+                <h3 className="text-lg text-center  font-serif  font-[200] text-primary-brown ">
                   {item.title}
                 </h3>
-                <p className="text-gray-600 text-sm md:text-base mb-6 leading-relaxed flex-grow">
+                <p className="text-gray-800 text-sm  text-center lg:text-[14px] md:text-base mb-2 leading-relaxed flex-grow">
                   {item.description}
                 </p>
                 <Link
                   href={`/products?category=${item.category}`}
-                  className="inline-block w-full text-center px-6 py-3 bg-primary-red text-white rounded-lg hover:bg-primary-darkRed transition-colors font-medium font-serif"
+                  className="inline-block w-full text-center px-6 py-3 border-2 border-primary-red text-black rounded-lg hover:bg-primary-darkRed  hover:text-white transition-colors font-medium font-poppins"
                 >
                   View Collection
                 </Link>

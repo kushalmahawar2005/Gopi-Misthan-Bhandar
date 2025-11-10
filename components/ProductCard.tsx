@@ -98,9 +98,9 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, showAddToCart = true
           </div>
         </div>
         {/* Brand Name */}
-        <p className="text-black text-[10px] md:text-xs font-serif mb-1 text-center font-normal px-2">GOPI MISTHAN BHANDAR</p>
+        <p className="text-black text-[10px] md:text-xs font-serif mb-3 text-center font-normal px-2">GOPI MISTHAN BHANDAR</p>
         {/* Product Name */}
-        <p className="text-black text-xs md:text-sm font-serif mb-1 text-center font-medium line-clamp-2 min-h-[2rem] md:min-h-[2.5rem] px-2">{product.name}</p>
+        <p className="text-black text-md md:text-sm font-serif  text-center font-medium line-clamp-2 min-h-[2rem] md:min-h-[2.5rem] px-2">{product.name}</p>
         {/* Price */}
         <p className="text-primary-red font-bold text-sm md:text-base font-serif text-center px-2">₹{product.price}</p>
       </div>

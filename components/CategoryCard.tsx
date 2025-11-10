@@ -15,7 +15,7 @@ const CategoryCard: React.FC<CategoryCardProps> = ({ category }) => {
     : "/c-1.jpg";
 
   return (
-    <div className="relative h-[400px] md:h-[450px] lg:h-[500px] w-[320px] md:w-[350px] lg:w-[420px] overflow-hidden group cursor-pointer  shadow-lg hover:shadow-2xl transition-all duration-300 bg-gray-200">
+    <div className="relative h-[400px] md:h-[450px] lg:h-[500px] w-[320px] md:w-[350px] lg:w-[400px] overflow-hidden group cursor-pointer  shadow-lg hover:shadow-2xl transition-all duration-300 bg-gray-200">
       {/* Background Image with Transition */}
       <Image
         src={imageSrc}

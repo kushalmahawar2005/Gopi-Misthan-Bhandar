@@ -39,7 +39,7 @@ const Footer = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 md:gap-12 mb-8">
           {/* Company Info */}
           <div className="text-white">
-            <h3 className="text-primary-yellow text-2xl font-bold font-serif mb-4">
+            <h3 className="text-primary-yellow text-xl font-bold font-jost tracking-wide mb-4">
               GOPI MISTHAN BHANDAR
             </h3>
             <p className="text-sm font-roboto leading-relaxed text-gray-200 mb-4">
@@ -116,7 +116,7 @@ const Footer = () => {
             <h4 className="text-primary-yellow text-lg font-bold font-serif mb-4">
               Newsletter
             </h4>
-            <p className="text-sm font-roboto text-gray-200 mb-4">
+            <p className="text-sm font-jost tracking-wide text-gray-200 mb-4">
               Subscribe to get updates on new products and special offers
             </p>
             <form onSubmit={handleSubscribe} className="space-y-3">

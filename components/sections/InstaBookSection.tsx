@@ -63,7 +63,7 @@ const VideoCard: React.FC<VideoCardProps> = ({ item }) => {
     <div className="relative flex flex-col items-center group">
       {/* Video Container */}
       <div 
-        className="relative w-[240px] sm:w-[280px] md:w-[320px] lg:w-[360px] xl:w-[400px] h-[380px] sm:h-[440px] md:h-[500px] lg:h-[560px] xl:h-[620px] rounded-lg overflow-hidden cursor-pointer"
+        className="relative w-[240px] sm:w-[280px] md:w-[190px] opacity-100 lg:w-[180px] xl:w-[220px] h-[420px] sm:h-[460px] md:h-[490px] lg:h-[460px] xl:h-[420px] rounded-lg overflow-hidden cursor-pointer"
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
         onTouchStart={() => setIsHovered(true)}
