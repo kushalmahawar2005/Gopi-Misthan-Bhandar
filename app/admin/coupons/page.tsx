@@ -109,14 +109,14 @@ export default function CouponsPage() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-primary-brown font-serif">Coupons</h1>
-          <p className="text-gray-600 mt-1">Manage discount coupons and promotions</p>
+          <h1 className="text-2xl sm:text-3xl font-bold text-primary-brown font-serif">Coupons</h1>
+          <p className="text-sm sm:text-base text-gray-600 mt-1">Manage discount coupons and promotions</p>
         </div>
         <Link
           href="/admin/coupons/new"
-          className="inline-flex items-center gap-2 px-4 py-2 bg-primary-red text-white rounded-lg hover:bg-primary-darkRed transition-colors font-medium"
+          className="inline-flex items-center justify-center gap-2 px-4 py-2 bg-primary-red text-white rounded-lg hover:bg-primary-darkRed transition-colors font-medium text-sm sm:text-base w-full sm:w-auto"
         >
           <FiPlus size={18} />
           <span>Add Coupon</span>
@@ -137,19 +137,19 @@ export default function CouponsPage() {
         </div>
       </div>
 
-      {/* Coupons Table */}
-      <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+      {/* Coupons Table - Desktop */}
+      <div className="bg-white rounded-lg border border-gray-200 overflow-hidden hidden md:block">
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead className="bg-gray-50">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Code</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Description</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Discount</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Usage</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Validity</th>
-                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                <th className="px-4 lg:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Code</th>
+                <th className="px-4 lg:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Description</th>
+                <th className="px-4 lg:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Discount</th>
+                <th className="px-4 lg:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Usage</th>
+                <th className="px-4 lg:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                <th className="px-4 lg:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden lg:table-cell">Validity</th>
+                <th className="px-4 lg:px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
@@ -165,13 +165,13 @@ export default function CouponsPage() {
                   const activeNow = isActiveNow(coupon);
                   return (
                     <tr key={coupon._id} className="hover:bg-gray-50 transition-colors">
-                      <td className="px-6 py-4 whitespace-nowrap">
+                      <td className="px-4 lg:px-6 py-4 whitespace-nowrap">
                         <div className="text-sm font-medium text-primary-brown">{coupon.code}</div>
                       </td>
-                      <td className="px-6 py-4">
-                        <div className="text-sm text-gray-600">{coupon.description || '-'}</div>
+                      <td className="px-4 lg:px-6 py-4">
+                        <div className="text-sm text-gray-600 truncate max-w-xs">{coupon.description || '-'}</div>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
+                      <td className="px-4 lg:px-6 py-4 whitespace-nowrap">
                         <div className="text-sm text-gray-900">
                           {coupon.discountType === 'percentage' 
                             ? `${coupon.discountValue}%` 
@@ -181,12 +181,12 @@ export default function CouponsPage() {
                           <div className="text-xs text-gray-500">Min: ₹{coupon.minimumPurchase}</div>
                         )}
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
+                      <td className="px-4 lg:px-6 py-4 whitespace-nowrap">
                         <div className="text-sm text-gray-600">
                           {coupon.usedCount} / {coupon.usageLimit === null ? '∞' : coupon.usageLimit}
                         </div>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
+                      <td className="px-4 lg:px-6 py-4 whitespace-nowrap">
                         <button
                           onClick={() => toggleActive(coupon._id, coupon.isActive)}
                           className={`px-2 py-1 text-xs font-medium rounded-full ${
@@ -200,12 +200,10 @@ export default function CouponsPage() {
                           {activeNow ? 'Active' : expired ? 'Expired' : 'Inactive'}
                         </button>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm text-gray-600">
-                          {new Date(coupon.startDate).toLocaleDateString()} - {new Date(coupon.endDate).toLocaleDateString()}
-                        </div>
+                      <td className="px-4 lg:px-6 py-4 whitespace-nowrap text-sm text-gray-600 hidden lg:table-cell">
+                        {new Date(coupon.startDate).toLocaleDateString()} - {new Date(coupon.endDate).toLocaleDateString()}
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                      <td className="px-4 lg:px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                         <div className="flex items-center justify-end gap-2">
                           <Link
                             href={`/admin/coupons/${coupon._id}`}
@@ -229,6 +227,88 @@ export default function CouponsPage() {
           </table>
         </div>
       </div>
+
+      {/* Coupons Cards - Mobile */}
+      <div className="md:hidden space-y-4">
+        {filteredCoupons.map((coupon) => {
+          const expired = isExpired(coupon.endDate);
+          const activeNow = isActiveNow(coupon);
+          return (
+            <div key={coupon._id} className="bg-white rounded-lg border border-gray-200 p-4">
+              <div className="flex items-start justify-between mb-3">
+                <div className="flex-1 min-w-0">
+                  <h3 className="text-sm font-medium text-primary-brown">{coupon.code}</h3>
+                  <p className="text-xs text-gray-500 mt-1">{coupon.description || 'No description'}</p>
+                </div>
+                <div className="flex items-center gap-2 flex-shrink-0">
+                  <Link
+                    href={`/admin/coupons/${coupon._id}`}
+                    className="p-2 text-primary-red hover:bg-red-50 rounded transition-colors"
+                    title="Edit"
+                  >
+                    <FiEdit size={16} />
+                  </Link>
+                  <button
+                    onClick={() => handleDelete(coupon._id)}
+                    className="p-2 text-red-600 hover:bg-red-50 rounded transition-colors"
+                    title="Delete"
+                  >
+                    <FiTrash2 size={16} />
+                  </button>
+                </div>
+              </div>
+              <div className="space-y-2 pt-3 border-t border-gray-200">
+                <div className="flex items-center justify-between text-sm">
+                  <span className="text-gray-600">Discount:</span>
+                  <span className="font-medium text-primary-brown">
+                    {coupon.discountType === 'percentage' 
+                      ? `${coupon.discountValue}%` 
+                      : `₹${coupon.discountValue}`}
+                  </span>
+                </div>
+                {coupon.minimumPurchase > 0 && (
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="text-gray-600">Min Purchase:</span>
+                    <span className="text-gray-700">₹{coupon.minimumPurchase}</span>
+                  </div>
+                )}
+                <div className="flex items-center justify-between text-sm">
+                  <span className="text-gray-600">Usage:</span>
+                  <span className="text-gray-700">
+                    {coupon.usedCount} / {coupon.usageLimit === null ? '∞' : coupon.usageLimit}
+                  </span>
+                </div>
+                <div className="flex items-center justify-between text-sm">
+                  <span className="text-gray-600">Validity:</span>
+                  <span className="text-xs text-gray-700 text-right">
+                    {new Date(coupon.startDate).toLocaleDateString()} - {new Date(coupon.endDate).toLocaleDateString()}
+                  </span>
+                </div>
+                <div className="pt-2">
+                  <button
+                    onClick={() => toggleActive(coupon._id, coupon.isActive)}
+                    className={`w-full px-3 py-2 text-xs font-medium rounded-lg ${
+                      activeNow
+                        ? 'bg-green-100 text-green-800'
+                        : expired
+                        ? 'bg-gray-100 text-gray-800'
+                        : 'bg-red-100 text-red-800'
+                    }`}
+                  >
+                    {activeNow ? 'Active' : expired ? 'Expired' : 'Inactive'}
+                  </button>
+                </div>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+
+      {filteredCoupons.length === 0 && (
+        <div className="text-center py-12">
+          <p className="text-gray-500">No coupons found</p>
+        </div>
+      )}
     </div>
   );
 }

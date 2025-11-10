@@ -31,21 +31,18 @@ const HeroSection = () => {
     {
       id: '1',
       image: '/1.jpg',
-      title: 'Gopi Misthan Bhandar',
       order: 0,
       isActive: true,
     },
     {
       id: '2',
       image: '/banner-2.png',
-      title: 'Classic Sweets Collection',
       order: 1,
       isActive: true,
     },
     {
       id: '3',
       image: '/banner-3.png',
-      title: 'Premium Sweets Collection',
       order: 2,
       isActive: true,
     },
@@ -106,25 +103,24 @@ const HeroSection = () => {
               index === currentSlide ? 'opacity-100 z-10' : 'opacity-0 z-0'
             }`}
           >
+            {/* Desktop Image */}
             <Image
               src={slide.image}
-              alt={slide.title || `Hero slide ${index + 1}`}
+              alt={`Hero slide ${index + 1}`}
               fill
-              className="object-cover object-center"
+              className="object-cover object-center hidden md:block"
               priority={index === 0}
               sizes="100vw"
             />
-            
-            {/* Overlay Content (if title exists) */}
-            {slide.title && (
-              <div className="absolute inset-0 bg-black/30 flex items-center justify-center z-10">
-                <div className="text-center text-white px-4 max-w-4xl">
-                  <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold font-serif">
-                    {slide.title}
-                  </h1>
-                </div>
-              </div>
-            )}
+            {/* Mobile Image */}
+            <Image
+              src={slide.mobileImage || slide.image}
+              alt={`Hero slide ${index + 1}`}
+              fill
+              className="object-cover object-center md:hidden"
+              priority={index === 0}
+              sizes="100vw"
+            />
           </div>
         ))}
       </div>

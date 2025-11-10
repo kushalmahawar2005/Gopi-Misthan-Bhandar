@@ -20,7 +20,7 @@ const InstaBookSection: React.FC<InstaBookSectionProps> = ({ instaBooks }) => {
           {instaBooks.map((item) => (
             <div key={item.id} className="relative flex flex-col items-center group">
               {/* Video Container */}
-              <div className="relative w-[160px] md:w-[180px] lg:w-[230px] h-[280px] md:h-[320px] lg:h-[375px] rounded-lg overflow-hidden">
+              <div className="relative w-[200px] md:w-[230px] lg:w-[280px] h-[320px] md:h-[320px] lg:h-[405px] rounded-lg overflow-hidden">
                 {item.isInstagramReel ? (
                   // Instagram Reel - Link to Instagram
                   <Link

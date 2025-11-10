@@ -141,17 +141,17 @@ export default function AdminDashboard() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-primary-brown font-serif">Admin Dashboard</h1>
-          <p className="text-gray-600 mt-1">Monitor your store's performance</p>
+          <h1 className="text-2xl sm:text-3xl font-bold text-primary-brown font-serif">Admin Dashboard</h1>
+          <p className="text-sm sm:text-base text-gray-600 mt-1">Monitor your store's performance</p>
         </div>
         <Link
           href="/admin/settings"
-          className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
+          className="flex items-center justify-center gap-2 px-4 py-2 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors text-sm font-medium w-full sm:w-auto"
         >
           <FiSettings size={18} />
-          <span className="text-sm font-medium">Settings</span>
+          <span>Settings</span>
         </Link>
       </div>
 
@@ -176,8 +176,8 @@ export default function AdminDashboard() {
 
       {/* Quick Actions */}
       <div>
-        <h2 className="text-xl font-bold text-primary-brown font-serif mb-4">+ Quick Actions</h2>
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+        <h2 className="text-lg sm:text-xl font-bold text-primary-brown font-serif mb-4">+ Quick Actions</h2>
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3">
           {quickActions.map((action, index) => {
             const Icon = action.icon;
             return (
@@ -225,8 +225,8 @@ export default function AdminDashboard() {
 
       {/* Content Management Cards */}
       <div>
-        <h2 className="text-xl font-bold text-primary-brown font-serif mb-4">Content Management</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <h2 className="text-lg sm:text-xl font-bold text-primary-brown font-serif mb-4">Content Management</h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {contentCards.map((card, index) => {
             const Icon = card.icon;
             return (

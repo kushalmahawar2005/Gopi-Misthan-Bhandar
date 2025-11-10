@@ -185,7 +185,7 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
                 Click to upload or drag and drop
               </p>
               <p className="text-xs text-gray-500">
-                PNG, JPG, GIF, MP4, WEBM up to 10MB
+                PNG, JPG, GIF, MP4, WEBM up to 100MB (videos), 10MB (images)
               </p>
             </div>
           )}

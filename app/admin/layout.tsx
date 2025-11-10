@@ -90,25 +90,32 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Top Header Bar */}
-      <header className="bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between shadow-sm">
-        <div className="flex items-center gap-4">
+      <header className="bg-white border-b border-gray-200 px-4 md:px-6 py-3 md:py-4 flex items-center justify-between shadow-sm">
+        <div className="flex items-center gap-2 md:gap-4">
+          <button
+            onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+            className="md:hidden p-2 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
+          >
+            <FiMenu size={20} />
+          </button>
           <Link
             href="/"
-            className="flex items-center gap-2 text-gray-700 hover:text-primary-red transition-colors text-sm font-medium"
+            className="flex items-center gap-1 md:gap-2 text-gray-700 hover:text-primary-red transition-colors text-xs md:text-sm font-medium"
           >
-            <FiArrowLeft size={18} />
-            <span>Back to Store</span>
+            <FiArrowLeft size={16} className="md:w-[18px] md:h-[18px]" />
+            <span className="hidden sm:inline">Back to Store</span>
+            <span className="sm:hidden">Back</span>
           </Link>
-          <div className="hidden md:block text-2xl font-bold text-primary-brown font-serif">Admin Panel</div>
+          <div className="text-lg md:text-2xl font-bold text-primary-brown font-serif">Admin Panel</div>
         </div>
-        <div className="flex items-center gap-4">
-          <span className="text-sm text-gray-600 hidden md:block">Welcome, {user.name}</span>
+        <div className="flex items-center gap-2 md:gap-4">
+          <span className="text-xs md:text-sm text-gray-600 hidden lg:block">Welcome, {user.name}</span>
           <button
             onClick={handleLogout}
-            className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 hover:text-primary-red transition-colors"
+            className="flex items-center gap-1 md:gap-2 px-2 md:px-4 py-1.5 md:py-2 text-xs md:text-sm font-medium text-gray-700 hover:text-primary-red transition-colors"
           >
-            <span>Logout</span>
-            <FiArrowRight size={16} />
+            <span className="hidden sm:inline">Logout</span>
+            <FiArrowRight size={14} className="md:w-4 md:h-4" />
           </button>
         </div>
       </header>
@@ -188,14 +195,14 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         </aside>
 
         {/* Main Content */}
-        <main className="flex-1 min-h-[calc(100vh-73px)] p-6 md:p-8 bg-gray-50">
+        <main className="flex-1 min-h-[calc(100vh-73px)] p-4 sm:p-6 md:p-8 bg-gray-50">
           {isSidebarOpen && (
             <div
               className="fixed inset-0 bg-black bg-opacity-50 z-40 md:hidden"
               onClick={() => setIsSidebarOpen(false)}
             />
           )}
-          <div className="max-w-7xl mx-auto">{children}</div>
+          <div className="max-w-7xl mx-auto w-full">{children}</div>
         </main>
       </div>
     </div>

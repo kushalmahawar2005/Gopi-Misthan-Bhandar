@@ -33,7 +33,7 @@ export async function GET(request: NextRequest) {
 
     // Optimize query - select only needed fields and add limit early
     let productsQuery = Product.find(query)
-      .select('name description price image category featured sizes defaultWeight shelfLife deliveryTime stock')
+      .select('name description price image category featured isPremium isClassic sizes defaultWeight shelfLife deliveryTime stock')
       .sort({ createdAt: -1 });
 
     if (limit) {

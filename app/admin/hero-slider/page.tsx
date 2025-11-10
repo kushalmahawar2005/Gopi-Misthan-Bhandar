@@ -7,8 +7,8 @@ import Image from 'next/image';
 
 interface HeroSlide {
   _id: string;
-  title?: string;
   image: string;
+  mobileImage?: string;
   order: number;
   isActive: boolean;
 }
@@ -127,7 +127,7 @@ export default function AdminHeroSlider() {
               <div className="relative h-48 w-full bg-gray-100">
                 <Image
                   src={slide.image}
-                  alt={slide.title || 'Hero slide'}
+                  alt="Hero slide"
                   fill
                   className="object-cover"
                   sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
@@ -142,13 +142,11 @@ export default function AdminHeroSlider() {
               {/* Slide Info */}
               <div className="p-4">
                 <div className="mb-2">
-                  {slide.title && (
-                    <h3 className="text-lg font-semibold text-primary-brown font-serif mb-1">
-                      {slide.title}
-                    </h3>
+                  <p className="text-xs text-gray-500 mb-1">Order: {slide.order}</p>
+                  {slide.mobileImage && (
+                    <p className="text-xs text-green-600">✓ Mobile image set</p>
                   )}
                 </div>
-                <p className="text-xs text-gray-400">Order: {slide.order}</p>
               </div>
 
               {/* Actions */}

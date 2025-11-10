@@ -15,6 +15,8 @@ export default function NewProduct() {
     image: '',
     category: 'sweets',
     featured: false,
+    isPremium: false,
+    isClassic: false,
     stock: '',
     shelfLife: '',
     deliveryTime: '',
@@ -83,23 +85,23 @@ export default function NewProduct() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex justify-between items-center">
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-primary-brown font-serif">Add New Product</h1>
-          <p className="text-gray-600 mt-1">Create a new product for your catalog</p>
+          <h1 className="text-2xl sm:text-3xl font-bold text-primary-brown font-serif">Add New Product</h1>
+          <p className="text-sm sm:text-base text-gray-600 mt-1">Create a new product for your catalog</p>
         </div>
         <button
           onClick={() => router.back()}
-          className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors text-gray-700 font-medium"
+          className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors text-gray-700 font-medium self-start sm:self-auto"
         >
           <FiX size={20} />
         </button>
       </div>
 
       {/* Form */}
-      <div className="bg-white rounded-lg border border-gray-200 p-6">
+      <div className="bg-white rounded-lg border border-gray-200 p-4 sm:p-6">
         <form onSubmit={handleSubmit} className="space-y-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">Product Name *</label>
             <input
@@ -206,7 +208,7 @@ export default function NewProduct() {
           />
         </div>
 
-        <div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <label className="flex items-center gap-2">
             <input
               type="checkbox"
@@ -215,6 +217,24 @@ export default function NewProduct() {
               className="w-4 h-4"
             />
             <span className="text-sm font-medium text-gray-700">Featured Product</span>
+          </label>
+          <label className="flex items-center gap-2">
+            <input
+              type="checkbox"
+              checked={formData.isPremium}
+              onChange={(e) => setFormData({ ...formData, isPremium: e.target.checked })}
+              className="w-4 h-4"
+            />
+            <span className="text-sm font-medium text-gray-700">Premium Sweets</span>
+          </label>
+          <label className="flex items-center gap-2">
+            <input
+              type="checkbox"
+              checked={formData.isClassic}
+              onChange={(e) => setFormData({ ...formData, isClassic: e.target.checked })}
+              className="w-4 h-4"
+            />
+            <span className="text-sm font-medium text-gray-700">Classic Sweets</span>
           </label>
         </div>
 
@@ -230,7 +250,7 @@ export default function NewProduct() {
             </button>
           </div>
           {formData.sizes.map((size, index) => (
-            <div key={index} className="grid grid-cols-4 gap-4 mb-4">
+            <div key={index} className="grid grid-cols-1 sm:grid-cols-4 gap-4 mb-4">
               <input
                 type="text"
                 placeholder="Weight (e.g., 500g)"
@@ -264,11 +284,11 @@ export default function NewProduct() {
           ))}
         </div>
 
-          <div className="flex gap-4 pt-4 border-t">
+          <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 pt-4 border-t">
             <button
               type="submit"
               disabled={loading}
-              className="bg-primary-red text-white px-6 py-2.5 rounded-lg flex items-center gap-2 hover:bg-primary-darkRed transition-colors disabled:opacity-50 font-medium"
+              className="bg-primary-red text-white px-6 py-2.5 rounded-lg flex items-center justify-center gap-2 hover:bg-primary-darkRed transition-colors disabled:opacity-50 font-medium w-full sm:w-auto"
             >
               <FiSave size={18} />
               {loading ? 'Saving...' : 'Create Product'}
@@ -276,7 +296,7 @@ export default function NewProduct() {
             <button
               type="button"
               onClick={() => router.back()}
-              className="px-6 py-2.5 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors text-gray-700 font-medium"
+              className="px-6 py-2.5 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors text-gray-700 font-medium w-full sm:w-auto"
             >
               Cancel
             </button>

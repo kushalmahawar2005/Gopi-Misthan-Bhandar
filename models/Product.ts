@@ -13,6 +13,8 @@ export interface IProduct extends Document {
   image: string;
   category: 'sweets' | 'classic-sweets' | 'premium-sweets' | 'snacks' | 'namkeen' | 'dry-fruit' | 'gifting';
   featured?: boolean;
+  isPremium?: boolean;
+  isClassic?: boolean;
   sizes?: IProductSize[];
   defaultWeight?: string;
   shelfLife?: string;
@@ -40,6 +42,8 @@ const ProductSchema = new Schema<IProduct>(
       required: true,
     },
     featured: { type: Boolean, default: false },
+    isPremium: { type: Boolean, default: false },
+    isClassic: { type: Boolean, default: false },
     sizes: [ProductSizeSchema],
     defaultWeight: { type: String },
     shelfLife: { type: String },

@@ -1,8 +1,8 @@
 import mongoose, { Schema, Document, Model } from 'mongoose';
 
 export interface IHeroSlider extends Document {
-  title?: string;
   image: string;
+  mobileImage?: string;
   order: number;
   isActive: boolean;
   createdAt: Date;
@@ -11,8 +11,8 @@ export interface IHeroSlider extends Document {
 
 const HeroSliderSchema = new Schema<IHeroSlider>(
   {
-    title: { type: String },
     image: { type: String, required: true },
+    mobileImage: { type: String },
     order: { type: Number, default: 0 },
     isActive: { type: Boolean, default: true },
   },

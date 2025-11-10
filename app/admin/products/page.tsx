@@ -80,14 +80,14 @@ export default function AdminProducts() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-primary-brown font-serif">Products</h1>
-          <p className="text-gray-600 mt-1">Manage your product catalog</p>
+          <h1 className="text-2xl sm:text-3xl font-bold text-primary-brown font-serif">Products</h1>
+          <p className="text-sm sm:text-base text-gray-600 mt-1">Manage your product catalog</p>
         </div>
         <Link
           href="/admin/products/new"
-          className="inline-flex items-center gap-2 px-4 py-2 bg-primary-red text-white rounded-lg hover:bg-primary-darkRed transition-colors font-medium"
+          className="inline-flex items-center justify-center gap-2 px-4 py-2 bg-primary-red text-white rounded-lg hover:bg-primary-darkRed transition-colors font-medium text-sm sm:text-base w-full sm:w-auto"
         >
           <FiPlus size={18} />
           <span>Add Product</span>
@@ -96,7 +96,7 @@ export default function AdminProducts() {
 
       {/* Search and Filters */}
       <div className="bg-white rounded-lg border border-gray-200 p-4">
-        <div className="flex flex-col md:flex-row gap-4">
+        <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
           <div className="flex-1 relative">
             <FiSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
             <input
@@ -130,8 +130,8 @@ export default function AdminProducts() {
         </div>
       </div>
 
-      {/* Products Table */}
-      <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+      {/* Products Table - Desktop */}
+      <div className="bg-white rounded-lg border border-gray-200 overflow-hidden hidden md:block">
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead className="bg-gray-50 border-b border-gray-200">
@@ -139,22 +139,22 @@ export default function AdminProducts() {
                 <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
                   <input type="checkbox" className="rounded border-gray-300" />
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                <th className="px-4 lg:px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
                   Product
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                <th className="px-4 lg:px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
                   Price
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                <th className="px-4 lg:px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
                   Stock
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                <th className="px-4 lg:px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
                   Status
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                <th className="px-4 lg:px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider hidden lg:table-cell">
                   Updated
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                <th className="px-4 lg:px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
                   Actions
                 </th>
               </tr>
@@ -162,10 +162,10 @@ export default function AdminProducts() {
             <tbody className="bg-white divide-y divide-gray-200">
               {filteredProducts.map((product) => (
                 <tr key={product._id} className="hover:bg-gray-50 transition-colors">
-                  <td className="px-6 py-4 whitespace-nowrap">
+                  <td className="px-4 lg:px-6 py-4 whitespace-nowrap">
                     <input type="checkbox" className="rounded border-gray-300" />
                   </td>
-                  <td className="px-6 py-4">
+                  <td className="px-4 lg:px-6 py-4">
                     <div className="flex items-center gap-3">
                       <div className="relative w-12 h-12 rounded border border-gray-200 overflow-hidden bg-gray-100">
                         <Image
@@ -184,13 +184,13 @@ export default function AdminProducts() {
                       </div>
                     </div>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
+                  <td className="px-4 lg:px-6 py-4 whitespace-nowrap">
                     <div className="text-sm font-medium text-primary-brown">₹{product.price}</div>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
+                  <td className="px-4 lg:px-6 py-4 whitespace-nowrap">
                     <div className="text-sm text-primary-brown">{product.stock || 0}</div>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
+                  <td className="px-4 lg:px-6 py-4 whitespace-nowrap">
                     <span
                       className={`px-2 py-1 text-xs font-medium rounded-full ${
                         product.featured
@@ -201,10 +201,10 @@ export default function AdminProducts() {
                       {product.featured ? 'active' : 'inactive'}
                     </span>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                  <td className="px-4 lg:px-6 py-4 whitespace-nowrap text-sm text-gray-500 hidden lg:table-cell">
                     {new Date().toLocaleDateString()}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
+                  <td className="px-4 lg:px-6 py-4 whitespace-nowrap">
                     <div className="flex items-center gap-2">
                       <Link
                         href={`/admin/products/${product._id}`}
@@ -234,6 +234,62 @@ export default function AdminProducts() {
         </table>
       </div>
 
+      {/* Products Cards - Mobile */}
+      <div className="md:hidden space-y-4">
+        {filteredProducts.map((product) => (
+          <div key={product._id} className="bg-white rounded-lg border border-gray-200 p-4">
+            <div className="flex items-start gap-3 mb-3">
+              <div className="relative w-16 h-16 rounded border border-gray-200 overflow-hidden bg-gray-100 flex-shrink-0">
+                <Image
+                  src={product.image || '/1.jpg'}
+                  alt={product.name}
+                  fill
+                  className="object-cover"
+                  sizes="64px"
+                />
+              </div>
+              <div className="flex-1 min-w-0">
+                <h3 className="text-sm font-medium text-primary-brown truncate">{product.name}</h3>
+                <p className="text-xs text-gray-500 capitalize mt-1">
+                  {product.category} {product.featured && '• Featured'}
+                </p>
+                <p className="text-sm font-bold text-primary-brown mt-1">₹{product.price}</p>
+              </div>
+            </div>
+            <div className="flex items-center justify-between pt-3 border-t border-gray-200">
+              <div className="flex flex-col gap-1">
+                <span className="text-xs text-gray-600">Stock: {product.stock || 0}</span>
+                <span
+                  className={`text-xs px-2 py-0.5 rounded-full w-fit ${
+                    product.featured
+                      ? 'bg-green-100 text-green-800'
+                      : 'bg-gray-100 text-gray-800'
+                  }`}
+                >
+                  {product.featured ? 'Active' : 'Inactive'}
+                </span>
+              </div>
+              <div className="flex items-center gap-2">
+                <Link
+                  href={`/admin/products/${product._id}`}
+                  className="p-2 text-primary-red hover:bg-red-50 rounded transition-colors"
+                  title="Edit"
+                >
+                  <FiEdit size={16} />
+                </Link>
+                <button
+                  onClick={() => handleDelete(product._id)}
+                  className="p-2 text-red-600 hover:bg-red-50 rounded transition-colors"
+                  title="Delete"
+                >
+                  <FiTrash2 size={16} />
+                </button>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+
       {filteredProducts.length === 0 && (
         <div className="text-center py-12">
           <p className="text-gray-500">No products found</p>
@@ -248,20 +304,20 @@ export default function AdminProducts() {
 
       {/* Pagination */}
       {filteredProducts.length > 0 && (
-        <div className="px-6 py-4 border-t border-gray-200 flex items-center justify-between">
-          <div className="text-sm text-gray-600">
+        <div className="px-4 md:px-6 py-4 border-t border-gray-200 flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div className="text-xs sm:text-sm text-gray-600 text-center sm:text-left">
             Showing 1 to {filteredProducts.length} of {filteredProducts.length} products
           </div>
-          <div className="flex gap-2">
+          <div className="flex gap-2 w-full sm:w-auto justify-center">
             <button
               disabled
-              className="px-4 py-2 text-sm border border-gray-300 rounded-lg text-gray-400 cursor-not-allowed"
+              className="px-3 sm:px-4 py-2 text-xs sm:text-sm border border-gray-300 rounded-lg text-gray-400 cursor-not-allowed"
             >
               Previous
             </button>
             <button
               disabled={filteredProducts.length <= 10}
-              className="px-4 py-2 text-sm border border-gray-300 rounded-lg bg-primary-red text-white hover:bg-primary-darkRed transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="px-3 sm:px-4 py-2 text-xs sm:text-sm border border-gray-300 rounded-lg bg-primary-red text-white hover:bg-primary-darkRed transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
               Next
             </button>

@@ -12,12 +12,12 @@ const DecorativeBanner: React.FC<DecorativeBannerProps> = ({
   image, 
   alt = 'Decorative banner',
   bgColor = 'brown',
-  height = 'h-16 md:h-24'
+  height = 'h-12 sm:h-16 md:h-20 lg:h-24'
 }) => {
   const bgClass = bgColor === 'red' ? 'bg-primary-red' : 'bg-primary-brown';
 
   return (
-    <div className={`w-full ${height} ${!image ? bgClass : ''} my-8 md:my-12 relative overflow-hidden`}>
+    <div className={`w-full ${height} ${!image ? bgClass : ''} my-4 sm:my-6 md:my-8 lg:my-12 relative overflow-hidden`}>
       {image && image.trim() !== '' ? (
         <Image
           src={image}

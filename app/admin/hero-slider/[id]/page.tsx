@@ -12,8 +12,8 @@ export default function EditHeroSlide() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [formData, setFormData] = useState({
-    title: '',
     image: '',
+    mobileImage: '',
     order: 0,
     isActive: true,
   });
@@ -29,8 +29,8 @@ export default function EditHeroSlide() {
       if (data.success && data.data) {
         const slide = data.data;
         setFormData({
-          title: slide.title || '',
           image: slide.image || '',
+          mobileImage: slide.mobileImage || '',
           order: slide.order || 0,
           isActive: slide.isActive !== false,
         });
@@ -107,20 +107,20 @@ export default function EditHeroSlide() {
               value={formData.image}
               onChange={(url) => setFormData({ ...formData, image: url })}
               folder="hero-slider"
-              label="Hero Slide Image"
+              label="Hero Slide Image (Full Size - Desktop) *"
               required
             />
+            <p className="text-xs text-gray-500 mt-1">Recommended size: 1920x800px or larger</p>
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Title</label>
-            <input
-              type="text"
-              value={formData.title}
-              onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-              placeholder="Main heading text"
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-red"
+            <ImageUpload
+              value={formData.mobileImage}
+              onChange={(url) => setFormData({ ...formData, mobileImage: url })}
+              folder="hero-slider"
+              label="Hero Slide Image (Mobile Size)"
             />
+            <p className="text-xs text-gray-500 mt-1">Recommended size: 768x500px. If not provided, full size image will be used on mobile.</p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

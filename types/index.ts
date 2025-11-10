@@ -12,6 +12,8 @@ export interface Product {
   image: string;
   category: 'sweets' | 'classic-sweets' | 'premium-sweets' | 'snacks' | 'namkeen' | 'dry-fruit' | 'gifting';
   featured?: boolean;
+  isPremium?: boolean;
+  isClassic?: boolean;
   sizes?: ProductSize[]; // Array of available sizes/weights
   defaultWeight?: string; // Default weight display
   shelfLife?: string;

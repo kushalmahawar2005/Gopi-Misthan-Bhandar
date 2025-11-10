@@ -117,29 +117,29 @@ export default function ReviewsPage() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-primary-brown font-serif">Product Reviews</h1>
-          <p className="text-gray-600 mt-1">Manage customer reviews and ratings</p>
+          <h1 className="text-2xl sm:text-3xl font-bold text-primary-brown font-serif">Product Reviews</h1>
+          <p className="text-sm sm:text-base text-gray-600 mt-1">Manage customer reviews and ratings</p>
         </div>
       </div>
 
       {/* Filters */}
       <div className="bg-white rounded-lg border border-gray-200 p-4">
-        <div className="flex flex-col md:flex-row gap-4">
+        <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
           <div className="flex-1">
             <input
               type="text"
               placeholder="Search reviews..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-red"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-red text-sm"
             />
           </div>
           <div className="flex gap-2">
             <button
               onClick={() => setFilter('all')}
-              className={`px-4 py-2 rounded-lg transition-colors ${
+              className={`px-3 sm:px-4 py-2 rounded-lg transition-colors text-sm ${
                 filter === 'all'
                   ? 'bg-primary-red text-white'
                   : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
@@ -149,7 +149,7 @@ export default function ReviewsPage() {
             </button>
             <button
               onClick={() => setFilter('pending')}
-              className={`px-4 py-2 rounded-lg transition-colors ${
+              className={`px-3 sm:px-4 py-2 rounded-lg transition-colors text-sm ${
                 filter === 'pending'
                   ? 'bg-primary-red text-white'
                   : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
@@ -159,7 +159,7 @@ export default function ReviewsPage() {
             </button>
             <button
               onClick={() => setFilter('approved')}
-              className={`px-4 py-2 rounded-lg transition-colors ${
+              className={`px-3 sm:px-4 py-2 rounded-lg transition-colors text-sm ${
                 filter === 'approved'
                   ? 'bg-primary-red text-white'
                   : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
@@ -180,8 +180,8 @@ export default function ReviewsPage() {
         ) : (
           <div className="divide-y divide-gray-200">
             {filteredReviews.map((review) => (
-              <div key={review._id} className="p-6 hover:bg-gray-50 transition-colors">
-                <div className="flex items-start justify-between gap-4">
+              <div key={review._id} className="p-4 sm:p-6 hover:bg-gray-50 transition-colors">
+                <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
                   <div className="flex-1">
                     <div className="flex items-center gap-3 mb-2">
                       <h3 className="font-bold font-serif">{review.userName}</h3>
@@ -206,16 +206,16 @@ export default function ReviewsPage() {
                     
                     <p className="text-gray-700 mb-2">{review.comment}</p>
                     
-                    <div className="flex items-center gap-4 text-sm text-gray-500">
+                    <div className="flex flex-wrap items-center gap-2 sm:gap-4 text-xs sm:text-sm text-gray-500">
                       <span>Product ID: {review.productId}</span>
-                      <span>•</span>
+                      <span className="hidden sm:inline">•</span>
                       <span>{new Date(review.createdAt).toLocaleDateString()}</span>
-                      <span>•</span>
+                      <span className="hidden sm:inline">•</span>
                       <span>{review.helpful} helpful</span>
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-2 flex-shrink-0">
                     {!review.isApproved && (
                       <button
                         onClick={() => handleApprove(review._id)}

@@ -52,11 +52,11 @@ export default function Home() {
       setFeaturedProducts(featured);
       setCategories(categoriesData);
       
-      // Split sweets into classic and premium (by price)
-      const sortedSweets = allSweets.sort((a, b) => a.price - b.price);
-      const midPoint = Math.floor(sortedSweets.length / 2);
-      setClassicProducts(sortedSweets.slice(0, midPoint).slice(0, 8));
-      setPremiumProducts(sortedSweets.slice(midPoint).slice(0, 8));
+      // Filter sweets by isClassic and isPremium flags
+      const classic = allSweets.filter((p: Product) => p.isClassic).slice(0, 8);
+      const premium = allSweets.filter((p: Product) => p.isPremium).slice(0, 8);
+      setClassicProducts(classic);
+      setPremiumProducts(premium);
       
       setInstaBooks(instaBooksData);
       setInstaPosts(instaPostsData);
@@ -105,7 +105,7 @@ export default function Home() {
         image="/banner-2.png"
         alt="Classic Sweets Banner"
         bgColor="brown"
-        height="h-20 md:h-28"
+        height="h-12 sm:h-16 md:h-20 lg:h-24 xl:h-28"
       />
       
       <div id="sweets">
@@ -121,7 +121,7 @@ export default function Home() {
         image="/banner-3.png"
         alt="Premium Sweets Banner"
         bgColor="red"
-        height="h-20 md:h-28"
+        height="h-12 sm:h-16 md:h-20 lg:h-24 xl:h-28"
       />
       
       <ProductSection 

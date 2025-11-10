@@ -12,7 +12,7 @@ export async function GET(request: NextRequest) {
     
     const query = all ? {} : { isActive: true };
     const slides = await HeroSlider.find(query)
-      .select('title image order isActive')
+      .select('image mobileImage order isActive')
       .sort({ order: 1, createdAt: -1 })
       .lean();
     

@@ -17,6 +17,8 @@ export default function EditProduct() {
     image: '',
     category: 'sweets',
     featured: false,
+    isPremium: false,
+    isClassic: false,
     stock: '',
     shelfLife: '',
     deliveryTime: '',
@@ -41,6 +43,8 @@ export default function EditProduct() {
           image: product.image,
           category: product.category,
           featured: product.featured || false,
+          isPremium: product.isPremium || false,
+          isClassic: product.isClassic || false,
           stock: (product.stock || 0).toString(),
           shelfLife: product.shelfLife || '',
           deliveryTime: product.deliveryTime || '',
@@ -241,7 +245,7 @@ export default function EditProduct() {
           />
         </div>
 
-        <div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <label className="flex items-center gap-2">
             <input
               type="checkbox"
@@ -250,6 +254,24 @@ export default function EditProduct() {
               className="w-4 h-4"
             />
             <span className="text-sm font-medium text-gray-700">Featured Product</span>
+          </label>
+          <label className="flex items-center gap-2">
+            <input
+              type="checkbox"
+              checked={formData.isPremium}
+              onChange={(e) => setFormData({ ...formData, isPremium: e.target.checked })}
+              className="w-4 h-4"
+            />
+            <span className="text-sm font-medium text-gray-700">Premium Sweets</span>
+          </label>
+          <label className="flex items-center gap-2">
+            <input
+              type="checkbox"
+              checked={formData.isClassic}
+              onChange={(e) => setFormData({ ...formData, isClassic: e.target.checked })}
+              className="w-4 h-4"
+            />
+            <span className="text-sm font-medium text-gray-700">Classic Sweets</span>
           </label>
         </div>
 

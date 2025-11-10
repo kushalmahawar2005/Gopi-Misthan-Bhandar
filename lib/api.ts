@@ -10,6 +10,8 @@ const transformProduct = (product: any): Product => {
     image: product.image,
     category: product.category,
     featured: product.featured || false,
+    isPremium: product.isPremium || false,
+    isClassic: product.isClassic || false,
     sizes: product.sizes || [],
     defaultWeight: product.defaultWeight,
     shelfLife: product.shelfLife,
@@ -157,8 +159,8 @@ export const fetchAboutContent = async () => {
 
 export interface HeroSlide {
   id: string;
-  title?: string;
   image: string;
+  mobileImage?: string;
   order: number;
   isActive: boolean;
 }
@@ -171,8 +173,8 @@ export const fetchHeroSlides = async (): Promise<HeroSlide[]> => {
     if (data.success && data.data) {
       return data.data.map((slide: any) => ({
         id: slide._id ? String(slide._id) : slide.id,
-        title: slide.title,
         image: slide.image,
+        mobileImage: slide.mobileImage,
         order: slide.order || 0,
         isActive: slide.isActive !== false,
       }));

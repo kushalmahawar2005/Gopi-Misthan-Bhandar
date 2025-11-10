@@ -253,15 +253,15 @@ export default function AnalyticsPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-primary-brown font-serif">Analytics</h1>
-          <p className="text-gray-600 mt-1">View your store's performance metrics</p>
+          <h1 className="text-2xl sm:text-3xl font-bold text-primary-brown font-serif">Analytics</h1>
+          <p className="text-sm sm:text-base text-gray-600 mt-1">View your store's performance metrics</p>
         </div>
         <select
           value={timeRange}
           onChange={(e) => setTimeRange(e.target.value)}
-          className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-red bg-white"
+          className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-red bg-white text-sm w-full sm:w-auto"
         >
           <option value="7">Last 7 days</option>
           <option value="30">Last 30 days</option>
@@ -288,7 +288,7 @@ export default function AnalyticsPage() {
         })}
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
         <div className="bg-white rounded-lg border border-gray-200 p-6">
           <h3 className="text-lg font-bold text-primary-brown font-serif mb-4">Revenue Trend</h3>
           <ResponsiveContainer width="100%" height={300}>
