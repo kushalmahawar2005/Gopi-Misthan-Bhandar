@@ -25,8 +25,8 @@ const GallerySection: React.FC<GallerySectionProps> = ({ galleryItems, showAll =
   return (
     <section className="py-12 md:py-16 px-4 bg-white w-full">
       <div className="w-full">
-        <h2 className="text-center text-2xl md:text-3xl font-serif text-black mb-12 md:mb-16 font-medium">
-          Our Gallery
+        <h2 className="text-center text-2xl md:text-3xl  text-black mb-12 md:mb-16 font-bold">
+          Our Shop Gallery
         </h2>
         
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 max-w-7xl mx-auto">

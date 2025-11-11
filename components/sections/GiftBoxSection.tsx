@@ -22,8 +22,8 @@ const GiftBoxSection: React.FC<GiftBoxSectionProps> = ({ giftBoxes }) => {
   return (
     <section className="py-12 md:py-20 px-4 bg-white w-full">
       <div className="w-full max-w-7xl mx-auto">
-        <h2 className="text-center text-4xl  font-thin font-serif text-black mb-2 md:mb-4 font-medium">
-          Gift Box
+        <h2 className="text-center text-4xl  text-black mb-2 md:mb-4 font-bold">
+          GIFT BOX
         </h2>
         <p className="text-gray-800 text-sm  text-center lg:text-[14px] md:text-base mb-12 leading-relaxed flex-grow">Exquisitely packaged to benefit every occasion, we celebrate your pride, happiness and relationships with absolute grandeur.</p>
         

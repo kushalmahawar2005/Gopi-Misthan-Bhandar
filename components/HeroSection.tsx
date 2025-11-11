@@ -26,54 +26,25 @@ const HeroSection = () => {
     }
   };
 
-  // Default slides as fallback
+  // Default slides
   const getDefaultSlides = (): HeroSlide[] => [
-    {
-      id: '1',
-      image: '/1.jpg',
-      order: 0,
-      isActive: true,
-    },
-    {
-      id: '2',
-      image: '/banner-2.png',
-      order: 1,
-      isActive: true,
-    },
-    {
-      id: '3',
-      image: '/banner-3.png',
-      order: 2,
-      isActive: true,
-    },
+    { id: '1', image: '/1.jpg', order: 0, isActive: true },
+    { id: '2', image: '/banner-2.png', order: 1, isActive: true },
+    { id: '3', image: '/banner-3.png', order: 2, isActive: true },
   ];
 
-  // Auto-slide functionality
+  // Auto-slide
   useEffect(() => {
     if (slides.length === 0) return;
-    
     const interval = setInterval(() => {
       setCurrentSlide((prev) => (prev + 1) % slides.length);
-    }, 5000); // Change slide every 5 seconds
-
+    }, 5000);
     return () => clearInterval(interval);
   }, [slides.length]);
 
-  const nextSlide = () => {
-    if (slides.length === 0) return;
-    setCurrentSlide((prev) => (prev + 1) % slides.length);
-  };
-
-  const prevSlide = () => {
-    if (slides.length === 0) return;
-    setCurrentSlide((prev) => (prev - 1 + slides.length) % slides.length);
-  };
-
-  const goToSlide = (index: number) => {
-    if (index >= 0 && index < slides.length) {
-      setCurrentSlide(index);
-    }
-  };
+  const nextSlide = () => slides.length && setCurrentSlide((p) => (p + 1) % slides.length);
+  const prevSlide = () => slides.length && setCurrentSlide((p) => (p - 1 + slides.length) % slides.length);
+  const goToSlide = (i: number) => i >= 0 && i < slides.length && setCurrentSlide(i);
 
   if (loading) {
     return (
@@ -87,13 +58,10 @@ const HeroSection = () => {
       </section>
     );
   }
-
-  if (slides.length === 0) {
-    return null;
-  }
+  if (slides.length === 0) return null;
 
   return (
-    <section className="w-full h-[500px] md:h-[450px] lg:h-[500px] relative overflow-hidden">
+    <section className="relative w-full h-[500px] md:h-[450px] lg:h-[500px] overflow-hidden">
       {/* Slides */}
       <div className="relative w-full h-full">
         {slides.map((slide, index) => (
@@ -103,7 +71,7 @@ const HeroSection = () => {
               index === currentSlide ? 'opacity-100 z-10' : 'opacity-0 z-0'
             }`}
           >
-            {/* Desktop Image */}
+            {/* Desktop */}
             <Image
               src={slide.image}
               alt={`Hero slide ${index + 1}`}
@@ -112,9 +80,9 @@ const HeroSection = () => {
               priority={index === 0}
               sizes="100vw"
             />
-            {/* Mobile Image */}
+            {/* Mobile */}
             <Image
-              src={slide.mobileImage || slide.image}
+              src={(slide as any).mobileImage || slide.image}
               alt={`Hero slide ${index + 1}`}
               fill
               className="object-cover object-center md:hidden"
@@ -125,7 +93,7 @@ const HeroSection = () => {
         ))}
       </div>
 
-      {/* Navigation Arrows */}
+      {/* Arrows */}
       {slides.length > 1 && (
         <>
           <button
@@ -145,7 +113,7 @@ const HeroSection = () => {
         </>
       )}
 
-      {/* Slider Dots */}
+      {/* Dots */}
       {slides.length > 1 && (
         <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-20 flex gap-2">
           {slides.map((_, index) => (
@@ -153,15 +121,23 @@ const HeroSection = () => {
               key={index}
               onClick={() => goToSlide(index)}
               className={`w-2 h-2 rounded-full transition-all ${
-                index === currentSlide
-                  ? 'bg-white w-8'
-                  : 'bg-white/50 hover:bg-white/75'
+                index === currentSlide ? 'bg-white w-8' : 'bg-white/50 hover:bg-white/75'
               }`}
               aria-label={`Go to slide ${index + 1}`}
             />
           ))}
         </div>
       )}
+
+      {/* Bottom scalloped divider (same as About section) */}
+      <div
+        aria-hidden="true"
+        className="
+          pointer-events-none absolute -bottom-px left-0 w-full h-10 z-20 bg-white
+          [mask:radial-gradient(1.25rem_1.25rem_at_1.25rem_0,#0000_98%,#000)_0_0/2.5rem_100%]
+          [-webkit-mask:radial-gradient(1.25rem_1.25rem_at_1.25rem_0,#0000_98%,#000)_0_0/2.5rem_100%]
+        "
+      />
     </section>
   );
 };

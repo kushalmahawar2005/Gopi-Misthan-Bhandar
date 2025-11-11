@@ -5,8 +5,8 @@ const Header = () => {
   return (
     <div className="bg-primary-red h-8 md:h-10 w-full">
       <div className="w-full h-full flex items-center justify-between px-4">
-        <p className="text-white text-[10px] md:text-xs font-bold font-sans tracking-wide hidden sm:block">
-          <span>GOPI MISTHAN BHANDAR </span>
+        <p className="text-white text-[10px] md:text-xs font-bold  font-sans tracking-wide hidden sm:block">
+          <span className="pl-4">GOPI MISTHAN BHANDAR </span>
           <span className="text-primary-yellow">NEEMUCH</span>
         </p>
         

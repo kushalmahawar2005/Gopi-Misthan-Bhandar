@@ -42,10 +42,10 @@ const Footer = () => {
             <h3 className="text-primary-yellow text-xl font-bold font-jost tracking-wide mb-4">
               GOPI MISTHAN BHANDAR
             </h3>
-            <p className="text-sm font-roboto leading-relaxed text-gray-200 mb-4">
+            <p className="text-sm  leading-relaxed text-gray-200 mb-4">
               Serving Tradition & Sweetness Since 1968
             </p>
-            <p className="text-sm font-roboto text-gray-300 mb-4 flex items-center gap-2">
+            <p className="text-sm  text-gray-300 mb-4 flex items-center gap-2">
               <FiMapPin className="w-4 h-4" />
               Neemuch, Madhya Pradesh
             </p>
@@ -72,7 +72,7 @@ const Footer = () => {
             <h4 className="text-primary-yellow text-lg font-bold font-serif mb-4">
               Quick Links
             </h4>
-            <ul className="space-y-3 text-sm font-roboto">
+            <ul className="space-y-3 text-sm ">
               {quickLinks.map((link) => (
                 <li key={link.label}>
                   <Link
@@ -91,7 +91,7 @@ const Footer = () => {
             <h4 className="text-primary-yellow text-lg font-bold font-serif mb-4">
               Contact Us
             </h4>
-            <ul className="space-y-3 text-sm font-roboto text-gray-200">
+            <ul className="space-y-3 text-sm text-gray-200">
               <li className="flex items-center gap-2">
                 <FiPhone className="w-4 h-4 text-primary-yellow" />
                 <a href="tel:+919876543210" className="hover:text-primary-yellow transition-colors">
@@ -113,7 +113,7 @@ const Footer = () => {
 
           {/* Newsletter */}
           <div className="text-white">
-            <h4 className="text-primary-yellow text-lg font-bold font-serif mb-4">
+            <h4 className="text-primary-yellow text-lg font-bold  mb-4">
               Newsletter
             </h4>
             <p className="text-sm font-jost tracking-wide text-gray-200 mb-4">
@@ -130,7 +130,7 @@ const Footer = () => {
               />
               <button
                 type="submit"
-                className="w-full bg-primary-yellow text-primary-darkRed px-4 py-2 rounded-lg font-bold font-serif hover:bg-yellow-400 transition-colors"
+                className="w-full bg-primary-yellow text-primary-darkRed px-4 py-2 rounded-lg font-bold font-poppins hover:bg-yellow-400 transition-colors"
               >
                 {subscribed ? 'Subscribed!' : 'Subscribe'}
               </button>
@@ -140,7 +140,7 @@ const Footer = () => {
 
         {/* Bottom Bar */}
         <div className="border-t border-white/20 pt-6 mt-8">
-          <div className="flex flex-col md:flex-row justify-between items-center text-sm text-gray-300 font-roboto">
+          <div className="flex flex-col md:flex-row justify-between items-center text-sm text-gray-300 ">
             <p>© {new Date().getFullYear()} Gopi Misthan Bhandar. All rights reserved.</p>
             <div className="flex gap-4 mt-4 md:mt-0">
               <Link href="/privacy" className="hover:text-primary-yellow transition-colors">

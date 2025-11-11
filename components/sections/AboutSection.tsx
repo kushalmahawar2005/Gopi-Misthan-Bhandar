@@ -2,101 +2,86 @@
 
 import React from 'react';
 import Image from 'next/image';
-import { FiAward, FiHeart, FiUsers } from 'react-icons/fi';
+import { FiCheck } from 'react-icons/fi';
 
 const AboutSection = () => {
-  const stats = [
-    { icon: FiAward, value: '56+', label: 'Years of Excellence' },
-    { icon: FiHeart, value: '50K+', label: 'Happy Customers' },
-    { icon: FiUsers, value: '100+', label: 'Product Varieties' },
-  ];
+  const features = ['Quality Products', 'Custom Products', 'Online Order', 'Home Delivery'];
 
   return (
-    <section className="bg-primary-darkRed py-8 md:py-12 px-4 w-full">
-      <div className="w-full">
-        <div className="grid md:grid-cols-2 gap-6 md:gap-8 items-center">
-          {/* Left Side - Shop Image + Gifts Content */}
-          <div className="flex flex-col gap-4">
-            {/* Large Shop Image */}
-            <div className="relative h-[280px] md:h-[320px] lg:h-[350px] w-full rounded-xl overflow-hidden shadow-xl group">
-              <Image
-                src="https://picsum.photos/seed/shop1/800/600"
-                alt="Gopi Misthan Bhandar Shop"
-                fill
-                className="object-cover object-center transition-transform duration-500 group-hover:scale-105"
-                sizes="(max-width: 768px) 100vw, 50vw"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-            </div>
+    <section className="relative bg-primary-darkRed text-white overflow-hidden
+                        px-4 py-8 md:py-12 w-full">
+      {/* TOP scalloped divider */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute left-0 top-[-1px] w-full h-6 md:h-10 z-20 bg-white rotate-180
+                   [mask:radial-gradient(1.25rem_1.25rem_at_1.25rem_0,#0000_98%,#000)_0_0/2.5rem_100%]
+                   [-webkit-mask:radial-gradient(1.25rem_1.25rem_at_1.25rem_0,#0000_98%,#000)_0_0/2.5rem_100%]"
+      />
+      
+      {/* safe space so top scallop not overlap */}
+      <div className="pt-6 md:pt-8 max-w-6xl mx-auto mb-6">
+        {/* Heading */}
+        <div className="mb-6">
+          <h2 className="text-primary-yellow text-center font-poppins font-extrabold
+                         text-xl sm:text-2xl md:text-3xl">
+            GOPI MISTHAN BHANDAR
+          </h2>
+          <p className="text-primary-yellow text-center mt-1 text-xs sm:text-sm md:text-[14px] ">
+            Serving Tradition & Sweetness Since
+          </p>
+          <p className = "text-center mt-2 font-bold font-poppins text-primary-yellow text-2xl">1968</p>
+        </div>
 
-            {/* Gifts and more Content */}
-            <div className="text-white bg-white/10 backdrop-blur-sm p-4 rounded-lg">
-              <h3 className="text-primary-yellow text-lg md:text-xl font-bold font-poppins mb-2">
-                Gifts and More
-              </h3>
-              <p className="text-sm font-roboto leading-relaxed text-gray-200">
-                Hailing from the land of sun and blue, over the years we've specialized in making traditional Indian sweets while maintaining their authentic tastes. From festival hampers to corporate gifting, we create memorable experiences.
-              </p>
-            </div>
+        {/* Content */}
+        <div className="flex flex-col md:flex-row items-center md:items-start gap-6 md:gap-10">
+          {/* Image (mobile full width, desktop half) */}
+          <div className="relative w-full md:w-1/2 h-56 sm:h-64 md:h-80 lg:h-[280px]
+                          rounded-xl overflow-hidden shadow-xl">
+            <Image
+              src="/2.jpg"
+              alt="Gopi Misthan Bhandar Shop"
+              fill
+              className="object-cover object-center"
+              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 600px"
+              priority
+            />
           </div>
 
-          {/* Right Side - Main Content */}
-          <div className="text-white">
-            <div className="mb-6">
-              <h2 className="text-primary-yellow text-center   text-2xl md:text-3xl font-extrabold mb-1 font-serif">
-                GOPI MISTHAN BHANDAR
-              </h2>
-              <p className="md:text-xl lg:text-[14px] text-center  mb-4 text-primary-yellow">
-                Serving Tradition & Sweetness Since 1968
-              </p>
-            </div>
+          {/* Text + Features */}
+          <div className="w-full md:w-1/2 text-center md:text-left md:pl-2">
+            <h3 className="font-poppins font-bold text-lg sm:text-xl md:text-2xl mb-2">
+              Where Tradition Meets the Taste of Love
+            </h3>
+            <p className="text-xs sm:text-sm md:text-base leading-relaxed">
+              Since 1968, we’ve been spreading the sweetness of tradition with pure desi ghee and
+              timeless recipes — made straight from the heart.
+            </p>
+            <p className="text-xs sm:text-sm md:text-base leading-relaxed mt-2">
+              Every bite tells a story of purity, tradition, and love — that’s the Gopi Misthan
+              Bhandar way.
+            </p>
 
-            <div className="mb-6">
-              <h3 className="text-lg md:text-xl font-serif mb-3 font-bold">Our Belief.</h3>
-              <p className="text-sm md:text-base font-poppins leading-relaxed text-gray-200 mb-4">
-              Rooted in tradition and crafted with love, Gopi Misthan Bhandar has been serving authentic Indian sweets since 1968. Each delicacy is made using time-honored recipes passed down through generations — a true taste of heritage and sweetness.
-              </p>
-            </div>
-
-            {/* Stats */}
-            <div className="grid grid-cols-3 gap-2 mb-6">
-              {stats.map((stat, index) => (
-                <div key={index} className="text-center bg-white/10 backdrop-blur-sm p-2 rounded-lg">
-                  <stat.icon className="w-5 h-5 text-primary-yellow mx-auto mb-1" />
-                  <div className="text-lg md:text-xl font-bold font-serif text-primary-yellow mb-0.5">
-                    {stat.value}
-                  </div>
-                  <div className="text-[10px] md:text-xs text-gray-300 font-roboto leading-tight">
-                    {stat.label}
-                  </div>
+            {/* Features */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-y-2 gap-x-4 mt-6">
+              {features.map((f, i) => (
+                <div key={i} className="flex items-center gap-2 justify-center md:justify-start">
+                  <FiCheck className="text-primary-yellow text-base sm:text-lg shrink-0" />
+                  <span className="text-xs sm:text-sm md:text-base text-gray-200">{f}</span>
                 </div>
               ))}
-            </div>
-
-            {/* Additional Images */}
-            <div className="grid grid-cols-2 gap-3">
-              <div className="relative h-32 md:h-36 w-full rounded-lg overflow-hidden shadow-lg group">
-                <Image
-                  src="https://picsum.photos/seed/sweets1/400/400"
-                  alt="Traditional Sweets"
-                  fill
-                  className="object-cover object-center transition-transform duration-300 group-hover:scale-110"
-                  sizes="(max-width: 768px) 50vw, 25vw"
-                />
-              </div>
-              <div className="relative h-32 md:h-36 w-full rounded-lg overflow-hidden shadow-lg group">
-                <Image
-                  src="https://picsum.photos/seed/sweets2/400/400"
-                  alt="Sweet Collection"
-                  fill
-                  className="object-cover object-center transition-transform duration-300 group-hover:scale-110"
-                  sizes="(max-width: 768px) 50vw, 25vw"
-                />
-              </div>
             </div>
           </div>
         </div>
       </div>
+
+      {/* BOTTOM scalloped divider + bottom safe space */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute -bottom-px left-0 w-full h-6 md:h-10 z-20 bg-white
+                   [mask:radial-gradient(1.25rem_1.25rem_at_1.25rem_0,#0000_98%,#000)_0_0/2.5rem_100%]
+                   [-webkit-mask:radial-gradient(1.25rem_1.25rem_at_1.25rem_0,#0000_98%,#000)_0_0/2.5rem_100%]"
+      />
+      <div className="pb-6 md:pb-8" />
     </section>
   );
 };
