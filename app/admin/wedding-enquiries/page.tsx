@@ -103,7 +103,8 @@ export default function WeddingEnquiriesPage() {
         </div>
       </div>
 
-      <div className="rounded-lg border border-gray-200 bg-white shadow-sm">
+      {/* Table - Desktop */}
+      <div className="rounded-lg border border-gray-200 bg-white shadow-sm hidden md:block">
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
@@ -142,7 +143,7 @@ export default function WeddingEnquiriesPage() {
                       {enquiry.email && (
                         <p className="flex items-center gap-1 text-gray-600">
                           <FiMail className="h-4 w-4" />
-                          <a href={`mailto:${enquiry.email}`} className="hover:text-primary-red">
+                          <a href={`mailto:${enquiry.email}`} className="hover:text-primary-red break-all">
                             {enquiry.email}
                           </a>
                         </p>
@@ -185,6 +186,79 @@ export default function WeddingEnquiriesPage() {
         {filteredEnquiries.length === 0 && (
           <div className="px-6 py-12 text-center text-sm text-gray-500">
             No enquiries found. Try adjusting your filters.
+          </div>
+        )}
+      </div>
+
+      {/* Cards - Mobile */}
+      <div className="md:hidden space-y-4">
+        {filteredEnquiries.map((enquiry) => (
+          <div key={enquiry.id} className="bg-white rounded-lg border border-gray-200 p-4">
+            <div className="mb-3">
+              <h3 className="font-semibold text-primary-brown text-sm">{enquiry.name}</h3>
+              {enquiry.location && (
+                <p className="mt-1 flex items-center gap-1 text-xs text-gray-500">
+                  <FiMapPin className="h-4 w-4 flex-shrink-0" />
+                  <span>{enquiry.location}</span>
+                </p>
+              )}
+            </div>
+
+            {enquiry.description && (
+              <p className="mt-2 text-xs text-gray-600 line-clamp-2 mb-3">{enquiry.description}</p>
+            )}
+
+            <div className="space-y-2 pt-3 border-t border-gray-100">
+              <div>
+                <p className="text-xs font-medium text-gray-700 mb-1">Contact:</p>
+                <div className="space-y-1">
+                  {enquiry.email && (
+                    <a
+                      href={`mailto:${enquiry.email}`}
+                      className="flex items-center gap-1 text-xs text-primary-red hover:underline break-all"
+                    >
+                      <FiMail className="h-3 w-3 flex-shrink-0" />
+                      <span className="break-all">{enquiry.email}</span>
+                    </a>
+                  )}
+                  {enquiry.phone && (
+                    <a
+                      href={`tel:${enquiry.phone}`}
+                      className="flex items-center gap-1 text-xs text-primary-red hover:underline"
+                    >
+                      <FiPhone className="h-3 w-3 flex-shrink-0" />
+                      <span>{enquiry.phone}</span>
+                    </a>
+                  )}
+                </div>
+              </div>
+
+              <div>
+                <p className="text-xs font-medium text-gray-700 mb-1">Gift Preference:</p>
+                {enquiry.giftType && (
+                  <p className="text-xs font-medium text-primary-brown mb-1">{enquiry.giftType}</p>
+                )}
+                <span className="inline-flex items-center rounded-full bg-red-50 px-2 py-1 text-xs font-semibold text-primary-red">
+                  {quantityLabels[enquiry.quantityPreference || 'small']}
+                </span>
+              </div>
+
+              <div className="flex items-center gap-1 text-xs text-gray-500 pt-2 border-t border-gray-100">
+                <FiCalendar className="h-3 w-3" />
+                <span>
+                  {new Date(enquiry.createdAt).toLocaleString('en-IN', {
+                    dateStyle: 'medium',
+                    timeStyle: 'short',
+                  })}
+                </span>
+              </div>
+            </div>
+          </div>
+        ))}
+
+        {filteredEnquiries.length === 0 && (
+          <div className="text-center py-12 bg-white rounded-lg border border-gray-200">
+            <p className="text-sm text-gray-500">No enquiries found. Try adjusting your filters.</p>
           </div>
         )}
       </div>

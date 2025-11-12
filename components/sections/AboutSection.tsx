@@ -33,7 +33,7 @@ const AboutSection = () => {
         </div>
 
         {/* Content */}
-        <div className="flex flex-col md:flex-row items-center md:items-start gap-6 md:gap-10">
+        <div className="flex flex-col md:flex-row items-center md:items-start gap-8 md:gap-16">
           {/* Image (mobile full width, desktop half) */}
           <div className="relative w-full md:w-1/2 h-56 sm:h-64 md:h-80 lg:h-[280px]
                           rounded-xl overflow-hidden shadow-xl">

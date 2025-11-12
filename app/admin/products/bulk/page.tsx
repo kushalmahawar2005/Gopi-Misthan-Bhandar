@@ -204,11 +204,11 @@ export default function BulkProductsPage() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-3xl font-bold text-primary-brown font-serif">Bulk Product Operations</h1>
-        <p className="text-gray-600 mt-1">Import or export products in bulk</p>
+        <h1 className="text-2xl sm:text-3xl font-bold text-primary-brown font-serif">Bulk Product Operations</h1>
+        <p className="text-sm sm:text-base text-gray-600 mt-1">Import or export products in bulk</p>
       </div>
 
       {message && (
@@ -225,18 +225,18 @@ export default function BulkProductsPage() {
       )}
 
       {/* Export Section */}
-      <div className="bg-white rounded-lg border border-gray-200 p-6">
-        <h2 className="text-xl font-bold font-serif mb-4 flex items-center gap-2">
-          <FiDownload className="text-primary-red" />
+      <div className="bg-white rounded-lg border border-gray-200 p-4 sm:p-6">
+        <h2 className="text-lg sm:text-xl font-bold font-serif mb-3 sm:mb-4 flex items-center gap-2">
+          <FiDownload className="text-primary-red" size={20} />
           Export Products
         </h2>
-        <p className="text-gray-600 mb-4">
+        <p className="text-sm sm:text-base text-gray-600 mb-4">
           Export all products to CSV format. Images will be exported as URLs (Cloudinary links).
         </p>
         <button
           onClick={handleExport}
           disabled={exporting}
-          className="px-6 py-3 bg-primary-red text-white rounded-lg font-bold hover:bg-primary-darkRed transition-colors disabled:opacity-50 flex items-center gap-2"
+          className="w-full sm:w-auto px-4 sm:px-6 py-2.5 sm:py-3 bg-primary-red text-white rounded-lg font-bold hover:bg-primary-darkRed transition-colors disabled:opacity-50 flex items-center justify-center gap-2 text-sm sm:text-base"
         >
           <FiDownload size={18} />
           {exporting ? 'Exporting...' : 'Export to CSV'}
@@ -244,17 +244,17 @@ export default function BulkProductsPage() {
       </div>
 
       {/* Import Section */}
-      <div className="bg-white rounded-lg border border-gray-200 p-6">
-        <h2 className="text-xl font-bold font-serif mb-4 flex items-center gap-2">
-          <FiUpload className="text-primary-red" />
+      <div className="bg-white rounded-lg border border-gray-200 p-4 sm:p-6">
+        <h2 className="text-lg sm:text-xl font-bold font-serif mb-3 sm:mb-4 flex items-center gap-2">
+          <FiUpload className="text-primary-red" size={20} />
           Import Products
         </h2>
-        <p className="text-gray-600 mb-4">
+        <p className="text-sm sm:text-base text-gray-600 mb-4">
           Import products from CSV file. Make sure your CSV has the following columns:
         </p>
         
-        <div className="bg-gray-50 p-4 rounded-lg mb-4">
-          <code className="text-sm">
+        <div className="bg-gray-50 p-3 sm:p-4 rounded-lg mb-4 overflow-x-auto">
+          <code className="text-xs sm:text-sm whitespace-nowrap">
             name, description, price, category, image, stock, featured, defaultWeight, shelfLife, deliveryTime
           </code>
         </div>
@@ -263,10 +263,10 @@ export default function BulkProductsPage() {
           <label className="block text-sm font-medium text-gray-700 mb-2">
             Select CSV File
           </label>
-          <div className="flex items-center gap-4">
-            <label className="flex items-center gap-2 px-6 py-3 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer hover:border-primary-red transition-colors">
-              <FiFile size={20} />
-              <span>{file ? file.name : 'Choose CSV File'}</span>
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4">
+            <label className="flex items-center gap-2 px-4 sm:px-6 py-3 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer hover:border-primary-red transition-colors flex-1 sm:flex-initial">
+              <FiFile size={18} className="sm:w-5 sm:h-5" />
+              <span className="text-sm sm:text-base truncate">{file ? file.name : 'Choose CSV File'}</span>
               <input
                 type="file"
                 accept=".csv"
@@ -277,7 +277,7 @@ export default function BulkProductsPage() {
             {file && (
               <button
                 onClick={() => setFile(null)}
-                className="text-red-600 hover:text-red-800 text-sm"
+                className="text-red-600 hover:text-red-800 text-sm px-3 py-2 sm:px-0 sm:py-0"
               >
                 Remove
               </button>
@@ -285,23 +285,23 @@ export default function BulkProductsPage() {
           </div>
         </div>
 
-        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-4">
-          <p className="text-sm text-yellow-800 mb-2">
+        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3 sm:p-4 mb-4">
+          <p className="text-xs sm:text-sm text-yellow-800 mb-2">
             <strong>Note:</strong> For images, use Cloudinary URLs. If you have local images, use the Advanced Import option below.
           </p>
           <Link
             href="/admin/products/bulk/import"
-            className="inline-flex items-center gap-2 text-sm text-blue-600 hover:text-blue-800 font-medium"
+            className="inline-flex items-center gap-2 text-xs sm:text-sm text-blue-600 hover:text-blue-800 font-medium"
           >
             <FiUpload size={14} />
-            Use Advanced Import (with Image Upload Support)
+            <span className="break-words">Use Advanced Import (with Image Upload Support)</span>
           </Link>
         </div>
 
         <button
           onClick={handleImport}
           disabled={importing || !file}
-          className="px-6 py-3 bg-primary-red text-white rounded-lg font-bold hover:bg-primary-darkRed transition-colors disabled:opacity-50 flex items-center gap-2"
+          className="w-full sm:w-auto px-4 sm:px-6 py-2.5 sm:py-3 bg-primary-red text-white rounded-lg font-bold hover:bg-primary-darkRed transition-colors disabled:opacity-50 flex items-center justify-center gap-2 text-sm sm:text-base"
         >
           <FiUpload size={18} />
           {importing ? 'Importing...' : 'Import from CSV'}
@@ -335,10 +335,10 @@ export default function BulkProductsPage() {
       </div>
 
       {/* Sample CSV */}
-      <div className="bg-white rounded-lg border border-gray-200 p-6">
-        <h3 className="text-lg font-bold font-serif mb-4">Sample CSV Format</h3>
-        <div className="bg-gray-50 p-4 rounded-lg overflow-x-auto">
-          <pre className="text-xs">
+      <div className="bg-white rounded-lg border border-gray-200 p-4 sm:p-6">
+        <h3 className="text-base sm:text-lg font-bold font-serif mb-3 sm:mb-4">Sample CSV Format</h3>
+        <div className="bg-gray-50 p-3 sm:p-4 rounded-lg overflow-x-auto">
+          <pre className="text-xs sm:text-sm whitespace-pre-wrap break-words">
 {`name,description,price,category,image,stock,featured,defaultWeight,shelfLife,deliveryTime
 "Gulab Jamun","Traditional sweet made with khoya","250","sweets","https://res.cloudinary.com/your-cloud/image/upload/v1/gulab-jamun.jpg",50,true,"500g","7 days","2-3 days"
 "Kaju Katli","Premium cashew sweet","450","sweets","https://res.cloudinary.com/your-cloud/image/upload/v1/kaju-katli.jpg",30,true,"250g","15 days","2-3 days"`}

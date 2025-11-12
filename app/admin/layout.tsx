@@ -197,7 +197,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         </aside>
 
         {/* Main Content */}
-        <main className="flex-1 min-h-[calc(100vh-73px)] p-4 sm:p-6 md:p-8 bg-gray-50">
+        <main className="flex-1 min-h-[calc(100vh-73px)] p-3 sm:p-4 md:p-6 lg:p-8 bg-gray-50 overflow-x-hidden">
           {isSidebarOpen && (
             <div
               className="fixed inset-0 bg-black bg-opacity-50 z-40 md:hidden"

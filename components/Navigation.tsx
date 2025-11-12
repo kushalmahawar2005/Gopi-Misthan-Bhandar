@@ -135,13 +135,13 @@ const Navigation = () => {
 
           {/* Desktop: Logo - Left */}
           <Link href="/" className="hidden md:flex items-center gap-2">
-            <div className="relative w-20 h-12 md:w-28 md:h-16">
+            <div className="relative w-16 h-10 md:w-24 md:h-14">
               <Image
                 src="/logo.png"
                 alt="Gopi Misthan Bhandar Logo"
                 fill
                 className="object-contain"
-                sizes="112px"
+                sizes="96px"
                 priority
               />
             </div>
@@ -149,13 +149,13 @@ const Navigation = () => {
 
           {/* Mobile: Logo - Center (Absolute Positioning) */}
           <Link href="/" className="md:hidden absolute left-1/2 transform -translate-x-1/2">
-            <div className="relative w-24 h-14">
+            <div className="relative w-20 h-12">
               <Image
                 src="/logo.png"
                 alt="Gopi Misthan Bhandar Logo"
                 fill
                 className="object-contain"
-                sizes="96px"
+                sizes="80px"
                 priority
               />
             </div>

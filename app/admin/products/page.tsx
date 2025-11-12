@@ -20,7 +20,7 @@ export default function AdminProducts() {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
-  const [statusFilter, setStatusFilter] = useState('all');
+  const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'inactive'>('all');
   const [categoryFilter, setCategoryFilter] = useState('all');
 
   useEffect(() => {
@@ -31,9 +31,7 @@ export default function AdminProducts() {
     try {
       const response = await fetch('/api/products');
       const data = await response.json();
-      if (data.success) {
-        setProducts(data.data);
-      }
+      if (data.success) setProducts(data.data);
     } catch (error) {
       console.error('Error fetching products:', error);
     } finally {
@@ -43,15 +41,10 @@ export default function AdminProducts() {
 
   const handleDelete = async (id: string) => {
     if (!confirm('Are you sure you want to delete this product?')) return;
-
     try {
-      const response = await fetch(`/api/products/${id}`, {
-        method: 'DELETE',
-      });
+      const response = await fetch(`/api/products/${id}`, { method: 'DELETE' });
       const data = await response.json();
-      if (data.success) {
-        setProducts(products.filter((p) => p._id !== id));
-      }
+      if (data.success) setProducts(prev => prev.filter(p => p._id !== id));
     } catch (error) {
       console.error('Error deleting product:', error);
     }
@@ -59,7 +52,10 @@ export default function AdminProducts() {
 
   const filteredProducts = products.filter((product) => {
     const matchesSearch = product.name.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesStatus = statusFilter === 'all' || (statusFilter === 'active' && product.featured);
+    const matchesStatus =
+      statusFilter === 'all' ||
+      (statusFilter === 'active' && product.featured) ||
+      (statusFilter === 'inactive' && !product.featured);
     const matchesCategory = categoryFilter === 'all' || product.category === categoryFilter;
     return matchesSearch && matchesStatus && matchesCategory;
   });
@@ -78,7 +74,7 @@ export default function AdminProducts() {
   const categories = ['all', 'sweets', 'snacks', 'namkeen', 'dry-fruit', 'gifting'];
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 w-full">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
@@ -94,11 +90,11 @@ export default function AdminProducts() {
         </Link>
       </div>
 
-      {/* Search and Filters */}
+      {/* Search + Filters */}
       <div className="bg-white rounded-lg border border-gray-200 p-4">
         <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
           <div className="flex-1 relative">
-            <FiSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
+            <FiSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
             <input
               type="text"
               placeholder="Search products..."
@@ -109,7 +105,7 @@ export default function AdminProducts() {
           </div>
           <select
             value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value)}
+            onChange={(e) => setStatusFilter(e.target.value as any)}
             className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-red bg-white"
           >
             <option value="all">All Status</option>
@@ -130,8 +126,8 @@ export default function AdminProducts() {
         </div>
       </div>
 
-      {/* Products Table */}
-      <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+      {/* Products Table - Desktop */}
+      <div className="bg-white rounded-lg border border-gray-200 overflow-hidden hidden md:block">
         <div className="overflow-x-auto">
           <table className="w-full min-w-[720px]">
             <thead className="bg-gray-50 border-b border-gray-200">
@@ -139,84 +135,141 @@ export default function AdminProducts() {
                 <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
                   <input type="checkbox" className="rounded border-gray-300" />
                 </th>
-                <th className="px-4 lg:px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                  Product
-                </th>
-                <th className="px-4 lg:px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                  Price
-                </th>
-                <th className="px-4 lg:px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                  Stock
-                </th>
-                <th className="px-4 lg:px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                  Status
-                </th>
-                <th className="px-4 lg:px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider hidden lg:table-cell">
-                  Updated
-                </th>
-                <th className="px-4 lg:px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                  Actions
-                </th>
+                <th className="px-4 lg:px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Product</th>
+                <th className="px-4 lg:px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Price</th>
+                <th className="px-4 lg:px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Stock</th>
+                <th className="px-4 lg:px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Status</th>
+                <th className="px-4 lg:px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider hidden lg:table-cell">Updated</th>
+                <th className="px-4 lg:px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Actions</th>
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {filteredProducts.map((product) => (
-                <tr key={product._id} className="hover:bg-gray-50 transition-colors">
-                  <td className="px-4 lg:px-6 py-4 whitespace-nowrap">
-                    <input type="checkbox" className="rounded border-gray-300" />
-                  </td>
-                  <td className="px-4 lg:px-6 py-4">
-                    <div className="flex items-center gap-3">
-                      <div className="relative w-12 h-12 rounded border border-gray-200 overflow-hidden bg-gray-100">
-                        <Image
-                          src={product.image || '/1.jpg'}
-                          alt={product.name}
-                          fill
-                          className="object-cover"
-                          sizes="48px"
-                        />
-                      </div>
-                      <div>
-                        <div className="text-sm font-medium text-primary-brown">{product.name}</div>
-                        <div className="text-xs text-gray-500 capitalize">
-                          {product.category} {product.featured && '• Featured'}
+              {filteredProducts.length === 0 ? (
+                <tr>
+                  <td colSpan={7} className="px-6 py-12 text-center text-gray-500">No products found</td>
+                </tr>
+              ) : (
+                filteredProducts.map((product) => (
+                  <tr key={product._id} className="hover:bg-gray-50 transition-colors">
+                    <td className="px-4 lg:px-6 py-4 whitespace-nowrap">
+                      <input type="checkbox" className="rounded border-gray-300" />
+                    </td>
+                    <td className="px-4 lg:px-6 py-4">
+                      <div className="flex items-center gap-3">
+                        <div className="relative w-12 h-12 rounded border border-gray-200 overflow-hidden bg-gray-100">
+                          <Image
+                            src={product.image || '/1.jpg'}
+                            alt={product.name}
+                            fill
+                            className="object-cover"
+                            sizes="48px"
+                          />
+                        </div>
+                        <div>
+                          <div className="text-sm font-medium text-primary-brown">{product.name}</div>
+                          <div className="text-xs text-gray-500 capitalize">
+                            {product.category} {product.featured && '• Featured'}
+                          </div>
                         </div>
                       </div>
+                    </td>
+                    <td className="px-4 lg:px-6 py-4 whitespace-nowrap">
+                      <div className="text-sm font-medium text-primary-brown">₹{product.price}</div>
+                    </td>
+                    <td className="px-4 lg:px-6 py-4 whitespace-nowrap">
+                      <div className="text-sm text-primary-brown">{product.stock || 0}</div>
+                    </td>
+                    <td className="px-4 lg:px-6 py-4 whitespace-nowrap">
+                      <span
+                        className={`px-2 py-1 text-xs font-medium rounded-full ${product.featured ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}`}
+                      >
+                        {product.featured ? 'active' : 'inactive'}
+                      </span>
+                    </td>
+                    <td className="px-4 lg:px-6 py-4 whitespace-nowrap text-sm text-gray-500 hidden lg:table-cell">
+                      {new Date().toLocaleDateString()}
+                    </td>
+                    <td className="px-4 lg:px-6 py-4 whitespace-nowrap">
+                      <div className="flex items-center gap-2">
+                        <Link
+                          href={`/admin/products/${product._id}`}
+                          className="p-2 text-primary-red hover:bg-red-50 rounded transition-colors"
+                          title="Edit"
+                        >
+                          <FiEdit size={16} />
+                        </Link>
+                        <button className="p-2 text-primary-red hover:bg-red-50 rounded transition-colors" title="Copy">
+                          <FiCopy size={16} />
+                        </button>
+                        <button
+                          onClick={() => handleDelete(product._id)}
+                          className="p-2 text-red-600 hover:bg-red-50 rounded transition-colors"
+                          title="Delete"
+                        >
+                          <FiTrash2 size={16} />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
+      </div> {/* ✅ desktop wrapper properly closed */}
+
+      {/* Products Cards - Mobile */}
+      <div className="block md:hidden w-full min-h-[200px]">
+        {filteredProducts.length === 0 ? (
+          <div className="text-center py-12 bg-white rounded-lg border border-gray-200 w-full">
+            <p className="text-gray-500 mb-4">No products found</p>
+            <Link
+              href="/admin/products/new"
+              className="inline-block px-4 py-2 bg-primary-red text-white rounded-lg hover:bg-primary-darkRed transition-colors font-medium text-sm"
+            >
+              Add your first product
+            </Link>
+          </div>
+        ) : (
+          <div className="space-y-4 w-full">
+            {filteredProducts.map((product) => (
+              <div key={product._id} className="bg-white rounded-lg border border-gray-200 p-4 w-full">
+                <div className="flex items-start gap-3 mb-3">
+                  <div className="relative w-16 h-16 rounded border border-gray-200 overflow-hidden bg-gray-100 flex-shrink-0">
+                    <Image
+                      src={product.image || '/1.jpg'}
+                      alt={product.name}
+                      fill
+                      className="object-cover"
+                      sizes="64px"
+                    />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <h3 className="text-sm font-medium text-primary-brown truncate">{product.name}</h3>
+                    <p className="text-xs text-gray-500 capitalize mt-1">
+                      {product.category} {product.featured && '• Featured'}
+                    </p>
+                    <div className="flex items-center gap-3 mt-2">
+                      <span className="text-sm font-medium text-primary-brown">₹{product.price}</span>
+                      <span className="text-xs text-gray-500">Stock: {product.stock || 0}</span>
                     </div>
-                  </td>
-                  <td className="px-4 lg:px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm font-medium text-primary-brown">₹{product.price}</div>
-                  </td>
-                  <td className="px-4 lg:px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-primary-brown">{product.stock || 0}</div>
-                  </td>
-                  <td className="px-4 lg:px-6 py-4 whitespace-nowrap">
-                    <span
-                      className={`px-2 py-1 text-xs font-medium rounded-full ${
-                        product.featured
-                          ? 'bg-green-100 text-green-800'
-                          : 'bg-gray-100 text-gray-800'
-                      }`}
-                    >
-                      {product.featured ? 'active' : 'inactive'}
-                    </span>
-                  </td>
-                  <td className="px-4 lg:px-6 py-4 whitespace-nowrap text-sm text-gray-500 hidden lg:table-cell">
-                    {new Date().toLocaleDateString()}
-                  </td>
-                  <td className="px-4 lg:px-6 py-4 whitespace-nowrap">
-                    <div className="flex items-center gap-2">
-                      <Link
-                        href={`/admin/products/${product._id}`}
+                  </div>
+                </div>
+                <div className="flex items-center justify-between pt-3 border-t border-gray-100">
+                  <span
+                    className={`px-2 py-1 text-xs font-medium rounded-full ${product.featured ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}`}
+                  >
+                    {product.featured ? 'active' : 'inactive'}
+                  </span>
+                  <div className="flex items-center gap-2">
+                    <Link
+                      href={`/admin/products/${product._id}`}
                       className="p-2 text-primary-red hover:bg-red-50 rounded transition-colors"
                       title="Edit"
                     >
                       <FiEdit size={16} />
                     </Link>
-                    <button
-                      className="p-2 text-primary-red hover:bg-red-50 rounded transition-colors"
-                      title="Copy"
-                    >
+                    <button className="p-2 text-primary-red hover:bg-red-50 rounded transition-colors" title="Copy">
                       <FiCopy size={16} />
                     </button>
                     <button
@@ -227,24 +280,12 @@ export default function AdminProducts() {
                       <FiTrash2 size={16} />
                     </button>
                   </div>
-                </td>
-              </tr>
+                </div>
+              </div>
             ))}
-          </tbody>
-        </table>
+          </div>
+        )}
       </div>
-
-      {filteredProducts.length === 0 && (
-        <div className="text-center py-12">
-          <p className="text-gray-500">No products found</p>
-          <Link
-            href="/admin/products/new"
-            className="inline-block mt-4 text-primary-red hover:underline font-medium"
-          >
-            Add your first product
-          </Link>
-        </div>
-      )}
 
       {/* Pagination */}
       {filteredProducts.length > 0 && (
@@ -268,7 +309,6 @@ export default function AdminProducts() {
           </div>
         </div>
       )}
-      </div>
     </div>
   );
 }

@@ -23,16 +23,16 @@ export default function AdminOrders() {
 
   useEffect(() => {
     fetchOrders();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [statusFilter]);
 
   const fetchOrders = async () => {
     try {
-      const url = statusFilter === 'all' ? '/api/orders' : `/api/orders?status=${statusFilter}`;
+      const url =
+        statusFilter === 'all' ? '/api/orders' : `/api/orders?status=${statusFilter}`;
       const response = await fetch(url);
       const data = await response.json();
-      if (data.success) {
-        setOrders(data.data);
-      }
+      if (data.success) setOrders(data.data);
     } catch (error) {
       console.error('Error fetching orders:', error);
     } finally {
@@ -44,16 +44,11 @@ export default function AdminOrders() {
     try {
       const response = await fetch(`/api/orders/${orderId}`, {
         method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status: newStatus }),
       });
-
       const data = await response.json();
-      if (data.success) {
-        fetchOrders();
-      }
+      if (data.success) fetchOrders();
     } catch (error) {
       console.error('Error updating order status:', error);
     }
@@ -92,8 +87,12 @@ export default function AdminOrders() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-bold text-primary-brown font-serif">Orders</h1>
-          <p className="text-sm sm:text-base text-gray-600 mt-1">Manage customer orders</p>
+          <h1 className="text-2xl sm:text-3xl font-bold text-primary-brown font-serif">
+            Orders
+          </h1>
+          <p className="text-sm sm:text-base text-gray-600 mt-1">
+            Manage customer orders
+          </p>
         </div>
         <select
           value={statusFilter}
@@ -109,8 +108,8 @@ export default function AdminOrders() {
         </select>
       </div>
 
-      {/* Orders Table */}
-      <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+      {/* Orders Table - Desktop */}
+      <div className="bg-white rounded-lg border border-gray-200 overflow-hidden hidden md:block">
         <div className="overflow-x-auto">
           <table className="w-full min-w-[720px]">
             <thead className="bg-gray-50 border-b border-gray-200">
@@ -142,62 +141,167 @@ export default function AdminOrders() {
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {orders.map((order) => (
-                <tr key={order._id} className="hover:bg-gray-50 transition-colors">
-                  <td className="px-4 lg:px-6 py-4 whitespace-nowrap">
-                  <div className="text-sm font-medium text-primary-brown">{order.orderNumber}</div>
-                </td>
-                <td className="px-4 lg:px-6 py-4">
-                  <div>
-                    <div className="text-sm font-medium text-primary-brown">{order.shipping.name}</div>
-                    <div className="text-xs sm:text-sm text-gray-500">{order.shipping.email}</div>
-                  </div>
-                </td>
-                <td className="px-4 lg:px-6 py-4 whitespace-nowrap">
-                  <div className="text-sm text-primary-brown">{order.items.length} items</div>
-                </td>
-                <td className="px-4 lg:px-6 py-4 whitespace-nowrap">
-                  <div className="text-sm font-medium text-primary-brown">₹{order.total.toLocaleString()}</div>
-                </td>
-                <td className="px-4 lg:px-6 py-4 whitespace-nowrap">
-                  <select
-                    value={order.status}
-                    onChange={(e) => updateOrderStatus(order._id, e.target.value)}
-                    className={`px-2 sm:px-3 py-1 rounded-full text-xs font-medium border ${getStatusColor(order.status)} focus:outline-none focus:ring-2 focus:ring-primary-red`}
+              {orders.length === 0 ? (
+                <tr>
+                  <td
+                    colSpan={8}
+                    className="px-6 py-12 text-center text-gray-500"
                   >
-                    <option value="pending">Pending</option>
-                    <option value="processing">Processing</option>
-                    <option value="shipped">Shipped</option>
-                    <option value="delivered">Delivered</option>
-                    <option value="cancelled">Cancelled</option>
-                  </select>
-                </td>
-                <td className="px-4 lg:px-6 py-4 whitespace-nowrap text-sm text-gray-600 uppercase hidden lg:table-cell">
-                  {order.paymentMethod}
-                </td>
-                <td className="px-4 lg:px-6 py-4 whitespace-nowrap text-sm text-gray-600 hidden lg:table-cell">
-                  {new Date(order.createdAt).toLocaleDateString()}
-                </td>
-                <td className="px-4 lg:px-6 py-4 whitespace-nowrap">
+                    No orders found
+                  </td>
+                </tr>
+              ) : (
+                orders.map((order) => (
+                  <tr
+                    key={order._id}
+                    className="hover:bg-gray-50 transition-colors"
+                  >
+                    <td className="px-4 lg:px-6 py-4 whitespace-nowrap">
+                      <div className="text-sm font-medium text-primary-brown">
+                        {order.orderNumber}
+                      </div>
+                    </td>
+                    <td className="px-4 lg:px-6 py-4">
+                      <div>
+                        <div className="text-sm font-medium text-primary-brown">
+                          {order.shipping.name}
+                        </div>
+                        <div className="text-xs sm:text-sm text-gray-500">
+                          {order.shipping.email}
+                        </div>
+                      </div>
+                    </td>
+                    <td className="px-4 lg:px-6 py-4 whitespace-nowrap">
+                      <div className="text-sm text-primary-brown">
+                        {order.items.length} items
+                      </div>
+                    </td>
+                    <td className="px-4 lg:px-6 py-4 whitespace-nowrap">
+                      <div className="text-sm font-medium text-primary-brown">
+                        ₹{order.total.toLocaleString()}
+                      </div>
+                    </td>
+                    <td className="px-4 lg:px-6 py-4 whitespace-nowrap">
+                      <select
+                        value={order.status}
+                        onChange={(e) =>
+                          updateOrderStatus(order._id, e.target.value)
+                        }
+                        className={`px-2 sm:px-3 py-1 rounded-full text-xs font-medium border ${getStatusColor(
+                          order.status
+                        )} focus:outline-none focus:ring-2 focus:ring-primary-red`}
+                      >
+                        <option value="pending">Pending</option>
+                        <option value="processing">Processing</option>
+                        <option value="shipped">Shipped</option>
+                        <option value="delivered">Delivered</option>
+                        <option value="cancelled">Cancelled</option>
+                      </select>
+                    </td>
+                    <td className="px-4 lg:px-6 py-4 whitespace-nowrap text-sm text-gray-600 uppercase hidden lg:table-cell">
+                      {order.paymentMethod}
+                    </td>
+                    <td className="px-4 lg:px-6 py-4 whitespace-nowrap text-sm text-gray-600 hidden lg:table-cell">
+                      {new Date(order.createdAt).toLocaleDateString()}
+                    </td>
+                    <td className="px-4 lg:px-6 py-4 whitespace-nowrap">
+                      <Link
+                        href={`/admin/orders/${order._id}`}
+                        className="p-2 text-primary-red hover:bg-red-50 rounded transition-colors inline-block"
+                        title="View Order"
+                      >
+                        <FiEye size={16} />
+                      </Link>
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
+      </div> {/* ✅ desktop wrapper properly closed */}
+
+      {/* Orders Cards - Mobile */}
+      <div className="block md:hidden w-full min-h-[200px]">
+        {orders.length === 0 ? (
+          <div className="text-center py-12 bg-white rounded-lg border border-gray-200 w-full">
+            <p className="text-gray-500">No orders found</p>
+          </div>
+        ) : (
+          <div className="space-y-4 w-full">
+            {orders.map((order) => (
+              <div
+                key={order._id}
+                className="bg-white rounded-lg border border-gray-200 p-4 w-full"
+              >
+                <div className="flex items-start justify-between mb-3">
+                  <div className="flex-1 min-w-0">
+                    <h3 className="text-sm font-medium text-primary-brown truncate">
+                      {order.orderNumber}
+                    </h3>
+                    <p className="text-xs text-gray-500 mt-1">
+                      {order.shipping.name}
+                    </p>
+                    <p className="text-xs text-gray-400 mt-1 truncate">
+                      {order.shipping.email}
+                    </p>
+                  </div>
                   <Link
                     href={`/admin/orders/${order._id}`}
-                    className="p-2 text-primary-red hover:bg-red-50 rounded transition-colors inline-block"
+                    className="p-2 text-primary-red hover:bg-red-50 rounded transition-colors flex-shrink-0"
                     title="View Order"
                   >
-                    <FiEye size={16} />
+                    <FiEye size={18} />
                   </Link>
-                </td>
-              </tr>
+                </div>
+                <div className="space-y-2 pt-3 border-t border-gray-100">
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="text-gray-600">Items:</span>
+                    <span className="font-medium text-primary-brown">
+                      {order.items.length} items
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="text-gray-600">Total:</span>
+                    <span className="font-medium text-primary-brown">
+                      ₹{order.total.toLocaleString()}
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="text-gray-600">Payment:</span>
+                    <span className="text-gray-700 uppercase">
+                      {order.paymentMethod}
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="text-gray-600">Date:</span>
+                    <span className="text-gray-700">
+                      {new Date(order.createdAt).toLocaleDateString()}
+                    </span>
+                  </div>
+                  <div className="pt-2">
+                    <select
+                      value={order.status}
+                      onChange={(e) =>
+                        updateOrderStatus(order._id, e.target.value)
+                      }
+                      className={`w-full px-3 py-2 rounded-lg text-xs font-medium border ${getStatusColor(
+                        order.status
+                      )} focus:outline-none focus:ring-2 focus:ring-primary-red`}
+                    >
+                      <option value="pending">Pending</option>
+                      <option value="processing">Processing</option>
+                      <option value="shipped">Shipped</option>
+                      <option value="delivered">Delivered</option>
+                      <option value="cancelled">Cancelled</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
             ))}
-          </tbody>
-        </table>
+          </div>
+        )}
       </div>
-
-      {orders.length === 0 && (
-        <div className="text-center py-12">
-          <p className="text-gray-500">No orders found</p>
-        </div>
-      )}
 
       {/* Pagination */}
       {orders.length > 0 && (
@@ -221,7 +325,6 @@ export default function AdminOrders() {
           </div>
         </div>
       )}
-      </div>
     </div>
   );
 }
