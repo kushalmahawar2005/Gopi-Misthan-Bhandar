@@ -143,8 +143,8 @@ export default function FloatingContactButtons() {
       </div>
 
       {isModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 px-4 py-8">
-          <div className="relative w-full max-w-lg rounded-2xl bg-white shadow-2xl">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 px-3 py-6 sm:px-4 sm:py-8">
+          <div className="relative flex w-full max-w-[95vw] flex-col overflow-hidden rounded-2xl bg-white shadow-2xl max-h-[90vh] sm:max-w-lg">
             <button
               onClick={closeModal}
               className="absolute right-4 top-4 rounded-full p-2 text-gray-500 transition hover:bg-gray-100 hover:text-gray-800"
@@ -153,14 +153,14 @@ export default function FloatingContactButtons() {
               <FiX className="h-5 w-5" />
             </button>
 
-            <div className="rounded-t-2xl bg-primary-red px-6 py-6 text-white">
-              <h2 className="text-2xl font-bold font-serif">Wedding Gift Enquiry</h2>
-              <p className="mt-1 text-sm text-white/80">
+            <div className="rounded-t-2xl bg-primary-red px-5 py-5 text-white sm:px-6 sm:py-6">
+              <h2 className="text-xl font-bold font-serif sm:text-2xl">Wedding Gift Enquiry</h2>
+              <p className="mt-1 text-xs text-white/80 sm:text-sm">
                 Share your requirements and we will get back to you within 24 hours.
               </p>
             </div>
 
-            <form onSubmit={handleSubmit} className="space-y-4 px-6 py-6">
+            <form onSubmit={handleSubmit} className="flex-1 space-y-4 overflow-y-auto px-5 py-5 sm:px-6 sm:py-6">
               <div className="grid gap-4 sm:grid-cols-2">
                 <div className="flex flex-col gap-2">
                   <label className="text-sm font-medium text-gray-700">

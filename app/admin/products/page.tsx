@@ -130,10 +130,10 @@ export default function AdminProducts() {
         </div>
       </div>
 
-      {/* Products Table - Desktop */}
-      <div className="bg-white rounded-lg border border-gray-200 overflow-hidden hidden md:block">
+      {/* Products Table */}
+      <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
         <div className="overflow-x-auto">
-          <table className="w-full">
+          <table className="w-full min-w-[720px]">
             <thead className="bg-gray-50 border-b border-gray-200">
               <tr>
                 <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
@@ -232,62 +232,6 @@ export default function AdminProducts() {
             ))}
           </tbody>
         </table>
-      </div>
-
-      {/* Products Cards - Mobile */}
-      <div className="md:hidden space-y-4">
-        {filteredProducts.map((product) => (
-          <div key={product._id} className="bg-white rounded-lg border border-gray-200 p-4">
-            <div className="flex items-start gap-3 mb-3">
-              <div className="relative w-16 h-16 rounded border border-gray-200 overflow-hidden bg-gray-100 flex-shrink-0">
-                <Image
-                  src={product.image || '/1.jpg'}
-                  alt={product.name}
-                  fill
-                  className="object-cover"
-                  sizes="64px"
-                />
-              </div>
-              <div className="flex-1 min-w-0">
-                <h3 className="text-sm font-medium text-primary-brown truncate">{product.name}</h3>
-                <p className="text-xs text-gray-500 capitalize mt-1">
-                  {product.category} {product.featured && '• Featured'}
-                </p>
-                <p className="text-sm font-bold text-primary-brown mt-1">₹{product.price}</p>
-              </div>
-            </div>
-            <div className="flex items-center justify-between pt-3 border-t border-gray-200">
-              <div className="flex flex-col gap-1">
-                <span className="text-xs text-gray-600">Stock: {product.stock || 0}</span>
-                <span
-                  className={`text-xs px-2 py-0.5 rounded-full w-fit ${
-                    product.featured
-                      ? 'bg-green-100 text-green-800'
-                      : 'bg-gray-100 text-gray-800'
-                  }`}
-                >
-                  {product.featured ? 'Active' : 'Inactive'}
-                </span>
-              </div>
-              <div className="flex items-center gap-2">
-                <Link
-                  href={`/admin/products/${product._id}`}
-                  className="p-2 text-primary-red hover:bg-red-50 rounded transition-colors"
-                  title="Edit"
-                >
-                  <FiEdit size={16} />
-                </Link>
-                <button
-                  onClick={() => handleDelete(product._id)}
-                  className="p-2 text-red-600 hover:bg-red-50 rounded transition-colors"
-                  title="Delete"
-                >
-                  <FiTrash2 size={16} />
-                </button>
-              </div>
-            </div>
-          </div>
-        ))}
       </div>
 
       {filteredProducts.length === 0 && (

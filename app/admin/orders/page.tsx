@@ -109,10 +109,10 @@ export default function AdminOrders() {
         </select>
       </div>
 
-      {/* Orders Table - Desktop */}
-      <div className="bg-white rounded-lg border border-gray-200 overflow-hidden hidden md:block">
+      {/* Orders Table */}
+      <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
         <div className="overflow-x-auto">
-          <table className="w-full">
+          <table className="w-full min-w-[720px]">
             <thead className="bg-gray-50 border-b border-gray-200">
               <tr>
                 <th className="px-4 lg:px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
@@ -191,59 +191,6 @@ export default function AdminOrders() {
             ))}
           </tbody>
         </table>
-      </div>
-
-      {/* Orders Cards - Mobile */}
-      <div className="md:hidden space-y-4">
-        {orders.map((order) => (
-          <div key={order._id} className="bg-white rounded-lg border border-gray-200 p-4">
-            <div className="flex items-start justify-between mb-3">
-              <div className="flex-1 min-w-0">
-                <h3 className="text-sm font-medium text-primary-brown truncate">{order.orderNumber}</h3>
-                <p className="text-xs text-gray-500 mt-1">{order.shipping.name}</p>
-                <p className="text-xs text-gray-400 truncate">{order.shipping.email}</p>
-              </div>
-              <Link
-                href={`/admin/orders/${order._id}`}
-                className="p-2 text-primary-red hover:bg-red-50 rounded transition-colors flex-shrink-0"
-                title="View Order"
-              >
-                <FiEye size={16} />
-              </Link>
-            </div>
-            <div className="space-y-2 pt-3 border-t border-gray-200">
-              <div className="flex items-center justify-between text-sm">
-                <span className="text-gray-600">Items:</span>
-                <span className="font-medium text-primary-brown">{order.items.length} items</span>
-              </div>
-              <div className="flex items-center justify-between text-sm">
-                <span className="text-gray-600">Total:</span>
-                <span className="font-bold text-primary-brown">₹{order.total.toLocaleString()}</span>
-              </div>
-              <div className="flex items-center justify-between text-sm">
-                <span className="text-gray-600">Payment:</span>
-                <span className="text-gray-700 uppercase">{order.paymentMethod}</span>
-              </div>
-              <div className="flex items-center justify-between text-sm">
-                <span className="text-gray-600">Date:</span>
-                <span className="text-gray-700">{new Date(order.createdAt).toLocaleDateString()}</span>
-              </div>
-              <div className="pt-2">
-                <select
-                  value={order.status}
-                  onChange={(e) => updateOrderStatus(order._id, e.target.value)}
-                  className={`w-full px-3 py-2 rounded-lg text-sm font-medium border ${getStatusColor(order.status)} focus:outline-none focus:ring-2 focus:ring-primary-red`}
-                >
-                  <option value="pending">Pending</option>
-                  <option value="processing">Processing</option>
-                  <option value="shipped">Shipped</option>
-                  <option value="delivered">Delivered</option>
-                  <option value="cancelled">Cancelled</option>
-                </select>
-              </div>
-            </div>
-          </div>
-        ))}
       </div>
 
       {orders.length === 0 && (
