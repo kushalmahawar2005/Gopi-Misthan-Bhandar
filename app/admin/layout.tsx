@@ -27,6 +27,7 @@ import {
   FiGrid,
   FiStar,
   FiTruck,
+  FiHeart,
 } from 'react-icons/fi';
 import { useState } from 'react';
 
@@ -60,6 +61,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     { href: '/admin/products', icon: FiPackage, label: 'Products' },
     { href: '/admin/products/bulk', icon: FiPackage, label: 'Bulk Operations' },
     { href: '/admin/orders', icon: FiShoppingBag, label: 'Orders' },
+    { href: '/admin/wedding-enquiries', icon: FiHeart, label: 'Wedding Enquiries' },
     { href: '/admin/users', icon: FiUsers, label: 'Users' },
     { href: '/admin/categories', icon: FiFolder, label: 'Categories' },
     { href: '/admin/inventory', icon: FiBox, label: 'Inventory' },

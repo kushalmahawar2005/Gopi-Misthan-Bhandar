@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { FiSave, FiX } from 'react-icons/fi';
 import ImageUpload from '@/components/ImageUpload';
+import MultipleImageUpload from '@/components/MultipleImageUpload';
 
 export default function NewProduct() {
   const router = useRouter();
@@ -13,6 +14,7 @@ export default function NewProduct() {
     description: '',
     price: '',
     image: '',
+    images: [] as string[],
     category: 'sweets',
     featured: false,
     isPremium: false,
@@ -158,9 +160,22 @@ export default function NewProduct() {
               value={formData.image}
               onChange={(url) => setFormData({ ...formData, image: url })}
               folder="products"
-              label="Product Image"
+              label="Main Product Image"
               required
             />
+          </div>
+
+          <div className="md:col-span-2">
+            <MultipleImageUpload
+              value={formData.images}
+              onChange={(urls) => setFormData({ ...formData, images: urls })}
+              folder="products"
+              label="Additional Product Images"
+              maxImages={5}
+            />
+            <p className="text-xs text-gray-500 mt-1">
+              Add up to 5 additional images. The first image will be shown on hover in product cards.
+            </p>
           </div>
 
           <div>

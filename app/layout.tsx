@@ -3,6 +3,7 @@ import './globals.css'
 import { CartProvider } from '@/context/CartContext'
 import { AuthProvider } from '@/context/AuthContext'
 import { WishlistProvider } from '@/context/WishlistContext'
+import FloatingContactButtons from '@/components/FloatingContactButtons'
 
 export const metadata: Metadata = {
   title: 'Gopi Misthan Bhandar Neemuch - Traditional Indian Sweets',
@@ -33,6 +34,7 @@ export default function RootLayout({
           <WishlistProvider>
             <CartProvider>
               {children}
+              <FloatingContactButtons />
             </CartProvider>
           </WishlistProvider>
         </AuthProvider>

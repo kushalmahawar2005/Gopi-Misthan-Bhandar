@@ -8,6 +8,7 @@ const transformProduct = (product: any): Product => {
     description: product.description,
     price: product.price,
     image: product.image,
+    images: Array.isArray(product.images) ? product.images : [],
     category: product.category,
     featured: product.featured || false,
     isPremium: product.isPremium || false,

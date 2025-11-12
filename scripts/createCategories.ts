@@ -48,6 +48,22 @@ async function createCategories() {
         slug: 'gifting',
         description: 'Gift hampers and boxes',
       },
+      // Add your new categories here:
+      // {
+      //   name: 'Chocolate Sweets',
+      //   slug: 'chocolate-sweets',
+      //   description: 'Chocolate-based Indian sweets',
+      // },
+      // {
+      //   name: 'Diwali Special',
+      //   slug: 'diwali-special',
+      //   description: 'Special sweets for Diwali festival',
+      // },
+      // {
+      //   name: 'Sugar Free',
+      //   slug: 'sugar-free',
+      //   description: 'Sugar-free healthy sweets',
+      // },
     ];
 
     for (const cat of categories) {

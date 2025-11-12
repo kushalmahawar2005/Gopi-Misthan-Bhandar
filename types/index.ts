@@ -9,7 +9,8 @@ export interface Product {
   name: string;
   description: string;
   price: number;
-  image: string;
+  image: string; // Main image (for backward compatibility)
+  images?: string[]; // Multiple images array
   category: 'sweets' | 'classic-sweets' | 'premium-sweets' | 'snacks' | 'namkeen' | 'dry-fruit' | 'gifting';
   featured?: boolean;
   isPremium?: boolean;
@@ -35,4 +36,16 @@ export interface InstagramPost {
   isVideo?: boolean;
   isInstagramReel?: boolean;
   overlayText?: string;
+}
+
+export interface WeddingEnquiry {
+  id: string;
+  name: string;
+  email?: string;
+  phone?: string;
+  location?: string;
+  giftType?: string;
+  quantityPreference?: 'small' | 'medium' | 'bulk' | 'custom';
+  description?: string;
+  createdAt: string;
 }

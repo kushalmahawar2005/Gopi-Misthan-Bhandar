@@ -10,7 +10,8 @@ export interface IProduct extends Document {
   name: string;
   description: string;
   price: number;
-  image: string;
+  image: string; // Main image (for backward compatibility)
+  images?: string[]; // Multiple images array
   category: 'sweets' | 'classic-sweets' | 'premium-sweets' | 'snacks' | 'namkeen' | 'dry-fruit' | 'gifting';
   featured?: boolean;
   isPremium?: boolean;
@@ -36,6 +37,7 @@ const ProductSchema = new Schema<IProduct>(
     description: { type: String, required: true },
     price: { type: Number, required: true },
     image: { type: String, required: true },
+    images: { type: [String], default: [] }, // Multiple images array
     category: {
       type: String,
       enum: ['sweets', 'classic-sweets', 'premium-sweets', 'snacks', 'namkeen', 'dry-fruit', 'gifting'],

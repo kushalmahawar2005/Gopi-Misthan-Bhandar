@@ -36,13 +36,28 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, showAddToCart = true
         onMouseLeave={() => setIsHovered(false)}
       >
         <div className="relative h-[200px] md:h-[280px] lg:h-[300px] xl:h-[320px] w-full mb-2 overflow-hidden  shadow-md group-hover:shadow-xl transition-shadow">
+          {/* Main Image */}
           <Image
             src={product.image && product.image.trim() !== '' ? product.image : `https://picsum.photos/seed/product${product.id}/240/240`}
             alt={product.name}
             fill
-            className="object-cover object-center transition-transform duration-300 group-hover:scale-110"
+            className={`object-cover object-center transition-all duration-500 ${
+              isHovered && product.images && product.images.length > 0 ? 'opacity-0 scale-110' : 'opacity-100 scale-100'
+            }`}
             sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
           />
+          {/* Second Image on Hover */}
+          {product.images && product.images.length > 0 && (
+            <Image
+              src={product.images[0]}
+              alt={`${product.name} - View 2`}
+              fill
+              className={`object-cover object-center transition-all duration-500 ${
+                isHovered ? 'opacity-100 scale-100' : 'opacity-0 scale-110'
+              }`}
+              sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
+            />
+          )}
           
           {/* Dark overlay background - appears on hover */}
           <div className={`absolute inset-0  transition-opacity duration-300 ${isHovered ? 'opacity-100' : 'opacity-0'}`}></div>

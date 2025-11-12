@@ -10,6 +10,7 @@ import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
 import Cart from '@/components/Cart';
 import Link from 'next/link';
+import Image from 'next/image';
 import { FiGrid, FiList, FiChevronDown, FiX, FiFilter } from 'react-icons/fi';
 import { Product, Category } from '@/types';
 
@@ -145,12 +146,26 @@ function ProductsContent() {
       <Cart />
 
       {/* Page Header */}
-      <div className="bg-gradient-to-r from-primary-red to-primary-darkRed py-12 md:py-16 px-4">
-        <div className="w-full text-center">
-          <h1 className="text-4xl md:text-5xl font-bold font-serif text-white mb-4">
+      <div className="relative w-full h-[300px] md:h-[400px] overflow-hidden">
+        {/* Background Image */}
+        <div className="absolute inset-0">
+          <Image
+            src="/banner-2.png"
+            alt="Products Banner"
+            fill
+            className="object-cover"
+            priority
+            sizes="100vw"
+          />
+        </div>
+        {/* Black Overlay */}
+        <div className="absolute inset-0 bg-black/50"></div>
+        {/* Content */}
+        <div className="relative z-10 h-full flex flex-col items-center justify-center px-4 text-center">
+          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold font-serif text-white mb-4 drop-shadow-lg">
             All Products
           </h1>
-          <p className="text-lg text-gray-100 max-w-2xl mx-auto">
+          <p className="text-lg md:text-xl text-gray-100 max-w-2xl mx-auto drop-shadow-md">
             Discover our complete collection of traditional Indian sweets, snacks, and namkeen
           </p>
         </div>
