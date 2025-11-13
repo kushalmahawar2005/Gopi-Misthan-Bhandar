@@ -35,10 +35,10 @@ const AboutSection = () => {
         {/* Content */}
         <div className="flex flex-col md:flex-row items-center md:items-start gap-8 md:gap-16">
           {/* Image (mobile full width, desktop half) */}
-          <div className="relative w-full md:w-1/2 h-56 sm:h-64 md:h-80 lg:h-[280px]
+          <div className="relative w-full md:w-1/2  h-56 sm:h-64 md:h-80 lg:h-[280px]
                           rounded-xl overflow-hidden shadow-xl">
             <Image
-              src="/2.jpg"
+              src="/2.png"
               alt="Gopi Misthan Bhandar Shop"
               fill
               className="object-cover object-center"
