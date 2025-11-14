@@ -24,11 +24,7 @@ export async function GET(request: NextRequest) {
     }
 
     if (search) {
-      query.$or = [
-        { name: { $regex: search, $options: 'i' } },
-        { description: { $regex: search, $options: 'i' } },
-        { category: { $regex: search, $options: 'i' } },
-      ];
+      query.name = { $regex: search, $options: 'i' };
     }
 
     // Optimize query - select only needed fields and add limit early

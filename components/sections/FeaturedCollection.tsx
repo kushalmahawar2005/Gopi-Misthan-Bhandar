@@ -5,9 +5,6 @@ import { Product } from '@/types';
 import Image from 'next/image';
 import Link from 'next/link';
 import { FiArrowRight } from 'react-icons/fi';
-import { useCart } from '@/context/CartContext';
-import { useWishlist } from '@/context/WishlistContext';
-import { FiShoppingCart, FiHeart } from 'react-icons/fi';
 
 interface FeaturedCollectionProps {
   products: Product[];
@@ -15,19 +12,7 @@ interface FeaturedCollectionProps {
 
 // Special Product Card for Featured Collection with semi-circular frame
 const FeaturedProductCard: React.FC<{ product: Product }> = ({ product }) => {
-  const { addToCart } = useCart();
-  const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
   const [isHovered, setIsHovered] = useState(false);
-  const [isAdding, setIsAdding] = useState(false);
-  const isFavorite = isInWishlist(product.id);
-
-  const handleAddToCart = async (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setIsAdding(true);
-    addToCart(product, 1);
-    setTimeout(() => setIsAdding(false), 500);
-  };
 
   return (
     <Link href={`/product/${product.id}`} className="group block">
@@ -69,43 +54,6 @@ const FeaturedProductCard: React.FC<{ product: Product }> = ({ product }) => {
                     />
                   )}
                   
-                  {/* Hover overlay */}
-                  <div className={`absolute inset-0 bg-black/5 transition-opacity duration-300 ${isHovered ? 'opacity-100' : 'opacity-0'}`}></div>
-                  
-                  {/* Action buttons on hover */}
-                  <div className={`absolute top-2 right-2 flex flex-col gap-2 z-10 transition-all duration-300 ${
-                    isHovered 
-                      ? 'opacity-100 translate-x-0' 
-                      : 'opacity-0 translate-x-full'
-                  }`}>
-                    <button
-                      onClick={(e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        if (isFavorite) {
-                          removeFromWishlist(product.id);
-                        } else {
-                          addToWishlist(product);
-                        }
-                      }}
-                      className="w-8 h-8 bg-white hover:bg-gray-100 text-black flex items-center justify-center rounded-full shadow-lg transition-all hover:scale-110"
-                      aria-label={isFavorite ? 'Remove from wishlist' : 'Add to wishlist'}
-                    >
-                      <FiHeart className={`w-4 h-4 transition-colors ${isFavorite ? 'fill-red-500 text-red-500' : 'text-black'}`} />
-                    </button>
-                    <button
-                      onClick={handleAddToCart}
-                      disabled={isAdding}
-                      className="w-8 h-8 bg-white hover:bg-primary-red hover:text-white text-black flex items-center justify-center rounded-full shadow-lg transition-all hover:scale-110 disabled:opacity-50"
-                      aria-label="Add to cart"
-                    >
-                      {isAdding ? (
-                        <span className="text-xs font-bold text-green-600">✓</span>
-                      ) : (
-                        <FiShoppingCart className="w-4 h-4" />
-                      )}
-                    </button>
-                  </div>
                 </div>
               </div>
             </div>

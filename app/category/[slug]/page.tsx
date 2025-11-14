@@ -48,12 +48,11 @@ function CategoryContent() {
   const filteredAndSortedProducts = useMemo(() => {
     let filtered = [...products];
 
-    // Search filter
+    // Search filter - only search in product name
     if (searchQuery) {
       const query = searchQuery.toLowerCase();
       filtered = filtered.filter(product =>
-        product.name.toLowerCase().includes(query) ||
-        product.description.toLowerCase().includes(query)
+        product.name.toLowerCase().includes(query)
       );
     }
 

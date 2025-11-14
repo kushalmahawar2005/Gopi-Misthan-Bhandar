@@ -73,13 +73,11 @@ function ProductsContent() {
       filtered = filtered.filter(product => product.category === selectedCategory);
     }
 
-    // Search filter
+    // Search filter - only search in product name
     if (searchQuery) {
       const query = searchQuery.toLowerCase();
       filtered = filtered.filter(product =>
-        product.name.toLowerCase().includes(query) ||
-        product.description.toLowerCase().includes(query) ||
-        product.category.toLowerCase().includes(query)
+        product.name.toLowerCase().includes(query)
       );
     }
 
@@ -173,8 +171,8 @@ function ProductsContent() {
 
       <div className="w-full px-4 py-8">
         <div className="flex flex-col lg:flex-row gap-8">
-          {/* Sidebar Filters */}
-          <aside className="lg:w-64 flex-shrink-0">
+          {/* Sidebar Filters - Desktop Only */}
+          <aside className="hidden lg:block lg:w-64 flex-shrink-0">
             <div className="bg-gray-50 rounded-lg p-6 sticky top-24">
               <h2 className="text-xl font-bold font-serif mb-4">Filters</h2>
 
@@ -254,7 +252,16 @@ function ProductsContent() {
               <div className="text-sm text-gray-600">
                 Showing {filteredAndSortedProducts.length} of {products.length} products
               </div>
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-3 w-full md:w-auto">
+                {/* Filter Button - Mobile Only */}
+                <button
+                  onClick={() => setShowFilterMenu(true)}
+                  className="lg:hidden flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors text-sm bg-white"
+                >
+                  <FiFilter className="w-4 h-4" />
+                  Filters
+                </button>
+
                 {/* Sort */}
                 <div className="relative">
                   <button
@@ -338,6 +345,116 @@ function ProductsContent() {
           </div>
         </div>
       </div>
+
+      {/* Mobile Filter Drawer */}
+      {showFilterMenu && (
+        <>
+          {/* Backdrop */}
+          <div
+            className="fixed inset-0 bg-black/50 z-40 lg:hidden"
+            onClick={() => setShowFilterMenu(false)}
+          />
+          {/* Filter Drawer */}
+          <div className="fixed inset-y-0 left-0 w-full max-w-sm bg-white z-50 lg:hidden transform transition-transform duration-300 ease-in-out shadow-xl overflow-y-auto">
+            <div className="p-4 border-b border-gray-200 sticky top-0 bg-white z-10">
+              <div className="flex items-center justify-between">
+                <h2 className="text-xl font-bold font-serif">Filters</h2>
+                <button
+                  onClick={() => setShowFilterMenu(false)}
+                  className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                >
+                  <FiX className="w-5 h-5" />
+                </button>
+              </div>
+            </div>
+
+            <div className="p-4 space-y-6">
+              {/* Category Filter */}
+              <div>
+                <h3 className="text-sm font-semibold text-gray-700 mb-3">Categories</h3>
+                <div className="space-y-2">
+                  <button
+                    onClick={() => {
+                      setSelectedCategory('all');
+                      setShowFilterMenu(false);
+                    }}
+                    className={`w-full text-left px-3 py-2.5 rounded-lg text-sm transition-colors ${
+                      selectedCategory === 'all'
+                        ? 'bg-primary-red text-white'
+                        : 'bg-gray-50 text-gray-700 hover:bg-gray-100'
+                    }`}
+                  >
+                    All Products ({categoryCounts.all || 0})
+                  </button>
+                  {categories.map((category) => (
+                    <button
+                      key={category.id}
+                      onClick={() => {
+                        setSelectedCategory(category.slug);
+                        setShowFilterMenu(false);
+                      }}
+                      className={`w-full text-left px-3 py-2.5 rounded-lg text-sm transition-colors ${
+                        selectedCategory === category.slug
+                          ? 'bg-primary-red text-white'
+                          : 'bg-gray-50 text-gray-700 hover:bg-gray-100'
+                      }`}
+                    >
+                      {category.name} ({categoryCounts[category.slug] || 0})
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Price Range Filter */}
+              <div>
+                <h3 className="text-sm font-semibold text-gray-700 mb-3">Price Range</h3>
+                <div className="space-y-3">
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="number"
+                      min="0"
+                      max={maxPrice}
+                      value={priceRange[0]}
+                      onChange={(e) => setPriceRange([parseInt(e.target.value) || 0, priceRange[1]])}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-red"
+                      placeholder="Min"
+                    />
+                    <span className="text-gray-500">-</span>
+                    <input
+                      type="number"
+                      min={priceRange[0]}
+                      max={maxPrice}
+                      value={priceRange[1]}
+                      onChange={(e) => setPriceRange([priceRange[0], parseInt(e.target.value) || maxPrice])}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-red"
+                      placeholder="Max"
+                    />
+                  </div>
+                  <div className="text-xs text-gray-600 px-1">
+                    ₹{priceRange[0].toLocaleString()} - ₹{priceRange[1].toLocaleString()}
+                  </div>
+                  <button
+                    onClick={() => setPriceRange([0, maxPrice])}
+                    className="w-full px-3 py-2 text-sm text-primary-red hover:bg-red-50 rounded-lg transition-colors font-medium"
+                  >
+                    Reset Price
+                  </button>
+                </div>
+              </div>
+
+              {/* Apply Button */}
+              <div className="pt-4 border-t border-gray-200">
+                <button
+                  onClick={() => setShowFilterMenu(false)}
+                  className="w-full px-4 py-3 bg-primary-red text-white rounded-lg hover:bg-primary-darkRed transition-colors font-medium"
+                >
+                  Apply Filters
+                </button>
+              </div>
+            </div>
+          </div>
+        </>
+      )}
 
       <Footer />
     </div>

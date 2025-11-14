@@ -433,7 +433,7 @@ const shortDescription =
 
               <div className="space-y-3">
                 <h3 className="text-lg font-semibold text-gray-900">Quantity</h3>
-                <div className="flex items-center gap-4">
+                <div className="flex items-center gap-3">
                   <button
                     type="button"
                     onClick={() => handleQuantityChange(-1)}
@@ -450,6 +450,17 @@ const shortDescription =
                     disabled={quantity >= 10}
                   >
                     <FiPlus className="h-4 w-4" />
+                  </button>
+                  <button
+                    onClick={handleWishlistToggle}
+                    className={`ml-auto rounded-lg border-2 p-2 transition ${
+                      isFavorite
+                        ? 'border-primary-red bg-red-50 text-primary-red'
+                        : 'border-gray-300 text-gray-700 hover:border-primary-red hover:text-primary-red'
+                    }`}
+                    title={isFavorite ? 'Remove from wishlist' : 'Add to wishlist'}
+                  >
+                    <FiHeart className={`h-5 w-5 ${isFavorite ? 'fill-current' : ''}`} />
                   </button>
                 </div>
               </div>
@@ -468,16 +479,6 @@ const shortDescription =
                   className="flex-1 rounded-lg bg-primary-red px-5 py-3 text-sm font-semibold uppercase tracking-wide text-white transition hover:bg-primary-darkRed disabled:cursor-not-allowed disabled:opacity-50"
                 >
                   {isBuying ? 'Redirecting...' : 'Buy It Now'}
-                </button>
-                <button
-                  onClick={handleWishlistToggle}
-                  className={`rounded-lg border-2 px-4 py-3 transition ${
-                    isFavorite
-                      ? 'border-primary-red bg-red-50 text-primary-red'
-                      : 'border-gray-300 text-gray-700 hover:border-primary-red hover:text-primary-red'
-                  }`}
-                >
-                  <FiHeart className={`h-5 w-5 ${isFavorite ? 'fill-current' : ''}`} />
                 </button>
               </div>
 
