@@ -140,6 +140,7 @@ export default function NewSiteContent() {
               <option value="hero">Hero</option>
               <option value="footer">Footer</option>
               <option value="header">Header</option>
+              <option value="marquee">Marquee</option>
             </select>
           </div>
 
@@ -175,16 +176,26 @@ export default function NewSiteContent() {
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">Description</label>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            {section === 'marquee' ? 'Marquee Text *' : 'Description'}
+          </label>
           <textarea
-            rows={4}
+            rows={section === 'marquee' ? 2 : 4}
             value={formData.description}
             onChange={(e) => setFormData({ ...formData, description: e.target.value })}
             className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-red"
+            placeholder={section === 'marquee' ? 'Enter marquee text (e.g., 🎉 Special Offer: Get 10% OFF on your first order! Use code FIRSTBUY10 🎉)' : ''}
+            required={section === 'marquee'}
           />
+          {section === 'marquee' && (
+            <p className="mt-2 text-sm text-gray-500">
+              This text will scroll from right to left in the top banner. You can include emojis and special offers.
+            </p>
+          )}
         </div>
 
-        {/* Content Section */}
+        {/* Content Section - Hide for marquee */}
+        {section !== 'marquee' && (
         <div className="border-t pt-6">
           <h3 className="text-lg font-bold mb-4">Main Content</h3>
           <div className="space-y-4">
@@ -218,8 +229,10 @@ export default function NewSiteContent() {
             </div>
           </div>
         </div>
+        )}
 
-        {/* Gifts Content Section */}
+        {/* Gifts Content Section - Hide for marquee */}
+        {section !== 'marquee' && (
         <div className="border-t pt-6">
           <h3 className="text-lg font-bold mb-4">Gifts Content</h3>
           <div className="space-y-4">
@@ -253,8 +266,10 @@ export default function NewSiteContent() {
             </div>
           </div>
         </div>
+        )}
 
-        {/* Stats Section */}
+        {/* Stats Section - Hide for marquee */}
+        {section !== 'marquee' && (
         <div className="border-t pt-6">
           <div className="flex justify-between items-center mb-4">
             <h3 className="text-lg font-bold">Stats</h3>
@@ -306,8 +321,10 @@ export default function NewSiteContent() {
             ))}
           </div>
         </div>
+        )}
 
-        {/* Additional Images */}
+        {/* Additional Images - Hide for marquee */}
+        {section !== 'marquee' && (
         <div className="border-t pt-6">
           <div className="flex justify-between items-center mb-4">
             <h3 className="text-lg font-bold">Additional Images</h3>
@@ -341,6 +358,7 @@ export default function NewSiteContent() {
             ))}
           </div>
         </div>
+        )}
 
         <div>
           <label className="flex items-center gap-2">

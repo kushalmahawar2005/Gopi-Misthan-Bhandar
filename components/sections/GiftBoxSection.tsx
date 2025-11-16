@@ -20,10 +20,10 @@ const GiftBoxSection: React.FC<GiftBoxSectionProps> = ({ giftBoxes }) => {
   return (
     <section className="py-12 md:py-20 px-4 bg-white w-full">
       <div className="w-full max-w-7xl mx-auto">
-        <h2 className="text-center text-4xl text-black mb-2 md:mb-4 font-bold">
+        <h2 className="text-center text-4xl text-black mb-2 font-general-sans md:mb-4 font-[500]">
           GIFT BOX
         </h2>
-        <p className="text-gray-800 text-sm text-center lg:text-[14px] md:text-base mb-12 leading-relaxed">
+        <p className="text-gray-800 text-sm text-center lg:text-[15px] md:text-md font-jost mb-12 leading-relaxed">
           Exquisitely packaged to benefit every occasion, we celebrate your pride, happiness and relationships with absolute grandeur.
         </p>
 
@@ -31,19 +31,20 @@ const GiftBoxSection: React.FC<GiftBoxSectionProps> = ({ giftBoxes }) => {
         <div
           className="
             md:grid md:grid-cols-3 md:gap-8
-            flex gap-4 -mx-4 px-4 overflow-x-auto no-scrollbar snap-x snap-mandatory
+            flex gap-4 -mx-4 pl-4 md:px-4 overflow-x-auto no-scrollbar snap-x snap-mandatory
           "
           role="region"
           aria-label="Gift box carousel"
         >
-          {giftBoxes.map((item) => (
+          {giftBoxes.map((item, index) => (
             <div
               key={item._id}
-              className="
+              className={`
                 flex flex-col gap-4
                 snap-start shrink-0 w-[85%] sm:w-[70%]
                 md:w-auto md:shrink md:snap-align-none
-              "
+                ${index === 0 ? 'ml-4 md:ml-0' : ''}
+              `}
             >
               {/* Image Card */}
               <div className="bg-white rounded-lg overflow-hidden shadow-md hover:shadow-xl transition-shadow duration-300">

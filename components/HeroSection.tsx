@@ -61,7 +61,7 @@ const HeroSection = () => {
   if (slides.length === 0) return null;
 
   return (
-    <section className="relative w-full h-[500px] md:h-[450px] lg:h-[500px] overflow-hidden">
+    <section className="relative w-full h-[500px] md:h-[450px] lg:h-[500px] overflow-hidden mt-0">
       {/* Slides */}
       <div className="relative w-full h-full">
         {slides.map((slide, index) => (
@@ -128,16 +128,6 @@ const HeroSection = () => {
           ))}
         </div>
       )}
-
-      {/* Bottom scalloped divider (same as About section) */}
-      <div
-        aria-hidden="true"
-        className="
-          pointer-events-none absolute -bottom-px left-0 w-full h-10 z-20 bg-white
-          [mask:radial-gradient(1.25rem_1.25rem_at_1.25rem_0,#0000_98%,#000)_0_0/2.5rem_100%]
-          [-webkit-mask:radial-gradient(1.25rem_1.25rem_at_1.25rem_0,#0000_98%,#000)_0_0/2.5rem_100%]
-        "
-      />
     </section>
   );
 };

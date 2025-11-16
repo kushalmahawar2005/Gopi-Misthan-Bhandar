@@ -18,7 +18,7 @@ const CategoriesSection: React.FC<CategoriesSectionProps> = ({ categories }) => 
             <h2 className="text-3xl md:text-2xl lg:text-4xl text-black mb-4 font-bold ">
               OUR CATEGORIES
             </h2>
-            <p className="text-base md:text-lg font-serif text-gray-600 max-w-2xl mx-auto">
+            <p className="text-base md:text-lg font-jost text-gray-600 max-w-2xl mx-auto">
               Explore our wide range of traditional Indian sweets, snacks, and namkeen
             </p>
           </div>
@@ -34,7 +34,7 @@ const CategoriesSection: React.FC<CategoriesSectionProps> = ({ categories }) => 
     <section className="py-12 md:py-20 px-4 bg-white w-full">
       <div className="w-full">
         <div className="text-center mb-12">
-          <h2 className="text-3xl md:text-4xl lg:text-5xl font-serif text-black mb-4 font-bold">
+          <h2 className="text-3xl md:text-4xl lg:text-5xl font-general-sans text-black mb-4 font-[500]">
             OUR CATEGORIES
           </h2>
           <p className="text-base md:text-lg font-serif text-gray-600 max-w-2xl mx-auto">

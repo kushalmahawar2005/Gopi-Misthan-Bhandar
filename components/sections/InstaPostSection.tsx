@@ -68,8 +68,8 @@ const InstaPostSection: React.FC<InstaPostSectionProps> = ({ instaPosts }) => {
   return (
     <section className="py-12 md:py-16 px-4 bg-white w-full">
       <div className="w-full max-w-7xl mx-auto">
-        <h3 className="text-center text-xl md:text-2xl lg:text-3xl text-black mb-8 md:mb-12 font-bold font-serif">
-          Follow Us on Instagram
+        <h3 className="text-center text-xl md:text-2xl lg:text-3xl text-black mb-8 md:mb-12 font-general-sans font-[500]">
+          FOLLOW US ON INSTAGRAM
         </h3>
 
         {/* Marquee container with swipe support */}

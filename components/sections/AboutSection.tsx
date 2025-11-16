@@ -61,12 +61,12 @@ const AboutSection = () => {
               Bhandar way.
             </p>
 
-            {/* Features */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-y-2 gap-x-4 mt-6">
+            {/* Features - Mobile: 2x2 grid, Desktop: inline */}
+            <div className="grid grid-cols-2 gap-3 md:gap-y-2 md:gap-x-4 mt-6">
               {features.map((f, i) => (
                 <div key={i} className="flex items-center gap-2 justify-center md:justify-start">
-                  <FiCheck className="text-primary-yellow text-base sm:text-lg shrink-0" />
-                  <span className="text-xs sm:text-sm md:text-base text-gray-200">{f}</span>
+                  <FiCheck className="text-primary-yellow text-lg sm:text-xl md:text-lg shrink-0 font-bold" />
+                  <span className="text-sm sm:text-base md:text-base text-white font-medium">{f}</span>
                 </div>
               ))}
             </div>

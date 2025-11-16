@@ -83,119 +83,93 @@ export default function AdminSiteContent() {
     );
   }
 
-  const sections = ['about', 'hero', 'footer', 'header'];
-  const existingSections = contents.map((c) => c.section);
+  // Filter only marquee section
+  const marqueeContent = contents.find((c) => c.section === 'marquee');
 
   return (
     <div className="space-y-6">
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-primary-brown font-serif">Site Content</h1>
-          <p className="text-gray-600 mt-1">Manage your website content sections</p>
+          <h1 className="text-3xl font-bold text-primary-brown font-serif">Offer Line (Marquee)</h1>
+          <p className="text-gray-600 mt-1">Manage the scrolling offer line at the top of your website</p>
         </div>
-        <div className="flex gap-2 flex-wrap">
-          {sections.map((section) => {
-            const existingContent = contents.find((c) => c.section === section);
-            return (
-              <Link
-                key={section}
-                href={existingContent ? `/admin/site-content/${existingContent._id}` : `/admin/site-content/new?section=${section}`}
-                className="inline-flex items-center gap-2 px-4 py-2 bg-primary-red text-white rounded-lg hover:bg-primary-darkRed transition-colors text-sm font-medium"
-              >
-                <FiPlus size={16} />
-                {existingContent ? 'Edit' : 'Add'} {section.charAt(0).toUpperCase() + section.slice(1)}
-              </Link>
-            );
-          })}
+        <div>
+          {marqueeContent ? (
+            <Link
+              href={`/admin/site-content/${marqueeContent._id}`}
+              className="inline-flex items-center gap-2 px-4 py-2 bg-primary-red text-white rounded-lg hover:bg-primary-darkRed transition-colors text-sm font-medium"
+            >
+              <FiEdit size={16} />
+              Edit Offer Line
+            </Link>
+          ) : (
+            <Link
+              href="/admin/site-content/new?section=marquee"
+              className="inline-flex items-center gap-2 px-4 py-2 bg-primary-red text-white rounded-lg hover:bg-primary-darkRed transition-colors text-sm font-medium"
+            >
+              <FiPlus size={16} />
+              Add Offer Line
+            </Link>
+          )}
         </div>
       </div>
 
-      {/* Content Table */}
-      <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead className="bg-gray-50 border-b border-gray-200">
-              <tr>
-                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                  Section
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                  Title
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                  Subtitle
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                  Status
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                  Actions
-                </th>
-              </tr>
-            </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
-              {contents.map((content) => (
-                <tr key={content._id} className="hover:bg-gray-50 transition-colors">
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm font-medium text-primary-brown capitalize">{content.section}</div>
-                  </td>
-                  <td className="px-6 py-4">
-                    <div className="text-sm text-primary-brown">{content.title || '-'}</div>
-                  </td>
-                  <td className="px-6 py-4">
-                    <div className="text-sm text-gray-600">{content.subtitle || '-'}</div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <button
-                      onClick={() => toggleActive(content._id, content.isActive)}
-                      className={`px-3 py-1 rounded-full text-xs font-medium border ${
-                        content.isActive
-                          ? 'bg-green-100 text-green-800 border-green-200'
-                          : 'bg-gray-100 text-gray-800 border-gray-200'
-                      } hover:opacity-80 transition-opacity`}
-                    >
-                      {content.isActive ? (
-                        <span className="flex items-center gap-1">
-                          <FiEye size={12} /> Active
-                        </span>
-                      ) : (
-                        <span className="flex items-center gap-1">
-                          <FiEyeOff size={12} /> Inactive
-                        </span>
-                      )}
-                    </button>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="flex gap-2">
-                      <Link
-                        href={`/admin/site-content/${content._id}`}
-                        className="p-2 text-primary-red hover:bg-red-50 rounded transition-colors"
-                        title="Edit"
-                      >
-                        <FiEdit size={16} />
-                      </Link>
-                      <button
-                        onClick={() => handleDelete(content._id)}
-                        className="p-2 text-red-600 hover:bg-red-50 rounded transition-colors"
-                        title="Delete"
-                      >
-                        <FiTrash2 size={16} />
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-
-        {contents.length === 0 && (
-          <div className="text-center py-12">
-            <p className="text-gray-500 mb-4">No site content found. Click "Add" to create content for each section.</p>
+      {/* Marquee Content Card */}
+      {marqueeContent ? (
+        <div className="bg-white rounded-lg border border-gray-200 p-6">
+          <div className="flex items-start justify-between mb-4">
+            <div className="flex-1">
+              <h3 className="text-lg font-semibold text-primary-brown mb-2">Current Offer Line</h3>
+              <p className="text-gray-700 bg-gray-50 p-3 rounded-lg border border-gray-200">
+                {marqueeContent.description || 'No text set'}
+              </p>
+            </div>
           </div>
-        )}
-      </div>
+          
+          <div className="flex items-center justify-between pt-4 border-t border-gray-200">
+            <div className="flex items-center gap-4">
+              <span className="text-sm text-gray-600">Status:</span>
+              <button
+                onClick={() => toggleActive(marqueeContent._id, marqueeContent.isActive)}
+                className={`px-4 py-2 rounded-lg text-sm font-medium border transition-colors ${
+                  marqueeContent.isActive
+                    ? 'bg-green-100 text-green-800 border-green-200 hover:bg-green-200'
+                    : 'bg-gray-100 text-gray-800 border-gray-200 hover:bg-gray-200'
+                }`}
+              >
+                {marqueeContent.isActive ? (
+                  <span className="flex items-center gap-2">
+                    <FiEye size={16} /> Visible
+                  </span>
+                ) : (
+                  <span className="flex items-center gap-2">
+                    <FiEyeOff size={16} /> Hidden
+                  </span>
+                )}
+              </button>
+            </div>
+            <Link
+              href={`/admin/site-content/${marqueeContent._id}`}
+              className="inline-flex items-center gap-2 px-4 py-2 bg-primary-red text-white rounded-lg hover:bg-primary-darkRed transition-colors text-sm font-medium"
+            >
+              <FiEdit size={16} />
+              Edit
+            </Link>
+          </div>
+        </div>
+      ) : (
+        <div className="bg-white rounded-lg border border-gray-200 p-12 text-center">
+          <p className="text-gray-500 mb-4">No offer line configured yet.</p>
+          <Link
+            href="/admin/site-content/new?section=marquee"
+            className="inline-flex items-center gap-2 px-6 py-3 bg-primary-red text-white rounded-lg hover:bg-primary-darkRed transition-colors font-medium"
+          >
+            <FiPlus size={18} />
+            Create Offer Line
+          </Link>
+        </div>
+      )}
     </div>
   );
 }

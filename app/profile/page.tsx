@@ -173,7 +173,7 @@ export default function ProfilePage() {
       {/* Page Header */}
       <div className="bg-gradient-to-r from-primary-red to-primary-darkRed py-8 md:py-12 px-4">
         <div className="max-w-7xl mx-auto">
-          <h1 className="text-3xl md:text-4xl font-bold font-serif text-white">
+          <h1 className="text-3xl md:text-4xl font-[500] font-general-sans text-white">
             My Profile
           </h1>
           <p className="text-lg text-gray-100 mt-2">
@@ -192,7 +192,7 @@ export default function ProfilePage() {
                 <div className="w-24 h-24 bg-primary-red rounded-full mx-auto flex items-center justify-center mb-4">
                   <FiUser className="w-12 h-12 text-white" />
                 </div>
-                <h2 className="text-xl font-bold font-serif">{user.name}</h2>
+                <h2 className="text-xl font-[500] font-general-sans">{user.name}</h2>
                 <p className="text-gray-600 text-sm">{user.email}</p>
               </div>
 
@@ -234,7 +234,7 @@ export default function ProfilePage() {
           <div className="md:col-span-2">
             <div className="bg-white rounded-lg shadow-md p-6 md:p-8">
               <div className="flex items-center justify-between mb-6">
-                <h2 className="text-2xl font-bold font-serif">Personal Information</h2>
+                <h2 className="text-2xl font-[500] font-general-sans">Personal Information</h2>
                 {!isEditing && (
                   <button
                     onClick={() => setIsEditing(true)}

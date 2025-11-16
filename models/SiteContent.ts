@@ -7,7 +7,7 @@ export interface IStat {
 }
 
 export interface ISiteContent extends Document {
-  section: 'about' | 'hero' | 'footer' | 'header';
+  section: 'about' | 'hero' | 'footer' | 'header' | 'marquee';
   title?: string;
   subtitle?: string;
   description?: string;
@@ -47,7 +47,7 @@ const SiteContentSchema = new Schema<ISiteContent>(
   {
     section: {
       type: String,
-      enum: ['about', 'hero', 'footer', 'header'],
+      enum: ['about', 'hero', 'footer', 'header', 'marquee'],
       required: true,
       unique: true,
     },

@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { FiSearch, FiShoppingCart, FiMenu, FiX, FiUser, FiLogOut, FiSettings, FiChevronDown } from 'react-icons/fi';
+import { FiSearch, FiShoppingCart, FiMenu, FiX, FiUser, FiLogOut, FiSettings } from 'react-icons/fi';
 import { useCart } from '@/context/CartContext';
 import { useAuth } from '@/context/AuthContext';
 import { fetchProducts } from '@/lib/api';
@@ -13,7 +13,6 @@ const Navigation = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
-  const [openDropdowns, setOpenDropdowns] = useState<string[]>([]);
   const pathname = usePathname();
   const router = useRouter();
   const { openCart, getTotalItems } = useCart();
@@ -49,48 +48,20 @@ const Navigation = () => {
 
   const navItems = [
     { label: 'HOME', href: '/' },
-    { label: 'ABOUT', href: '#about' },
-    { 
-      label: 'SWEETS', 
-      href: '#sweets',
-      hasDropdown: true,
-      dropdownItems: [
-        { label: 'Classic Sweets', href: '/category/classic-sweets' },
-        { label: 'Premium Sweets', href: '/category/premium-sweets' },
-        { label: 'All Sweets', href: '/category/sweets' },
-      ]
-    },
-    { 
-      label: 'GIFTING', 
-      href: '#gifting',
-      hasDropdown: true,
-      dropdownItems: [
-        { label: 'Gift Hampers', href: '/category/gifting' },
-        { label: 'Corporate Gifts', href: '/category/corporate-gifts' },
-      ]
-    },
-    { 
-      label: 'DRY FRUIT', 
-      href: '#dry-fruit',
-      hasDropdown: true,
-      dropdownItems: [
-        { label: 'All Dry Fruits', href: '/category/dry-fruit' },
-      ]
-    },
-    { label: 'SAVOURY', href: '#savoury' },
+    { label: 'SWEETS', href: '/category/sweets' },
+    { label: 'DRY FRUIT', href: '/category/dry-fruit' },
+    { label: 'BACKERY ITEMS', href: '/category/bakery' },
+    { label: 'NAMKEEN', href: '/category/namkeen' },
+    { label: 'SAVOURY SNACKS', href: '/category/savoury' },
+    { label: 'GIFTING', href: '/category/gifting' },
   ];
 
   const isActive = (href: string) => {
     if (href === '/') return pathname === '/';
+    if (href.startsWith('/category/')) {
+      return pathname === href || pathname.startsWith(href);
+    }
     return pathname.includes(href.replace('#', ''));
-  };
-
-  const toggleDropdown = (label: string) => {
-    setOpenDropdowns(prev => 
-      prev.includes(label) 
-        ? prev.filter(item => item !== label)
-        : [...prev, label]
-    );
   };
 
   useEffect(() => {
@@ -122,7 +93,7 @@ const Navigation = () => {
       </div> */}
 
       {/* Main Navigation */}
-      <nav className="bg-white h-16 md:h-[72px] w-full border-b border-gray-200 shadow-sm sticky top-0 z-50">
+      <nav className="bg-white h-20 md:h-[72px] w-full border-b border-gray-200 shadow-sm sticky top-0 z-50">
         <div className="h-full flex items-center justify-between px-4 relative">
           {/* Mobile: Hamburger Menu - Left */}
           <button
@@ -180,22 +151,7 @@ const Navigation = () => {
                   }`}
                 >
                   {item.label}
-                  {item.hasDropdown && <FiChevronDown className="w-3 h-3" />}
                 </Link>
-                {/* Desktop Dropdown */}
-                {item.hasDropdown && item.dropdownItems && (
-                  <div className="absolute top-full left-0 mt-2 w-48 bg-white shadow-lg rounded-lg py-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50 border border-gray-200">
-                    {item.dropdownItems.map((dropdownItem) => (
-                      <Link
-                        key={dropdownItem.label}
-                        href={dropdownItem.href}
-                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-primary-red transition-colors"
-                      >
-                        {dropdownItem.label}
-                      </Link>
-                    ))}
-                  </div>
-                )}
               </div>
             ))}
           </div>
@@ -288,61 +244,24 @@ const Navigation = () => {
             {/* Menu Items */}
             <div className="flex flex-col py-2">
               {navItems.map((item) => (
-                <div key={item.label}>
-                  {item.hasDropdown ? (
-                    <div>
-                      <button
-                        onClick={() => toggleDropdown(item.label)}
-                        className={`w-full flex items-center justify-between px-6 py-3 text-sm font-serif tracking-wider transition-colors ${
-                          isActive(item.href)
-                            ? 'text-primary-red bg-red-50'
-                            : 'text-black hover:text-primary-red hover:bg-gray-50'
-                        }`}
-                      >
-                        <span>{item.label}</span>
-                        <FiChevronDown
-                          className={`w-4 h-4 transition-transform ${
-                            openDropdowns.includes(item.label) ? 'rotate-180' : ''
-                          }`}
-                        />
-                      </button>
-                      {/* Dropdown Items */}
-                      {openDropdowns.includes(item.label) && item.dropdownItems && (
-                        <div className="bg-gray-50">
-                          {item.dropdownItems.map((dropdownItem) => (
-                            <Link
-                              key={dropdownItem.label}
-                              href={dropdownItem.href}
-                              onClick={() => setIsMobileMenuOpen(false)}
-                              className="block px-10 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-primary-red transition-colors"
-                            >
-                              {dropdownItem.label}
-                            </Link>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-                  ) : (
-                    <Link
-                      href={item.href}
-                      onClick={(e) => {
-                        if (item.href.startsWith('#')) {
-                          e.preventDefault();
-                          handleNavClick(item.href);
-                        } else {
-                          setIsMobileMenuOpen(false);
-                        }
-                      }}
-                      className={`block px-6 py-3 text-sm font-serif tracking-wider transition-colors border-l-4 ${
-                        isActive(item.href)
-                          ? 'text-primary-red bg-red-50 border-primary-red'
-                          : 'text-black hover:text-primary-red hover:bg-gray-50 border-transparent'
-                      }`}
-                    >
-                      {item.label}
-                    </Link>
-                  )}
-                </div>
+                <Link
+                  key={item.label}
+                  href={item.href}
+                  onClick={(e) => {
+                    if (item.href.startsWith('#')) {
+                      e.preventDefault();
+                      handleNavClick(item.href);
+                    }
+                    setIsMobileMenuOpen(false);
+                  }}
+                  className={`block px-6 py-3 text-sm font-general-sans font-[500] tracking-wider transition-colors border-l-4 ${
+                    isActive(item.href)
+                      ? 'text-primary-red bg-red-50 border-primary-red'
+                      : 'text-black hover:text-primary-red hover:bg-gray-50 border-transparent'
+                  }`}
+                >
+                  {item.label}
+                </Link>
               ))}
               
               {/* Admin Panel Link - Only show when user is admin */}

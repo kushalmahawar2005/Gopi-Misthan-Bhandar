@@ -16,6 +16,7 @@ import GiftBoxSection from '@/components/sections/GiftBoxSection';
 import BlogSection from '@/components/sections/BlogSection';
 import Footer from '@/components/Footer';
 import DecorativeBanner from '@/components/DecorativeBanner';
+import ScrollAnimation from '@/components/ScrollAnimation';
 import { fetchProducts, fetchCategories, fetchInstaBooks, fetchInstaPosts, fetchGallery, fetchGiftBoxes, fetchBlogs } from '@/lib/api';
 import { Product, Category, InstagramPost } from '@/types';
 
@@ -88,61 +89,85 @@ export default function Home() {
   }
 
   return (
-    <main className="min-h-screen bg-white w-full overflow-x-hidden">
+    <main className="min-h-screen bg-white w-full overflow-x-hidden pb-24 md:pb-0">
       <Header />
       <Navigation />
       <Cart />
       <HeroSection />
       
-      <div id="featured">
-        <FeaturedCollection products={featuredProducts.slice(0, 8)} />
-      </div>
+      <ScrollAnimation delay={100}>
+        <div id="featured">
+          <FeaturedCollection products={featuredProducts.slice(0, 8)} />
+        </div>
+      </ScrollAnimation>
       
-      <CategoriesSection categories={categories} />
+      <ScrollAnimation delay={150}>
+        <CategoriesSection categories={categories} />
+      </ScrollAnimation>
       
       {/* Decorative Banner - 2nd Image */}
-      <DecorativeBanner 
-        image="/banner-2.png"
-        alt="Classic Sweets Banner"
-        bgColor="brown"
-        height="h-12 sm:h-16 md:h-20 lg:h-24 xl:h-28"
-      />
-      
-      <div id="sweets">
-        <ProductSection 
-          title=""
-          products={classicProducts}
-          bgColor="beige"
+      <ScrollAnimation fadeOnly delay={100}>
+        <DecorativeBanner 
+          image="/banner-2.png"
+          alt="Classic Sweets Banner"
+          bgColor="brown"
+          height="h-12 sm:h-16 md:h-20 lg:h-24 xl:h-28"
         />
-      </div>
+      </ScrollAnimation>
+      
+      <ScrollAnimation delay={200}>
+        <div id="sweets">
+          <ProductSection 
+            title=""
+            products={classicProducts}
+            bgColor="beige"
+          />
+        </div>
+      </ScrollAnimation>
       
       {/* Decorative Banner - 3rd Image */}
-      <DecorativeBanner 
-        image="/banner-3.png"
-        alt="Premium Sweets Banner"
-        bgColor="red"
-        height="h-12 sm:h-16 md:h-20 lg:h-24 xl:h-28"
-      />
+      <ScrollAnimation fadeOnly delay={100}>
+        <DecorativeBanner 
+          image="/banner-3.png"
+          alt="Premium Sweets Banner"
+          bgColor="red"
+          height="h-12 sm:h-16 md:h-20 lg:h-24 xl:h-28"
+        />
+      </ScrollAnimation>
       
-      <ProductSection 
-        title=""
-        products={premiumProducts}
-        bgColor="beige"
-      />
+      <ScrollAnimation delay={200}>
+        <ProductSection 
+          title=""
+          products={premiumProducts}
+          bgColor="beige"
+        />
+      </ScrollAnimation>
       
-      <div id="about">
-        <AboutSection />
-      </div>
+      <ScrollAnimation delay={150}>
+        <div id="about">
+          <AboutSection />
+        </div>
+      </ScrollAnimation>
       
-      <GiftBoxSection giftBoxes={giftBoxes} />
+      <ScrollAnimation delay={200}>
+        <GiftBoxSection giftBoxes={giftBoxes} />
+      </ScrollAnimation>
       
-      <InstaBookSection instaBooks={instaBooks} />
+      <ScrollAnimation delay={150}>
+        <InstaBookSection instaBooks={instaBooks} />
+      </ScrollAnimation>
       
-      <GallerySection galleryItems={galleryItems} />
+      <ScrollAnimation delay={200}>
+        <GallerySection galleryItems={galleryItems} />
+      </ScrollAnimation>
       
-      <InstaPostSection instaPosts={instaPosts} />
+      <ScrollAnimation delay={150}>
+        <InstaPostSection instaPosts={instaPosts} />
+      </ScrollAnimation>
       
-      <BlogSection blogs={blogs} />
+      <ScrollAnimation delay={200}>
+        <BlogSection blogs={blogs} />
+      </ScrollAnimation>
       
       <Footer />
     </main>

@@ -74,13 +74,13 @@ const FeaturedProductCard: React.FC<{ product: Product }> = ({ product }) => {
 
 const FeaturedCollection: React.FC<FeaturedCollectionProps> = ({ products }) => {
   return (
-    <section className="py-12 md:py-20 px-4 bg-gradient-to-b from-white to-gray-50 w-full">
+    <section className="pt-6 pb-12 md:pt-8 md:pb-20 px-4 bg-gradient-to-b from-white to-gray-50 w-full">
       <div className="w-full">
         <div className="text-center mb-12">
-          <h2 className="text-3xl md:text-3xl lg:text-4xl font-serif text-black mb-1 font-[100]">
-            New Arrivals
+          <h2 className="text-3xl md:text-3xl lg:text-5xl mt-2 md:mt-4 lg:mt-6 font-general-sans text-black mb-3 font-[500]">
+            NEW ARRIVALS
           </h2>
-          <p className="text-sm md:text-md font-jost text-gray-700 mb-12 max-w-5xl mx-auto leading-relaxed">
+          <p className="text-sm md:text-lg font-jost text-gray-700 mb-14 max-w-5xl mx-auto leading-relaxed">
             From traditional treasures to modern delights, find the perfect picks for gifting and celebrating
           </p>
         </div>
@@ -96,7 +96,7 @@ const FeaturedCollection: React.FC<FeaturedCollectionProps> = ({ products }) => 
         <div className="text-center">
           <Link
             href="/products"
-            className="inline-flex items-center gap-2 bg-primary-red text-white px-4 py-3  font-[200] font-poppins text-[13px] hover:bg-primary-darkRed transition-all duration-300 transform hover:scale-105 shadow-lg"
+            className="inline-flex items-center gap-2 bg-primary-red text-white px-4 py-3  font-[400] tracking-wide font-general-sans text-[15px] hover:bg-primary-darkRed transition-all duration-300 transform hover:scale-105 shadow-lg"
           >
             View All Products
             <FiArrowRight className="w-3 h-4" />

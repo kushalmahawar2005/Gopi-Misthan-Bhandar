@@ -157,59 +157,107 @@ export default function EditSiteContent() {
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Section *</label>
-            <input
-              type="text"
-              value={formData.section}
-              disabled
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-100"
-            />
-          </div>
+        {/* For marquee section, show simplified form */}
+        {formData.section === 'marquee' ? (
+          <>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Section *</label>
+              <input
+                type="text"
+                value={formData.section}
+                disabled
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-100"
+              />
+            </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Title</label>
-            <input
-              type="text"
-              value={formData.title}
-              onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-red"
-            />
-          </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Marquee Text *</label>
+              <textarea
+                rows={3}
+                value={formData.description}
+                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-red"
+                placeholder="Enter marquee text (e.g., 🎉 Special Offer: Get 10% OFF on your first order! Use code FIRSTBUY10 🎉)"
+                required
+              />
+              <p className="mt-2 text-sm text-gray-500">
+                This text will scroll from right to left in the top banner. You can include emojis and special offers.
+              </p>
+            </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Subtitle</label>
-            <input
-              type="text"
-              value={formData.subtitle}
-              onChange={(e) => setFormData({ ...formData, subtitle: e.target.value })}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-red"
-            />
-          </div>
+            <div>
+              <label className="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  checked={formData.isActive}
+                  onChange={(e) => setFormData({ ...formData, isActive: e.target.checked })}
+                  className="w-4 h-4"
+                />
+                <span className="text-sm font-medium text-gray-700">Show on website</span>
+              </label>
+              <p className="mt-1 text-sm text-gray-500">
+                When unchecked, the marquee line will be hidden from the website.
+              </p>
+            </div>
+          </>
+        ) : (
+          <>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Section *</label>
+                <input
+                  type="text"
+                  value={formData.section}
+                  disabled
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-100"
+                />
+              </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Main Image URL</label>
-            <input
-              type="url"
-              value={formData.mainImage}
-              onChange={(e) => setFormData({ ...formData, mainImage: e.target.value })}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-red"
-            />
-          </div>
-        </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Title</label>
+                <input
+                  type="text"
+                  value={formData.title}
+                  onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-red"
+                />
+              </div>
 
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">Description</label>
-          <textarea
-            rows={4}
-            value={formData.description}
-            onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-red"
-          />
-        </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Subtitle</label>
+                <input
+                  type="text"
+                  value={formData.subtitle}
+                  onChange={(e) => setFormData({ ...formData, subtitle: e.target.value })}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-red"
+                />
+              </div>
 
-        {/* Content Section */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Main Image URL</label>
+                <input
+                  type="url"
+                  value={formData.mainImage}
+                  onChange={(e) => setFormData({ ...formData, mainImage: e.target.value })}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-red"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Description</label>
+              <textarea
+                rows={4}
+                value={formData.description}
+                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-red"
+              />
+            </div>
+          </>
+        )}
+
+        {/* Content Section - Hide for marquee */}
+        {formData.section !== 'marquee' && (
         <div className="border-t pt-6">
           <h3 className="text-lg font-bold mb-4">Main Content</h3>
           <div className="space-y-4">
@@ -243,8 +291,10 @@ export default function EditSiteContent() {
             </div>
           </div>
         </div>
+        )}
 
-        {/* Gifts Content Section */}
+        {/* Gifts Content Section - Hide for marquee */}
+        {formData.section !== 'marquee' && (
         <div className="border-t pt-6">
           <h3 className="text-lg font-bold mb-4">Gifts Content</h3>
           <div className="space-y-4">
@@ -278,8 +328,10 @@ export default function EditSiteContent() {
             </div>
           </div>
         </div>
+        )}
 
-        {/* Stats Section */}
+        {/* Stats Section - Hide for marquee */}
+        {formData.section !== 'marquee' && (
         <div className="border-t pt-6">
           <div className="flex justify-between items-center mb-4">
             <h3 className="text-lg font-bold">Stats</h3>
@@ -331,8 +383,10 @@ export default function EditSiteContent() {
             ))}
           </div>
         </div>
+        )}
 
-        {/* Additional Images */}
+        {/* Additional Images - Hide for marquee */}
+        {formData.section !== 'marquee' && (
         <div className="border-t pt-6">
           <div className="flex justify-between items-center mb-4">
             <h3 className="text-lg font-bold">Additional Images</h3>
@@ -366,7 +420,10 @@ export default function EditSiteContent() {
             ))}
           </div>
         </div>
+        )}
 
+        {/* Active toggle - Only show for non-marquee sections */}
+        {formData.section !== 'marquee' && (
         <div>
           <label className="flex items-center gap-2">
             <input
@@ -378,6 +435,7 @@ export default function EditSiteContent() {
             <span className="text-sm font-medium text-gray-700">Active</span>
           </label>
         </div>
+        )}
 
         <div className="flex gap-4">
           <button
