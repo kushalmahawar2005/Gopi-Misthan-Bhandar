@@ -61,7 +61,7 @@ const HeroSection = () => {
   if (slides.length === 0) return null;
 
   return (
-    <section className="relative w-full h-[500px] md:h-[450px] lg:h-[500px] overflow-hidden mt-0">
+    <section className="relative w-full h-[500px] md:h-[450px] mb-4 lg:mb-4 lg:h-[600px] overflow-hidden mt-0">
       {/* Slides */}
       <div className="relative w-full h-full">
         {slides.map((slide, index) => (

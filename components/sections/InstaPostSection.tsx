@@ -1,8 +1,9 @@
 'use client';
 
-import React, { useState, useRef } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { FaInstagram } from 'react-icons/fa';
 
 interface InstaPostSectionProps {
   instaPosts: Array<{
@@ -14,56 +15,26 @@ interface InstaPostSectionProps {
 }
 
 const InstaPostSection: React.FC<InstaPostSectionProps> = ({ instaPosts }) => {
-  const [paused, setPaused] = useState(false);
-  const [isDragging, setIsDragging] = useState(false);
-  const [startX, setStartX] = useState(0);
-  const [manualOffset, setManualOffset] = useState(0);
-
-  const containerRef = useRef<HTMLDivElement>(null);
-  const trackRef = useRef<HTMLDivElement>(null);
+  const [index, setIndex] = useState(0);
+  const sliderRef = useRef<HTMLDivElement>(null);
 
   if (!instaPosts || instaPosts.length === 0) return null;
 
-  // duplicate for seamless loop
-  const duplicated = [...instaPosts, ...instaPosts];
+  // Auto-slide every 3 sec
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setIndex((prev) => (prev + 1) % instaPosts.length);
+    }, 3000);
 
-  // speed control (smaller = faster)
-  const durationSec = 30;
+    return () => clearInterval(interval);
+  }, [instaPosts.length]);
 
-  // Touch/Mouse handlers for swipe
-  const handleStart = (e: React.TouchEvent | React.MouseEvent) => {
-    setIsDragging(true);
-    setPaused(true);
-    const clientX = 'touches' in e ? e.touches[0].clientX : (e as React.MouseEvent).clientX;
-    setStartX(clientX);
-  };
-
-  const handleMove = (e: React.TouchEvent | React.MouseEvent) => {
-    if (!isDragging) return;
-    e.preventDefault();
-    const clientX = 'touches' in e ? e.touches[0].clientX : (e as React.MouseEvent).clientX;
-    const x = clientX - startX;
-    setManualOffset(x);
-  };
-
-  const handleEnd = () => {
-    setIsDragging(false);
-    // Reset offset smoothly
-    setTimeout(() => {
-      setManualOffset(0);
-      // Resume marquee after a short delay
-      setTimeout(() => setPaused(false), 500);
-    }, 100);
-  };
-
-  // Merge both previous onMouseLeave behaviors
-  const handleMouseLeave = () => {
-    if (isDragging) {
-      handleEnd();
-    } else {
-      setPaused(false);
+  // Slide logic
+  useEffect(() => {
+    if (sliderRef.current) {
+      sliderRef.current.style.transform = `translateX(-${index * 320}px)`;
     }
-  };
+  }, [index]);
 
   return (
     <section className="py-12 md:py-16 px-4 bg-white w-full">
@@ -72,72 +43,39 @@ const InstaPostSection: React.FC<InstaPostSectionProps> = ({ instaPosts }) => {
           FOLLOW US ON INSTAGRAM
         </h3>
 
-        {/* Marquee container with swipe support */}
-        <div
-          ref={containerRef}
-          className="relative overflow-hidden w-full cursor-grab active:cursor-grabbing select-none"
-          onMouseEnter={() => !isDragging && setPaused(true)}
-          onMouseDown={handleStart}
-          onMouseMove={handleMove}
-          onMouseUp={handleEnd}
-          onMouseLeave={handleMouseLeave}   // <-- single prop
-          onTouchStart={handleStart}
-          onTouchMove={handleMove}
-          onTouchEnd={handleEnd}
-        >
-          {/* Wrapper for manual swipe offset */}
+        {/* Slider Container */}
+        <div className="relative overflow-hidden w-full">
+          {/* Track */}
           <div
-            style={{
-              transform: isDragging ? `translateX(${manualOffset}px)` : 'translateX(0)',
-              transition: isDragging ? 'none' : 'transform 0.3s ease-out',
-            }}
+            ref={sliderRef}
+            className="flex gap-6 transition-transform duration-700 ease-in-out"
+            style={{ width: `${instaPosts.length * 320}px` }}
           >
-            {/* Track (200% width because of duplication) */}
-            <div
-              ref={trackRef}
-              className="flex gap-4 md:gap-6 lg:gap-8 w-[200%]"
-              style={{
-                animation: `marquee ${durationSec}s linear infinite`,
-                animationPlayState: paused ? 'paused' : 'running',
-              }}
-            >
-              {duplicated.map((post, i) => (
-                <Link
-                  key={`${post._id}-${i}`}
-                  href={post.instagramUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="relative flex-shrink-0 w-[200px] sm:w-[240px] md:w-[280px] lg:w-[320px] xl:w-[360px]
-                             h-[280px] sm:h-[320px] md:h-[360px] lg:h-[400px] xl:h-[450px]
-                             overflow-hidden rounded-lg cursor-pointer transition-transform duration-300 hover:scale-[1.05] shadow-lg"
-                  onClick={(e) => {
-                    if (isDragging) e.preventDefault(); // block click during drag
-                  }}
-                >
-                  <Image
-                    src={post.imageUrl || `https://picsum.photos/seed/igpost${post._id}/200/360`}
-                    alt={post.caption || 'Instagram post'}
-                    fill
-                    className="object-cover object-center"
-                    sizes="(max-width: 640px) 200px, (max-width: 768px) 240px, (max-width: 1024px) 280px, (max-width: 1280px) 320px, 360px"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent opacity-0 hover:opacity-100 transition-opacity" />
-                </Link>
-              ))}
-            </div>
-          </div>
+            {instaPosts.map((post) => (
+              <Link
+                key={post._id}
+                href={post.instagramUrl}
+                target="_blank"
+                className="relative w-[220px] h-[260px] flex-shrink-0  overflow-hidden shadow-lg group cursor-pointer"
 
-          {/* keyframes */}
-          <style jsx>{`
-            @keyframes marquee {
-              0% {
-                transform: translateX(0);
-              }
-              100% {
-                transform: translateX(-50%);
-              }
-            }
-          `}</style>
+              >
+                <Image
+                  src={post.imageUrl || `https://picsum.photos/seed/ig${post._id}/300/340`}
+                  alt={post.caption || 'Instagram Post'}
+                  fill
+                  className="object-cover object-center group-hover:scale-110 transition-transform duration-500"
+                />
+
+                {/* Shadow Overlay */}
+                <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+
+                {/* Instagram Icon */}
+                <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                  <FaInstagram className="text-white text-4xl drop-shadow-xl" />
+                </div>
+              </Link>
+            ))}
+          </div>
         </div>
       </div>
     </section>
