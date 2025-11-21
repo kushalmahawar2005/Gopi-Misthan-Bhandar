@@ -138,7 +138,7 @@ const VideoCard: React.FC<VideoCardProps> = ({ item }) => {
       </div>
 
       {/* Label */}
-      <p className="text-black text-[23px] mb-8 mt-2  md:text-base font-serif mt-4 text-center font-medium">
+      <p className="text-black text-[23px] mb-8 mt-2  md:text-base font-jost mt-4 text-center font-medium">
         {item.label}
       </p>
     </div>

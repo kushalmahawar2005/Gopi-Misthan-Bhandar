@@ -124,7 +124,7 @@ const FeaturedCollection: React.FC<FeaturedCollectionProps> = ({ products }) => 
             <h2 className="text-3xl md:text-4xl lg:text-5xl font-general-sans text-black mb-4 font-[500]">
               New Arrivals
             </h2>
-            <p className="text-sm md:text-base lg:text-lg font-jost text-gray-700 mb-6 leading-relaxed max-w-md">
+            <p className="text-sm md:text-base lg:text-lg font-jost text-gray-700  leading-relaxed max-w-md">
               From traditional treasures to modern delights, discover the freshest picks
               crafted for gifting, celebrations, and every sweet craving in between.
             </p>

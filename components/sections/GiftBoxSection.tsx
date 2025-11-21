@@ -21,27 +21,27 @@ const GiftBoxSection: React.FC<GiftBoxSectionProps> = ({ giftBoxes }) => {
   const [featured, ...rest] = giftBoxes;
 
   return (
-    <section className="py-12 md:py-20 px-4 bg-white w-full">
+    <section className="py-12  mt-12 md:py-20 px-4 bg-white w-full">
       <div className="w-full max-w-7xl mx-auto">
         {/* Heading */}
-        <h2 className="text-center text-4xl text-black mb-2 font-general-sans md:mb-4 font-[500]">
+        <h2 className="md:text-center text-4xl text-black mb-2 font-jost leading-relaxed md:mb-4 font-[500]">
           GIFT BOX
         </h2>
-        <p className="text-gray-800 text-sm text-center lg:text-[15px] md:text-md font-jost mb-12 leading-relaxed">
+        <p className="text-gray-800 text-sm md:text-center lg:text-[15px] md:text-md font-jost mb-12 leading-relaxed">
           Exquisitely packaged to benefit every occasion, we celebrate your pride, happiness and relationships with absolute grandeur.
         </p>
 
         {/* Layout:
-            Mobile: 1 column (hero upar, baaki niche)
+            Mobile: sirf right side products (2 per row), hero HIDE
             Desktop: 2 columns - left big, right 2-per-row cards */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-8 items-start">
-          {/* LEFT: BIG HERO CARD */}
-          <div className="lg:col-span-1">
+          {/* LEFT: BIG HERO CARD (sirf lg+ screens pe) */}
+          <div className="lg:block lg:col-span-1">
             <Link
               href={`/products?category=${featured.category}`}
               className="group block w-full h-full"
             >
-              <div className="relative w-full h-[320px] sm:h-[380px]  md:h-[830px] overflow-hidden">
+              <div className="relative w-full h-[420px] sm:h-[480px] md:h-[830px] overflow-hidden">
                 <Image
                   src={featured.imageUrl}
                   alt={featured.title}
@@ -68,22 +68,23 @@ const GiftBoxSection: React.FC<GiftBoxSectionProps> = ({ giftBoxes }) => {
             </Link>
           </div>
 
-          {/* RIGHT: SMALL PRODUCT CARDS (2 per row on desktop) */}
+          {/* RIGHT: SMALL PRODUCT CARDS */}
           <div className="lg:col-span-1 w-full">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-6">
+            {/* MOBILE + DESKTOP: 1 row me 2 product => grid-cols-2 */}
+            <div className="grid grid-cols-2 gap-4 md:gap-6">
               {rest.map((item) => (
                 <div
                   key={item._id}
-                  className="group bg-white overflow-hidden  flex flex-col"
+                  className="group bg-white overflow-hidden flex flex-col"
                 >
                   {/* Image + hover button inside card */}
-                  <div className="relative w-full h-[280px] sm:h-[190px] md:h-[300px] lg:h-[320px] overflow-hidden">
+                  <div className="relative w-full h-[180px] sm:h-[190px] md:h-[260px] lg:h-[320px] overflow-hidden">
                     <Image
                       src={item.imageUrl}
                       alt={item.title}
                       fill
                       className="object-cover transition-transform duration-500 group-hover:scale-105"
-                      sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 25vw"
+                      sizes="(max-width: 768px) 50vw, (max-width: 1024px) 50vw, 25vw"
                       priority={false}
                     />
 
@@ -103,10 +104,10 @@ const GiftBoxSection: React.FC<GiftBoxSectionProps> = ({ giftBoxes }) => {
 
                   {/* Details (image ke niche) */}
                   <div className="px-3 md:px-4 pt-3 pb-4 flex flex-col gap-2">
-                    <h3 className="text-sm md:text-base text-center md:text-left font-general-sans font-[500] text-primary-brown">
+                    <h3 className="text-xs sm:text-sm md:text-base text-center md:text-left font-general-sans font-[500] text-primary-brown">
                       {item.title}
                     </h3>
-                    <p className="text-gray-800 text-xs md:text-sm text-center font-jost md:text-left leading-relaxed">
+                    <p className="text-gray-800 text-[10px] sm:text-xs md:text-sm text-center font-jost md:text-left leading-relaxed">
                       {item.description}
                     </p>
                   </div>
