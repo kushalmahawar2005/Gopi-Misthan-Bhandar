@@ -222,6 +222,19 @@
   animation: fadeIn 0.8s ease-out forwards;
 }
 
+/* Exclude headings from scroll animation */
+.scroll-animate h1,
+.scroll-animate h2,
+.scroll-animate h3,
+.scroll-animate h4,
+.scroll-animate h5,
+.scroll-animate h6 {
+  opacity: 1 !important;
+  transform: none !important;
+  animation: none !important;
+  transition: none !important;
+}
+
 /* Smooth scroll behavior */
 html {
   scroll-behavior: smooth;

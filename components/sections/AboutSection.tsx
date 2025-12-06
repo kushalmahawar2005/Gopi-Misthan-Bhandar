@@ -2,88 +2,107 @@
 
 import React from 'react';
 import Image from 'next/image';
-import { FiCheck } from 'react-icons/fi';
+import Link from 'next/link';
 
-const AboutSection = () => {
-  const features = ['Quality Products', 'Custom Products', 'Online Order', 'Home Delivery'];
-
+const AboutHero: React.FC = () => {
   return (
-    <section className="relative bg-primary-darkRed text-white overflow-hidden
-                        px-4 py-8 md:py-12 w-full">
-      {/* TOP scalloped divider */}
+    <section className="w-full px-4 md:px-8 lg:px-16">
+      {/* Card container */}
       <div
-        aria-hidden="true"
-        className="pointer-events-none absolute left-0 top-[-1px] w-full h-6 md:h-10 z-20 bg-white rotate-180
-                   [mask:radial-gradient(1.25rem_1.25rem_at_1.25rem_0,#0000_98%,#000)_0_0/2.5rem_100%]
-                   [-webkit-mask:radial-gradient(1.25rem_1.25rem_at_1.25rem_0,#0000_98%,#000)_0_0/2.5rem_100%]"
-      />
-      
-      {/* safe space so top scallop not overlap */}
-      <div className="pt-6 md:pt-8 max-w-6xl mx-auto mb-6">
-        {/* Heading */}
-        <div className="mb-6">
-          <h2 className="text-primary-yellow text-center font-poppins font-extrabold
-                         text-xl sm:text-2xl md:text-3xl">
-            GOPI MISTHAN BHANDAR
-          </h2>
-          <p className="text-primary-yellow text-center mt-1 text-xs sm:text-sm md:text-[14px] ">
-            Serving Tradition & Sweetness Since
-          </p>
-          <p className = "text-center mt-2 font-bold font-poppins text-primary-yellow text-2xl">1968</p>
-        </div>
-
-        {/* Content */}
-        <div className="flex flex-col md:flex-row items-center md:items-start gap-8 md:gap-16">
-          {/* Image (mobile full width, desktop half) */}
-          <div className="relative w-full md:w-1/2  h-56 sm:h-64 md:h-80 lg:h-[280px]
-                          rounded-xl overflow-hidden shadow-xl">
-            <Image
-              src="/2.png"
-              alt="Gopi Misthan Bhandar Shop"
-              fill
-              className="object-cover object-center"
-              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 600px"
-              priority
-            />
-          </div>
-
-          {/* Text + Features */}
-          <div className="w-full md:w-1/2 text-center md:text-left md:pl-2">
-            <h3 className="font-poppins font-bold text-lg sm:text-xl md:text-2xl mb-2">
-              Where Tradition Meets the Taste of Love
-            </h3>
-            <p className="text-xs sm:text-sm md:text-base leading-relaxed">
-              Since 1968, we’ve been spreading the sweetness of tradition with pure desi ghee and
-              timeless recipes — made straight from the heart.
-            </p>
-            <p className="text-xs sm:text-sm md:text-base leading-relaxed mt-2">
-              Every bite tells a story of purity, tradition, and love — that’s the Gopi Misthan
-              Bhandar way.
-            </p>
-
-            {/* Features - Mobile: 2x2 grid, Desktop: inline */}
-            <div className="grid grid-cols-2 gap-3 md:gap-y-2 md:gap-x-4 mt-6">
-              {features.map((f, i) => (
-                <div key={i} className="flex items-center gap-2 justify-center md:justify-start">
-                  <FiCheck className="text-primary-yellow text-lg sm:text-xl md:text-lg shrink-0 font-bold" />
-                  <span className="text-sm sm:text-base md:text-base text-white font-medium">{f}</span>
+        className="mx-auto w-full max-w-[1200px] rounded-xl overflow-hidden mt-8 md:mt-10 mb-12"
+        aria-label="About hero"
+      >
+        {/* Background: pale beige with subtle pattern (use provided bg image) */}
+        <div
+          className="relative bg-[color:var(--beige,#f6efe8)]"
+          style={{
+            backgroundImage: "url('/about/bg-pattern.png')",
+            backgroundRepeat: 'repeat',
+            backgroundSize: '500px',
+          }}
+        >
+          <div className="px-6 md:px-10 lg:px-12 py-10 md:py-14 lg:py-16">
+            <div className="flex flex-col md:flex-row items-center gap-8 md:gap-12">
+              
+              {/* Left: image group */}
+              <div className="w-full md:w-6/12 flex items-start gap-4">
+                {/* Large left image */}
+                <div className="w-2/3 md:w-[56%]">
+                  <div className="relative rounded-md overflow-hidden shadow-sm">
+                    <Image
+                      src="/about/box-large.jpg"
+                      alt="Product box"
+                      width={720}
+                      height={720}
+                      className="object-cover w-full h-[320px] md:h-[360px]"
+                      sizes="(max-width: 768px) 100vw, 45vw"
+                      priority
+                    />
+                  </div>
                 </div>
-              ))}
+
+                {/* Two stacked small images */}
+                <div className="w-1/3 md:w-[44%] flex flex-col gap-4">
+                  <div className="relative rounded-md overflow-hidden shadow-sm">
+                    <Image
+                      src="/about/box-small1.jpg"
+                      alt="Small 1"
+                      width={320}
+                      height={160}
+                      className="object-cover w-full h-[150px]"
+                      sizes="(max-width: 768px) 100vw, 20vw"
+                      priority
+                    />
+                  </div>
+                  <div className="relative rounded-md overflow-hidden shadow-sm">
+                    <Image
+                      src="/about/box-small2.jpg"
+                      alt="Small 2"
+                      width={320}
+                      height={160}
+                      className="object-cover w-full h-[150px]"
+                      sizes="(max-width: 768px) 100vw, 20vw"
+                      priority
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Right: heading + text + button */}
+              <div className="w-full md:w-6/12">
+                <h2 className="font-serif text-3xl md:text-4xl lg:text-5xl text-[#1c1c1c] leading-tight mb-4">
+                  A Legacy of Sweet Excellence
+                </h2>
+
+                <p className="text-sm md:text-base text-[#3d3d3d] mb-4 max-w-xl">
+                  With over four decades of mastery in crafting premium Indian sweets,
+                  Chhappanbhog stands as a hallmark of tradition, purity, and flavor.
+                </p>
+
+                <p className="text-sm md:text-base text-[#3d3d3d] mb-6 max-w-xl">
+                  Our commitment is simple yet profound — to bring the rich, authentic taste of India's royal heritage
+                  to your celebrations, one exquisite bite at a time.
+                </p>
+
+                <div>
+                  <Link
+                    href="/about"
+                    className="inline-block bg-[#9b1f24] hover:bg-[#7f191d] text-white px-6 md:px-8 py-2.5 md:py-3 rounded-md font-medium transition-colors shadow-sm"
+                  >
+                    Learn More
+                  </Link>
+                </div>
+              </div>
+
             </div>
           </div>
+
+          {/* Decorative border radius / outer spacing (subtle) */}
+          <div className="pointer-events-none absolute inset-0 rounded-xl ring-0" />
         </div>
       </div>
-
-      {/* BOTTOM scalloped divider + bottom safe space */}
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute -bottom-px left-0 w-full h-6 md:h-10 z-20 bg-white
-                   [mask:radial-gradient(1.25rem_1.25rem_at_1.25rem_0,#0000_98%,#000)_0_0/2.5rem_100%]
-                   [-webkit-mask:radial-gradient(1.25rem_1.25rem_at_1.25rem_0,#0000_98%,#000)_0_0/2.5rem_100%]"
-      />
-      <div className="pb-6 md:pb-8" />
     </section>
   );
 };
 
-export default AboutSection;
+export default AboutHero;
