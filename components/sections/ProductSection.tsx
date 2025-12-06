@@ -10,58 +10,58 @@ interface ProductSectionProps {
   title: string;
   subtitle?: string;
   products: Product[];
-  bgColor?: 'beige' | 'red';
   showViewMore?: boolean;
   viewMoreLink?: string;
 }
 
-const ProductSection: React.FC<ProductSectionProps> = ({ 
-  title, 
-  subtitle, 
-  products, 
-  bgColor = 'beige',
+const ProductSection: React.FC<ProductSectionProps> = ({
+  title,
+  subtitle,
+  products,
   showViewMore = true,
   viewMoreLink = '/products',
 }) => {
-  const bgClass = bgColor === 'red' ? 'bg-primary-red' : 'bg-gradient-to-b from-white to-gray-50';
-  const textColor = bgColor === 'red' ? 'text-white' : 'text-black';
-
   return (
-    <section className={`${bgClass} py-12 md:py-20 px-4 w-full`}>
+    <section className="w-full py-12 md:py-20 px-4">
       <div className="w-full">
+
+        {/* ---------------------- 
+            Heading + Subtitle (Clean)
+        ----------------------- */}
         {title && (
           <div className="text-center mb-12">
-            <h2 className={`text-3xl md:text-4xl lg:text-5xl font-serif ${textColor} mb-4 font-bold`}>
+            <h2 className="text-3xl md:text-4xl lg:text-5xl font-general-sans text-black font-[500] tracking-wide">
               {title}
             </h2>
+
             {subtitle && (
-              <p className={`text-base md:text-lg font-serif ${bgColor === 'red' ? 'text-gray-100' : 'text-gray-600'} mb-8 max-w-3xl mx-auto leading-relaxed`}>
-              {subtitle}
-            </p>
+              <p className="text-base md:text-lg text-gray-600 mt-4 max-w-3xl mx-auto leading-relaxed font-serif">
+                {subtitle}
+              </p>
             )}
           </div>
         )}
-        
-        {/* Product Cards Grid */}
+
+        {/* ---------------------- 
+            Product Grid
+        ----------------------- */}
         <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-4 xl:grid-cols-4 gap-3 md:gap-4 lg:gap-5 mb-12">
           {products.map((product) => (
             <ProductCard key={product.id} product={product} />
           ))}
         </div>
 
-        {/* View More Button */}
+        {/* ---------------------- 
+            View More Button
+        ----------------------- */}
         {showViewMore && products.length > 0 && (
           <div className="text-center">
             <Link
               href={viewMoreLink}
-              className={`inline-flex items-center gap-2 ${
-                bgColor === 'red'
-                  ? 'bg-white text-primary-red hover:bg-gray-100'
-                  : 'bg-primary-red text-white hover:bg-primary-darkRed'
-              } px-4 py-3 font-[200] font-poppins text-[15px] transition-all duration-300 transform hover:scale-105 shadow-lg`}
+              className="inline-flex items-center gap-2 bg-red-700 text-white px-8 py-4 font-light text-lg md:text-xl rounded-md transition-all duration-300 hover:bg-red-800 hover:scale-105 shadow-md"
             >
               View More Products
-              <FiArrowRight className="w-3 h-3" />
+              <FiArrowRight className="w-5 h-5" />
             </Link>
           </div>
         )}

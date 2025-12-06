@@ -6,6 +6,7 @@ import Navigation from '@/components/Navigation';
 import Cart from '@/components/Cart';
 import HeroSection from '@/components/HeroSection';
 import FeaturedCollection from '@/components/sections/FeaturedCollection';
+import PromotionalBanner from '@/components/sections/PromotionalBanner';
 import AboutSection from '@/components/sections/AboutSection';
 import CategoriesSection from '@/components/sections/CategoriesSection';
 import ProductSection from '@/components/sections/ProductSection';
@@ -101,45 +102,28 @@ export default function Home() {
         </div>
       </ScrollAnimation>
       
+      {/* Promotional Banner */}
+      <PromotionalBanner />
+      
       <ScrollAnimation delay={150}>
         <CategoriesSection categories={categories} />
-      </ScrollAnimation>
-      
-      {/* Decorative Banner - 2nd Image */}
-      <ScrollAnimation fadeOnly delay={100}>
-        <DecorativeBanner 
-          image="/banner-2.png"
-          alt="Classic Sweets Banner"
-          bgColor="brown"
-          height="h-12 sm:h-16 md:h-20 lg:h-24 xl:h-28"
-        />
       </ScrollAnimation>
       
       <ScrollAnimation delay={200}>
         <div id="sweets">
           <ProductSection 
-            title=""
+            title="Classic Sweets"
+            subtitle="Savour The Timeless Taste of Tradition With Kesar Classic Sweets"
             products={classicProducts}
-            bgColor="beige"
           />
         </div>
       </ScrollAnimation>
       
-      {/* Decorative Banner - 3rd Image */}
-      <ScrollAnimation fadeOnly delay={100}>
-        <DecorativeBanner 
-          image="/banner-3.png"
-          alt="Premium Sweets Banner"
-          bgColor="red"
-          height="h-12 sm:h-16 md:h-20 lg:h-24 xl:h-28"
-        />
-      </ScrollAnimation>
-      
       <ScrollAnimation delay={200}>
         <ProductSection 
-          title=""
+          title="Premium Sweets"
+          subtitle="Savour The Timeless Taste of Tradition With Kesar Classic Sweets"
           products={premiumProducts}
-          bgColor="beige"
         />
       </ScrollAnimation>
       

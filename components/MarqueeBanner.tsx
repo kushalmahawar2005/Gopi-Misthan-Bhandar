@@ -7,7 +7,7 @@ interface MarqueeBannerProps {
 }
 
 const MarqueeBanner: React.FC<MarqueeBannerProps> = ({ text }) => {
-  const [marqueeText, setMarqueeText] = useState(text || '🎉 Special Offer: Get 10% OFF on your first order! Use code FIRSTBUY10 🎉');
+  const [marqueeText, setMarqueeText] = useState(text || 'ALERT: Same day delivery in Delhi NCR for all orders placed before 5pm.');
 
   useEffect(() => {
     // Fetch marquee text from API (only active content)
@@ -18,36 +18,25 @@ const MarqueeBanner: React.FC<MarqueeBannerProps> = ({ text }) => {
         if (data.success && data.data?.description && data.data?.isActive) {
           setMarqueeText(data.data.description);
         } else {
-          // If no active marquee, hide the banner
-          setMarqueeText('');
+          // If no active marquee, use default text
+          setMarqueeText(text || 'ALERT: Same day delivery in Delhi NCR for all orders placed before 5pm.');
         }
       } catch (error) {
         console.error('Error fetching marquee text:', error);
-        setMarqueeText('');
+        setMarqueeText(text || 'ALERT: Same day delivery in Delhi NCR for all orders placed before 5pm.');
       }
     };
 
     fetchMarqueeText();
-  }, []);
+  }, [text]);
 
-  // Don't render if no text or if explicitly hidden
-  if (!marqueeText || marqueeText.trim() === '') return null;
-
+  // Always render the banner
   return (
-    <div className="bg-primary-red text-white overflow-hidden relative h-10 md:h-10 w-full">
-      <div className="marquee-container h-full flex items-center">
-        <div className="marquee-content whitespace-nowrap flex items-center gap-8">
-          {/* Duplicate content for seamless loop */}
-          <span className="text-[10px] md:text-xs font-bold font-sans tracking-wide">
-            {marqueeText}
-          </span>
-          <span className="text-[10px] md:text-xs font-bold font-sans tracking-wide">
-            {marqueeText}
-          </span>
-          <span className="text-[10px] md:text-xs font-bold font-sans tracking-wide">
-            {marqueeText}
-          </span>
-        </div>
+    <div className="bg-gray-900 text-white w-full py-2.5 md:py-3">
+      <div className="max-w-7xl mx-auto px-4 md:px-6">
+        <p className="text-xs md:text-sm font-medium text-center leading-tight">
+          {marqueeText}
+        </p>
       </div>
     </div>
   );
