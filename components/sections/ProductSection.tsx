@@ -30,7 +30,7 @@ const ProductSection: React.FC<ProductSectionProps> = ({
         ----------------------- */}
         {title && (
           <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl lg:text-5xl font-serif text-black font-bold tracking-wide">
+            <h2 className="text-3xl md:text-4xl lg:text-5xl font-general-sans text-black font-[500] tracking-wide">
               {title}
             </h2>
 
