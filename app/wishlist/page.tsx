@@ -45,10 +45,10 @@ export default function WishlistPage() {
 
         {/* Page Header */}
         <div className="bg-gradient-to-r from-primary-red to-primary-darkRed py-8 md:py-12 px-4">
-          <div className="max-w-7xl mx-auto">
+          <div className="max-w-7xl text-center mx-auto">
             <div className="flex items-center justify-between">
-              <div>
-                <h1 className="text-3xl md:text-4xl font-bold font-serif text-white">
+              <div className="text-center">
+                <h1 className="text-3xl md:text-4xl font-[500] font-general-sans text-white">
                   My Wishlist
                 </h1>
                 <p className="text-lg text-gray-100 mt-2">
@@ -73,7 +73,7 @@ export default function WishlistPage() {
             /* Empty State */
             <div className="bg-white rounded-lg shadow-md p-12 text-center">
               <FiHeart className="w-20 h-20 text-gray-300 mx-auto mb-6" />
-              <h2 className="text-2xl font-bold font-serif text-gray-800 mb-4">
+              <h2 className="text-2xl font-[500] font-general-sans text-gray-800 mb-4">
                 Your Wishlist is Empty
               </h2>
               <p className="text-gray-600 mb-8 max-w-md mx-auto">
@@ -81,7 +81,7 @@ export default function WishlistPage() {
               </p>
               <Link
                 href="/products"
-                className="inline-flex items-center gap-2 bg-primary-red text-white px-8 py-3 rounded-lg font-bold font-serif text-lg hover:bg-primary-darkRed transition-colors"
+                className="inline-flex items-center gap-2 bg-primary-red text-white px-8 py-3 rounded-lg font-[450] font-general-sans text-lg hover:bg-primary-darkRed transition-colors"
               >
                 <FiShoppingBag className="w-5 h-5" />
                 Start Shopping
