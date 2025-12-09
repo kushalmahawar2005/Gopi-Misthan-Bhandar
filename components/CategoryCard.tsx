@@ -15,14 +15,14 @@ const CategoryCard: React.FC<CategoryCardProps> = ({ category }) => {
     : "/c-1.jpg";
 
   return (
-    <div className="relative h-[400px] md:h-[450px] lg:h-[500px] w-[320px] md:w-[350px] lg:w-[400px] overflow-hidden group cursor-pointer  shadow-lg hover:shadow-2xl transition-all duration-300 bg-gray-200">
+    <div className="relative w-full aspect-[4/5] sm:aspect-[3/4] lg:aspect-[4/5] overflow-hidden group cursor-pointer shadow-lg hover:shadow-2xl transition-all duration-300 bg-gray-200 rounded-lg">
       {/* Background Image with Transition */}
       <Image
         src={imageSrc}
         alt={category.name}
         fill
         className="object-cover object-center transition-all duration-500 ease-in-out group-hover:scale-110 group-hover:brightness-110"
-        sizes="(max-width: 640px) 320px, (max-width: 1024px) 350px, 380px"
+        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
         unoptimized
       />
       

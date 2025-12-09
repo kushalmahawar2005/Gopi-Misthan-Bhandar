@@ -96,14 +96,14 @@ export default function Home() {
       <Cart />
       <HeroSection />
       
+      {/* Promotional Banner with Intro Animation */}
+      <PromotionalBanner />
+      
       <ScrollAnimation delay={100}>
         <div id="featured">
           <FeaturedCollection products={featuredProducts.slice(0, 8)} />
         </div>
       </ScrollAnimation>
-      
-      {/* Promotional Banner */}
-      <PromotionalBanner />
       
       <ScrollAnimation delay={150}>
         <CategoriesSection categories={categories} />

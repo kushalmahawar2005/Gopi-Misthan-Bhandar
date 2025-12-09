@@ -22,8 +22,8 @@ const ProductSection: React.FC<ProductSectionProps> = ({
   viewMoreLink = '/products',
 }) => {
   return (
-    <section className="w-full py-12 md:py-20 px-4">
-      <div className="w-full">
+    <section className="w-full pt-6 md:pt-8 pb-12 md:pb-20">
+      <div className="section-container w-full">
 
         {/* ----------------------
             HEADING + SUBTITLE
@@ -48,7 +48,7 @@ const ProductSection: React.FC<ProductSectionProps> = ({
         <div
           className="
             grid
-            grid-cols-2
+            grid-cols-1
             sm:grid-cols-2
             md:grid-cols-3
             lg:grid-cols-4
@@ -56,7 +56,6 @@ const ProductSection: React.FC<ProductSectionProps> = ({
             md:gap-8
             lg:gap-10
             mb-16
-            px-2
           "
         >
           {products.map((product) => (

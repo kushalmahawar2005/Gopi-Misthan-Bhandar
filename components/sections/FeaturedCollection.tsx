@@ -77,8 +77,8 @@ const FeaturedCollection: React.FC<FeaturedCollectionProps> = ({ products }) => 
   const displayProducts = products.slice(0, 4);
 
   return (
-    <section className="pt-10 pb-14 md:pt-16 md:pb-20 px-4 bg-white w-full">
-      <div className="max-w-6xl lg:max-w-7xl mx-auto">
+    <section className="pt-10 pb-14 md:pt-16 md:pb-20 bg-white w-full">
+      <div className="section-container max-w-6xl lg:max-w-7xl mx-auto">
         {/* Header: Title on left, View All button on right */}
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-8 md:mb-10">
           <div>
