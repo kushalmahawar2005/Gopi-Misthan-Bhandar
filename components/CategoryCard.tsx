@@ -30,9 +30,9 @@ const CategoryCard: React.FC<CategoryCardProps> = ({ category }) => {
       <div className="absolute inset-0  opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
       
       {/* Category Name Button - Orange/Red Style */}
-      <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 bg-primary-red tracking-wide px-8 py-4 font-[200] font-poppins text-[15px] z-10 group-hover:bg-primary-darkRed transition-all duration-300 group-hover:scale-105 shadow-lg">
-        <div className="flex items-center gap-2">
-          <p className="text-white text-sm font-sans tracking-wide font-bold uppercase">
+      <div className="absolute bottom-4 md:bottom-8 left-1/2 transform -translate-x-1/2 bg-primary-red tracking-wide px-2 py-1 md:px-8 md:py-4 font-[200] font-poppins text-[15px] z-10 group-hover:bg-primary-darkRed transition-all duration-300 group-hover:scale-105 shadow-lg max-w-[90%] md:max-w-none">
+        <div className="flex items-center gap-1 md:gap-2">
+          <p className="text-white text-[10px] md:text-sm font-sans tracking-wide font-bold uppercase whitespace-nowrap line-clamp-1">
             {category.name}
           </p>
           

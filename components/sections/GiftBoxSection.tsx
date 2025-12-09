@@ -20,18 +20,18 @@ const GiftBoxSection: React.FC<GiftBoxSectionProps> = ({ giftBoxes }) => {
   if (!giftBoxes || giftBoxes.length === 0) return null;
 
   return (
-    <section className="py-12 mt-12 md:py-20 px-4 bg-white w-full">
+    <section className="py-6 mt-6 md:py-12 md:mt-8 px-4 bg-white w-full">
       <div className="w-full max-w-7xl mx-auto">
         {/* Heading */}
         <h2 className="text-4xl text-black mb-2 font-jost font-[500] text-center">
           GIFT BOX
         </h2>
-        <p className="text-gray-800 text-sm md:text-[15px] font-jost mb-12 text-center max-w-3xl mx-auto leading-relaxed">
+        <p className="text-gray-800 text-sm md:text-[15px] font-jost mb-6 md:mb-8 text-center max-w-3xl mx-auto leading-relaxed">
           Exquisitely packaged to benefit every occasion, we celebrate your pride, happiness and relationships with absolute grandeur.
         </p>
 
         {/* Grid: make all cards same size (2 per row on mobile, 3 per row on md/lg) */}
-        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 md:gap-8 items-start">
+        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-5 lg:gap-6 items-start">
           {giftBoxes.map((item) => (
             <article key={item._id} className="group bg-white overflow-hidden flex flex-col rounded-md">
               {/* Image block */}

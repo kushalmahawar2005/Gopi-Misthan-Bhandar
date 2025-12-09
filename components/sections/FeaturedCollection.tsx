@@ -77,10 +77,10 @@ const FeaturedCollection: React.FC<FeaturedCollectionProps> = ({ products }) => 
   const displayProducts = products.slice(0, 4);
 
   return (
-    <section className="pt-10 pb-14 md:pt-16 md:pb-20 bg-white w-full">
+    <section className="pt-6 pb-8 md:pt-10 md:pb-12 bg-white w-full">
       <div className="section-container max-w-6xl lg:max-w-7xl mx-auto">
         {/* Header: Title on left, View All button on right */}
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-8 md:mb-10">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6 md:mb-8">
           <div>
             <h2 className="text-3xl md:text-4xl lg:text-5xl font-[450] text-black font-general-sans mb-2">
               New Arrivals
@@ -94,8 +94,8 @@ const FeaturedCollection: React.FC<FeaturedCollectionProps> = ({ products }) => 
           </Link>
         </div>
 
-        {/* Product Grid - 4 columns on desktop, 2 on tablet, 1 on mobile */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
+        {/* Product Grid - 4 columns on desktop, 2 on tablet and mobile */}
+        <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
           {displayProducts.map((product) => (
             <FeaturedProductCard key={product.id} product={product} />
           ))}
