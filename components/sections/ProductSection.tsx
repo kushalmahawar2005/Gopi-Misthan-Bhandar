@@ -48,13 +48,13 @@ const ProductSection: React.FC<ProductSectionProps> = ({
         <div
           className="
             grid
-            grid-cols-1
+            grid-cols-2
             sm:grid-cols-2
             md:grid-cols-3
             lg:grid-cols-4
-            gap-6
-            md:gap-8
-            lg:gap-10
+            gap-4
+            md:gap-5
+            lg:gap-6
             mb-16
           "
         >
@@ -72,10 +72,10 @@ const ProductSection: React.FC<ProductSectionProps> = ({
           <div className="text-center">
             <Link
               href={viewMoreLink}
-              className="inline-flex items-center gap-2 bg-red-700 text-white px-8 py-4 font-light text-lg md:text-xl rounded-md transition-all duration-300 hover:bg-red-800 hover:scale-105 shadow-md"
+              className="inline-flex items-center gap-1.5 bg-red-700 text-white px-5 py-2.5 md:px-6 md:py-3 font-light text-sm md:text-base rounded-md transition-all duration-300 hover:bg-red-800 hover:scale-105 shadow-md"
             >
               View More Products
-              <FiArrowRight className="w-5 h-5" />
+              <FiArrowRight className="w-4 h-4" />
             </Link>
           </div>
         )}

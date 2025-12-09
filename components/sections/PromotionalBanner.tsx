@@ -6,6 +6,7 @@ import { FiHeart, FiAward, FiPackage, FiTruck } from 'react-icons/fi';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import SplitText from '../SplitText';
+import ClickSpark from '../ClickSpark';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -13,6 +14,7 @@ const PromotionalBanner = () => {
   const [showTitle, setShowTitle] = useState(true);
   const [showFeatures, setShowFeatures] = useState(false);
   const [hasAnimated, setHasAnimated] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
   const titleRef = useRef<HTMLDivElement>(null);
   const featuresRef = useRef<HTMLDivElement>(null);
   const sectionRef = useRef<HTMLElement>(null);
@@ -49,7 +51,28 @@ const PromotionalBanner = () => {
   ];
 
   useEffect(() => {
-    // Initialize features as hidden
+    // Check if mobile
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    
+    return () => {
+      window.removeEventListener('resize', checkMobile);
+    };
+  }, []);
+
+  useEffect(() => {
+    // On mobile, show only title, skip fadeout
+    if (isMobile) {
+      setShowTitle(true);
+      setShowFeatures(false);
+      return;
+    }
+
+    // Initialize features as hidden (desktop only)
     if (featuresRef.current) {
       gsap.set(featuresRef.current, {
         opacity: 0,
@@ -57,7 +80,7 @@ const PromotionalBanner = () => {
       });
     }
 
-    // Set up ScrollTrigger to detect when section comes into view
+    // Set up ScrollTrigger to detect when section comes into view (desktop only)
     if (sectionRef.current) {
       const trigger = ScrollTrigger.create({
         trigger: sectionRef.current,
@@ -73,9 +96,12 @@ const PromotionalBanner = () => {
         trigger.kill();
       };
     }
-  }, []);
+  }, [isMobile]);
 
   const handleTitleAnimationComplete = () => {
+    // Skip fadeout on mobile
+    if (isMobile) return;
+    
     // Only proceed if section has been scrolled into view
     if (!hasAnimated) return;
     
@@ -118,15 +144,28 @@ const PromotionalBanner = () => {
   return (
     <section ref={sectionRef} className="w-full px-6 md:px-8 lg:px-12 mt-2 md:mt-4">
       <div className="max-w-7xl mx-auto bg-gradient-to-b from-[#941a1f] to-[#a21f28] rounded-xl md:rounded-2xl overflow-hidden">
-        <div className="py-6 md:py-8 lg:py-10 min-h-[100px] md:min-h-[110px] flex items-center relative px-4 md:px-6 lg:px-8">
-          {/* Title Animation - shown first */}
+        <ClickSpark
+          sparkColor="#fff"
+          sparkSize={10}
+          sparkRadius={15}
+          sparkCount={8}
+          duration={400}
+        >
+          <div className="py-6 md:py-8 lg:py-10 min-h-[100px] md:min-h-[110px] flex items-center relative px-4 md:px-6 lg:px-8">
+          {/* Title - Mobile: Always show, Desktop: Animation */}
           {showTitle && (
             <div
               ref={titleRef}
               className="flex items-center justify-center w-full absolute inset-0"
             >
               <div className="text-center w-full px-4">
-                {hasAnimated ? (
+                {isMobile ? (
+                  // Mobile: Simple text, no animation
+                  <h1 className="text-2xl md:text-3xl lg:text-4xl font-general-sans font-[450] text-white">
+                    Gopi Misthan Bhandar, Neemuch
+                  </h1>
+                ) : hasAnimated ? (
+                  // Desktop: Animated text
                   <SplitText
                     text="Gopi Misthan Bhandar, Neemuch"
                     className="text-2xl md:text-3xl lg:text-4xl font-general-sans font-[450] text-white"
@@ -194,7 +233,8 @@ const PromotionalBanner = () => {
               })}
             </div>
           )}
-        </div>
+          </div>
+        </ClickSpark>
       </div>
     </section>
   );

@@ -249,13 +249,13 @@ const Navigation = () => {
 
           {/* Center: Logo */}
           <Link href="/" className="absolute left-1/2 transform -translate-x-1/2 py-2 md:py-3 mt-2">
-            <div className="relative w-28 h-16 md:w-32 md:h-16 lg:w-40 lg:h-20">
+            <div className="relative w-20 h-12 md:w-32 md:h-16 lg:w-40 lg:h-20">
               <Image
                 src="/logo.png"
                 alt="Logo"
                 fill
                 className="object-contain"
-                sizes="(max-width: 768px) 112px, (max-width: 1024px) 144px, 176px"
+                sizes="(max-width: 768px) 80px, (max-width: 1024px) 144px, 176px"
                 priority
               />
             </div>

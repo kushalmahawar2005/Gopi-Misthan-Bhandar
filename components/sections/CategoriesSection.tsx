@@ -41,7 +41,23 @@ const CategoriesSection: React.FC<CategoriesSectionProps> = ({ categories }) => 
             Explore our wide range of traditional Indian sweets, snacks, and namkeen
           </p>
         </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8 lg:gap-10">
+        {/* Mobile: Horizontal Scroll Slider, Desktop: Grid */}
+        <div className="md:hidden overflow-x-auto pb-4 -mx-4 px-4 no-scrollbar">
+          <div className="flex gap-4" style={{ width: 'max-content' }}>
+            {categories.map((category) => (
+              <Link 
+                key={category.id} 
+                href={`/category/${category.slug}`}
+                className="flex-shrink-0 w-[calc(50vw-1rem)]"
+              >
+                <CategoryCard category={category} />
+              </Link>
+            ))}
+          </div>
+        </div>
+        
+        {/* Desktop: Grid Layout */}
+        <div className="hidden md:grid grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8 lg:gap-10">
           {categories.map((category) => (
             <Link 
               key={category.id} 
