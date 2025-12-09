@@ -25,9 +25,9 @@ const ProductSection: React.FC<ProductSectionProps> = ({
     <section className="w-full py-12 md:py-20 px-4">
       <div className="w-full">
 
-        {/* ---------------------- 
-            Heading + Subtitle (Clean)
-        ----------------------- */}
+        {/* ----------------------
+            HEADING + SUBTITLE
+        ---------------------- */}
         {title && (
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl lg:text-5xl font-general-sans text-black font-[500] tracking-wide">
@@ -42,18 +42,33 @@ const ProductSection: React.FC<ProductSectionProps> = ({
           </div>
         )}
 
-        {/* ---------------------- 
-            Product Grid
-        ----------------------- */}
-        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-4 xl:grid-cols-4 gap-3 md:gap-4 lg:gap-5 mb-12">
+        {/* ----------------------
+            PRODUCT GRID — FINAL PERFECT VERSION
+        ---------------------- */}
+        <div
+          className="
+            grid
+            grid-cols-2
+            sm:grid-cols-2
+            md:grid-cols-3
+            lg:grid-cols-4
+            gap-6
+            md:gap-8
+            lg:gap-10
+            mb-16
+            px-2
+          "
+        >
           {products.map((product) => (
-            <ProductCard key={product.id} product={product} />
+            <div key={product.id} className="p-2">
+              <ProductCard product={product} />
+            </div>
           ))}
         </div>
 
-        {/* ---------------------- 
-            View More Button
-        ----------------------- */}
+        {/* ----------------------
+            VIEW MORE BUTTON
+        ---------------------- */}
         {showViewMore && products.length > 0 && (
           <div className="text-center">
             <Link

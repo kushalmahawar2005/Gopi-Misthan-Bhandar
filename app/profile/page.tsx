@@ -172,7 +172,7 @@ export default function ProfilePage() {
 
       {/* Page Header */}
       <div className="bg-gradient-to-r from-primary-red to-primary-darkRed py-8 md:py-12 px-4">
-        <div className="max-w-7xl mx-auto">
+        <div className="max-w-7xl text-center mx-auto">
           <h1 className="text-3xl md:text-4xl font-[500] font-general-sans text-white">
             My Profile
           </h1>
@@ -387,7 +387,7 @@ export default function ProfilePage() {
                       type="button"
                       onClick={handleSave}
                       disabled={saveLoading}
-                      className="flex items-center gap-2 bg-primary-red text-white px-6 py-3 rounded-lg font-bold font-serif hover:bg-primary-darkRed transition-colors disabled:opacity-50"
+                      className="flex items-center gap-2 bg-primary-red text-white px-6 py-3 rounded-lg font-[450] font-general-sans hover:bg-primary-darkRed transition-colors disabled:opacity-50"
                     >
                       <FiSave className="w-5 h-5" />
                       {saveLoading ? 'Saving...' : 'Save Changes'}
@@ -395,7 +395,7 @@ export default function ProfilePage() {
                     <button
                       type="button"
                       onClick={handleCancel}
-                      className="flex items-center gap-2 bg-gray-200 text-gray-700 px-6 py-3 rounded-lg font-bold font-serif hover:bg-gray-300 transition-colors"
+                      className="flex items-center gap-2 bg-gray-200 text-gray-700 px-6 py-3 rounded-lg font-[450] font-general-sans hover:bg-gray-300 transition-colors"
                     >
                       <FiX className="w-5 h-5" />
                       Cancel

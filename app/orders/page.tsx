@@ -136,8 +136,8 @@ export default function OrdersPage() {
 
         {/* Page Header */}
         <div className="bg-gradient-to-r from-primary-red to-primary-darkRed py-8 md:py-12 px-4">
-          <div className="max-w-7xl mx-auto">
-            <h1 className="text-3xl md:text-4xl font-bold font-serif text-white">
+          <div className="max-w-7xl text-center mx-auto">
+            <h1 className="text-3xl md:text-4xl font-[500] font-general-sans text-white">
               My Orders
             </h1>
             <p className="text-lg text-gray-100 mt-2">
