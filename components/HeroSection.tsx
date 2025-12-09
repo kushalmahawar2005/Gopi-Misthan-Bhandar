@@ -48,11 +48,13 @@ const HeroSection = () => {
 
   if (loading) {
     return (
-      <section className="w-full h-[500px] md:h-[450px] lg:h-[500px] relative overflow-hidden bg-gray-100">
-        <div className="flex items-center justify-center h-full">
-          <div className="text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-red mx-auto mb-4"></div>
-            <p className="text-gray-600">Loading...</p>
+      <section className="w-full px-6 md:px-8 lg:px-12 mt-4 md:mt-6">
+        <div className="max-w-7xl mx-auto h-[400px] md:h-[380px] lg:h-[420px] relative overflow-hidden bg-gray-100 rounded-xl md:rounded-2xl">
+          <div className="flex items-center justify-center h-full">
+            <div className="text-center">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-red mx-auto mb-4"></div>
+              <p className="text-gray-600">Loading...</p>
+            </div>
           </div>
         </div>
       </section>
@@ -61,9 +63,10 @@ const HeroSection = () => {
   if (slides.length === 0) return null;
 
   return (
-    <section className="relative w-full h-[500px] md:h-[450px] mb-4 lg:mb-4 lg:h-[600px] overflow-hidden mt-0">
-      {/* Slides */}
-      <div className="relative w-full h-full">
+    <section className="relative w-full px-6 md:px-8 lg:px-12 mt-4 md:mt-6 mb-4 lg:mb-4">
+      <div className="max-w-7xl mx-auto h-[400px] md:h-[380px] lg:h-[420px] relative overflow-hidden rounded-xl md:rounded-2xl">
+        {/* Slides */}
+        <div className="relative w-full h-full">
         {slides.map((slide, index) => (
           <div
             key={slide.id}
@@ -76,7 +79,7 @@ const HeroSection = () => {
               src={slide.image}
               alt={`Hero slide ${index + 1}`}
               fill
-              className="object-cover object-center hidden md:block"
+              className="object-contain object-center hidden md:block"
               priority={index === 0}
               sizes="100vw"
             />
@@ -85,7 +88,7 @@ const HeroSection = () => {
               src={(slide as any).mobileImage || slide.image}
               alt={`Hero slide ${index + 1}`}
               fill
-              className="object-cover object-center md:hidden"
+              className="object-contain object-center md:hidden"
               priority={index === 0}
               sizes="100vw"
             />
@@ -93,29 +96,29 @@ const HeroSection = () => {
         ))}
       </div>
 
-      {/* Arrows */}
-      {slides.length > 1 && (
-        <>
-          <button
-            onClick={prevSlide}
-            className="absolute left-4 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white text-gray-800 p-2 rounded-full shadow-lg transition-all z-20 opacity-70 hover:opacity-100"
-            aria-label="Previous slide"
-          >
-            <FiChevronLeft className="w-5 h-5 md:w-6 md:h-6" />
-          </button>
-          <button
-            onClick={nextSlide}
-            className="absolute right-4 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white text-gray-800 p-2 rounded-full shadow-lg transition-all z-20 opacity-70 hover:opacity-100"
-            aria-label="Next slide"
-          >
-            <FiChevronRight className="w-5 h-5 md:w-6 md:h-6" />
-          </button>
-        </>
-      )}
+        {/* Arrows */}
+        {slides.length > 1 && (
+          <>
+            <button
+              onClick={prevSlide}
+              className="absolute left-4 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white text-gray-800 p-2 rounded-full shadow-lg transition-all z-20 opacity-70 hover:opacity-100"
+              aria-label="Previous slide"
+            >
+              <FiChevronLeft className="w-5 h-5 md:w-6 md:h-6" />
+            </button>
+            <button
+              onClick={nextSlide}
+              className="absolute right-4 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white text-gray-800 p-2 rounded-full shadow-lg transition-all z-20 opacity-70 hover:opacity-100"
+              aria-label="Next slide"
+            >
+              <FiChevronRight className="w-5 h-5 md:w-6 md:h-6" />
+            </button>
+          </>
+        )}
 
-      {/* Dots */}
-      {slides.length > 1 && (
-        <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-20 flex gap-2">
+        {/* Dots */}
+        {slides.length > 1 && (
+          <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-20 flex gap-2">
           {slides.map((_, index) => (
             <button
               key={index}
@@ -127,7 +130,8 @@ const HeroSection = () => {
             />
           ))}
         </div>
-      )}
+        )}
+      </div>
     </section>
   );
 };

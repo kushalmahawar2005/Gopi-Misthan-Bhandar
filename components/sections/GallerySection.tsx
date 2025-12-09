@@ -23,19 +23,19 @@ const GallerySection: React.FC<GallerySectionProps> = ({ galleryItems, showAll =
   const displayedItems = showAll ? galleryItems : galleryItems.slice(0, 4);
 
   return (
-    <section className="py-12 md:py-16 px-4 bg-white w-full">
-      <div className="w-full">
+    <section className="py-12 md:py-16 bg-white w-full">
+      <div className="section-container w-full">
         <h2 className="text-center text-2xl md:text-3xl  text-black mb-12 md:mb-16 font-bold">
           Our Shop Gallery
         </h2>
         
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 max-w-7xl mx-auto">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 max-w-7xl mx-auto">
           {displayedItems.map((item) => (
             <div
               key={item._id}
               className="relative group overflow-hidden rounded-lg shadow-md hover:shadow-xl transition-shadow duration-300"
             >
-              <div className="relative w-full h-[300px] md:h-[350px] lg:h-[400px]">
+              <div className="relative w-full aspect-[4/3] sm:aspect-[3/2] lg:aspect-[4/3]">
                 <Image
                   src={item.imageUrl}
                   alt={item.title || 'Gallery image'}
