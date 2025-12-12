@@ -17,7 +17,6 @@ interface AboutCard {
 
 interface AboutContent {
   aboutCards?: AboutCard[];
-  // Legacy support
   title?: string;
   description?: string;
   content?: {
@@ -34,12 +33,11 @@ const AboutHero: React.FC = () => {
 
   useEffect(() => {
     loadContent();
-    
-    // Refresh content every 30 seconds to get latest updates
+
     const refreshInterval = setInterval(() => {
       loadContent();
     }, 30000);
-    
+
     return () => clearInterval(refreshInterval);
   }, []);
 
@@ -47,12 +45,13 @@ const AboutHero: React.FC = () => {
     try {
       const data = await fetchAboutContent();
       if (data) {
-        // Sort cards by order if available
+        
+        // FIXED SORT FUNCTION (TS SAFE)
         if (data.aboutCards && Array.isArray(data.aboutCards) && data.aboutCards.length > 0) {
-          data.aboutCards.sort((a, b) => (a.order || 0) - (b.order || 0));
+          data.aboutCards.sort((a: AboutCard, b: AboutCard) => (a?.order ?? 0) - (b?.order ?? 0));
           setContent(data);
+
         } else {
-          // No cards found, use default or legacy
           setContent({
             aboutCards: [
               {
@@ -67,8 +66,9 @@ const AboutHero: React.FC = () => {
             ],
           });
         }
+
       } else {
-        // Default content if API doesn't return data
+
         setContent({
           aboutCards: [
             {
@@ -85,7 +85,6 @@ const AboutHero: React.FC = () => {
       }
     } catch (error) {
       console.error('Error loading about content:', error);
-      // Fallback to default content
       setContent({
         aboutCards: [
           {
@@ -104,13 +103,14 @@ const AboutHero: React.FC = () => {
     }
   };
 
-  // Auto-slide for slider
   useEffect(() => {
     const cards = content?.aboutCards || [];
     if (cards.length <= 1) return;
+
     const interval = setInterval(() => {
       setCurrentSlide((prev) => (prev + 1) % cards.length);
     }, 5000);
+
     return () => clearInterval(interval);
   }, [content?.aboutCards]);
 
@@ -153,7 +153,6 @@ const AboutHero: React.FC = () => {
   const cards = content.aboutCards || [];
   const hasCards = cards.length > 0;
 
-  // Legacy support: convert old format to new format
   if (!hasCards && (content.title || content.description || content.content)) {
     const legacyCard: AboutCard = {
       heading: content.title || content.content?.heading || 'A Legacy of Sweet Excellence',
@@ -185,8 +184,8 @@ const AboutHero: React.FC = () => {
         }}
       >
         <div className="px-6 md:px-14 lg:px-12 py-10 md:py-14 lg:py-16 relative">
-          {/* Slider Container */}
           <div className="relative">
+
             {cards.map((card, index) => (
               <div
                 key={index}
@@ -195,7 +194,7 @@ const AboutHero: React.FC = () => {
                 }`}
               >
                 <div className="flex flex-col-reverse md:flex-row items-center gap-8 md:gap-12">
-                  {/* TEXT / CTA */}
+
                   <div className="w-full md:w-6/12">
                     {card.heading && (
                       <h2
@@ -212,120 +211,108 @@ const AboutHero: React.FC = () => {
                       </p>
                     )}
 
-                    <div>
-                      <Link
-                        href="/about"
-                        className="inline-block bg-[#a02126] hover:bg-[#7f1a1f] text-white px-6 md:px-8 py-2.5 md:py-3 rounded-md font-medium transition-colors shadow-sm"
-                        aria-label="Learn more about Chhappanbhog"
-                      >
-                        Learn More
-                      </Link>
-                    </div>
+                    <Link
+                      href="/about"
+                      className="inline-block bg-[#a02126] hover:bg-[#7f1a1f] text-white px-6 md:px-8 py-2.5 md:py-3 rounded-md font-medium transition-colors shadow-sm"
+                    >
+                      Learn More
+                    </Link>
                   </div>
 
-                  {/* IMAGE GROUP - Original Format */}
                   <div className="w-full md:w-6/12 pr-0 md:pr-4 flex items-start gap-4">
-                    {/* Large image */}
                     <div className="w-full md:w-2/3">
                       <div className="relative rounded-md overflow-hidden shadow-sm">
                         <Image
                           src={card.mainImage || '/box-large.jpg'}
-                          alt={card.heading || 'Assorted sweets in a decorative box'}
+                          alt={card.heading || 'Assorted sweets'}
                           width={720}
                           height={720}
                           className="object-cover w-full h-[320px] md:h-[360px]"
-                          sizes="(max-width: 768px) 100vw, 45vw"
                           priority={index === 0}
                         />
                       </div>
                     </div>
 
-                    {/* stacked small images */}
                     <div className="hidden md:flex md:w-1/3 flex-col gap-4">
                       {card.smallImage1 && (
                         <div className="relative rounded-md overflow-hidden shadow-sm">
                           <Image
                             src={card.smallImage1}
-                            alt="Traditional sweet - variant 1"
+                            alt="Small image 1"
                             width={320}
                             height={180}
                             className="object-cover w-full h-[180px]"
-                            sizes="(max-width: 768px) 100vw, 20vw"
                           />
                         </div>
                       )}
+
                       {card.smallImage2 && (
                         <div className="relative rounded-md overflow-hidden shadow-sm">
                           <Image
                             src={card.smallImage2}
-                            alt="Traditional sweet - variant 2"
+                            alt="Small image 2"
                             width={320}
                             height={180}
                             className="object-cover w-full h-[180px]"
-                            sizes="(max-width: 768px) 100vw, 20vw"
                           />
                         </div>
                       )}
                     </div>
                   </div>
+
                 </div>
               </div>
             ))}
 
-            {/* Navigation Arrows */}
             {cards.length > 1 && (
               <>
                 <button
                   onClick={prevSlide}
-                  className="absolute left-0 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white text-gray-800 p-2 rounded-full shadow-lg transition-all z-20 opacity-70 hover:opacity-100"
-                  aria-label="Previous slide"
+                  className="absolute left-0 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white text-gray-800 p-2 rounded-full shadow-lg z-20 opacity-70 hover:opacity-100"
                 >
-                  <FiChevronLeft className="w-5 h-5 md:w-6 md:h-6" />
+                  <FiChevronLeft className="w-6 h-6" />
                 </button>
+
                 <button
                   onClick={nextSlide}
-                  className="absolute right-0 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white text-gray-800 p-2 rounded-full shadow-lg transition-all z-20 opacity-70 hover:opacity-100"
-                  aria-label="Next slide"
+                  className="absolute right-0 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white text-gray-800 p-2 rounded-full shadow-lg z-20 opacity-70 hover:opacity-100"
                 >
-                  <FiChevronRight className="w-5 h-5 md:w-6 md:h-6" />
+                  <FiChevronRight className="w-6 h-6" />
                 </button>
               </>
             )}
 
-            {/* Dots Indicator */}
             {cards.length > 1 && (
-              <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-20 flex gap-2">
+              <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2 z-20">
                 {cards.map((_, index) => (
                   <button
                     key={index}
                     onClick={() => goToSlide(index)}
                     className={`w-2 h-2 rounded-full transition-all ${
-                      index === currentSlide ? 'bg-[#a02126] w-8' : 'bg-white/50 hover:bg-white/75'
+                      index === currentSlide ? 'bg-[#a02126] w-8' : 'bg-white/50'
                     }`}
-                    aria-label={`Go to slide ${index + 1}`}
                   />
                 ))}
               </div>
             )}
           </div>
 
-          {/* floral watermark on right (low opacity) */}
           <div
             aria-hidden="true"
             className="pointer-events-none absolute inset-y-0 right-6 md:right-10 lg:right-16 flex items-center"
             style={{ opacity: 0.12 }}
           >
-            <div className="w-[320px] h-[320px] md:w-[420px] md:h-[420px]">
+            <div className="w-[420px] h-[420px]">
               <Image
                 src="/floral.svg"
                 alt=""
                 width={420}
                 height={420}
                 className="object-contain"
-                priority
               />
             </div>
           </div>
+
         </div>
       </div>
     </section>
