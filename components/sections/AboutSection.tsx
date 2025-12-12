@@ -194,76 +194,76 @@ const AboutHero: React.FC = () => {
                   index === currentSlide ? 'opacity-100' : 'opacity-0 absolute inset-0'
                 }`}
               >
-                <div className="flex flex-col-reverse md:flex-row items-center gap-8 md:gap-12">
-                  {/* TEXT / CTA */}
-                  <div className="w-full md:w-6/12">
+          <div className="flex flex-col-reverse md:flex-row items-center gap-8 md:gap-12">
+            {/* TEXT / CTA */}
+            <div className="w-full md:w-6/12">
                     {card.heading && (
-                      <h2
-                        id="about-hero-title"
-                        className="font-geom font-[450] text-3xl md:text-4xl lg:text-5xl text-[#121212] leading-tight mb-4"
-                      >
+              <h2
+                id="about-hero-title"
+                className="font-geom font-[450] text-3xl md:text-4xl lg:text-5xl text-[#121212] leading-tight mb-4"
+              >
                         {card.heading}
-                      </h2>
+              </h2>
                     )}
 
                     {card.description && (
-                      <p className="text-sm md:text-base text-[#444444] mb-6 max-w-xl">
+              <p className="text-sm md:text-base text-[#444444] mb-6 max-w-xl">
                         {card.description}
-                      </p>
+              </p>
                     )}
 
-                    <div>
-                      <Link
-                        href="/about"
-                        className="inline-block bg-[#a02126] hover:bg-[#7f1a1f] text-white px-6 md:px-8 py-2.5 md:py-3 rounded-md font-medium transition-colors shadow-sm"
-                        aria-label="Learn more about Chhappanbhog"
-                      >
-                        Learn More
-                      </Link>
-                    </div>
-                  </div>
+              <div>
+                <Link
+                  href="/about"
+                  className="inline-block bg-[#a02126] hover:bg-[#7f1a1f] text-white px-6 md:px-8 py-2.5 md:py-3 rounded-md font-medium transition-colors shadow-sm"
+                  aria-label="Learn more about Chhappanbhog"
+                >
+                  Learn More
+                </Link>
+              </div>
+            </div>
 
                   {/* IMAGE GROUP - Original Format */}
-                  <div className="w-full md:w-6/12 pr-0 md:pr-4 flex items-start gap-4">
-                    {/* Large image */}
-                    <div className="w-full md:w-2/3">
-                      <div className="relative rounded-md overflow-hidden shadow-sm">
-                        <Image
+            <div className="w-full md:w-6/12 pr-0 md:pr-4 flex items-start gap-4">
+              {/* Large image */}
+              <div className="w-full md:w-2/3">
+                <div className="relative rounded-md overflow-hidden shadow-sm">
+                  <Image
                           src={card.mainImage || '/box-large.jpg'}
                           alt={card.heading || 'Assorted sweets in a decorative box'}
-                          width={720}
-                          height={720}
-                          className="object-cover w-full h-[320px] md:h-[360px]"
-                          sizes="(max-width: 768px) 100vw, 45vw"
+                    width={720}
+                    height={720}
+                    className="object-cover w-full h-[320px] md:h-[360px]"
+                    sizes="(max-width: 768px) 100vw, 45vw"
                           priority={index === 0}
-                        />
-                      </div>
-                    </div>
+                  />
+                </div>
+              </div>
 
-                    {/* stacked small images */}
-                    <div className="hidden md:flex md:w-1/3 flex-col gap-4">
+              {/* stacked small images */}
+              <div className="hidden md:flex md:w-1/3 flex-col gap-4">
                       {card.smallImage1 && (
-                        <div className="relative rounded-md overflow-hidden shadow-sm">
-                          <Image
+                <div className="relative rounded-md overflow-hidden shadow-sm">
+                  <Image
                             src={card.smallImage1}
-                            alt="Traditional sweet - variant 1"
-                            width={320}
-                            height={180}
-                            className="object-cover w-full h-[180px]"
-                            sizes="(max-width: 768px) 100vw, 20vw"
-                          />
-                        </div>
+                    alt="Traditional sweet - variant 1"
+                    width={320}
+                    height={180}
+                    className="object-cover w-full h-[180px]"
+                    sizes="(max-width: 768px) 100vw, 20vw"
+                  />
+                </div>
                       )}
                       {card.smallImage2 && (
-                        <div className="relative rounded-md overflow-hidden shadow-sm">
-                          <Image
+                <div className="relative rounded-md overflow-hidden shadow-sm">
+                  <Image
                             src={card.smallImage2}
-                            alt="Traditional sweet - variant 2"
-                            width={320}
-                            height={180}
-                            className="object-cover w-full h-[180px]"
-                            sizes="(max-width: 768px) 100vw, 20vw"
-                          />
+                    alt="Traditional sweet - variant 2"
+                    width={320}
+                    height={180}
+                    className="object-cover w-full h-[180px]"
+                    sizes="(max-width: 768px) 100vw, 20vw"
+                  />
                         </div>
                       )}
                     </div>
@@ -305,7 +305,7 @@ const AboutHero: React.FC = () => {
                     aria-label={`Go to slide ${index + 1}`}
                   />
                 ))}
-              </div>
+            </div>
             )}
           </div>
 
