@@ -6,6 +6,15 @@ export interface IStat {
   label: string;
 }
 
+export interface IAboutCard {
+  heading?: string;
+  description?: string;
+  mainImage?: string; // Large image
+  smallImage1?: string; // First small image
+  smallImage2?: string; // Second small image
+  order?: number;
+}
+
 export interface ISiteContent extends Document {
   section: 'about' | 'hero' | 'footer' | 'header' | 'marquee';
   title?: string;
@@ -13,6 +22,7 @@ export interface ISiteContent extends Document {
   description?: string;
   mainImage?: string;
   images?: string[];
+  aboutCards?: IAboutCard[]; // Array of about cards for slider
   stats?: IStat[];
   content?: {
     heading?: string;
@@ -43,6 +53,15 @@ const GiftsContentSchema = new Schema({
   text: { type: String },
 });
 
+const AboutCardSchema = new Schema({
+  heading: { type: String },
+  description: { type: String },
+  mainImage: { type: String },
+  smallImage1: { type: String },
+  smallImage2: { type: String },
+  order: { type: Number, default: 0 },
+});
+
 const SiteContentSchema = new Schema<ISiteContent>(
   {
     section: {
@@ -56,6 +75,7 @@ const SiteContentSchema = new Schema<ISiteContent>(
     description: { type: String },
     mainImage: { type: String },
     images: [{ type: String }],
+    aboutCards: [AboutCardSchema],
     stats: [StatSchema],
     content: ContentSchema,
     giftsContent: GiftsContentSchema,

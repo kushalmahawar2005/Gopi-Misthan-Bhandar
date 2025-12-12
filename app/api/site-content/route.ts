@@ -35,10 +35,17 @@ export async function POST(request: NextRequest) {
     await connectDB();
     
     const body = await request.json();
+    console.log('POST Creating site content with:', JSON.stringify(body, null, 2));
     const content = await SiteContent.create(body);
 
-    return NextResponse.json({ success: true, data: content }, { status: 201 });
+    // Convert to plain object to ensure all fields are included
+    const responseData = JSON.parse(JSON.stringify(content));
+    console.log('POST Created content:', JSON.stringify(responseData, null, 2));
+    console.log('POST Created aboutCards:', responseData.aboutCards);
+
+    return NextResponse.json({ success: true, data: responseData }, { status: 201 });
   } catch (error: any) {
+    console.error('Error creating site content:', error);
     return NextResponse.json({ success: false, error: error.message }, { status: 500 });
   }
 }

@@ -91,6 +91,7 @@ export default function AdminDashboard() {
   const quickActions = [
     { label: 'Add Product', icon: FiPackage, href: '/admin/products/new', color: 'bg-blue-50 text-blue-700 hover:bg-blue-100' },
     { label: 'Hero Slider', icon: FiImage, href: '/admin/hero-slider', color: 'bg-purple-50 text-purple-700 hover:bg-purple-100' },
+    { label: 'About Us', icon: FiEdit, href: '/admin/about-us', color: 'bg-amber-50 text-amber-700 hover:bg-amber-100' },
     { label: 'Shop Now', icon: FiShoppingBag, href: '/admin/products', color: 'bg-green-50 text-green-700 hover:bg-green-100' },
     { label: 'Add Blog', icon: FiFile, href: '/admin/blog/new', color: 'bg-pink-50 text-pink-700 hover:bg-pink-100' },
     { label: 'Categories', icon: FiFolder, href: '/admin/categories', color: 'bg-orange-50 text-orange-700 hover:bg-orange-100' },
@@ -143,8 +144,8 @@ export default function AdminDashboard() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-bold text-primary-brown font-serif">Admin Dashboard</h1>
-          <p className="text-sm sm:text-base text-gray-600 mt-1">Monitor your store's performance</p>
+          <h1 className="text-2xl sm:text-3xl font-bold text-primary-brown font-geom">Admin Dashboard</h1>
+          <p className="text-sm sm:text-base text-gray-600 mt-1 font-geom">Monitor your store's performance</p>
         </div>
         <Link
           href="/admin/settings"
@@ -176,7 +177,7 @@ export default function AdminDashboard() {
 
       {/* Quick Actions */}
       <div>
-        <h2 className="text-lg sm:text-xl font-bold text-primary-brown font-serif mb-4">+ Quick Actions</h2>
+        <h2 className="text-lg sm:text-xl font-bold text-primary-brown font-geom mb-4">+ Quick Actions</h2>
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3">
           {quickActions.map((action, index) => {
             const Icon = action.icon;
@@ -198,7 +199,7 @@ export default function AdminDashboard() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div className="bg-white rounded-lg border border-gray-200 p-6">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-bold text-primary-brown font-serif">Recent Orders</h3>
+            <h3 className="text-lg font-bold text-primary-brown font-geom">Recent Orders</h3>
             <Link
               href="/admin/orders"
               className="text-sm text-primary-red hover:underline font-medium"
@@ -211,7 +212,7 @@ export default function AdminDashboard() {
 
         <div className="bg-white rounded-lg border border-gray-200 p-6">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-bold text-primary-brown font-serif">Low Stock Alert</h3>
+            <h3 className="text-lg font-bold text-primary-brown font-geom">Low Stock Alert</h3>
             <Link
               href="/admin/products"
               className="text-sm text-primary-red hover:underline font-medium"
@@ -225,7 +226,7 @@ export default function AdminDashboard() {
 
       {/* Content Management Cards */}
       <div>
-        <h2 className="text-lg sm:text-xl font-bold text-primary-brown font-serif mb-4">Content Management</h2>
+        <h2 className="text-lg sm:text-xl font-bold text-primary-brown font-geom mb-4">Content Management</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {contentCards.map((card, index) => {
             const Icon = card.icon;
@@ -234,7 +235,7 @@ export default function AdminDashboard() {
                 <div className="flex items-center justify-between mb-4">
                   <div className="flex items-center gap-2">
                     <Icon className="text-primary-red" size={20} />
-                    <h3 className="text-lg font-semibold text-primary-brown font-serif">{card.title}</h3>
+                    <h3 className="text-lg font-semibold text-primary-brown font-geom">{card.title}</h3>
                   </div>
                   <Link
                     href={card.manage.href}

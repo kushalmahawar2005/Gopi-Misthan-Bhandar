@@ -74,6 +74,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
   const contentMenuItems = [
     { href: '/admin/hero-slider', icon: FiImage, label: 'Hero Slider' },
+    { href: '/admin/about-us', icon: FiType, label: 'About Us' },
     { href: '/admin/site-content', icon: FiType, label: 'Offer Line' },
     { href: '/admin/featured', icon: FiTrendingUp, label: "What's Trending" },
     { href: '/admin/blog', icon: FiFile, label: 'Blog Posts' },
@@ -94,7 +95,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Top Header Bar */}
-      <header className="bg-white border-b border-gray-200 px-4 md:px-6 py-3 md:py-4 flex items-center justify-between shadow-sm">
+      <header className="bg-white border-b border-gray-200 px-4 md:px-6 py-3 md:py-4 flex items-center justify-between shadow-sm font-geom">
         <div className="flex items-center gap-2 md:gap-4">
           <button
             onClick={() => setIsSidebarOpen(!isSidebarOpen)}
@@ -104,19 +105,19 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           </button>
           <Link
             href="/"
-            className="flex items-center gap-1 md:gap-2 text-gray-700 hover:text-primary-red transition-colors text-xs md:text-sm font-medium"
+            className="flex items-center gap-1 md:gap-2 text-gray-700 hover:text-primary-red transition-colors text-xs md:text-sm font-medium font-geom"
           >
             <FiArrowLeft size={16} className="md:w-[18px] md:h-[18px]" />
             <span className="hidden sm:inline">Back to Store</span>
             <span className="sm:hidden">Back</span>
           </Link>
-          <div className="text-lg md:text-2xl font-bold text-primary-brown font-serif">Admin Panel</div>
+          <div className="text-lg md:text-2xl font-bold text-primary-brown font-geom">Admin Panel</div>
         </div>
         <div className="flex items-center gap-2 md:gap-4">
-          <span className="text-xs md:text-sm text-gray-600 hidden lg:block">Welcome, {user.name}</span>
+          <span className="text-xs md:text-sm text-gray-600 hidden lg:block font-geom">Welcome, {user.name}</span>
           <button
             onClick={handleLogout}
-            className="flex items-center gap-1 md:gap-2 px-2 md:px-4 py-1.5 md:py-2 text-xs md:text-sm font-medium text-gray-700 hover:text-primary-red transition-colors"
+            className="flex items-center gap-1 md:gap-2 px-2 md:px-4 py-1.5 md:py-2 text-xs md:text-sm font-medium text-gray-700 hover:text-primary-red transition-colors font-geom"
           >
             <span className="hidden sm:inline">Logout</span>
             <FiArrowRight size={14} className="md:w-4 md:h-4" />
@@ -133,16 +134,16 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         >
           {/* Mobile Menu Button */}
           <div className="md:hidden p-4 border-b flex items-center justify-between">
-            <h2 className="text-xl font-bold text-primary-brown font-serif">Admin Panel</h2>
+            <h2 className="text-xl font-bold text-primary-brown font-geom">Admin Panel</h2>
             <button onClick={() => setIsSidebarOpen(!isSidebarOpen)} className="text-gray-700">
               {isSidebarOpen ? <FiX size={24} /> : <FiMenu size={24} />}
             </button>
           </div>
 
-          <nav className="p-4">
+          <nav className="p-4 font-geom">
             {/* MAIN Section */}
             <div className="mb-6">
-              <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3 px-3">
+              <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3 px-3 font-geom">
                 MAIN
               </h3>
               <div className="space-y-1">
@@ -153,7 +154,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                     <Link
                       key={item.href}
                       href={item.href}
-                      className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors ${
+                      className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors font-geom ${
                         active
                           ? 'bg-primary-red text-white'
                           : 'text-gray-700 hover:bg-red-50 hover:text-primary-red'
@@ -161,7 +162,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                       onClick={() => setIsSidebarOpen(false)}
                     >
                       <Icon size={18} />
-                      <span className="text-sm font-medium">{item.label}</span>
+                      <span className="text-sm font-medium font-geom">{item.label}</span>
                     </Link>
                   );
                 })}
@@ -170,7 +171,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
             {/* CONTENT MANAGEMENT Section */}
             <div>
-              <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3 px-3">
+              <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3 px-3 font-geom">
                 CONTENT MANAGEMENT
               </h3>
               <div className="space-y-1">
@@ -181,7 +182,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                     <Link
                       key={item.href}
                       href={item.href}
-                      className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors ${
+                      className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors font-geom ${
                         active
                           ? 'bg-primary-red text-white'
                           : 'text-gray-700 hover:bg-red-50 hover:text-primary-red'
@@ -189,7 +190,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                       onClick={() => setIsSidebarOpen(false)}
                     >
                       <Icon size={18} />
-                      <span className="text-sm font-medium">{item.label}</span>
+                      <span className="text-sm font-medium font-geom">{item.label}</span>
                     </Link>
                   );
                 })}
@@ -199,7 +200,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         </aside>
 
         {/* Main Content */}
-        <main className="flex-1 min-h-[calc(100vh-73px)] p-3 sm:p-4 md:p-6 lg:p-8 bg-gray-50 overflow-x-hidden">
+        <main className="flex-1 min-h-[calc(100vh-73px)] p-3 sm:p-4 md:p-6 lg:p-8 bg-gray-50 overflow-x-hidden font-geom">
           {isSidebarOpen && (
             <div
               className="fixed inset-0 bg-black bg-opacity-50 z-40 md:hidden"

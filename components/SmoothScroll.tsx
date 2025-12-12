@@ -68,35 +68,56 @@ export default function SmoothScroll() {
 
     // Override window.scrollTo for smooth behavior
     const originalScrollTo = window.scrollTo;
+    const scrollToObject = (options: ScrollToOptions) => {
+      originalScrollTo(options);
+    };
+    const scrollToNumbers = (x: number, y: number) => {
+      originalScrollTo(x, y);
+    };
+    
     window.scrollTo = function(options?: ScrollToOptions | number, y?: number) {
-      if (typeof options === 'object' && options?.behavior === 'smooth') {
-        if (typeof options.top === 'number') {
+      if (typeof options === 'object' && options) {
+        if (options.behavior === 'smooth' && typeof options.top === 'number') {
           smoothScroll(options.top);
         } else {
-          originalScrollTo.call(window, options);
+          // Use the object overload
+          scrollToObject(options);
         }
       } else if (typeof options === 'number' && typeof y === 'number') {
         smoothScroll(y);
+      } else if (typeof options === 'number') {
+        // Use the two-number overload
+        scrollToNumbers(options, y || 0);
       } else {
-        originalScrollTo.call(window, options as any, y);
+        // Default: no arguments or invalid
+        scrollToObject({});
       }
     };
 
     // Override window.scrollBy for smooth behavior
     const originalScrollBy = window.scrollBy;
+    const scrollByObject = (options: ScrollToOptions) => {
+      originalScrollBy(options);
+    };
+    const scrollByNumbers = (x: number, y: number) => {
+      originalScrollBy(x, y);
+    };
+    
     window.scrollBy = function(options?: ScrollToOptions | number, y?: number) {
-      if (typeof options === 'object' && options?.behavior === 'smooth') {
-        const currentScroll = window.pageYOffset;
-        if (typeof options.top === 'number') {
+      if (typeof options === 'object' && options) {
+        if (options.behavior === 'smooth' && typeof options.top === 'number') {
+          const currentScroll = window.pageYOffset;
           smoothScroll(currentScroll + options.top);
         } else {
-          originalScrollBy.call(window, options);
+          // Use the object overload
+          scrollByObject(options);
         }
       } else if (typeof options === 'number' && typeof y === 'number') {
         const currentScroll = window.pageYOffset;
         smoothScroll(currentScroll + y);
       } else {
-        originalScrollBy.call(window, options as any, y);
+        // Default: use the object overload
+        scrollByObject(options || {});
       }
     };
 
