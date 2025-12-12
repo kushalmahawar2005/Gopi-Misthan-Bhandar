@@ -31,11 +31,12 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, showAddToCart = true
   return (
     <Link href={`/product/${product.id}`} className="group block">
       <div 
-        className="flex flex-col w-full items-center cursor-pointer "
+        className="flex flex-col w-full items-center cursor-pointer mb-0 h-full rounded-xl overflow-hidden"
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
       >
-        <div className="relative h-[200px] md:h-[280px] lg:h-[300px] xl:h-[320px] w-full mb-2 overflow-hidden  shadow-md group-hover:shadow-xl transition-shadow">
+        {/* Image Container */}
+        <div className="relative w-full aspect-[4/5] md:aspect-[2/2] mb-0 rounded-xl overflow-hidden bg-gray-100">
           {/* Main Image */}
           <Image
             src={product.image && product.image.trim() !== '' ? product.image : `https://picsum.photos/seed/product${product.id}/240/240`}
@@ -112,12 +113,45 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, showAddToCart = true
             )}
           </div>
         </div>
-        {/* Brand Name */}
-        <p className="text-black text-[8px] md:text-xs font-serif mb-1 text-center font-normal px-2">GOPI MISTHAN BHANDAR</p>
-        {/* Product Name */}
-        <p className="text-black text-md md:text-md  font-montserrat font-[600]  text-center tracking-wide font-medium line-clamp-2 min-h-[0.9rem] md:min-h-[0.5rem] px-2">{product.name}</p>
-        {/* Price */}
-        <p className="text-primary-red font-bold text-sm md:text-base font-serif text-center mb-3 px-2">₹{product.price}</p>
+        
+        {/* Product Info Section with Background Color */}
+        <div className="w-full relative" style={{ backgroundColor: 'white' }}>
+          {/* Product Name on Colored Background */}
+          <div className="px-3 pt-4 pb-2 md:px-4 md:pt-5">
+            <p className="text-black text-sm md:text-base font-light  line-clamp-2 font-geom leading-tight">
+              {product.name}
+            </p>
+          </div>
+          
+          {/* Category */}
+          <div className="px-3 pb-1 md:px-4">
+            <p className="text-gray-600 text-xs md:text-sm  font-jost capitalize">
+              {product.category ? product.category.replace('-', ' ') : 'Product'}
+            </p>
+          </div>
+          
+          {/* Price with Cart Icon */}
+          <div className="px-3 pb-4 md:px-4 md:pb-5 relative">
+            <p className="text-black font-[450] text-md md:text-lg font-inter ">
+              ₹{product.price}
+            </p>
+            {/* Cart Icon on Bottom Right */}
+            {showAddToCart && (
+              <button
+                onClick={handleAddToCart}
+                disabled={isAdding}
+                className="absolute bottom-2 right-3 md:right-4 w-8 h-8 md:w-9 md:h-9 bg-white hover:bg-primary-black hover:text-primary-red text-black flex items-center justify-center transition-all duration-300 hover:scale-110 rounded-full  disabled:opacity-50"
+                aria-label="Add to cart"
+              >
+                {isAdding ? (
+                  <span className="text-sm font-bold text-green-600">✓</span>
+                ) : (
+                  <FiShoppingCart className="w-4 h-4 md:w-5 md:h-5" />
+                )}
+              </button>
+            )}
+          </div>
+        </div>
       </div>
     </Link>
   );

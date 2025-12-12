@@ -145,10 +145,17 @@ export const fetchInstaPosts = async (): Promise<any[]> => {
 
 export const fetchAboutContent = async () => {
   try {
-    const response = await fetch('/api/site-content/section/about');
+    const response = await fetch('/api/site-content/section/about', {
+      cache: 'no-store', // Always fetch fresh data
+    });
     const data = await response.json();
     
     if (data.success && data.data) {
+      // Ensure aboutCards is an array
+      if (data.data.aboutCards && Array.isArray(data.data.aboutCards)) {
+        return data.data;
+      }
+      // If no aboutCards but has legacy data, return it
       return data.data;
     }
     return null;

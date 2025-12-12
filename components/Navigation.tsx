@@ -126,7 +126,7 @@ const Navigation = () => {
     <>
       <nav className="bg-white w-full border-b border-gray-200 shadow-sm sticky top-0 z-50">
         {/* Header row */}
-        <div className="flex items-center justify-between px-4 md:px-6 lg:px-8 py-3 md:py-4 relative">
+        <div className="flex items-center justify-between px-4 md:px-6 lg:px-8 py-2 md:py-4 relative">
           {/* Left: Search (desktop) + hamburger on mobile */}
           <div className="flex items-center gap-3 flex-1 md:flex-initial">
             {/* Mobile hamburger */}
@@ -221,7 +221,7 @@ const Navigation = () => {
                               />
                             </div>
                             <div className="flex-1 min-w-0">
-                              <p className="text-sm font-medium font-serif line-clamp-1">{product.name}</p>
+                              <p className="text-sm font-medium font-geom line-clamp-1">{product.name}</p>
                               <p className="text-xs text-gray-500 capitalize">{product.category}</p>
                             </div>
                             <div className="text-sm font-bold text-red-600">₹{product.price}</div>
@@ -343,7 +343,7 @@ const Navigation = () => {
             <div key={item.label} className="relative group">
               <button
                 onClick={() => handleNavClick(item.href)}
-                className={`text-xs md:text-sm font-serif tracking-wider transition-colors font-medium flex items-center gap-1 py-2 ${
+                className={`text-xs md:text-sm font-geom tracking-wider transition-colors font-medium flex items-center gap-1 py-2 ${
                   isActive(item.href) ? 'text-red-600' : 'text-black hover:text-red-600'
                 }`}
               >
@@ -360,10 +360,10 @@ const Navigation = () => {
           <div
             className="fixed inset-0 bg-black/50 z-40 md:hidden"
             onClick={() => setIsMobileMenuOpen(false)}
-          />
+          />  
           <div className="fixed top-0 left-0 h-full w-3/4 max-w-sm bg-white shadow-2xl z-50 md:hidden overflow-y-auto">
             <div className="flex items-center justify-between p-4 border-b border-gray-200">
-              <h2 className="text-lg font-bold text-amber-700 font-serif">Menu</h2>
+              <h2 className="text-lg font-bold text-amber-700 font-geom">Menu</h2>
               <button
                 onClick={() => setIsMobileMenuOpen(false)}
                 className="p-2 hover:bg-gray-100 rounded-full transition-colors"
@@ -397,7 +397,7 @@ const Navigation = () => {
                     router.push('/admin');
                     setIsMobileMenuOpen(false);
                   }}
-                  className="px-6 py-3 text-sm font-serif tracking-wider transition-colors bg-blue-50 text-blue-700 hover:bg-blue-100 border-l-4 border-blue-600 flex items-center gap-2 font-semibold"
+                  className="px-6 py-3 text-sm font-geom tracking-wider transition-colors bg-blue-50 text-blue-700 hover:bg-blue-100 border-l-4 border-blue-600 flex items-center gap-2 font-semibold"
                 >
                   <FiSettings className="w-4 h-4" />
                   Admin Panel
@@ -409,8 +409,8 @@ const Navigation = () => {
                   router.push(isAuthenticated ? '/profile' : '/login');
                   setIsMobileMenuOpen(false);
                 }}
-                className="px-6 py-3 text-sm font-serif tracking-wider transition-colors text-black hover:text-red-600 hover:bg-gray-50 flex items-center gap-2 border-l-4 border-transparent"
-              >
+                className="px-6 py-3 text-sm font-geom tracking-wider transition-colors text-black hover:text-red-600 hover:bg-gray-50 flex items-center gap-2 border-l-4 border-transparent"
+              > 
                 <FiUser className="w-4 h-4" />
                 {isAuthenticated ? 'Profile' : 'Login'}
               </button>
@@ -422,7 +422,7 @@ const Navigation = () => {
                     setIsMobileMenuOpen(false);
                     router.push('/');
                   }}
-                  className="px-6 py-3 text-sm font-serif tracking-wider transition-colors text-black hover:text-red-600 hover:bg-gray-50 text-left flex items-center gap-2 w-full border-l-4 border-transparent"
+                  className="px-6 py-3 text-sm font-geom tracking-wider transition-colors text-black hover:text-red-600 hover:bg-gray-50 text-left flex items-center gap-2 w-full border-l-4 border-transparent"
                 >
                   <FiLogOut className="w-4 h-4" />
                   Logout
@@ -502,7 +502,7 @@ const Navigation = () => {
                           />
                         </div>
                         <div className="flex-1 min-w-0">
-                          <p className="text-sm font-medium font-serif line-clamp-1">{product.name}</p>
+                          <p className="text-sm font-medium font-geom line-clamp-1">{product.name}</p>
                           <p className="text-xs text-gray-500 capitalize">{product.category}</p>
                           <p className="text-sm font-bold text-red-600 mt-1">₹{product.price}</p>
                         </div>

@@ -31,7 +31,7 @@ const CategoriesSection: React.FC<CategoriesSectionProps> = ({ categories }) => 
   }
 
   return (
-    <section className="py-12 md:py-20 bg-white w-full">
+    <section className="py-12 md:py-20 bg-[#f7db9d] w-full">
       <div className="section-container w-full">
         <div className="md:text-center mb-12">
           <h2 className="text-3xl md:text-4xl lg:text-5xl font-jost  text-black mb-2 leading-relaxed font-[450]">

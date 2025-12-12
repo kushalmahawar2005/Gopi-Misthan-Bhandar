@@ -105,7 +105,7 @@ function CategoryContent() {
         <Navigation />
         <Cart />
         <div className="flex flex-col items-center justify-center min-h-[60vh] px-4">
-          <h1 className="text-3xl font-bold font-serif mb-4">Category Not Found</h1>
+          <h1 className="text-3xl font-bold font-geom mb-4">Category Not Found</h1>
           <p className="text-gray-600 mb-8">The category you're looking for doesn't exist.</p>
         </div>
         <Footer />
@@ -122,7 +122,7 @@ function CategoryContent() {
       {/* Category Header */}
       <div className="bg-gradient-to-r from-primary-red to-primary-darkRed py-12 md:py-16 px-4">
         <div className="w-full text-center">
-          <h1 className="text-4xl md:text-5xl font-bold font-serif text-white mb-4">
+          <h1 className="text-4xl md:text-5xl font-bold font-geom text-white mb-4">
             {category.name}
           </h1>
           <p className="text-lg text-gray-100 max-w-2xl mx-auto">
@@ -231,7 +231,7 @@ function CategoryContent() {
           <div
             className={
               viewMode === 'grid'
-                ? 'grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-3 gap-3 md:gap-4 lg:gap-5'
+                ? 'grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 gap-3 md:gap-4 lg:gap-5'
                 : 'space-y-4'
             }
           >
