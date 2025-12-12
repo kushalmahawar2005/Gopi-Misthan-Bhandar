@@ -85,11 +85,19 @@ const config: Config = {
   				'General Sans',
   				'sans-serif'
   			],
-  			'general-sans-variable': [
-  				'General Sans Variable',
-  				'sans-serif'
-  			]
-  		},
+			'general-sans-variable': [
+				'General Sans Variable',
+				'sans-serif'
+			],
+			sora: [
+				'Sora',
+				'sans-serif'
+			],
+			geom: [
+				'Geom',
+				'sans-serif'
+			]
+		},
   		fontWeight: {
   			extralight: '200',
   			light: '300',

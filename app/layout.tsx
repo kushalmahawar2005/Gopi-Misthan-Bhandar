@@ -5,6 +5,7 @@ import { AuthProvider } from '@/context/AuthContext'
 import { WishlistProvider } from '@/context/WishlistContext'
 import FloatingContactButtons from '@/components/FloatingContactButtons'
 import MobileBottomNav from '@/components/MobileBottomNav'
+import SmoothScroll from '@/components/SmoothScroll'
 
 export const metadata: Metadata = {
   title: 'Gopi Misthan Bhandar Neemuch - Traditional Indian Sweets',
@@ -23,6 +24,7 @@ export default function RootLayout({
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link href="https://fonts.googleapis.com/css2?family=Averia+Serif+Libre:wght@300;400;700&family=Inder&family=Inter:wght@300;400;500;600;700;800;900&family=Roboto+Slab:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
         <link href="https://fonts.googleapis.com/css2?family=Jost:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet" />
+        <link href="https://fonts.googleapis.com/css2?family=Geom:ital,wght@0,300..900;1,300..900&family=Sora:wght@100..800&display=swap" rel="stylesheet" />
         <link rel="manifest" href="/manifest.json" />
         <meta name="theme-color" content="#ba0606" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -31,6 +33,7 @@ export default function RootLayout({
         <link rel="apple-touch-icon" href="/logo.png" />
       </head>
       <body className="antialiased">
+        <SmoothScroll />
         <AuthProvider>
           <WishlistProvider>
             <CartProvider>

@@ -22,20 +22,20 @@ const ProductSection: React.FC<ProductSectionProps> = ({
   viewMoreLink = '/products',
 }) => {
   return (
-    <section className="w-full pt-6 md:pt-8 pb-12 md:pb-20">
-      <div className="section-container w-full">
+    <section className="w-full pt-8 pb-8 md:pt-12 md:pb-12 bg-white">
+      <div className="section-container max-w-6xl lg:max-w-7xl mx-auto px-0 md:px-0 w-full">
 
         {/* ----------------------
             HEADING + SUBTITLE
         ---------------------- */}
         {title && (
-          <div className="text-center mb-12">
+          <div className="text-center mb-6 md:mb-8 px-4 md:px-6">
             <h2 className="text-3xl md:text-4xl lg:text-5xl font-general-sans text-black font-[500] tracking-wide">
               {title}
             </h2>
 
             {subtitle && (
-              <p className="text-base md:text-lg text-gray-600 mt-4 max-w-3xl mx-auto leading-relaxed font-serif">
+              <p className="text-base md:text-lg text-gray-600 mt-4 max-w-3xl mx-auto leading-relaxed font-geom">
                 {subtitle}
               </p>
             )}
@@ -53,13 +53,12 @@ const ProductSection: React.FC<ProductSectionProps> = ({
             md:grid-cols-3
             lg:grid-cols-4
             gap-4
-            md:gap-5
-            lg:gap-6
-            mb-16
+            md:gap-4
+            mb-8
           "
         >
           {products.map((product) => (
-            <div key={product.id} className="p-2">
+            <div key={product.id}>
               <ProductCard product={product} />
             </div>
           ))}
@@ -69,7 +68,7 @@ const ProductSection: React.FC<ProductSectionProps> = ({
             VIEW MORE BUTTON
         ---------------------- */}
         {showViewMore && products.length > 0 && (
-          <div className="text-center">
+          <div className="text-center px-4 md:px-6">
             <Link
               href={viewMoreLink}
               className="inline-flex items-center gap-1.5 bg-red-700 text-white px-5 py-2.5 md:px-6 md:py-3 font-light text-sm md:text-base rounded-md transition-all duration-300 hover:bg-red-800 hover:scale-105 shadow-md"

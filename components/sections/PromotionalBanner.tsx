@@ -142,7 +142,7 @@ const PromotionalBanner = () => {
   };
 
   return (
-    <section ref={sectionRef} className="w-full px-6 md:px-8 lg:px-12 mt-2 md:mt-4">
+    <section ref={sectionRef} className="w-full px-6 md:px-8 lg:px-12 mt-2 md:mt-12 md:mb-12">
       <div className="max-w-7xl mx-auto bg-gradient-to-b from-[#941a1f] to-[#a21f28] rounded-xl md:rounded-2xl overflow-hidden">
         <ClickSpark
           sparkColor="#fff"
@@ -151,7 +151,7 @@ const PromotionalBanner = () => {
           sparkCount={8}
           duration={400}
         >
-          <div className="py-6 md:py-8 lg:py-10 min-h-[100px] md:min-h-[110px] flex items-center relative px-4 md:px-6 lg:px-8">
+          <div className="py-6 md:py-8 lg:py-10 min-h-[90px] md:min-h-[110px] flex items-center relative px-4 md:px-6 lg:px-8">
           {/* Title - Mobile: Always show, Desktop: Animation */}
           {showTitle && (
             <div
@@ -161,7 +161,7 @@ const PromotionalBanner = () => {
               <div className="text-center w-full px-4">
                 {isMobile ? (
                   // Mobile: Simple text, no animation
-                  <h1 className="text-2xl md:text-3xl lg:text-4xl font-general-sans font-[450] text-white">
+                  <h1 className="text-xl tracking-wider md:text-3xl lg:text-4xl font-general-sans font-[450] text-white">
                     Gopi Misthan Bhandar, Neemuch
                   </h1>
                 ) : hasAnimated ? (
@@ -190,7 +190,7 @@ const PromotionalBanner = () => {
 
           {/* Features - shown after title fades out */}
           {showFeatures && (
-            <div ref={featuresRef} className="grid grid-cols-2 md:grid-cols-4 items-stretch gap-6 md:gap-8 w-full relative z-10">
+            <div ref={featuresRef} className="grid grid-cols-2 md:grid-cols-4 items-stretch  gap-6 md:gap-8 w-full relative z-10">
               {features.map((feature, index) => {
                 const Icon = feature.icon;
                 return (
