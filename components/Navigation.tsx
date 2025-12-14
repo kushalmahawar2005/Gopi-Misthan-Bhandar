@@ -16,13 +16,16 @@ import {
 import { useCart } from '@/context/CartContext';
 import { useAuth } from '@/context/AuthContext';
 import { useWishlist } from '@/context/WishlistContext';
-import { fetchProducts } from '@/lib/api';
+import { fetchProducts, fetchCategories } from '@/lib/api';
+import { Category } from '@/types';
 
 const Navigation = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false); // mobile modal
   const [searchQuery, setSearchQuery] = useState('');
   const [isFocused, setIsFocused] = useState(false); // for underline color animation
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [hoveredCategory, setHoveredCategory] = useState<string | null>(null);
   const pathname = usePathname();
   const router = useRouter();
   const { openCart, getTotalItems } = useCart();
@@ -38,6 +41,20 @@ const Navigation = () => {
 
   const searchInputRef = useRef<HTMLInputElement | null>(null);
   const dropdownRef = useRef<HTMLDivElement | null>(null);
+  const categoryDropdownRef = useRef<HTMLDivElement | null>(null);
+
+  // Fetch categories with subcategories
+  useEffect(() => {
+    const loadCategories = async () => {
+      try {
+        const cats = await fetchCategories();
+        setCategories(cats);
+      } catch (error) {
+        console.error('Error fetching categories:', error);
+      }
+    };
+    loadCategories();
+  }, []);
 
   useEffect(() => {
     const performSearch = async () => {
@@ -81,14 +98,19 @@ const Navigation = () => {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
+  // Get category by slug from fetched categories
+  const getCategoryBySlug = (slug: string): Category | undefined => {
+    return categories.find(cat => cat.slug === slug);
+  };
+
   const navItems = [
     { label: 'HOME', href: '/' },
-    { label: 'SWEETS', href: '/category/sweets' },
-    { label: 'DRY FRUIT', href: '/category/dry-fruit' },
-    { label: 'BACKERY ITEMS', href: '/category/bakery' },
-    { label: 'NAMKEEN', href: '/category/namkeen' },
-    { label: 'SAVOURY SNACKS', href: '/category/savoury' },
-    { label: 'GIFTING', href: '/category/gifting' },
+    { label: 'SWEETS', href: '/category/sweets', slug: 'sweets' },
+    { label: 'DRY FRUIT', href: '/category/dry-fruit', slug: 'dry-fruit' },
+    { label: 'BACKERY ITEMS', href: '/category/bakery', slug: 'bakery' },
+    { label: 'NAMKEEN', href: '/category/namkeen', slug: 'namkeen' },
+    { label: 'SAVOURY SNACKS', href: '/category/savoury', slug: 'savoury' },
+    { label: 'GIFTING', href: '/category/gifting', slug: 'gifting' },
   ];
 
   const isActive = (href: string) => {
@@ -125,6 +147,8 @@ const Navigation = () => {
   return (
     <>
       <nav className="bg-white w-full border-b border-gray-200 shadow-sm sticky top-0 z-50">
+        
+
         {/* Header row */}
         <div className="flex items-center justify-between px-4 md:px-6 lg:px-8 py-2 md:py-4 relative">
           {/* Left: Search (desktop) + hamburger on mobile */}
@@ -326,31 +350,79 @@ const Navigation = () => {
               )}
             </button>
 
-            {/* Mobile search icon */}
-            <button
-              onClick={() => setIsSearchOpen(true)}
-              className="md:hidden relative p-2 hover:text-gray-700  transition-colors"
-              aria-label="Search"
-            >
-              <FiSearch className="w-5 h-5" />
-            </button>
           </div>
         </div>
 
         {/* Bottom row: center nav links on desktop */}
         <div className="hidden md:flex items-center justify-center gap-4 lg:gap-6 xl:gap-8 px-4 py-3">
-          {navItems.map((item) => (
-            <div key={item.label} className="relative group">
-              <button
-                onClick={() => handleNavClick(item.href)}
-                className={`text-xs md:text-sm font-geom tracking-wider transition-colors font-medium flex items-center gap-1 py-2 ${
-                  isActive(item.href) ? 'text-red-600' : 'text-black hover:text-red-600'
-                }`}
+          {navItems.map((item) => {
+            const category = item.slug ? getCategoryBySlug(item.slug) : null;
+            const hasSubcategories = category?.subCategories && category.subCategories.length > 0;
+            
+            return (
+              <div 
+                key={item.label} 
+                className="relative"
+                onMouseEnter={() => hasSubcategories ? setHoveredCategory(item.slug || null) : null}
+                onMouseLeave={() => setHoveredCategory(null)}
               >
-                {item.label}
-              </button>
-            </div>
-          ))}
+                <button
+                  onClick={() => handleNavClick(item.href)}
+                  className={`text-xs md:text-sm font-geom tracking-wider transition-colors font-medium flex items-center gap-1 py-2 relative ${
+                    isActive(item.href) ? 'text-red-600' : 'text-black hover:text-red-600'
+                  }`}
+                >
+                  {item.label}
+                  {/* Underline on hover */}
+                  <span 
+                    className={`absolute bottom-0 left-0 h-0.5 bg-red-600 transition-all duration-300 ${
+                      hoveredCategory === item.slug || isActive(item.href)
+                        ? 'w-full opacity-100'
+                        : 'w-0 opacity-0'
+                    }`}
+                  />
+                </button>
+                
+                {/* Subcategories Dropdown */}
+                {hasSubcategories && hoveredCategory === item.slug && (
+                  <div 
+                    ref={categoryDropdownRef}
+                    className="absolute top-full left-1/2 transform -translate-x-1/2 pt-2 bg-transparent z-50"
+                    onMouseEnter={() => setHoveredCategory(item.slug || null)}
+                    onMouseLeave={() => setHoveredCategory(null)}
+                  >
+                    <div className="bg-white border border-gray-200 rounded-md shadow-lg min-w-[180px] py-2">
+                    {/* All Category Link */}
+                    <Link
+                      href={item.href}
+                      onClick={() => setHoveredCategory(null)}
+                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-red-600 transition-colors font-medium"
+                    >
+                      All {item.label}
+                    </Link>
+                    
+                    {/* Divider */}
+                    {category.subCategories && category.subCategories.length > 0 && (
+                      <div className="border-t border-gray-200 my-1" />
+                    )}
+                    
+                    {/* Subcategories */}
+                    {category.subCategories?.map((subcategory) => (
+                      <Link
+                        key={subcategory.slug}
+                        href={`/category/${item.slug}?subcategory=${subcategory.slug}`}
+                        onClick={() => setHoveredCategory(null)}
+                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-red-600 transition-colors"
+                      >
+                        {subcategory.name}
+                      </Link>
+                    ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            );
+          })}
         </div>
       </nav>
 
@@ -372,6 +444,102 @@ const Navigation = () => {
                 <FiX className="w-6 h-6" />
               </button>
             </div>
+            {/* Mobile Search Bar - At the very top */}
+        <div className="md:hidden w-full px-4 py-3 border-b border-gray-200 bg-white">
+          <div className="relative">
+            <input
+              ref={searchInputRef}
+              type="text"
+              placeholder="Search products..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              onFocus={() => {
+                setIsFocused(true);
+                if (searchQuery.trim().length >= 2) setShowDropdown(true);
+              }}
+              onBlur={() => {
+                setIsFocused(false);
+              }}
+              className="w-full px-4 py-2 pr-10 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-red focus:border-transparent"
+              aria-label="Search products"
+            />
+            <button
+              onClick={() => {
+                if (searchQuery.trim().length >= 2) {
+                  router.push(`/products?search=${encodeURIComponent(searchQuery)}`);
+                  setShowDropdown(false);
+                  setSearchQuery('');
+                } else {
+                  searchInputRef.current?.focus();
+                }
+              }}
+              className="absolute right-3 top-1/2 transform -translate-y-1/2 p-1"
+              aria-label="Search"
+            >
+              <FiSearch className="w-5 h-5 text-gray-600" />
+            </button>
+            
+            {/* Mobile Search Dropdown */}
+            {showDropdown && (
+              <div
+                ref={dropdownRef}
+                className="absolute left-0 right-0 mt-2 bg-white border border-gray-200 rounded-md shadow-lg z-50 max-h-80 overflow-y-auto"
+              >
+                {searchLoading ? (
+                  <div className="p-4 text-center text-gray-500">
+                    <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-red-600 mx-auto mb-2"></div>
+                    <div>Searching...</div>
+                  </div>
+                ) : searchResults.length === 0 ? (
+                  <div className="p-4 text-sm text-gray-500">
+                    No products found for "<span className="font-medium">{searchQuery}</span>"
+                  </div>
+                ) : (
+                  <div className="divide-y divide-gray-100">
+                    {searchResults.slice(0, 6).map((product) => (
+                      <Link
+                        key={product.id}
+                        href={`/product/${product.id}`}
+                        onClick={() => {
+                          setShowDropdown(false);
+                          setSearchQuery('');
+                        }}
+                        className="flex items-center gap-3 p-3 hover:bg-gray-50 transition-colors"
+                      >
+                        <div className="relative w-14 h-14 flex-shrink-0 rounded-md overflow-hidden bg-gray-100">
+                          <Image
+                            src={product.image || '/placeholder.png'}
+                            alt={product.name}
+                            fill
+                            className="object-cover"
+                            sizes="56px"
+                          />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-medium font-geom line-clamp-1">{product.name}</p>
+                          <p className="text-xs text-gray-500 capitalize">{product.category}</p>
+                        </div>
+                        <div className="text-sm font-bold text-red-600">₹{product.price}</div>
+                      </Link>
+                    ))}
+                    {searchResults.length > 6 && (
+                      <Link
+                        href={`/products?search=${encodeURIComponent(searchQuery)}`}
+                        onClick={() => {
+                          setShowDropdown(false);
+                          setSearchQuery('');
+                        }}
+                        className="block text-center text-red-600 font-medium py-3 hover:bg-gray-50 transition-colors"
+                      >
+                        View all {searchResults.length} results
+                      </Link>
+                    )}
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        </div>
 
             <div className="flex flex-col py-2">
               {navItems.map((item) => (

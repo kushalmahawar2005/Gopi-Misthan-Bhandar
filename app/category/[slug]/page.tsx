@@ -2,7 +2,9 @@
 
 import React, { useState, useMemo, useEffect, Suspense } from 'react';
 import { useParams } from 'next/navigation';
-import { fetchCategoryBySlug, fetchProducts } from '@/lib/api';
+import Link from 'next/link';
+import Image from 'next/image';
+import { fetchCategoryBySlug, fetchProducts, fetchCategories } from '@/lib/api';
 import ProductCard from '@/components/ProductCard';
 import ProductListCard from '@/components/ProductListCard';
 import Header from '@/components/Header';
@@ -23,6 +25,8 @@ function CategoryContent() {
   const [searchQuery, setSearchQuery] = useState('');
   const [category, setCategory] = useState<Category | null>(null);
   const [products, setProducts] = useState<Product[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [categoryProductCounts, setCategoryProductCounts] = useState<Record<string, number>>({});
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -31,12 +35,28 @@ function CategoryContent() {
 
   const loadData = async () => {
     try {
-      const [categoryData, productsData] = await Promise.all([
+      const [categoryData, productsData, allCategories] = await Promise.all([
         fetchCategoryBySlug(slug),
         fetchProducts({ category: slug }),
+        fetchCategories(),
       ]);
       setCategory(categoryData);
       setProducts(productsData);
+      setCategories(allCategories);
+      
+      // Fetch product counts for each category
+      const counts: Record<string, number> = {};
+      await Promise.all(
+        allCategories.map(async (cat) => {
+          try {
+            const catProducts = await fetchProducts({ category: cat.slug });
+            counts[cat.slug] = catProducts.length;
+          } catch (error) {
+            counts[cat.slug] = 0;
+          }
+        })
+      );
+      setCategoryProductCounts(counts);
     } catch (error) {
       console.error('Error loading data:', error);
     } finally {
@@ -119,23 +139,64 @@ function CategoryContent() {
       <Navigation />
       <Cart />
 
-      {/* Category Header */}
-      <div className="bg-gradient-to-r from-primary-red to-primary-darkRed py-12 md:py-16 px-4">
-        <div className="w-full text-center">
-          <h1 className="text-4xl md:text-5xl font-bold font-geom text-white mb-4">
-            {category.name}
-          </h1>
-          <p className="text-lg text-gray-100 max-w-2xl mx-auto">
-            Explore our wide collection of {category.name.toLowerCase()}
-          </p>
+      {/* Categories List Section */}
+      <div className="w-full bg-[#f7db9d] py-6 md:py-8 px-4 overflow-x-auto">
+        <div className="flex gap-4 md:gap-6 md:justify-center" style={{ width: 'max-content', minWidth: '100%' }}>
+          {categories.map((cat) => {
+            const isActive = cat.slug === slug;
+            const productCount = categoryProductCounts[cat.slug] || 0;
+            return (
+              <Link
+                key={cat.id}
+                href={`/category/${cat.slug}`}
+                className={`flex-shrink-0 flex flex-col items-center bg-white rounded-xl overflow-hidden transition-all ${
+                  isActive 
+                    ? 'ring-4 ring-primary-red shadow-xl' 
+                    : 'hover:shadow-lg'
+                }`}
+                style={{ width: '150px', minWidth: '150px' }}
+              >
+                {/* Category Image */}
+                <div className={`relative w-full aspect-square overflow-hidden ${
+                  isActive ? 'bg-primary-red' : 'bg-gray-100'
+                }`}>
+                  {cat.image ? (
+                    <Image
+                      src={cat.image}
+                      alt={cat.name}
+                      fill
+                      className="object-cover"
+                      sizes="150px"
+                    />
+                  ) : (
+                    <div className="w-full h-full bg-gray-200 flex items-center justify-center">
+                      <span className="text-gray-400 text-sm">No Image</span>
+                    </div>
+                  )}
+                </div>
+                
+                {/* Category Info */}
+                <div className="w-full p-3 bg-white">
+                  <h3 className={`text-sm font-bold text-center mb-1 ${
+                    isActive ? 'text-primary-red' : 'text-gray-800'
+                  }`}>
+                    {cat.name}
+                  </h3>
+                  <p className="text-xs text-gray-600 text-center">
+                    {productCount} {productCount === 1 ? 'Product' : 'Products'}
+                  </p>
+                </div>
+              </Link>
+            );
+          })}
         </div>
       </div>
 
       {/* Filters and Controls */}
       <div className="w-full px-4 py-6 border-b border-gray-200">
         <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
-          {/* Search */}
-          <div className="flex-1 w-full md:w-auto">
+          {/* Search - Desktop Only */}
+          <div className="hidden md:flex flex-1 w-full md:w-auto">
             <div className="relative">
               <input
                 type="text"

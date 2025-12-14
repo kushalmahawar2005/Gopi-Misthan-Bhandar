@@ -27,6 +27,9 @@ const transformCategory = (category: any): Category => {
     name: category.name,
     slug: category.slug,
     image: category.image,
+    description: category.description,
+    subCategories: category.subCategories || [],
+    order: category.order || 0,
   };
 };
 
