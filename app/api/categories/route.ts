@@ -9,8 +9,8 @@ export async function GET(request: NextRequest) {
     
     // Optimize query - select only needed fields and use lean
     const categories = await Category.find()
-      .select('name slug image description')
-      .sort({ name: 1 })
+      .select('name slug image description subCategories order')
+      .sort({ order: 1, name: 1 })
       .lean();
 
     // Add cache headers for better performance
@@ -34,6 +34,14 @@ export async function POST(request: NextRequest) {
     await connectDB();
     
     const body = await request.json();
+    
+    // If order is not provided or is 0, auto-assign the next order number (1-based)
+    if (!body.order || body.order === 0) {
+      const maxOrderCategory = await Category.findOne().sort({ order: -1 }).select('order').lean();
+      const maxOrder = maxOrderCategory && maxOrderCategory.order !== undefined ? maxOrderCategory.order : 0;
+      body.order = maxOrder + 1;
+    }
+    
     const category = await Category.create(body);
 
     return NextResponse.json({ success: true, data: category }, { status: 201 });

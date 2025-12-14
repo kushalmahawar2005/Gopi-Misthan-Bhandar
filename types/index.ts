@@ -22,11 +22,21 @@ export interface Product {
   stock?: number; // Stock quantity
 }
 
+export interface SubCategory {
+  name: string;
+  slug: string;
+  image?: string;
+  description?: string;
+}
+
 export interface Category {
   id: string;
   name: string;
   slug: string;
   image?: string;
+  description?: string;
+  subCategories?: SubCategory[];
+  order?: number;
 }
 
 export interface InstagramPost {
