@@ -22,11 +22,11 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Check file size - 100MB for videos, 10MB for images
+    // Check file size - 100MB for videos, 30MB for images
     const isVideo = file.type.startsWith('video/');
-    const maxSize = isVideo ? 100 * 1024 * 1024 : 10 * 1024 * 1024; // 100MB for videos, 10MB for images
+    const maxSize = isVideo ? 100 * 1024 * 1024 : 30 * 1024 * 1024; // 100MB for videos, 30MB for images
     if (file.size > maxSize) {
-      const maxSizeMB = isVideo ? 100 : 10;
+      const maxSizeMB = isVideo ? 100 : 30;
       return NextResponse.json(
         { success: false, error: `File size exceeds ${maxSizeMB}MB limit` },
         { status: 400 }

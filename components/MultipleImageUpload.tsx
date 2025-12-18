@@ -217,7 +217,7 @@ const MultipleImageUpload: React.FC<MultipleImageUploadProps> = ({
                 Click to upload or drag and drop
               </p>
               <p className="text-xs text-gray-500">
-                PNG, JPG, GIF up to 10MB
+                PNG, JPG, GIF up to 30MB
               </p>
             </div>
           )}

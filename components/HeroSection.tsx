@@ -48,8 +48,8 @@ const HeroSection = () => {
 
   if (loading) {
     return (
-      <section className="w-full px-0 md:px-8 lg:px-12 -mt-0 md:mt-6">
-        <div className="w-full md:max-w-7xl md:mx-auto h-[calc(100vh-56px)] md:h-[380px] lg:h-[420px] relative overflow-hidden bg-gray-100 rounded-[30%] md:rounded-2xl">
+      <section className="w-full -mt-0 md:mt-6">
+        <div className="w-full md:max-w-7xl md:mx-auto md:px-8 lg:px-12 h-[calc(100vh-56px)] md:h-[380px] lg:h-[420px] relative overflow-hidden bg-gray-100 rounded-none md:rounded-2xl">
           <div className="flex items-center justify-center h-full">
             <div className="text-center">
               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-red mx-auto mb-4"></div>
@@ -63,8 +63,8 @@ const HeroSection = () => {
   if (slides.length === 0) return null;
 
   return (
-    <section className="relative w-full px-0 md:px-8 lg:px-12 -mt-2 md:mt-6 mb-4 lg:mb-4">
-      <div className="w-full md:max-w-7xl top-0 md:mx-auto h-[calc(100vh-340px)] md:h-[380px] lg:h-[420px] relative overflow-hidden rounded-none md:rounded-2xl">
+    <section className="relative w-full -mt-2 md:mt-6 mb-4 lg:mb-4">
+      <div className="w-full md:max-w-7xl md:mx-auto md:px-8 lg:px-12 h-[calc(100vh-340px)] md:h-[380px] lg:h-[420px] relative overflow-hidden rounded-none md:rounded-2xl">
         {/* Slides */}
         <div className="relative w-full h-full">
         {slides.map((slide, index) => (
@@ -88,7 +88,7 @@ const HeroSection = () => {
               src={(slide as any).mobileImage || slide.image}
               alt={`Hero slide ${index + 1}`}
               fill
-              className="object-contain object-center md:hidden"
+              className="object-cover object-center md:hidden"
               priority={index === 0}
               sizes="100vw"
             />

@@ -35,21 +35,80 @@ function CategoryContent() {
 
   const loadData = async () => {
     try {
-      const [categoryData, productsData, allCategories] = await Promise.all([
+      const [categoryData, allCategories] = await Promise.all([
         fetchCategoryBySlug(slug),
-        fetchProducts({ category: slug }),
         fetchCategories(),
       ]);
       setCategory(categoryData);
-      setProducts(productsData);
       setCategories(allCategories);
       
-      // Fetch product counts for each category
+      // Fetch products: category + subcategories
+      let allProducts: Product[] = [];
+      
+      // Fetch main category products
+      try {
+        const categoryProducts = await fetchProducts({ category: slug });
+        allProducts = [...categoryProducts];
+      } catch (error) {
+        console.error('Error fetching category products:', error);
+      }
+      
+      // Fetch subcategory products if category has subcategories
+      if (categoryData && categoryData.subCategories && categoryData.subCategories.length > 0) {
+        try {
+          const subcategoryProductsPromises = categoryData.subCategories.map(async (sub: any) => {
+            try {
+              return await fetchProducts({ category: sub.slug });
+            } catch (error) {
+              console.error(`Error fetching subcategory ${sub.slug} products:`, error);
+              return [];
+            }
+          });
+          
+          const subcategoryProductsArrays = await Promise.all(subcategoryProductsPromises);
+          // Flatten and add to allProducts
+          subcategoryProductsArrays.forEach(subProducts => {
+            allProducts = [...allProducts, ...subProducts];
+          });
+        } catch (error) {
+          console.error('Error fetching subcategory products:', error);
+        }
+      }
+      
+      // Remove duplicates based on product ID
+      const uniqueProducts = allProducts.filter((product, index, self) =>
+        index === self.findIndex((p) => p.id === product.id)
+      );
+      
+      setProducts(uniqueProducts);
+      
+      // Fetch product counts for each category (including subcategories)
       const counts: Record<string, number> = {};
       await Promise.all(
         allCategories.map(async (cat) => {
           try {
-            const catProducts = await fetchProducts({ category: cat.slug });
+            let catProducts = await fetchProducts({ category: cat.slug });
+            
+            // Also include subcategory products in count
+            if (cat.subCategories && cat.subCategories.length > 0) {
+              const subcategoryProductsPromises = cat.subCategories.map(async (sub: any) => {
+                try {
+                  return await fetchProducts({ category: sub.slug });
+                } catch (error) {
+                  return [];
+                }
+              });
+              const subcategoryProductsArrays = await Promise.all(subcategoryProductsPromises);
+              subcategoryProductsArrays.forEach(subProducts => {
+                catProducts = [...catProducts, ...subProducts];
+              });
+              
+              // Remove duplicates
+              catProducts = catProducts.filter((product, index, self) =>
+                index === self.findIndex((p) => p.id === product.id)
+              );
+            }
+            
             counts[cat.slug] = catProducts.length;
           } catch (error) {
             counts[cat.slug] = 0;
