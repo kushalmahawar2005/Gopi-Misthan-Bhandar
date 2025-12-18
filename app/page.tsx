@@ -115,6 +115,7 @@ export default function Home() {
             title="Classic Sweets"
             subtitle="Savour The Timeless Taste of Tradition With Kesar Classic Sweets"
             products={classicProducts}
+            viewMoreLink="/products?category=sweets"
           />
         </div>
       </ScrollAnimation>
@@ -124,6 +125,7 @@ export default function Home() {
           title="Premium Sweets"
           subtitle="Savour The Timeless Taste of Tradition With Kesar Classic Sweets"
           products={premiumProducts}
+          viewMoreLink="/products?category=sweets"
         />
       </ScrollAnimation>
       

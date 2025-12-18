@@ -37,6 +37,39 @@ export default function BulkImportPage() {
     }
   };
 
+  // Proper CSV parser that handles quoted fields with commas
+  const parseCSVLine = (line: string): string[] => {
+    const result: string[] = [];
+    let current = '';
+    let inQuotes = false;
+    
+    for (let i = 0; i < line.length; i++) {
+      const char = line[i];
+      const nextChar = line[i + 1];
+      
+      if (char === '"') {
+        if (inQuotes && nextChar === '"') {
+          // Escaped quote (double quote)
+          current += '"';
+          i++; // Skip next quote
+        } else {
+          // Toggle quote state
+          inQuotes = !inQuotes;
+        }
+      } else if (char === ',' && !inQuotes) {
+        // End of field
+        result.push(current.trim());
+        current = '';
+      } else {
+        current += char;
+      }
+    }
+    
+    // Add last field
+    result.push(current.trim());
+    return result;
+  };
+
   const handleImageSelect = (productName: string, e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       setImageFiles((prev) => ({
@@ -87,7 +120,7 @@ export default function BulkImportPage() {
         throw new Error('CSV file must have at least a header and one data row');
       }
 
-      const headers = lines[0].split(',').map(h => h.trim().replace(/"/g, ''));
+      const headers = parseCSVLine(lines[0]).map(h => h.trim().replace(/^"|"$/g, ''));
       const rows = lines.slice(1);
 
       const results = {
@@ -102,7 +135,7 @@ export default function BulkImportPage() {
         if (!row.trim()) continue;
 
         try {
-          const values = row.split(',').map(v => v.trim().replace(/^"|"$/g, ''));
+          const values = parseCSVLine(row).map(v => v.trim().replace(/^"|"$/g, ''));
           
           const product: any = {};
           headers.forEach((header, index) => {
@@ -114,8 +147,8 @@ export default function BulkImportPage() {
             throw new Error(`Row ${i + 2}: Missing required fields (name, price)`);
           }
 
-          // Handle image
-          let imageUrl = product.image;
+          // Handle image - make it optional
+          let imageUrl = '';
           
           // If image file is provided for this product, upload it
           if (imageFiles[product.name]) {
@@ -123,23 +156,27 @@ export default function BulkImportPage() {
               imageUrl = await uploadImageToCloudinary(imageFiles[product.name]);
             } catch (error: any) {
               results.errors.push(`Row ${i + 2}: Failed to upload image - ${error.message}`);
-              // Continue with existing image URL or placeholder
+              // Continue without image - can be added manually later
+              imageUrl = '';
             }
+          } else if (product.image && product.image.startsWith('http')) {
+            // If image is a URL, use it
+            imageUrl = product.image;
           } else if (product.image && !product.image.startsWith('http')) {
-            // If image is a local path but no file provided, use placeholder
-            results.errors.push(`Row ${i + 2}: Image must be a URL or upload image file. Using placeholder.`);
-            imageUrl = 'https://via.placeholder.com/400';
+            // If image is a local path but no file provided, skip it
+            results.errors.push(`Row ${i + 2}: Image must be a URL or upload image file. Skipping - can be added manually later.`);
+            imageUrl = '';
           }
 
-          // Convert types
+          // Convert types - featured field removed from bulk operation
           const productData = {
             name: product.name,
             description: product.description || '',
             price: parseFloat(product.price) || 0,
             category: product.category || 'sweets',
-            image: imageUrl || 'https://via.placeholder.com/400',
+            image: imageUrl, // Can be empty - user can add manually later
             stock: parseInt(product.stock) || 0,
-            featured: product.featured === 'true' || product.featured === true,
+            featured: false, // Always false in bulk operation - user can set manually
             defaultWeight: product.defaultWeight || '500g',
             shelfLife: product.shelfLife || '',
             deliveryTime: product.deliveryTime || '',

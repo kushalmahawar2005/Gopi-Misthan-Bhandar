@@ -28,6 +28,39 @@ export default function BulkProductsPage() {
     errors: string[];
   } | null>(null);
 
+  // Proper CSV parser that handles quoted fields with commas
+  const parseCSVLine = (line: string): string[] => {
+    const result: string[] = [];
+    let current = '';
+    let inQuotes = false;
+    
+    for (let i = 0; i < line.length; i++) {
+      const char = line[i];
+      const nextChar = line[i + 1];
+      
+      if (char === '"') {
+        if (inQuotes && nextChar === '"') {
+          // Escaped quote (double quote)
+          current += '"';
+          i++; // Skip next quote
+        } else {
+          // Toggle quote state
+          inQuotes = !inQuotes;
+        }
+      } else if (char === ',' && !inQuotes) {
+        // End of field
+        result.push(current.trim());
+        current = '';
+      } else {
+        current += char;
+      }
+    }
+    
+    // Add last field
+    result.push(current.trim());
+    return result;
+  };
+
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       setFile(e.target.files[0]);
@@ -58,7 +91,6 @@ export default function BulkProductsPage() {
         'category',
         'image',
         'stock',
-        'featured',
         'defaultWeight',
         'shelfLife',
         'deliveryTime',
@@ -71,7 +103,6 @@ export default function BulkProductsPage() {
         product.category || '',
         product.image || '',
         product.stock || 0,
-        product.featured ? 'true' : 'false',
         product.defaultWeight || '',
         product.shelfLife || '',
         product.deliveryTime || '',
@@ -119,7 +150,7 @@ export default function BulkProductsPage() {
         throw new Error('CSV file must have at least a header and one data row');
       }
 
-      const headers = lines[0].split(',').map(h => h.trim().replace(/"/g, ''));
+      const headers = parseCSVLine(lines[0]).map(h => h.trim().replace(/^"|"$/g, ''));
       const rows = lines.slice(1);
 
       const results = {
@@ -134,7 +165,7 @@ export default function BulkProductsPage() {
         if (!row.trim()) continue;
 
         try {
-          const values = row.split(',').map(v => v.trim().replace(/^"|"$/g, ''));
+          const values = parseCSVLine(row).map(v => v.trim().replace(/^"|"$/g, ''));
           
           const product: any = {};
           headers.forEach((header, index) => {
@@ -146,25 +177,31 @@ export default function BulkProductsPage() {
             throw new Error(`Row ${i + 2}: Missing required fields (name, price)`);
           }
 
-          // Handle image - if it's a URL, use it; if it's a local path, upload to Cloudinary
-          let imageUrl = product.image;
+          // Handle image - make it optional, allow empty
+          let imageUrl = (product.image || '').trim();
           
-          if (product.image && !product.image.startsWith('http')) {
-            // If image is a local file path, you would need to handle file upload
-            // For now, we'll skip images that aren't URLs
-            results.errors.push(`Row ${i + 2}: Image must be a URL. Skipping local image.`);
-            imageUrl = ''; // Or set a default image
+          // Only validate if image is provided and it's not a URL
+          if (imageUrl && !imageUrl.startsWith('http')) {
+            // If image is a local file path, skip it (user can add manually later)
+            // Don't show error for empty strings, only for actual invalid values
+            if (imageUrl.length > 0) {
+              results.errors.push(`Row ${i + 2}: Image must be a URL or leave empty. Skipping local image.`);
+            }
+            imageUrl = ''; // Empty image - can be added manually later
           }
 
-          // Convert types
+          // Category validation will happen in API
+          const categoryValue = product.category || 'sweets';
+
+          // Convert types - featured field removed from bulk operation
           const productData = {
             name: product.name,
             description: product.description || '',
             price: parseFloat(product.price) || 0,
-            category: product.category || 'sweets',
-            image: imageUrl || 'https://via.placeholder.com/400',
+            category: categoryValue,
+            image: imageUrl, // Can be empty - user can add manually later
             stock: parseInt(product.stock) || 0,
-            featured: product.featured === 'true' || product.featured === true,
+            featured: false, // Always false in bulk operation - user can set manually
             defaultWeight: product.defaultWeight || '500g',
             shelfLife: product.shelfLife || '',
             deliveryTime: product.deliveryTime || '',
@@ -255,8 +292,19 @@ export default function BulkProductsPage() {
         
         <div className="bg-gray-50 p-3 sm:p-4 rounded-lg mb-4 overflow-x-auto">
           <code className="text-xs sm:text-sm whitespace-nowrap">
-            name, description, price, category, image, stock, featured, defaultWeight, shelfLife, deliveryTime
+            name, description, price, category, image, stock, defaultWeight, shelfLife, deliveryTime
           </code>
+        </div>
+        
+        <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 sm:p-4 mb-4">
+          <p className="text-xs sm:text-sm text-blue-800 mb-2">
+            <strong>Note:</strong>
+          </p>
+          <ul className="text-xs sm:text-sm text-blue-700 list-disc list-inside space-y-1">
+            <li><strong>Image:</strong> Optional - leave empty if you want to add images manually later in the edit section</li>
+            <li><strong>Featured:</strong> Removed from bulk operation - set manually in edit section</li>
+            <li><strong>Category:</strong> Supports both categories and subcategories</li>
+          </ul>
         </div>
 
         <div className="mb-4">
@@ -339,9 +387,9 @@ export default function BulkProductsPage() {
         <h3 className="text-base sm:text-lg font-bold font-serif mb-3 sm:mb-4">Sample CSV Format</h3>
         <div className="bg-gray-50 p-3 sm:p-4 rounded-lg overflow-x-auto">
           <pre className="text-xs sm:text-sm whitespace-pre-wrap break-words">
-{`name,description,price,category,image,stock,featured,defaultWeight,shelfLife,deliveryTime
-"Gulab Jamun","Traditional sweet made with khoya","250","sweets","https://res.cloudinary.com/your-cloud/image/upload/v1/gulab-jamun.jpg",50,true,"500g","7 days","2-3 days"
-"Kaju Katli","Premium cashew sweet","450","sweets","https://res.cloudinary.com/your-cloud/image/upload/v1/kaju-katli.jpg",30,true,"250g","15 days","2-3 days"`}
+{`name,description,price,category,image,stock,defaultWeight,shelfLife,deliveryTime
+"Gulab Jamun","Traditional sweet made with khoya","250","sweets","https://res.cloudinary.com/your-cloud/image/upload/v1/gulab-jamun.jpg",50,"500g","7 days","2-3 days"
+"Kaju Katli","Premium cashew sweet","450","sweets","",30,"250g","15 days","2-3 days"`}
           </pre>
         </div>
       </div>
