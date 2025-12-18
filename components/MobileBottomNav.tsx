@@ -37,7 +37,7 @@ const MobileBottomNav = () => {
     },
     {
       label: 'Shop',
-      href: '/products',
+      href: '/products?category=sweets',
       icon: FiShoppingBag,
       badge: 0,
     },

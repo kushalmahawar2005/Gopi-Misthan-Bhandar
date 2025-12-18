@@ -12,7 +12,7 @@ export interface IProduct extends Document {
   price: number;
   image: string; // Main image (for backward compatibility)
   images?: string[]; // Multiple images array
-  category: 'sweets' | 'classic-sweets' | 'premium-sweets' | 'snacks' | 'namkeen' | 'dry-fruit' | 'gifting';
+  category: string; // Can be category slug or subcategory slug
   featured?: boolean;
   isPremium?: boolean;
   isClassic?: boolean;
@@ -36,12 +36,12 @@ const ProductSchema = new Schema<IProduct>(
     name: { type: String, required: true },
     description: { type: String, required: true },
     price: { type: Number, required: true },
-    image: { type: String, required: true },
+    image: { type: String, required: false, default: '' },
     images: { type: [String], default: [] }, // Multiple images array
     category: {
       type: String,
-      enum: ['sweets', 'classic-sweets', 'premium-sweets', 'snacks', 'namkeen', 'dry-fruit', 'gifting'],
       required: true,
+      // Allow any string - validation happens in API to support subcategories
     },
     featured: { type: Boolean, default: false },
     isPremium: { type: Boolean, default: false },

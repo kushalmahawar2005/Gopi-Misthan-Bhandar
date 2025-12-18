@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
 import Product from '@/models/Product';
+import Category from '@/models/Category';
 
 // GET all products
 export async function GET(request: NextRequest) {
@@ -59,6 +60,28 @@ export async function POST(request: NextRequest) {
     await connectDB();
     
     const body = await request.json();
+    
+    // Validate category (including subcategories)
+    if (body.category) {
+      const categories = await Category.find({});
+      const categoryExists = categories.some((cat: any) => cat.slug === body.category);
+      const subcategoryExists = categories.some((cat: any) => 
+        cat.subCategories && cat.subCategories.some((sub: any) => sub.slug === body.category)
+      );
+      
+      if (!categoryExists && !subcategoryExists) {
+        return NextResponse.json({ 
+          success: false, 
+          error: `Category "${body.category}" not found. Please use a valid category or subcategory slug.` 
+        }, { status: 400 });
+      }
+    }
+    
+    // Make image optional - allow empty string
+    if (!body.image) {
+      body.image = '';
+    }
+    
     const product = await Product.create(body);
 
     return NextResponse.json({ success: true, data: product }, { status: 201 });

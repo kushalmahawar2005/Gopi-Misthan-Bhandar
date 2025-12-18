@@ -11,7 +11,7 @@ export interface Product {
   price: number;
   image: string; // Main image (for backward compatibility)
   images?: string[]; // Multiple images array
-  category: 'sweets' | 'classic-sweets' | 'premium-sweets' | 'snacks' | 'namkeen' | 'dry-fruit' | 'gifting';
+  category: string; // Can be category slug or subcategory slug
   featured?: boolean;
   isPremium?: boolean;
   isClassic?: boolean;
