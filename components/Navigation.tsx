@@ -162,11 +162,11 @@ const Navigation = () => {
               {isMobileMenuOpen ? <FiX className="w-6 h-6" /> : <FiMenu className="w-6 h-6" />}
             </button>
 
-            {/* Desktop search (underline style) */}
+            {/* Desktop search (with border and radius) */}
             <div className="hidden md:flex items-center w-full max-w-md mt-4 relative ml-4 md:ml-6">
               <div className="relative w-full">
                 {/* Input + icon-button aligned */}
-                <div className="flex items-center">
+                <div className="relative flex items-center">
                   <input
                     ref={searchInputRef}
                     type="text"
@@ -180,7 +180,11 @@ const Navigation = () => {
                     onBlur={() => {
                       setIsFocused(false);
                     }}
-                    className="w-full pr-10 py-2 text-md bg-transparent outline-none border-0 focus:ring-0 placeholder-gray-500"
+                    className={`w-full pr-10 py-2.5 pl-4 text-md bg-white outline-none border transition-colors rounded-lg placeholder-gray-500 ${
+                      isFocused 
+                        ? 'border-primary-red focus:ring-2 focus:ring-primary-red focus:border-primary-red' 
+                        : 'border-gray-300 focus:border-primary-red focus:ring-2 focus:ring-primary-red'
+                    }`}
                     aria-label="Search products"
                   />
                   {/* Search button on the right */}
@@ -194,19 +198,12 @@ const Navigation = () => {
                         searchInputRef.current?.focus();
                       }
                     }}
-                    className="absolute right-0 top-1/2 transform -translate-y-1/2 p-2"
+                    className="absolute right-2 top-1/2 transform -translate-y-1/2 p-2 hover:bg-gray-100 rounded-lg transition-colors"
                     aria-label="Search"
                   >
                     <FiSearch className="w-5 h-5 text-gray-600" />
                   </button>
                 </div>
-
-                {/* Underline (thin) with focus animation */}
-                <div
-                  className={`h-px mt-2 transition-colors ${
-                    isFocused ? 'bg-red-600' : 'bg-gray-300'
-                  }`}
-                />
 
                 {/* Dropdown */}
                 {showDropdown && (
