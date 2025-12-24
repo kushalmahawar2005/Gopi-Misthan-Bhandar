@@ -20,6 +20,7 @@ function ProductsContent() {
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [sortBy, setSortBy] = useState<SortOption>('default');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
+  const [selectedSubCategory, setSelectedSubCategory] = useState<string>('all');
   const [showSortMenu, setShowSortMenu] = useState(false);
   const [showFilterMenu, setShowFilterMenu] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
@@ -44,6 +45,11 @@ function ProductsContent() {
   useEffect(() => {
     loadData();
   }, []);
+
+  // Reset subcategory when category changes
+  useEffect(() => {
+    setSelectedSubCategory('all');
+  }, [selectedCategory]);
 
   const loadData = async () => {
     try {
@@ -73,7 +79,17 @@ function ProductsContent() {
 
     // Category filter
     if (selectedCategory !== 'all') {
-      filtered = filtered.filter(product => product.category === selectedCategory);
+      if (selectedSubCategory !== 'all') {
+        filtered = filtered.filter(product => product.category === selectedSubCategory);
+      } else {
+        // Include products from main category AND its subcategories
+        const currentCategory = categories.find(c => c.slug === selectedCategory);
+        const subCategorySlugs = currentCategory?.subCategories?.map(s => s.slug) || [];
+        
+        filtered = filtered.filter(product => 
+          product.category === selectedCategory || subCategorySlugs.includes(product.category)
+        );
+      }
     }
 
     // Search filter - only search in product name
@@ -105,14 +121,27 @@ function ProductsContent() {
     }
 
     return filtered;
-  }, [products, selectedCategory, searchQuery, priceRange, sortBy]);
+  }, [products, selectedCategory, selectedSubCategory, searchQuery, priceRange, sortBy]);
 
   // Category counts
   const categoryCounts = useMemo(() => {
     const counts: { [key: string]: number } = { all: products.length };
+    
     categories.forEach(cat => {
-      counts[cat.slug] = products.filter(p => p.category === cat.slug).length;
+      // Get all subcategory slugs for this category
+      const subCategorySlugs = cat.subCategories?.map(s => s.slug) || [];
+      // Include the category itself and all its subcategories
+      const relevantSlugs = [cat.slug, ...subCategorySlugs];
+      
+      // Count products that match any of these slugs
+      counts[cat.slug] = products.filter(p => relevantSlugs.includes(p.category)).length;
+      
+      // Also calculate counts for each subcategory individually
+      cat.subCategories?.forEach(sub => {
+        counts[sub.slug] = products.filter(p => p.category === sub.slug).length;
+      });
     });
+    
     return counts;
   }, [products, categories]);
 
@@ -224,6 +253,42 @@ function ProductsContent() {
 
           {/* Main Content */}
           <div className="flex-1">
+            {/* Subcategories */}
+            {selectedCategory !== 'all' && (() => {
+              const currentCategory = categories.find(c => c.slug === selectedCategory);
+              if (!currentCategory?.subCategories?.length) return null;
+              
+              return (
+                <div className="mb-6 overflow-x-auto pb-2 scrollbar-hide">
+                  <div className="flex gap-2 min-w-max">
+                    <button
+                      onClick={() => setSelectedSubCategory('all')}
+                      className={`px-4 py-2 rounded-full text-sm border transition-colors ${
+                        selectedSubCategory === 'all'
+                          ? 'bg-primary-red text-white border-primary-red'
+                          : 'bg-white text-gray-600 border-gray-300 hover:border-primary-red hover:text-primary-red'
+                      }`}
+                    >
+                      All ({categoryCounts[currentCategory.slug] || 0})
+                    </button>
+                    {currentCategory.subCategories.map((sub) => (
+                      <button
+                        key={sub.slug}
+                        onClick={() => setSelectedSubCategory(sub.slug)}
+                        className={`px-4 py-2 rounded-full text-sm border transition-colors ${
+                          selectedSubCategory === sub.slug
+                            ? 'bg-primary-red text-white border-primary-red'
+                            : 'bg-white text-gray-600 border-gray-300 hover:border-primary-red hover:text-primary-red'
+                        }`}
+                      >
+                        {sub.name} ({categoryCounts[sub.slug] || 0})
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              );
+            })()}
+
             {/* Toolbar */}
             <div className="flex flex-col md:flex-row gap-4 items-center justify-between mb-6">
               <div className="text-sm text-gray-600">
@@ -434,6 +499,15 @@ function ProductsContent() {
       )}
 
       <Footer />
+      <style jsx global>{`
+        .scrollbar-hide::-webkit-scrollbar {
+          display: none;
+        }
+        .scrollbar-hide {
+          -ms-overflow-style: none;
+          scrollbar-width: none;
+        }
+      `}</style>
     </div>
   );
 }
