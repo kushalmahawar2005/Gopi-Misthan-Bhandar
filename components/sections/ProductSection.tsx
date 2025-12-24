@@ -80,7 +80,7 @@ const ProductSection: React.FC<ProductSectionProps> = ({
           <div className="relative px-4 md:px-6">
             <div
               ref={scrollContainerRef}
-              className="flex gap-4 md:gap-6 overflow-x-auto scroll-smooth mb-8"
+              className="flex gap-4 md:gap-6 overflow-x-auto scroll-smooth scrollbar-hide mb-8"
               style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
             >
               {products.map((product) => (
@@ -93,14 +93,14 @@ const ProductSection: React.FC<ProductSectionProps> = ({
               ))}
             </div>
             {products.length > 4 && (
-              <div className="hidden md:flex items-center gap-2 absolute inset-y-1/2 -translate-y-1/2 left-2 right-2 justify-between pointer-events-none">
+              <div className="hidden md:flex items-center gap-2 absolute top-1/2 -translate-y-1/2 md:-left-5 md:-right-5 justify-between pointer-events-none">
                 <button
                   onClick={() => scroll('left')}
                   disabled={!canScrollLeft}
-                  className={`pointer-events-auto p-2 rounded-full transition-all ${
+                  className={`pointer-events-auto p-2  outline-none focus:outline-none transition-all ${
                     canScrollLeft
-                      ? 'bg-primary-red text-white hover:bg-primary-darkRed'
-                      : 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                      ? 'text-Black hover:bg-primary-darkRed'
+                      : 'text-gray-400 cursor-not-allowed'
                   }`}
                   aria-label="Previous products"
                 >
@@ -109,9 +109,9 @@ const ProductSection: React.FC<ProductSectionProps> = ({
                 <button
                   onClick={() => scroll('right')}
                   disabled={!canScrollRight}
-                  className={`pointer-events-auto p-2 rounded-full transition-all ${
+                  className={`pointer-events-auto p-2  border-0 outline-none focus:outline-none transition-all ${
                     canScrollRight
-                      ? 'bg-primary-red text-white hover:bg-primary-darkRed'
+                      ? 'text-black hover:bg-primary-darkRed'
                       : 'bg-gray-200 text-gray-400 cursor-not-allowed'
                   }`}
                   aria-label="Next products"
@@ -158,6 +158,11 @@ const ProductSection: React.FC<ProductSectionProps> = ({
           </div>
         )}
       </div>
+      <style jsx>{`
+        .scrollbar-hide::-webkit-scrollbar {
+          display: none;
+        }
+      `}</style>
     </section>
   );
 };
