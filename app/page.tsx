@@ -40,10 +40,11 @@ export default function Home() {
   const loadData = async () => {
     try {
       // Optimized: Fetch only what we need, avoid duplicate calls
-      const [featured, categoriesData, allSweets, instaBooksData, instaPostsData, galleryData, giftBoxesData, blogsData] = await Promise.all([
+      const [featured, categoriesData, classicFlagged, premiumFlagged, instaBooksData, instaPostsData, galleryData, giftBoxesData, blogsData] = await Promise.all([
         fetchProducts({ featured: true, limit: 8 }),
         fetchCategories(),
-        fetchProducts({ category: 'sweets' }), // Fetch all sweets once
+        fetchProducts({ isClassic: true, limit: 8 }),
+        fetchProducts({ isPremium: true, limit: 8 }),
         fetchInstaBooks(),
         fetchInstaPosts(),
         fetchGallery(),
@@ -54,11 +55,8 @@ export default function Home() {
       setFeaturedProducts(featured);
       setCategories(categoriesData);
       
-      // Filter sweets by isClassic and isPremium flags
-      const classic = allSweets.filter((p: Product) => p.isClassic).slice(0, 8);
-      const premium = allSweets.filter((p: Product) => p.isPremium).slice(0, 8);
-      setClassicProducts(classic);
-      setPremiumProducts(premium);
+      setClassicProducts(classicFlagged.slice(0, 8));
+      setPremiumProducts(premiumFlagged.slice(0, 8));
       
       setInstaBooks(instaBooksData);
       setInstaPosts(instaPostsData);
@@ -116,6 +114,7 @@ export default function Home() {
             subtitle="Savour The Timeless Taste of Tradition With Kesar Classic Sweets"
             products={classicProducts}
             viewMoreLink="/products?category=sweets"
+            enableSlider
           />
         </div>
       </ScrollAnimation>
@@ -126,6 +125,7 @@ export default function Home() {
           subtitle="Savour The Timeless Taste of Tradition With Kesar Classic Sweets"
           products={premiumProducts}
           viewMoreLink="/products?category=sweets"
+          enableSlider
         />
       </ScrollAnimation>
       

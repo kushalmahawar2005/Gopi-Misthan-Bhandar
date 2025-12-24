@@ -20,15 +20,6 @@ const InstaPostSection: React.FC<InstaPostSectionProps> = ({ instaPosts }) => {
 
   if (!instaPosts || instaPosts.length === 0) return null;
 
-  // Auto-slide every 3 sec
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setIndex((prev) => (prev + 1) % instaPosts.length);
-    }, 3000);
-
-    return () => clearInterval(interval);
-  }, [instaPosts.length]);
-
   // Slide logic
   useEffect(() => {
     if (sliderRef.current) {
