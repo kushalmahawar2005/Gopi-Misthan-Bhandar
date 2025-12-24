@@ -13,8 +13,6 @@ export async function GET(request: NextRequest) {
     const featured = searchParams.get('featured');
     const search = searchParams.get('search');
     const limit = searchParams.get('limit');
-    const isClassic = searchParams.get('isClassic');
-    const isPremium = searchParams.get('isPremium');
 
     let query: any = {};
 
@@ -28,14 +26,6 @@ export async function GET(request: NextRequest) {
 
     if (search) {
       query.name = { $regex: search, $options: 'i' };
-    }
-    
-    if (isClassic === 'true') {
-      query.isClassic = true;
-    }
-    
-    if (isPremium === 'true') {
-      query.isPremium = true;
     }
 
     // Optimize query - select only needed fields and add limit early
