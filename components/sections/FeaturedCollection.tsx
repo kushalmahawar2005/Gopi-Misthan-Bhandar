@@ -103,7 +103,7 @@ const FeaturedCollection: React.FC<FeaturedCollectionProps> = ({ products }) => 
         });
       } else {
         // Scroll to next
-        const scrollAmount = scrollContainerRef.current.clientWidth * 0.8;
+        const scrollAmount = scrollContainerRef.current.clientWidth * 0.6;
         scrollContainerRef.current.scrollBy({
           left: scrollAmount,
           behavior: 'smooth',
@@ -153,9 +153,13 @@ const FeaturedCollection: React.FC<FeaturedCollectionProps> = ({ products }) => 
   // Auto-scroll every 2 seconds
   useEffect(() => {
     if (products.length > 4) {
+      const isMobile =
+        typeof window !== 'undefined' &&
+        window.matchMedia('(max-width: 768px)').matches;
+      const intervalMs = isMobile ? 4000 : 4000;
       autoScrollIntervalRef.current = setInterval(() => {
         autoScroll();
-      }, 2000);
+      }, intervalMs);
 
       return () => {
         if (autoScrollIntervalRef.current) {
@@ -189,7 +193,7 @@ const FeaturedCollection: React.FC<FeaturedCollectionProps> = ({ products }) => 
     <section className="pt-8 pb-8 md:pt-12 md:pb-12 bg-white w-full">
       <div className="section-container max-w-6xl lg:max-w-7xl mx-auto px-0 md:px-0">
         {/* Header: Title on left, View All button and arrows on right */}
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6 md:mb-8 px-4 md:px-6">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6 md:mb-8 px-2 sm:px-4 md:px-6">
           <div>
             <h2 className="text-3xl md:text-4xl lg:text-5xl font-[450] text-black font-general-sans mb-2">
               New Arrivals
@@ -237,10 +241,10 @@ const FeaturedCollection: React.FC<FeaturedCollectionProps> = ({ products }) => 
         </div>
 
         {/* Product Carousel - Scrollable */}
-        <div className="relative px-4 md:px-6">
+        <div className="relative px-2 sm:px-4 md:px-6">
           <div
             ref={scrollContainerRef}
-            className="flex gap-4 md:gap-6 overflow-x-auto scrollbar-hide scroll-smooth"
+            className="flex gap-3 md:gap-6 overflow-x-auto scrollbar-hide scroll-smooth"
             style={{
               scrollbarWidth: 'none',
               msOverflowStyle: 'none',
