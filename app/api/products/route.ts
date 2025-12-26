@@ -11,6 +11,8 @@ export async function GET(request: NextRequest) {
     const searchParams = request.nextUrl.searchParams;
     const category = searchParams.get('category');
     const featured = searchParams.get('featured');
+    const isClassic = searchParams.get('isClassic');
+    const isPremium = searchParams.get('isPremium');
     const search = searchParams.get('search');
     const limit = searchParams.get('limit');
 
@@ -22,6 +24,14 @@ export async function GET(request: NextRequest) {
 
     if (featured === 'true') {
       query.featured = true;
+    }
+    
+    // Flags for special sections
+    if (isClassic === 'true') {
+      query.isClassic = true;
+    }
+    if (isPremium === 'true') {
+      query.isPremium = true;
     }
 
     if (search) {
