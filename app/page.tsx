@@ -55,8 +55,17 @@ export default function Home() {
       setFeaturedProducts(featured);
       setCategories(categoriesData);
       
-      setClassicProducts(classicFlagged.slice(0, 8));
-      setPremiumProducts(premiumFlagged.slice(0, 8));
+      // Restrict Classic/Premium sections to Sweets category and its subcategories
+      const sweetsCategory = categoriesData.find((c) => c.slug === 'sweets');
+      const sweetsSlugs = sweetsCategory
+        ? [sweetsCategory.slug, ...(sweetsCategory.subCategories?.map((s: any) => s.slug) || [])]
+        : ['sweets'];
+      
+      const classicFiltered = classicFlagged.filter((p) => sweetsSlugs.includes(p.category));
+      const premiumFiltered = premiumFlagged.filter((p) => sweetsSlugs.includes(p.category));
+      
+      setClassicProducts(classicFiltered.slice(0, 8));
+      setPremiumProducts(premiumFiltered.slice(0, 8));
       
       setInstaBooks(instaBooksData);
       setInstaPosts(instaPostsData);

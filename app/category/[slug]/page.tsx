@@ -23,6 +23,7 @@ function CategoryContent() {
   const [sortBy, setSortBy] = useState<SortOption>('default');
   const [showSortMenu, setShowSortMenu] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const [selectedSubCategory, setSelectedSubCategory] = useState<string>('all');
   const [category, setCategory] = useState<Category | null>(null);
   const [products, setProducts] = useState<Product[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
@@ -31,6 +32,10 @@ function CategoryContent() {
 
   useEffect(() => {
     loadData();
+  }, [slug]);
+
+  useEffect(() => {
+    setSelectedSubCategory('all');
   }, [slug]);
 
   const loadData = async () => {
@@ -127,6 +132,10 @@ function CategoryContent() {
   const filteredAndSortedProducts = useMemo(() => {
     let filtered = [...products];
 
+    if (selectedSubCategory !== 'all') {
+      filtered = filtered.filter(p => p.category === selectedSubCategory);
+    }
+
     // Search filter - only search in product name
     if (searchQuery) {
       const query = searchQuery.toLowerCase();
@@ -151,7 +160,18 @@ function CategoryContent() {
     }
 
     return filtered;
-  }, [products, searchQuery, sortBy]);
+  }, [products, selectedSubCategory, searchQuery, sortBy]);
+
+  // Subcategory counts for chip labels
+  const subCategoryCounts = useMemo(() => {
+    const counts: Record<string, number> = {};
+    if (category?.subCategories && category.subCategories.length > 0) {
+      category.subCategories.forEach((sub) => {
+        counts[sub.slug] = products.filter(p => p.category === sub.slug).length;
+      });
+    }
+    return counts;
+  }, [products, category]);
 
   const sortOptions: { value: SortOption; label: string }[] = [
     { value: 'default', label: 'Default' },
@@ -339,6 +359,39 @@ function CategoryContent() {
           Showing {filteredAndSortedProducts.length} of {products.length} products
         </div>
       </div>
+
+      {/* Subcategories Chips */}
+      {category?.subCategories && category.subCategories.length > 0 && (
+        <div className="w-full px-4 pt-4">
+          <div className="mb-4 overflow-x-auto pb-2 scrollbar-hide">
+            <div className="flex gap-2 min-w-max">
+              <button
+                onClick={() => setSelectedSubCategory('all')}
+                className={`px-4 py-2 rounded-full text-sm border transition-colors ${
+                  selectedSubCategory === 'all'
+                    ? 'bg-primary-red text-white border-primary-red'
+                    : 'bg-white text-gray-600 border-gray-300 hover:border-primary-red hover:text-primary-red'
+                }`}
+              >
+                All ({products.length})
+              </button>
+              {category.subCategories.map((sub) => (
+                <button
+                  key={sub.slug}
+                  onClick={() => setSelectedSubCategory(sub.slug)}
+                  className={`px-4 py-2 rounded-full text-sm border transition-colors ${
+                    selectedSubCategory === sub.slug
+                      ? 'bg-primary-red text-white border-primary-red'
+                      : 'bg-white text-gray-600 border-gray-300 hover:border-primary-red hover:text-primary-red'
+                  }`}
+                >
+                  {sub.name} ({subCategoryCounts[sub.slug] || 0})
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Products Grid/List */}
       <div className="w-full px-4 py-8 md:py-12">

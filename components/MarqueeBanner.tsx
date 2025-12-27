@@ -7,7 +7,7 @@ interface MarqueeBannerProps {
 }
 
 const MarqueeBanner: React.FC<MarqueeBannerProps> = ({ text }) => {
-  const [marqueeText, setMarqueeText] = useState(text || 'ALERT: Same day delivery in Delhi NCR for all orders placed before 5pm.');
+  const [marqueeText, setMarqueeText] = useState(text || 'ALERT: Same day delivery in Neemuch for all orders placed before 5pm.');
 
   useEffect(() => {
     // Fetch marquee text from API (only active content)
