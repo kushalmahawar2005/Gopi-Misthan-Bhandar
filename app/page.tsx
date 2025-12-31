@@ -120,7 +120,7 @@ export default function Home() {
         <div id="sweets">
           <ProductSection 
             title="Classic Sweets"
-            subtitle="Savour The Timeless Taste of Tradition With Kesar Classic Sweets"
+            subtitle="Savour The Timeless Taste of Tradition With Gopi Sweets"
             products={classicProducts}
             viewMoreLink="/products?category=sweets"
           />
@@ -130,7 +130,7 @@ export default function Home() {
       <ScrollAnimation delay={200}>
         <ProductSection 
           title="Premium Sweets"
-          subtitle="Savour The Timeless Taste of Tradition With Kesar Classic Sweets"
+          subtitle="Savour The Timeless Taste of Tradition With Gopi Premium Sweets"
           products={premiumProducts}
           viewMoreLink="/products?category=sweets"
         />
