@@ -108,7 +108,7 @@ export default function EditInstaPost() {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-bold text-primary-brown font-serif">Edit InstaPost</h1>
+          <h1 className="text-3xl font-bold text-primary-brown font-general-sansal-sansal-sansal-sansal-sans">Edit InstaPost</h1>
           <p className="text-gray-600 mt-1">Update InstaPost details</p>
         </div>
         <button

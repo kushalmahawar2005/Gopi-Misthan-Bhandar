@@ -91,7 +91,7 @@ export default function AdminSiteContent() {
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-primary-brown font-serif">Offer Line (Marquee)</h1>
+          <h1 className="text-3xl font-bold text-primary-brown font-general-sansal-sansal-sansal-sans">Offer Line (Marquee)</h1>
           <p className="text-gray-600 mt-1">Manage the scrolling offer line at the top of your website</p>
         </div>
         <div>

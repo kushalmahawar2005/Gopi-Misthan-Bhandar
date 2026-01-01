@@ -32,7 +32,7 @@ const BlogSection: React.FC<BlogSectionProps> = ({ blogs }) => {
   return (
     <section className="py-12 md:py-20 px-4 bg-white w-full">
       <div className="w-full max-w-7xl mx-auto">
-        <h2 className="text-center text-2xl md:text-3xl font-serif text-black mb-12 md:mb-16 font-medium">
+        <h2 className="text-center text-2xl md:text-3xl font-general-sansal-sansal-sansal-sansal-sansal-sans text-black mb-12 md:mb-16 font-medium">
           Latest Blogs
         </h2>
         
@@ -58,7 +58,7 @@ const BlogSection: React.FC<BlogSectionProps> = ({ blogs }) => {
                 <p className="text-sm text-gray-500 mb-3">
                   {formatDate(blog.publishedDate)}
                 </p>
-                <h3 className="text-xl md:text-2xl font-serif font-bold text-primary-brown mb-3 line-clamp-2">
+                <h3 className="text-xl md:text-2xl font-general-sansal-sansal-sansal-sansal-sansal-sans font-bold text-primary-brown mb-3 line-clamp-2">
                   {blog.title}
                 </h3>
                 <p className="text-gray-600 text-sm md:text-base mb-6 leading-relaxed line-clamp-3 flex-grow">

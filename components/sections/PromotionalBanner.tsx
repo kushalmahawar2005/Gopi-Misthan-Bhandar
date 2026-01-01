@@ -215,7 +215,7 @@ const PromotionalBanner = () => {
 
                       {/* Text */}
                       <div className="flex-1">
-                        <h3 className="text-white font-serif text-lg md:text-2xl lg:text-2xl leading-tight font-medium">
+                        <h3 className="text-white font-general-sans text-lg md:text-2xl lg:text-2xl leading-tight font-medium">
                           {feature.title}
                         </h3>
                         <p className="text-white/90 text-xs md:text-sm mt-1">{feature.subtitle}</p>

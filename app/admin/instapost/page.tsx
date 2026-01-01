@@ -155,7 +155,7 @@ export default function InstaPostPage() {
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-primary-brown font-serif">InstaPost</h1>
+          <h1 className="text-3xl font-bold text-primary-brown font-general-sansal-sansal-sans">InstaPost</h1>
           <p className="text-gray-600 mt-1">Manage Instagram post grid items</p>
         </div>
         <Link

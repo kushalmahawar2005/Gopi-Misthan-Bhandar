@@ -96,7 +96,7 @@ export const sendOrderConfirmationEmail = async (
     <head>
       <meta charset="utf-8">
       <style>
-        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+        body { font-family: Arial, sans-general-sans; line-height: 1.6; color: #333; }
         .container { max-width: 600px; margin: 0 auto; padding: 20px; }
         .header { background: #ba0606; color: white; padding: 20px; text-align: center; }
         .content { background: #f9f9f9; padding: 20px; }
@@ -179,7 +179,7 @@ export const sendPasswordResetEmail = async (email: string, resetToken: string) 
     <head>
       <meta charset="utf-8">
       <style>
-        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+        body { font-family: Arial, sans-general-sans; line-height: 1.6; color: #333; }
         .container { max-width: 600px; margin: 0 auto; padding: 20px; }
         .header { background: #ba0606; color: white; padding: 20px; text-align: center; }
         .content { background: #f9f9f9; padding: 20px; }
@@ -233,7 +233,7 @@ export const sendWeddingEnquiryEmails = async (enquiry: WeddingEnquiryPayload) =
       <head>
         <meta charset="utf-8">
         <style>
-          body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+          body { font-family: Arial, sans-general-sans; line-height: 1.6; color: #333; }
           .container { max-width: 600px; margin: 0 auto; padding: 20px; background: #f9f9f9; }
           .header { background: #ba0606; color: white; padding: 16px; text-align: center; border-radius: 8px 8px 0 0; }
           .section { background: #fff; padding: 20px; border-radius: 0 0 8px 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
@@ -281,7 +281,7 @@ export const sendWeddingEnquiryEmails = async (enquiry: WeddingEnquiryPayload) =
       <head>
         <meta charset="utf-8">
         <style>
-          body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+          body { font-family: Arial, sans-general-sans; line-height: 1.6; color: #333; }
           .container { max-width: 600px; margin: 0 auto; padding: 20px; background: #f9f9f9; }
           .header { background: #ba0606; color: white; padding: 16px; text-align: center; border-radius: 8px 8px 0 0; }
           .section { background: #fff; padding: 20px; border-radius: 0 0 8px 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }

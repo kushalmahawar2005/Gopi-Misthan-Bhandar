@@ -142,7 +142,7 @@ export default function ProductReviews({ productId }: ProductReviewsProps) {
       <div className="flex flex-col md:flex-row gap-8">
         {/* Reviews Summary */}
         <div className="md:w-1/3">
-          <h3 className="text-2xl font-bold font-serif mb-4">Customer Reviews</h3>
+          <h3 className="text-2xl font-bold font-general-sansal-sans mb-4">Customer Reviews</h3>
           
           {stats.totalReviews > 0 ? (
             <>
@@ -195,7 +195,7 @@ export default function ProductReviews({ productId }: ProductReviewsProps) {
 
           {showReviewForm && (
             <form onSubmit={handleSubmitReview} className="mb-8 p-6 bg-gray-50 rounded-lg">
-              <h4 className="text-lg font-bold font-serif mb-4">Write Your Review</h4>
+              <h4 className="text-lg font-bold font-general-sansal-sans mb-4">Write Your Review</h4>
               
               <div className="mb-4">
                 <label className="block text-sm font-medium mb-2">Rating</label>
@@ -264,7 +264,7 @@ export default function ProductReviews({ productId }: ProductReviewsProps) {
                   <div className="flex items-start justify-between mb-2">
                     <div>
                       <div className="flex items-center gap-2 mb-1">
-                        <h4 className="font-bold font-serif">{review.userName}</h4>
+                        <h4 className="font-bold font-general-sansal-sans">{review.userName}</h4>
                         {review.isVerified && (
                           <FiCheckCircle className="text-green-500" size={16} title="Verified Purchase" />
                         )}

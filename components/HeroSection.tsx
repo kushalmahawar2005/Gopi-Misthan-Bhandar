@@ -9,9 +9,26 @@ const HeroSection = () => {
   const [slides, setSlides] = useState<HeroSlide[]>([]);
   const [currentSlide, setCurrentSlide] = useState(0);
   const [loading, setLoading] = useState(true);
+  const [enquiryOpen, setEnquiryOpen] = useState(false);
 
   useEffect(() => {
     loadSlides();
+  }, []);
+
+  // Hide controls when enquiry modal is open
+  useEffect(() => {
+    const openHandler = () => setEnquiryOpen(true);
+    const closeHandler = () => setEnquiryOpen(false);
+    if (typeof window !== 'undefined') {
+      window.addEventListener('open-wedding-enquiry', openHandler as EventListener);
+      window.addEventListener('close-wedding-enquiry', closeHandler as EventListener);
+    }
+    return () => {
+      if (typeof window !== 'undefined') {
+        window.removeEventListener('open-wedding-enquiry', openHandler as EventListener);
+        window.removeEventListener('close-wedding-enquiry', closeHandler as EventListener);
+      }
+    };
   }, []);
 
   const loadSlides = async () => {
@@ -97,7 +114,7 @@ const HeroSection = () => {
       </div>
 
         {/* Arrows */}
-        {slides.length > 1 && (
+        {slides.length > 1 && !enquiryOpen && (
           <>
             <button
               onClick={prevSlide}
@@ -117,7 +134,7 @@ const HeroSection = () => {
         )}
 
         {/* Dots */}
-        {slides.length > 1 && (
+        {slides.length > 1 && !enquiryOpen && (
           <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-20 flex gap-2">
           {slides.map((_, index) => (
             <button

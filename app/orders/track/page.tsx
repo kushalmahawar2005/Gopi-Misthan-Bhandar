@@ -114,7 +114,7 @@ function OrderTrackingContent() {
       {/* Page Header */}
       <div className="bg-gradient-to-r from-primary-red to-primary-darkRed py-12 md:py-16 px-4">
         <div className="max-w-4xl mx-auto text-center">
-          <h1 className="text-3xl md:text-4xl font-bold font-serif text-white mb-4">
+          <h1 className="text-3xl md:text-4xl font-bold font-general-sansal-sansal-sans text-white mb-4">
             Track Your Order
           </h1>
           <p className="text-lg text-gray-100">
@@ -155,7 +155,7 @@ function OrderTrackingContent() {
           <div className="space-y-6">
             {/* Order Status Timeline */}
             <div className="bg-white rounded-lg border border-gray-200 p-6 md:p-8">
-              <h2 className="text-2xl font-bold font-serif mb-6">Order Status</h2>
+              <h2 className="text-2xl font-bold font-general-sansal-sansal-sans mb-6">Order Status</h2>
               
               <div className="relative">
                 {/* Timeline Line */}
@@ -207,7 +207,7 @@ function OrderTrackingContent() {
             <div className="grid md:grid-cols-2 gap-6">
               {/* Order Details */}
               <div className="bg-white rounded-lg border border-gray-200 p-6">
-                <h3 className="text-xl font-bold font-serif mb-4">Order Details</h3>
+                <h3 className="text-xl font-bold font-general-sansal-sansal-sans mb-4">Order Details</h3>
                 <div className="space-y-2 text-sm">
                   <div className="flex justify-between">
                     <span className="text-gray-600">Order Number:</span>
@@ -242,7 +242,7 @@ function OrderTrackingContent() {
 
               {/* Shipping Address */}
               <div className="bg-white rounded-lg border border-gray-200 p-6">
-                <h3 className="text-xl font-bold font-serif mb-4">Shipping Address</h3>
+                <h3 className="text-xl font-bold font-general-sansal-sansal-sans mb-4">Shipping Address</h3>
                 <div className="text-sm text-gray-700 space-y-1">
                   <p className="font-semibold">{order.shipping.name}</p>
                   <p>{order.shipping.street}</p>
@@ -255,7 +255,7 @@ function OrderTrackingContent() {
 
             {/* Order Items */}
             <div className="bg-white rounded-lg border border-gray-200 p-6">
-              <h3 className="text-xl font-bold font-serif mb-4">Order Items</h3>
+              <h3 className="text-xl font-bold font-general-sansal-sansal-sans mb-4">Order Items</h3>
               <div className="space-y-4">
                 {order.items.map((item, index) => (
                   <div key={index} className="flex gap-4 pb-4 border-b border-gray-200 last:border-0">

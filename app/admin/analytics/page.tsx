@@ -255,7 +255,7 @@ export default function AnalyticsPage() {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-bold text-primary-brown font-serif">Analytics</h1>
+          <h1 className="text-2xl sm:text-3xl font-bold text-primary-brown font-general-sans">Analytics</h1>
           <p className="text-sm sm:text-base text-gray-600 mt-1">View your store's performance metrics</p>
         </div>
         <select
@@ -290,7 +290,7 @@ export default function AnalyticsPage() {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
         <div className="bg-white rounded-lg border border-gray-200 p-6">
-          <h3 className="text-lg font-bold text-primary-brown font-serif mb-4">Revenue Trend</h3>
+          <h3 className="text-lg font-bold text-primary-brown font-general-sans mb-4">Revenue Trend</h3>
           <ResponsiveContainer width="100%" height={300}>
             <LineChart data={revenueData}>
               <CartesianGrid strokeDasharray="3 3" />
@@ -314,7 +314,7 @@ export default function AnalyticsPage() {
         </div>
 
         <div className="bg-white rounded-lg border border-gray-200 p-6">
-          <h3 className="text-lg font-bold text-primary-brown font-serif mb-4">Order Trends</h3>
+          <h3 className="text-lg font-bold text-primary-brown font-general-sans mb-4">Order Trends</h3>
             <ResponsiveContainer width="100%" height={300}>
               <BarChart data={orderData}>
                 <CartesianGrid strokeDasharray="3 3" />
@@ -330,7 +330,7 @@ export default function AnalyticsPage() {
         </div>
 
         <div className="bg-white rounded-lg border border-gray-200 p-6">
-          <h3 className="text-lg font-bold text-primary-brown font-serif mb-4">Revenue by Category</h3>
+          <h3 className="text-lg font-bold text-primary-brown font-general-sans mb-4">Revenue by Category</h3>
           <ResponsiveContainer width="100%" height={300}>
             <PieChart>
               <Pie
@@ -359,7 +359,7 @@ export default function AnalyticsPage() {
         </div>
 
         <div className="bg-white rounded-lg border border-gray-200 p-6">
-          <h3 className="text-lg font-bold text-primary-brown font-serif mb-4">Payment Methods</h3>
+          <h3 className="text-lg font-bold text-primary-brown font-general-sans mb-4">Payment Methods</h3>
           <ResponsiveContainer width="100%" height={300}>
             <PieChart>
               <Pie
@@ -390,7 +390,7 @@ export default function AnalyticsPage() {
 
       {topProducts.length > 0 && (
         <div className="bg-white rounded-lg border border-gray-200 p-6">
-          <h3 className="text-lg font-bold text-primary-brown font-serif mb-4">Top Selling Products</h3>
+          <h3 className="text-lg font-bold text-primary-brown font-general-sans mb-4">Top Selling Products</h3>
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead className="bg-gray-50">

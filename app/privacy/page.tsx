@@ -15,7 +15,7 @@ export default function PrivacyPage() {
       {/* Page Header */}
       <div className="bg-gradient-to-r from-primary-red to-primary-darkRed py-8 md:py-12 px-4">
         <div className="max-w-7xl mx-auto text-center">
-          <h1 className="text-3xl md:text-4xl font-bold font-serif text-white">
+          <h1 className="text-3xl md:text-4xl font-bold font-general-sansal-sansal-sansal-sans text-white">
             Privacy Policy
           </h1>
           <p className="text-lg text-gray-100 mt-2">
@@ -27,14 +27,14 @@ export default function PrivacyPage() {
       <div className="max-w-4xl mx-auto px-4 md:px-8 py-12">
         <div className="bg-white rounded-lg shadow-md p-8 md:p-12 space-y-8">
           <section>
-            <h2 className="text-2xl font-bold font-serif text-gray-800 mb-4">1. Introduction</h2>
+            <h2 className="text-2xl font-bold font-general-sansal-sansal-sansal-sans text-gray-800 mb-4">1. Introduction</h2>
             <p className="text-gray-700 leading-relaxed">
               Gopi Misthan Bhandar ("we", "our", or "us") is committed to protecting your privacy. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you visit our website.
             </p>
           </section>
 
           <section>
-            <h2 className="text-2xl font-bold font-serif text-gray-800 mb-4">2. Information We Collect</h2>
+            <h2 className="text-2xl font-bold font-general-sansal-sansal-sansal-sans text-gray-800 mb-4">2. Information We Collect</h2>
             <p className="text-gray-700 leading-relaxed mb-4">
               We collect information that you provide directly to us, including:
             </p>
@@ -48,7 +48,7 @@ export default function PrivacyPage() {
           </section>
 
           <section>
-            <h2 className="text-2xl font-bold font-serif text-gray-800 mb-4">3. How We Use Your Information</h2>
+            <h2 className="text-2xl font-bold font-general-sansal-sansal-sansal-sans text-gray-800 mb-4">3. How We Use Your Information</h2>
             <p className="text-gray-700 leading-relaxed mb-4">
               We use the information we collect to:
             </p>
@@ -63,7 +63,7 @@ export default function PrivacyPage() {
           </section>
 
           <section>
-            <h2 className="text-2xl font-bold font-serif text-gray-800 mb-4">4. Information Sharing</h2>
+            <h2 className="text-2xl font-bold font-general-sansal-sansal-sansal-sans text-gray-800 mb-4">4. Information Sharing</h2>
             <p className="text-gray-700 leading-relaxed mb-4">
               We do not sell, trade, or rent your personal information to third parties. We may share your information with:
             </p>
@@ -76,21 +76,21 @@ export default function PrivacyPage() {
           </section>
 
           <section>
-            <h2 className="text-2xl font-bold font-serif text-gray-800 mb-4">5. Data Security</h2>
+            <h2 className="text-2xl font-bold font-general-sansal-sansal-sansal-sans text-gray-800 mb-4">5. Data Security</h2>
             <p className="text-gray-700 leading-relaxed">
               We implement appropriate security measures to protect your personal information. However, no method of transmission over the Internet is 100% secure. While we strive to protect your data, we cannot guarantee absolute security.
             </p>
           </section>
 
           <section>
-            <h2 className="text-2xl font-bold font-serif text-gray-800 mb-4">6. Cookies</h2>
+            <h2 className="text-2xl font-bold font-general-sansal-sansal-sansal-sans text-gray-800 mb-4">6. Cookies</h2>
             <p className="text-gray-700 leading-relaxed">
               We use cookies to enhance your experience on our website. Cookies are small files stored on your device that help us remember your preferences and improve site functionality. You can disable cookies in your browser settings, but this may affect website functionality.
             </p>
           </section>
 
           <section>
-            <h2 className="text-2xl font-bold font-serif text-gray-800 mb-4">7. Your Rights</h2>
+            <h2 className="text-2xl font-bold font-general-sansal-sansal-sansal-sans text-gray-800 mb-4">7. Your Rights</h2>
             <p className="text-gray-700 leading-relaxed mb-4">
               You have the right to:
             </p>
@@ -104,21 +104,21 @@ export default function PrivacyPage() {
           </section>
 
           <section>
-            <h2 className="text-2xl font-bold font-serif text-gray-800 mb-4">8. Children's Privacy</h2>
+            <h2 className="text-2xl font-bold font-general-sansal-sansal-sansal-sans text-gray-800 mb-4">8. Children's Privacy</h2>
             <p className="text-gray-700 leading-relaxed">
               Our website is not intended for children under the age of 18. We do not knowingly collect personal information from children. If you are a parent or guardian and believe your child has provided us with personal information, please contact us.
             </p>
           </section>
 
           <section>
-            <h2 className="text-2xl font-bold font-serif text-gray-800 mb-4">9. Changes to This Policy</h2>
+            <h2 className="text-2xl font-bold font-general-sansal-sansal-sansal-sans text-gray-800 mb-4">9. Changes to This Policy</h2>
             <p className="text-gray-700 leading-relaxed">
               We may update this Privacy Policy from time to time. We will notify you of any changes by posting the new policy on this page and updating the "Last updated" date.
             </p>
           </section>
 
           <section>
-            <h2 className="text-2xl font-bold font-serif text-gray-800 mb-4">10. Contact Us</h2>
+            <h2 className="text-2xl font-bold font-general-sansal-sansal-sansal-sans text-gray-800 mb-4">10. Contact Us</h2>
             <p className="text-gray-700 leading-relaxed">
               If you have any questions about this Privacy Policy, please contact us at:
             </p>
@@ -133,7 +133,7 @@ export default function PrivacyPage() {
         <div className="mt-8 text-center">
           <Link
             href="/"
-            className="inline-block bg-primary-red text-white px-6 py-3 rounded-lg font-bold font-serif hover:bg-primary-darkRed transition-colors"
+            className="inline-block bg-primary-red text-white px-6 py-3 rounded-lg font-bold font-general-sansal-sansal-sansal-sans hover:bg-primary-darkRed transition-colors"
           >
             Back to Home
           </Link>

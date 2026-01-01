@@ -189,7 +189,7 @@ export default function DeliveryManagementPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-primary-brown font-serif">Delivery Management</h1>
+          <h1 className="text-3xl font-bold text-primary-brown font-general-sansal-sans">Delivery Management</h1>
           <p className="text-gray-600 mt-1">Manage delivery zones and charges</p>
         </div>
         <button
@@ -225,7 +225,7 @@ export default function DeliveryManagementPage() {
       {showForm && (
         <div className="bg-white rounded-lg border border-gray-200 p-6">
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-xl font-bold font-serif">
+            <h2 className="text-xl font-bold font-general-sansal-sans">
               {editingZone ? 'Edit Delivery Zone' : 'Add New Delivery Zone'}
             </h2>
             <button
@@ -504,7 +504,7 @@ export default function DeliveryManagementPage() {
 
       {/* Info Card */}
       <div className="bg-blue-50 border border-blue-200 rounded-lg p-6">
-        <h3 className="text-lg font-bold font-serif mb-3 flex items-center gap-2">
+        <h3 className="text-lg font-bold font-general-sansal-sans mb-3 flex items-center gap-2">
           <FiMapPin className="text-blue-600" />
           Delivery Zone Information
         </h3>

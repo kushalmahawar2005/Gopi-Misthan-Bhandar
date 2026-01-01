@@ -47,7 +47,7 @@ const GallerySection: React.FC<GallerySectionProps> = ({ galleryItems, showAll =
                   <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                     <div className="absolute bottom-0 left-0 right-0 p-4 md:p-6 text-white">
                       {item.title && (
-                        <h3 className="text-lg md:text-xl font-serif font-semibold mb-2">
+                        <h3 className="text-lg md:text-xl font-general-sansal-sansal-sansal-sansal-sans font-semibold mb-2">
                           {item.title}
                         </h3>
                       )}
@@ -69,7 +69,7 @@ const GallerySection: React.FC<GallerySectionProps> = ({ galleryItems, showAll =
           <div className="text-center mt-12">
             <Link
               href="/gallery"
-              className="inline-block px-8 py-3 bg-primary-red text-white rounded-lg hover:bg-primary-darkRed transition-colors font-medium text-lg font-serif"
+              className="inline-block px-8 py-3 bg-primary-red text-white rounded-lg hover:bg-primary-darkRed transition-colors font-medium text-lg font-general-sansal-sansal-sansal-sansal-sans"
             >
               More Images
             </Link>

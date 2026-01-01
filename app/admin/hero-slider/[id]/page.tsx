@@ -88,7 +88,7 @@ export default function EditHeroSlide() {
       {/* Header */}
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-bold text-primary-brown font-serif">Edit Hero Slide</h1>
+          <h1 className="text-3xl font-bold text-primary-brown font-general-sansal-sansal-sansal-sans">Edit Hero Slide</h1>
           <p className="text-gray-600 mt-1">Update the hero slider slide</p>
         </div>
         <button

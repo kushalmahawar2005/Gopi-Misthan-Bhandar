@@ -15,7 +15,7 @@ export default function TermsPage() {
       {/* Page Header */}
       <div className="bg-gradient-to-r from-primary-red to-primary-darkRed py-8 md:py-12 px-4">
         <div className="max-w-7xl mx-auto text-center">
-          <h1 className="text-3xl md:text-4xl font-bold font-serif text-white">
+          <h1 className="text-3xl md:text-4xl font-bold font-general-sansal-sansal-sansal-sans text-white">
             Terms & Conditions
           </h1>
           <p className="text-lg text-gray-100 mt-2">
@@ -27,14 +27,14 @@ export default function TermsPage() {
       <div className="max-w-4xl mx-auto px-4 md:px-8 py-12">
         <div className="bg-white rounded-lg shadow-md p-8 md:p-12 space-y-8">
           <section>
-            <h2 className="text-2xl font-bold font-serif text-gray-800 mb-4">1. Acceptance of Terms</h2>
+            <h2 className="text-2xl font-bold font-general-sansal-sansal-sansal-sans text-gray-800 mb-4">1. Acceptance of Terms</h2>
             <p className="text-gray-700 leading-relaxed">
               By accessing and using the Gopi Misthan Bhandar website, you accept and agree to be bound by the terms and provision of this agreement. If you do not agree to these terms, please do not use our services.
             </p>
           </section>
 
           <section>
-            <h2 className="text-2xl font-bold font-serif text-gray-800 mb-4">2. Products and Services</h2>
+            <h2 className="text-2xl font-bold font-general-sansal-sansal-sansal-sans text-gray-800 mb-4">2. Products and Services</h2>
             <p className="text-gray-700 leading-relaxed mb-4">
               We offer traditional Indian sweets, snacks, and namkeen products. All products are subject to availability. We reserve the right to discontinue any product at any time without notice.
             </p>
@@ -46,7 +46,7 @@ export default function TermsPage() {
           </section>
 
           <section>
-            <h2 className="text-2xl font-bold font-serif text-gray-800 mb-4">3. Orders and Payment</h2>
+            <h2 className="text-2xl font-bold font-general-sansal-sansal-sansal-sans text-gray-800 mb-4">3. Orders and Payment</h2>
             <p className="text-gray-700 leading-relaxed mb-4">
               When you place an order, you are making an offer to purchase products. We reserve the right to accept or decline your order for any reason.
             </p>
@@ -58,7 +58,7 @@ export default function TermsPage() {
           </section>
 
           <section>
-            <h2 className="text-2xl font-bold font-serif text-gray-800 mb-4">4. Delivery</h2>
+            <h2 className="text-2xl font-bold font-general-sansal-sansal-sansal-sans text-gray-800 mb-4">4. Delivery</h2>
             <p className="text-gray-700 leading-relaxed mb-4">
               We aim to deliver your orders within 2-3 business days. Delivery times may vary based on your location.
             </p>
@@ -70,28 +70,28 @@ export default function TermsPage() {
           </section>
 
           <section>
-            <h2 className="text-2xl font-bold font-serif text-gray-800 mb-4">5. Returns and Refunds</h2>
+            <h2 className="text-2xl font-bold font-general-sansal-sansal-sansal-sans text-gray-800 mb-4">5. Returns and Refunds</h2>
             <p className="text-gray-700 leading-relaxed mb-4">
               Due to the perishable nature of our products, we have a strict no-return policy. However, if you receive a damaged or incorrect product, please contact us within 24 hours of delivery.
             </p>
           </section>
 
           <section>
-            <h2 className="text-2xl font-bold font-serif text-gray-800 mb-4">6. User Accounts</h2>
+            <h2 className="text-2xl font-bold font-general-sansal-sansal-sansal-sans text-gray-800 mb-4">6. User Accounts</h2>
             <p className="text-gray-700 leading-relaxed">
               You are responsible for maintaining the confidentiality of your account and password. You agree to accept responsibility for all activities that occur under your account.
             </p>
           </section>
 
           <section>
-            <h2 className="text-2xl font-bold font-serif text-gray-800 mb-4">7. Limitation of Liability</h2>
+            <h2 className="text-2xl font-bold font-general-sansal-sansal-sansal-sans text-gray-800 mb-4">7. Limitation of Liability</h2>
             <p className="text-gray-700 leading-relaxed">
               Gopi Misthan Bhandar shall not be liable for any indirect, incidental, special, or consequential damages arising out of or in connection with the use of our website or products.
             </p>
           </section>
 
           <section>
-            <h2 className="text-2xl font-bold font-serif text-gray-800 mb-4">8. Contact Us</h2>
+            <h2 className="text-2xl font-bold font-general-sansal-sansal-sansal-sans text-gray-800 mb-4">8. Contact Us</h2>
             <p className="text-gray-700 leading-relaxed">
               If you have any questions about these Terms & Conditions, please contact us at:
             </p>
@@ -106,7 +106,7 @@ export default function TermsPage() {
         <div className="mt-8 text-center">
           <Link
             href="/"
-            className="inline-block bg-primary-red text-white px-6 py-3 rounded-lg font-bold font-serif hover:bg-primary-darkRed transition-colors"
+            className="inline-block bg-primary-red text-white px-6 py-3 rounded-lg font-bold font-general-sansal-sansal-sansal-sans hover:bg-primary-darkRed transition-colors"
           >
             Back to Home
           </Link>

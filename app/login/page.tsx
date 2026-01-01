@@ -51,7 +51,7 @@ export default function LoginPage() {
       {/* Page Header */}
       <div className="bg-gradient-to-r from-primary-red to-primary-darkRed py-8 md:py-12 px-4">
         <div className="max-w-7xl mx-auto text-center">
-          <h1 className="text-3xl md:text-4xl font-bold font-serif text-white">
+          <h1 className="text-3xl md:text-4xl font-bold font-general-sansal-sansal-sans text-white">
             Login
           </h1>
           <p className="text-lg text-gray-100 mt-2">
@@ -129,7 +129,7 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full bg-primary-red text-white py-3 px-6 rounded-lg font-bold font-serif text-lg hover:bg-primary-darkRed transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full bg-primary-red text-white py-3 px-6 rounded-lg font-bold font-general-sansal-sansal-sans text-lg hover:bg-primary-darkRed transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isLoading ? 'Logging in...' : 'Login'}
             </button>

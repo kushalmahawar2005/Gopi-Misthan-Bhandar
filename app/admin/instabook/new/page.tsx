@@ -46,7 +46,7 @@ export default function NewInstaBook() {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-bold text-primary-brown font-serif">Add New InstaBook Item</h1>
+          <h1 className="text-3xl font-bold text-primary-brown font-general-sansal-sansal-sans">Add New InstaBook Item</h1>
           <p className="text-gray-600 mt-1">Create a new InstaBook item</p>
         </div>
         <button

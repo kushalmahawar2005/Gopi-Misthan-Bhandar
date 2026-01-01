@@ -166,7 +166,7 @@ export default function GiftBoxPage() {
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-primary-brown font-serif">Gift Box</h1>
+          <h1 className="text-3xl font-bold text-primary-brown font-general-sansal-sansal-sansal-sans">Gift Box</h1>
           <p className="text-gray-600 mt-1">Manage gift box categories</p>
         </div>
         <Link

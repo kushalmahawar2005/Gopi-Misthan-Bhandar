@@ -94,7 +94,7 @@ export default function NewBlog() {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-bold text-primary-brown font-serif">Add New Blog Post</h1>
+          <h1 className="text-3xl font-bold text-primary-brown font-general-sans">Add New Blog Post</h1>
           <p className="text-gray-600 mt-1">Create a new blog post</p>
         </div>
         <button

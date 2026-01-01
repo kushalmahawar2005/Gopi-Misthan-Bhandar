@@ -141,7 +141,7 @@ export default function SettingsPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-primary-brown font-serif">Settings</h1>
+          <h1 className="text-3xl font-bold text-primary-brown font-general-sansal-sansal-sansal-sans">Settings</h1>
           <p className="text-gray-600 mt-1">Manage your site configuration</p>
         </div>
         <button

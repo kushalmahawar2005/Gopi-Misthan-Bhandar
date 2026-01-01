@@ -180,7 +180,7 @@ function ProductsContent() {
           {/* Sidebar Filters - Desktop Only */}
           <aside className="hidden lg:block lg:w-64 flex-shrink-0">
             <div className="bg-gray-50 rounded-lg p-6 sticky top-24">
-              <h2 className="text-xl font-bold font-serif mb-4">Filters</h2>
+              <h2 className="text-xl font-bold font-general-sansal-sarsal-sansal-sansal-sansal-sansal-sansal-sans mb-4">Filters</h2>
 
               {/* Category Filter */}
               <div className="mb-6">
@@ -400,7 +400,7 @@ function ProductsContent() {
           <div className="fixed inset-y-0 left-0 w-full max-w-sm bg-white z-50 lg:hidden transform transition-transform duration-300 ease-in-out shadow-xl overflow-y-auto">
             <div className="p-4 border-b border-gray-200 sticky top-0 bg-white z-10">
               <div className="flex items-center justify-between">
-                <h2 className="text-xl font-bold font-serif">Filters</h2>
+                <h2 className="text-xl font-bold font-general-sansal-sarsal-sansal-sansal-sansal-sansal-sansal-sans">Filters</h2>
                 <button
                   onClick={() => setShowFilterMenu(false)}
                   className="p-2 hover:bg-gray-100 rounded-lg transition-colors"

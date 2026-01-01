@@ -119,7 +119,7 @@ export default function ReviewsPage() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-bold text-primary-brown font-serif">Product Reviews</h1>
+          <h1 className="text-2xl sm:text-3xl font-bold text-primary-brown font-general-sansal-sansal-sansal-sansal-sans">Product Reviews</h1>
           <p className="text-sm sm:text-base text-gray-600 mt-1">Manage customer reviews and ratings</p>
         </div>
       </div>
@@ -184,7 +184,7 @@ export default function ReviewsPage() {
                 <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
                   <div className="flex-1">
                     <div className="flex items-center gap-3 mb-2">
-                      <h3 className="font-bold font-serif">{review.userName}</h3>
+                      <h3 className="font-bold font-general-sansal-sansal-sansal-sansal-sans">{review.userName}</h3>
                       {renderStars(review.rating)}
                       <span className={`px-2 py-1 text-xs rounded-full ${
                         review.isApproved

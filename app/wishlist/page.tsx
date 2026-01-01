@@ -109,7 +109,7 @@ export default function WishlistPage() {
               <div className="mt-12 text-center">
                 <Link
                   href="/products"
-                  className="inline-flex items-center gap-2 bg-white border-2 border-primary-red text-primary-red px-8 py-3 rounded-lg font-bold font-serif text-lg hover:bg-primary-red hover:text-white transition-colors"
+                  className="inline-flex items-center gap-2 bg-white border-2 border-primary-red text-primary-red px-8 py-3 rounded-lg font-bold font-general-sansal-sansal-sans text-lg hover:bg-primary-red hover:text-white transition-colors"
                 >
                   <FiShoppingBag className="w-5 h-5" />
                   Continue Shopping

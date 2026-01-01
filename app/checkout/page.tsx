@@ -425,7 +425,7 @@ export default function CheckoutPage() {
           <p className="text-xl text-gray-600 mb-4">Your cart is empty</p>
           <Link
             href="/products"
-            className="bg-primary-red text-white px-6 py-3 rounded-lg font-bold font-serif hover:bg-primary-darkRed transition-colors"
+            className="bg-primary-red text-white px-6 py-3 rounded-lg font-bold font-general-sans hover:bg-primary-darkRed transition-colors"
           >
             Continue Shopping
           </Link>
@@ -451,7 +451,7 @@ export default function CheckoutPage() {
             <FiArrowLeft className="w-5 h-5" />
             <span>Back to Shopping</span>
           </Link>
-          <h1 className="text-3xl md:text-4xl font-bold font-serif text-white">
+          <h1 className="text-3xl md:text-4xl font-bold font-general-sans text-white">
             Checkout
           </h1>
         </div>
@@ -464,7 +464,7 @@ export default function CheckoutPage() {
             <div className="lg:col-span-2 space-y-8">
               {/* Shipping Information */}
               <div className="bg-white rounded-lg shadow-md p-6 md:p-8">
-                <h2 className="text-2xl font-bold font-serif mb-6 flex items-center gap-2">
+                <h2 className="text-2xl font-bold font-general-sans mb-6 flex items-center gap-2">
                   <FiTruck className="w-6 h-6 text-primary-red" />
                   Shipping Information
                 </h2>
@@ -661,7 +661,7 @@ export default function CheckoutPage() {
               {/* Billing Information */}
               <div className="bg-white rounded-lg shadow-md p-6 md:p-8">
                 <div className="flex items-center justify-between mb-6">
-                  <h2 className="text-2xl font-bold font-serif flex items-center gap-2">
+                  <h2 className="text-2xl font-bold font-general-sansal-sansal-sansal-sansal-sansal-sans flex items-center gap-2">
                     <FiCreditCard className="w-6 h-6 text-primary-red" />
                     Billing Information
                   </h2>
@@ -786,7 +786,7 @@ export default function CheckoutPage() {
 
               {/* Payment Method */}
               <div className="bg-white rounded-lg shadow-md p-6 md:p-8">
-                <h2 className="text-2xl font-bold font-serif mb-6">Payment Method</h2>
+                <h2 className="text-2xl font-bold font-general-sansal-sansal-sansal-sansal-sansal-sans mb-6">Payment Method</h2>
                 <div className="space-y-4">
                   <label className="flex items-center gap-4 p-4 border-2 border-gray-200 rounded-lg cursor-pointer hover:border-primary-red transition-colors">
                     <input
@@ -799,7 +799,7 @@ export default function CheckoutPage() {
                     />
                     <FiTruck className="w-6 h-6 text-gray-600" />
                     <div className="flex-1">
-                      <p className="font-bold font-serif">Cash on Delivery (COD)</p>
+                      <p className="font-bold font-general-sansal-sansal-sansal-sansal-sansal-sans">Cash on Delivery (COD)</p>
                       <p className="text-sm text-gray-600">Pay when you receive</p>
                     </div>
                   </label>
@@ -814,7 +814,7 @@ export default function CheckoutPage() {
                     />
                     <FiSmartphone className="w-6 h-6 text-gray-600" />
                     <div className="flex-1">
-                      <p className="font-bold font-serif">UPI Payment</p>
+                      <p className="font-bold font-general-sansal-sansal-sansal-sansal-sansal-sans">UPI Payment</p>
                       <p className="text-sm text-gray-600">Pay using UPI apps</p>
                     </div>
                   </label>
@@ -829,7 +829,7 @@ export default function CheckoutPage() {
                     />
                     <FiCreditCard className="w-6 h-6 text-gray-600" />
                     <div className="flex-1">
-                      <p className="font-bold font-serif">Debit/Credit Card</p>
+                      <p className="font-bold font-general-sansal-sansal-sansal-sansal-sansal-sans">Debit/Credit Card</p>
                       <p className="text-sm text-gray-600">Pay using card</p>
                     </div>
                   </label>
@@ -840,7 +840,7 @@ export default function CheckoutPage() {
             {/* Right Column - Order Summary */}
             <div className="lg:col-span-1">
               <div className="bg-white rounded-lg shadow-md p-6 sticky top-24">
-                <h2 className="text-2xl font-bold font-serif mb-6">Order Summary</h2>
+                <h2 className="text-2xl font-bold font-general-sansal-sansal-sansal-sansal-sansal-sans mb-6">Order Summary</h2>
                 
                 {/* Cart Items */}
                 <div className="space-y-4 mb-6 max-h-96 overflow-y-auto">
@@ -856,7 +856,7 @@ export default function CheckoutPage() {
                         />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <h3 className="font-serif font-medium text-sm mb-1 line-clamp-2">
+                        <h3 className="font-general-sansal-sansal-sansal-sansal-sansal-sans font-medium text-sm mb-1 line-clamp-2">
                           {item.name}
                         </h3>
                         <p className="text-primary-red font-bold text-sm mb-2">
@@ -918,7 +918,7 @@ export default function CheckoutPage() {
                     <span className="text-gray-600">Tax (GST 5%)</span>
                     <span className="font-medium">₹{calculateTax().toLocaleString()}</span>
                   </div>
-                  <div className="flex justify-between text-lg font-bold font-serif pt-3 border-t border-gray-200">
+                  <div className="flex justify-between text-lg font-bold font-general-sansal-sansal-sansal-sansal-sansal-sans pt-3 border-t border-gray-200">
                     <span>Total</span>
                     <span className="text-primary-red">₹{calculateTotal().toLocaleString()}</span>
                   </div>
@@ -928,7 +928,7 @@ export default function CheckoutPage() {
                 <button
                   type="submit"
                   disabled={isPlacingOrder}
-                  className="w-full bg-primary-red text-white py-4 px-6 rounded-lg font-bold font-serif text-lg hover:bg-primary-darkRed transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="w-full bg-primary-red text-white py-4 px-6 rounded-lg font-bold font-general-sansal-sansal-sansal-sansal-sansal-sans text-lg hover:bg-primary-darkRed transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {isPlacingOrder ? 'Placing Order...' : 'Place Order'}
                 </button>

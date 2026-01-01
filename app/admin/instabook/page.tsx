@@ -150,7 +150,7 @@ export default function InstaBookPage() {
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-primary-brown font-serif">InstaBook</h1>
+          <h1 className="text-3xl font-bold text-primary-brown font-general-sansal-sansal-sansal-sans">InstaBook</h1>
           <p className="text-gray-600 mt-1">Manage InstaBook section items</p>
         </div>
         <Link
@@ -204,7 +204,7 @@ export default function InstaBookPage() {
                 </div>
               )}
             </div>
-            <h3 className="text-lg font-semibold text-primary-brown font-serif mb-2">{item.label}</h3>
+            <h3 className="text-lg font-semibold text-primary-brown font-general-sansal-sansal-sansal-sans mb-2">{item.label}</h3>
             {item.overlayText && (
               <p className="text-sm text-gray-600 mb-2 line-clamp-2">{item.overlayText}</p>
             )}
