@@ -67,7 +67,7 @@ const IntroAnimation = () => {
           <div className="text-center px-4">
             <SplitText
               text="Gopi Misthan Bhandar, Neemuch"
-              className="text-4xl md:text-5xl lg:text-6xl font-serif font-bold text-[#941a1f]"
+              className="text-4xl md:text-5xl lg:text-6xl font-general-sansal-sansal-sansal-sans font-bold text-[#941a1f]"
               delay={80}
               duration={0.5}
               ease="power3.out"

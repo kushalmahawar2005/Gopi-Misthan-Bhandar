@@ -134,7 +134,7 @@ export default function EditCategory() {
   return (
     <div>
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold text-primary-brown font-serif">Edit Category</h1>
+        <h1 className="text-3xl font-bold text-primary-brown font-general-sans">Edit Category</h1>
         <button
           onClick={() => router.back()}
           className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors text-gray-700 font-medium"
@@ -202,7 +202,7 @@ export default function EditCategory() {
         <div className="border-t pt-6">
           <div className="flex items-center justify-between mb-4">
             <div>
-              <h3 className="text-lg font-semibold text-primary-brown font-serif">Subcategories</h3>
+              <h3 className="text-lg font-semibold text-primary-brown font-general-sans">Subcategories</h3>
               <p className="text-sm text-gray-600">Add subcategories to organize products further</p>
             </div>
             <button

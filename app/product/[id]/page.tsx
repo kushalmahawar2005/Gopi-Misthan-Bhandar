@@ -153,11 +153,11 @@ useEffect(() => {
         <Navigation />
         <Cart />
         <div className="flex flex-col items-center justify-center min-h-[60vh] px-4">
-          <h1 className="text-3xl font-bold font-serif mb-4">Product Not Found</h1>
+          <h1 className="text-3xl font-bold font-general-sansal-sansal-sans mb-4">Product Not Found</h1>
           <p className="text-gray-600 mb-8">The product you're looking for doesn't exist.</p>
           <Link
             href="/"
-            className="bg-primary-red text-white px-6 py-3 rounded-lg font-bold font-serif hover:bg-primary-darkRed transition-colors"
+            className="bg-primary-red text-white px-6 py-3 rounded-lg font-bold font-general-sansal-sansal-sans hover:bg-primary-darkRed transition-colors"
           >
             Go Back Home
           </Link>
@@ -547,7 +547,7 @@ const shortDescription =
       <div className="w-full px-4 pb-4 md:pb-8">
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
           <div>
-            <h2 className="text-2xl md:text-3xl font-bold font-serif text-primary-brown">Reviews & Ratings</h2>
+            <h2 className="text-2xl md:text-3xl font-bold font-general-sansal-sansal-sans text-primary-brown">Reviews & Ratings</h2>
             <p className="text-sm text-gray-500">Click below to read experiences or share your own.</p>
           </div>
           <button
@@ -569,7 +569,7 @@ const shortDescription =
       {/* Related Products */}
       {relatedProducts.length > 0 && (
         <div className="w-full px-4 py-8 md:py-12 bg-gray-50">
-          <h2 className="text-2xl md:text-3xl font-bold font-serif text-primary-brown mb-8 text-center">
+          <h2 className="text-2xl md:text-3xl font-bold font-general-sansal-sansal-sans text-primary-brown mb-8 text-center">
             Related Products
           </h2>
           <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-3 gap-3 md:gap-4 lg:gap-5">

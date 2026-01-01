@@ -34,7 +34,7 @@ const Cart: React.FC = () => {
           <div className="bg-primary-red text-white p-6 flex items-center justify-between sticky top-0 z-10">
             <div className="flex items-center gap-3">
               <FiShoppingBag className="w-6 h-6" />
-              <h2 className="text-xl font-bold font-serif">
+              <h2 className="text-xl font-bold font-general-sansal-sansal-sansal-sans">
                 Shopping Cart ({getTotalItems()})
               </h2>
             </div>
@@ -52,7 +52,7 @@ const Cart: React.FC = () => {
             {cartItems.length === 0 ? (
               <div className="flex flex-col items-center justify-center h-full text-center">
                 <FiShoppingBag className="w-20 h-20 text-gray-300 mb-4" />
-                <p className="text-gray-500 text-lg font-serif mb-2">Your cart is empty</p>
+                <p className="text-gray-500 text-lg font-general-sansal-sansal-sansal-sans mb-2">Your cart is empty</p>
                 <p className="text-gray-400 text-sm">Add some delicious sweets to get started!</p>
               </div>
             ) : (
@@ -75,7 +75,7 @@ const Cart: React.FC = () => {
 
                     {/* Product Details */}
                     <div className="flex-1 min-w-0">
-                      <h3 className="font-serif font-medium text-sm mb-1 line-clamp-2">
+                      <h3 className="font-general-sansal-sansal-sansal-sans font-medium text-sm mb-1 line-clamp-2">
                         {item.name}
                       </h3>
                       <p className="text-primary-red font-bold text-sm mb-2">
@@ -122,14 +122,14 @@ const Cart: React.FC = () => {
           {cartItems.length > 0 && (
             <div className="border-t border-gray-200 p-6 bg-gray-50 sticky bottom-0">
               <div className="flex justify-between items-center mb-4">
-                <span className="text-lg font-bold font-serif">Total:</span>
-                <span className="text-xl font-bold text-primary-red font-serif">
+                <span className="text-lg font-bold font-general-sansal-sansal-sansal-sans">Total:</span>
+                <span className="text-xl font-bold text-primary-red font-general-sansal-sansal-sansal-sans">
                   ₹{getTotalPrice().toLocaleString()}
                 </span>
               </div>
               <Link
                 href="/checkout"
-                className="block w-full bg-primary-red text-white py-3 px-6 rounded-lg font-bold font-serif hover:bg-primary-darkRed transition-colors text-center"
+                className="block w-full bg-primary-red text-white py-3 px-6 rounded-lg font-bold font-general-sansal-sansal-sansal-sans hover:bg-primary-darkRed transition-colors text-center"
                 onClick={closeCart}
               >
                 Proceed to Checkout

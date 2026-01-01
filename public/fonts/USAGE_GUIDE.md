@@ -47,19 +47,19 @@ Plus **Italic** variants bhi available hain sab weights ke liye!
 ```css
 /* Regular */
 .your-class {
-  font-family: 'General Sans', sans-serif;
+  font-family: 'General Sans', sans-general-sansal-sans;
   font-weight: 400;
 }
 
 /* Medium */
 .your-class {
-  font-family: 'General Sans', sans-serif;
+  font-family: 'General Sans', sans-general-sansal-sans;
   font-weight: 500;
 }
 
 /* Bold */
 .your-class {
-  font-family: 'General Sans', sans-serif;
+  font-family: 'General Sans', sans-general-sansal-sans;
   font-weight: 700;
   font-style: italic; /* For italic */
 }
@@ -71,7 +71,7 @@ Variable font use karke aap koi bhi weight 200 se 700 tak use kar sakte hain:
 
 ```css
 .variable-font {
-  font-family: 'General Sans Variable', sans-serif;
+  font-family: 'General Sans Variable', sans-general-sansal-sans;
   font-variation-settings: 'wght' 450; /* Custom weight between 200-700 */
 }
 ```
@@ -157,7 +157,7 @@ Agar aap chahte hain ki poore website mein General Sans default font ho:
 ```css
 @layer base {
   body {
-    font-family: 'General Sans', sans-serif;
+    font-family: 'General Sans', sans-general-sansal-sans;
   }
 }
 ```

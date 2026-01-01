@@ -61,10 +61,6 @@ const config: Config = {
   			}
   		},
   		fontFamily: {
-  			serif: [
-  				'Averia Serif Libre',
-  				'serif'
-  			],
   			sans: [
   				'Inter',
   				'sans-serif'
@@ -82,7 +78,7 @@ const config: Config = {
   				'sans-serif'
   			],
   			'general-sans': [
-  				'General Sans',
+  				'GeneralSans-Variable',
   				'sans-serif'
   			],
 			'general-sans-variable': [

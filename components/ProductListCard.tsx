@@ -50,12 +50,12 @@ const ProductListCard: React.FC<ProductListCardProps> = ({ product, showAddToCar
         <div className="flex-1 flex flex-col justify-between min-w-0">
           <div>
             {/* Brand Name */}
-            <p className="text-black text-[10px] md:text-xs font-serif mb-1 font-normal">
+            <p className="text-black text-[10px] md:text-xs font-general-sansal-sansal-sansal-sans mb-1 font-normal">
               GOPI MISTHAN BHANDAR
             </p>
             
             {/* Product Name */}
-            <h3 className="text-base md:text-lg lg:text-xl font-serif font-bold text-black mb-2 line-clamp-2">
+            <h3 className="text-base md:text-lg lg:text-xl font-general-sansal-sansal-sansal-sans font-bold text-black mb-2 line-clamp-2">
               {product.name}
             </h3>
             
@@ -65,7 +65,7 @@ const ProductListCard: React.FC<ProductListCardProps> = ({ product, showAddToCar
             </p>
             
             {/* Price */}
-            <p className="text-primary-red font-bold text-lg md:text-xl lg:text-2xl font-serif mb-4">
+            <p className="text-primary-red font-bold text-lg md:text-xl lg:text-2xl font-general-sansal-sansal-sansal-sans mb-4">
               ₹{product.price}
             </p>
           </div>
@@ -76,7 +76,7 @@ const ProductListCard: React.FC<ProductListCardProps> = ({ product, showAddToCar
               <button
                 onClick={handleAddToCart}
                 disabled={isAdding}
-                className="flex items-center gap-2 bg-primary-red text-white px-4 md:px-6 py-2 md:py-3 rounded-lg font-bold font-serif text-sm md:text-base hover:bg-primary-darkRed transition-colors disabled:opacity-50"
+                className="flex items-center gap-2 bg-primary-red text-white px-4 md:px-6 py-2 md:py-3 rounded-lg font-bold font-general-sansal-sansal-sansal-sans text-sm md:text-base hover:bg-primary-darkRed transition-colors disabled:opacity-50"
               >
                 <FiShoppingCart className="w-4 h-4 md:w-5 md:h-5" />
                 {isAdding ? 'Adding...' : 'Add to Cart'}

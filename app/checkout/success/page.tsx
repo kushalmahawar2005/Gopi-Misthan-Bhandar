@@ -41,7 +41,7 @@ function OrderSuccessContent() {
           <p className="text-xl text-gray-600 mb-4">No order found</p>
           <Link
             href="/"
-            className="bg-primary-red text-white px-6 py-3 rounded-lg font-bold font-serif hover:bg-primary-darkRed transition-colors"
+            className="bg-primary-red text-white px-6 py-3 rounded-lg font-bold font-general-sansal-sansal-sans hover:bg-primary-darkRed transition-colors"
           >
             Go to Home
           </Link>
@@ -63,7 +63,7 @@ function OrderSuccessContent() {
       <div className="bg-gradient-to-r from-green-500 to-green-600 py-12 md:py-16 px-4">
         <div className="max-w-4xl mx-auto text-center">
           <FiCheckCircle className="w-20 h-20 md:w-24 md:h-24 text-white mx-auto mb-6" />
-          <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold font-serif text-white mb-4">
+          <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold font-general-sansal-sansal-sans text-white mb-4">
             Order Placed Successfully!
           </h1>
           <p className="text-lg md:text-xl text-white/90 mb-2">
@@ -78,7 +78,7 @@ function OrderSuccessContent() {
       <div className="max-w-4xl mx-auto px-4 md:px-8 py-8 md:py-12">
         {/* Order Details Card */}
         <div className="bg-white rounded-lg shadow-md p-6 md:p-8 mb-8">
-          <h2 className="text-2xl font-bold font-serif mb-6 flex items-center gap-2">
+          <h2 className="text-2xl font-bold font-general-sansal-sansal-sans mb-6 flex items-center gap-2">
             <FiPackage className="w-6 h-6 text-primary-red" />
             Order Details
           </h2>
@@ -87,7 +87,7 @@ function OrderSuccessContent() {
             <>
               {/* Shipping Address */}
               <div className="mb-6 pb-6 border-b border-gray-200">
-                <h3 className="text-lg font-bold font-serif mb-3">Shipping Address</h3>
+                <h3 className="text-lg font-bold font-general-sansal-sansal-sans mb-3">Shipping Address</h3>
                 <div className="text-gray-700">
                   <p className="font-medium">
                     {orderData.shipping.firstName} {orderData.shipping.lastName}
@@ -104,7 +104,7 @@ function OrderSuccessContent() {
 
               {/* Order Items */}
               <div className="mb-6 pb-6 border-b border-gray-200">
-                <h3 className="text-lg font-bold font-serif mb-4">Order Items</h3>
+                <h3 className="text-lg font-bold font-general-sansal-sansal-sans mb-4">Order Items</h3>
                 <div className="space-y-4">
                   {orderData.items.map((item: any) => (
                     <div key={item.id} className="flex gap-4">
@@ -118,7 +118,7 @@ function OrderSuccessContent() {
                         />
                       </div>
                       <div className="flex-1">
-                        <h4 className="font-serif font-medium mb-1">{item.name}</h4>
+                        <h4 className="font-general-sansal-sansal-sans font-medium mb-1">{item.name}</h4>
                         <p className="text-sm text-gray-600 mb-2">
                           Quantity: {item.quantity} × ₹{item.price}
                         </p>
@@ -134,7 +134,7 @@ function OrderSuccessContent() {
               {/* Payment & Total */}
               <div className="grid md:grid-cols-2 gap-6">
                 <div>
-                  <h3 className="text-lg font-bold font-serif mb-3">Payment Method</h3>
+                  <h3 className="text-lg font-bold font-general-sansal-sansal-sans mb-3">Payment Method</h3>
                   <p className="text-gray-700 capitalize">
                     {orderData.paymentMethod === 'cod' ? 'Cash on Delivery' : 
                      orderData.paymentMethod === 'upi' ? 'UPI Payment' : 
@@ -142,7 +142,7 @@ function OrderSuccessContent() {
                   </p>
                 </div>
                 <div>
-                  <h3 className="text-lg font-bold font-serif mb-3">Order Summary</h3>
+                  <h3 className="text-lg font-bold font-general-sansal-sansal-sans mb-3">Order Summary</h3>
                   <div className="space-y-2 text-gray-700">
                     <div className="flex justify-between">
                       <span>Subtotal:</span>
@@ -162,7 +162,7 @@ function OrderSuccessContent() {
                       <span>Tax (GST 5%):</span>
                       <span>₹{orderData.tax.toLocaleString()}</span>
                     </div>
-                    <div className="flex justify-between text-lg font-bold font-serif pt-2 border-t border-gray-200">
+                    <div className="flex justify-between text-lg font-bold font-general-sansal-sansal-sans pt-2 border-t border-gray-200">
                       <span>Total:</span>
                       <span className="text-primary-red">₹{orderData.total.toLocaleString()}</span>
                     </div>
@@ -175,7 +175,7 @@ function OrderSuccessContent() {
 
         {/* Next Steps */}
         <div className="bg-white rounded-lg shadow-md p-6 md:p-8 mb-8">
-          <h2 className="text-2xl font-bold font-serif mb-4">What's Next?</h2>
+          <h2 className="text-2xl font-bold font-general-sansal-sansal-sans mb-4">What's Next?</h2>
           <div className="space-y-4 text-gray-700">
             <div className="flex items-start gap-3">
               <div className="w-8 h-8 rounded-full bg-primary-red text-white flex items-center justify-center font-bold flex-shrink-0 mt-1">
@@ -217,14 +217,14 @@ function OrderSuccessContent() {
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
           <Link
             href="/products"
-            className="inline-flex items-center justify-center gap-2 bg-primary-red text-white px-8 py-4 rounded-lg font-bold font-serif text-lg hover:bg-primary-darkRed transition-colors"
+            className="inline-flex items-center justify-center gap-2 bg-primary-red text-white px-8 py-4 rounded-lg font-bold font-general-sansal-sansal-sans text-lg hover:bg-primary-darkRed transition-colors"
           >
             <FiShoppingBag className="w-5 h-5" />
             Continue Shopping
           </Link>
           <Link
             href="/"
-            className="inline-flex items-center justify-center gap-2 bg-white text-primary-red border-2 border-primary-red px-8 py-4 rounded-lg font-bold font-serif text-lg hover:bg-gray-50 transition-colors"
+            className="inline-flex items-center justify-center gap-2 bg-white text-primary-red border-2 border-primary-red px-8 py-4 rounded-lg font-bold font-general-sansal-sansal-sans text-lg hover:bg-gray-50 transition-colors"
           >
             <FiHome className="w-5 h-5" />
             Go to Home

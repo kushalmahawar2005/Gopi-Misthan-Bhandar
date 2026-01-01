@@ -151,7 +151,7 @@ export default function OrdersPage() {
             /* Empty State */
             <div className="bg-white rounded-lg shadow-md p-12 text-center">
               <FiPackage className="w-20 h-20 text-gray-300 mx-auto mb-6" />
-              <h2 className="text-2xl font-bold font-serif text-gray-800 mb-4">
+              <h2 className="text-2xl font-bold font-general-sansal-sansal-sans text-gray-800 mb-4">
                 No Orders Yet
               </h2>
               <p className="text-gray-600 mb-8 max-w-md mx-auto">
@@ -159,7 +159,7 @@ export default function OrdersPage() {
               </p>
               <Link
                 href="/products"
-                className="inline-flex items-center gap-2 bg-primary-red text-white px-8 py-3 rounded-lg font-bold font-serif text-lg hover:bg-primary-darkRed transition-colors"
+                className="inline-flex items-center gap-2 bg-primary-red text-white px-8 py-3 rounded-lg font-bold font-general-sansal-sansal-sans text-lg hover:bg-primary-darkRed transition-colors"
               >
                 <FiShoppingBag className="w-5 h-5" />
                 Start Shopping
@@ -174,7 +174,7 @@ export default function OrdersPage() {
                   <div className="bg-gray-50 px-6 py-4 border-b border-gray-200">
                     <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                       <div>
-                        <h3 className="text-lg font-bold font-serif text-primary-brown">
+                        <h3 className="text-lg font-bold font-general-sansal-sansal-sans text-primary-brown">
                           Order #{order.orderNumber}
                         </h3>
                         <div className="flex items-center gap-4 mt-2 text-sm text-gray-600">

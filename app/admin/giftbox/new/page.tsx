@@ -69,7 +69,7 @@ export default function NewGiftBox() {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-bold text-primary-brown font-serif">Add New Gift Box</h1>
+          <h1 className="text-3xl font-bold text-primary-brown font-general-sansal-sansal-sansal-sansal-sans">Add New Gift Box</h1>
           <p className="text-gray-600 mt-1">Add a new gift box category</p>
         </div>
         <button

@@ -58,7 +58,7 @@ export default function NewGallery() {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-bold text-primary-brown font-serif">Add New Gallery Item</h1>
+          <h1 className="text-3xl font-bold text-primary-brown font-general-sansal-sansal-sans">Add New Gallery Item</h1>
           <p className="text-gray-600 mt-1">Add a new image to the gallery</p>
         </div>
         <button

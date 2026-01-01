@@ -78,7 +78,7 @@ export default function AdminProducts() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-bold text-primary-brown font-serif">Products</h1>
+          <h1 className="text-2xl sm:text-3xl font-bold text-primary-brown font-general-sansal-sansal-sans">Products</h1>
           <p className="text-sm sm:text-base text-gray-600 mt-1">Manage your product catalog</p>
         </div>
         <Link

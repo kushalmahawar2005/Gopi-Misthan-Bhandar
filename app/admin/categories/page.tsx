@@ -169,7 +169,7 @@ export default function AdminCategories() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-bold text-primary-brown font-serif">Categories</h1>
+          <h1 className="text-2xl sm:text-3xl font-bold text-primary-brown font-general-sans">Categories</h1>
           <p className="text-sm sm:text-base text-gray-600 mt-1">Manage your product categories</p>
         </div>
         <Link
@@ -211,7 +211,7 @@ export default function AdminCategories() {
               </div>
             )}
             <div className="flex items-center justify-between mb-2">
-              <h3 className="text-lg font-semibold text-primary-brown font-serif">{category.name}</h3>
+              <h3 className="text-lg font-semibold text-primary-brown font-general-sans">{category.name}</h3>
               {category.subCategories && category.subCategories.length > 0 && (
                 <button
                   onClick={() => toggleCategoryExpansion(category._id)}

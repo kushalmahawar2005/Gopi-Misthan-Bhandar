@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { usePathname } from 'next/navigation';
 import { FaWhatsapp } from 'react-icons/fa';
 import { FiGift, FiSend, FiX } from 'react-icons/fi';
@@ -46,6 +46,22 @@ export default function FloatingContactButtons() {
 
   const whatsappHref = useMemo(() => {
     return `https://wa.me/${whatsappNumber}?text=${encodeURI(decodeURI(whatsappMessage))}`;
+  }, []);
+
+  // Listen for global event to open/close enquiry modal (triggered from header Bulk Enquiry)
+  useEffect(() => {
+    const openHandler = () => setIsModalOpen(true);
+    const closeHandler = () => setIsModalOpen(false);
+    if (typeof window !== 'undefined') {
+      window.addEventListener('open-wedding-enquiry', openHandler as EventListener);
+      window.addEventListener('close-wedding-enquiry', closeHandler as EventListener);
+    }
+    return () => {
+      if (typeof window !== 'undefined') {
+        window.removeEventListener('open-wedding-enquiry', openHandler as EventListener);
+        window.removeEventListener('close-wedding-enquiry', closeHandler as EventListener);
+      }
+    };
   }, []);
 
   if (pathname?.startsWith('/admin')) {
@@ -120,7 +136,7 @@ export default function FloatingContactButtons() {
             <FiGift className="h-6 w-6" />
           </div>
           <div className="pointer-events-none absolute right-[110%] hidden min-w-[200px] translate-y-1 rounded-xl bg-primary-red px-4 py-3 text-left text-white shadow-lg transition group-hover:flex">
-            <span className="text-sm font-semibold uppercase tracking-wide">Wedding Enquiry</span>
+            <span className="text-sm font-semibold uppercase tracking-wide">Bulk Enquiry</span>
             <span className="text-xs text-white/80">Plan your custom gift hampers</span>
           </div>
         </button>
@@ -143,7 +159,7 @@ export default function FloatingContactButtons() {
       </div>
 
       {isModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 px-3 py-6 sm:px-4 sm:py-8">
+        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/60 px-3 py-6 sm:px-4 sm:py-8">
           <div className="relative flex w-full max-w-[95vw] flex-col overflow-hidden rounded-2xl bg-white shadow-2xl max-h-[90vh] sm:max-w-lg">
             <button
               onClick={closeModal}
@@ -154,14 +170,14 @@ export default function FloatingContactButtons() {
             </button>
 
             <div className="rounded-t-2xl bg-primary-red px-5 py-5 text-white sm:px-6 sm:py-6">
-              <h2 className="text-xl font-bold font-serif sm:text-2xl">Wedding Gift Enquiry</h2>
+              <h2 className="text-xl font-bold font-general-sans sm:text-2xl">Bulk order Enquiry</h2>
               <p className="mt-1 text-xs text-white/80 sm:text-sm">
                 Share your requirements and we will get back to you within 24 hours.
               </p>
             </div>
 
-            <form onSubmit={handleSubmit} className="flex-1 space-y-4 overflow-y-auto px-5 py-5 sm:px-6 sm:py-6">
-              <div className="grid gap-4 sm:grid-cols-2">
+            <form onSubmit={handleSubmit} className="flex-1 space-y-4 overflow-y-auto px-4 py-4 sm:px-6 sm:py-6">
+              <div className="grid gap-3 sm:gap-4 sm:grid-cols-2">
                 <div className="flex flex-col gap-2">
                   <label className="text-sm font-medium text-gray-700">
                     Name<span className="text-primary-red">*</span>
@@ -213,7 +229,7 @@ export default function FloatingContactButtons() {
                 </div>
               </div>
 
-              <div className="grid gap-4 sm:grid-cols-2">
+              <div className="grid gap-3 sm:gap-4 sm:grid-cols-2">
                 <div className="flex flex-col gap-2">
                   <label className="text-sm font-medium text-gray-700">Type of Gifts</label>
                   <select

@@ -147,7 +147,7 @@ export default function EditSiteContent() {
   return (
     <div>
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold text-primary-brown font-serif">Edit Site Content - {formData.section.toUpperCase()}</h1>
+        <h1 className="text-3xl font-bold text-primary-brown font-general-sansal-sansal-sansal-sans">Edit Site Content - {formData.section.toUpperCase()}</h1>
         <button
           onClick={() => router.back()}
           className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors text-gray-700 font-medium"

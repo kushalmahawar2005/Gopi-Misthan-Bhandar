@@ -89,7 +89,7 @@ export default function NewProduct() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-bold text-primary-brown font-serif">Add New Product</h1>
+          <h1 className="text-2xl sm:text-3xl font-bold text-primary-brown font-general-sansal-sans">Add New Product</h1>
           <p className="text-sm sm:text-base text-gray-600 mt-1">Create a new product for your catalog</p>
         </div>
         <button

@@ -18,7 +18,7 @@ const InstagramSection: React.FC<InstagramSectionProps> = ({ instaBooks, instaPo
     <section className="py-12 md:py-16 px-4 bg-white w-full">
       <div className="w-full">
         {/* INSTABOOK Section - Videos Only */}
-        <h2 className="text-center text-2xl md:text-3xl font-serif text-black mb-12 md:mb-16 font-medium">
+        <h2 className="text-center text-2xl md:text-3xl font-general-sansal-sansal-sansal-sansal-sans text-black mb-12 md:mb-16 font-medium">
           INSTABOOK
         </h2>
         
@@ -59,7 +59,7 @@ const InstagramSection: React.FC<InstagramSectionProps> = ({ instaBooks, instaPo
                 {/* Overlay Text (if exists) */}
                 {item.overlayText && (
                   <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/40 to-transparent flex items-end z-10">
-                    <p className="text-white text-xs md:text-sm font-serif px-4 pb-4 font-medium leading-relaxed">
+                    <p className="text-white text-xs md:text-sm font-general-sansal-sansal-sansal-sansal-sans px-4 pb-4 font-medium leading-relaxed">
                       {item.overlayText}
                     </p>
                   </div>
@@ -67,7 +67,7 @@ const InstagramSection: React.FC<InstagramSectionProps> = ({ instaBooks, instaPo
               </div>
               
               {/* Label Below Card */}
-              <p className="text-black text-sm md:text-base font-serif mt-4 text-center font-medium">
+              <p className="text-black text-sm md:text-base font-general-sans mt-4 text-center font-medium">
                 {item.label}
               </p>
             </div>
@@ -75,7 +75,7 @@ const InstagramSection: React.FC<InstagramSectionProps> = ({ instaBooks, instaPo
         </div>
 
         {/* INSTAPOST Section - Instagram Posts with Links */}
-        <h3 className="text-center text-xl md:text-2xl font-serif text-black mb-8 md:mb-12 font-medium">
+        <h3 className="text-center text-xl md:text-2xl font-general-sansal-sansal-sansal-sansal-sans text-black mb-8 md:mb-12 font-medium">
           Follow Us on Instagram
         </h3>
 

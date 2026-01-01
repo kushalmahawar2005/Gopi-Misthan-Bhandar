@@ -50,7 +50,7 @@ export default function NewHeroSlide() {
       {/* Header */}
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-bold text-primary-brown font-serif">Add New Hero Slide</h1>
+          <h1 className="text-3xl font-bold text-primary-brown font-general-sansal-sans">Add New Hero Slide</h1>
           <p className="text-gray-600 mt-1">Create a new slide for the homepage hero slider</p>
         </div>
         <button

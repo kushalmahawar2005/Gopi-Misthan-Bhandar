@@ -131,7 +131,7 @@ export default function EditProduct() {
   return (
     <div>
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold text-primary-brown font-serif">Edit Product</h1>
+        <h1 className="text-3xl font-bold text-primary-brown font-general-sansal-sansal-sans">Edit Product</h1>
         <button
           onClick={() => router.back()}
           className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors text-gray-700 font-medium"
