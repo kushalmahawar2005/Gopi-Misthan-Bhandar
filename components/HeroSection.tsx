@@ -81,72 +81,69 @@ const HeroSection = () => {
 
   return (
     <section className="relative w-full -mt-2 md:mt-6 mb-4 lg:mb-4">
-      <div className="w-full md:max-w-7xl md:mx-auto md:px-8 lg:px-12 h-[calc(100vh-340px)] md:h-[380px] lg:h-[420px] relative overflow-hidden rounded-none md:rounded-2xl">
-        {/* Slides */}
-        <div className="relative w-full h-full">
-        {slides.map((slide, index) => (
-          <div
-            key={slide.id}
-            className={`absolute inset-0 transition-opacity duration-700 ${
-              index === currentSlide ? 'opacity-100 z-10' : 'opacity-0 z-0'
-            }`}
-          >
-            {/* Desktop */}
-            <Image
-              src={slide.image}
-              alt={`Hero slide ${index + 1}`}
-              fill
-              className="object-contain object-center hidden md:block"
-              priority={index === 0}
-              sizes="100vw"
-            />
-            {/* Mobile */}
-            <Image
-              src={(slide as any).mobileImage || slide.image}
-              alt={`Hero slide ${index + 1}`}
-              fill
-              className="object-cover object-center md:hidden"
-              priority={index === 0}
-              sizes="100vw"
-            />
+      <div className="relative w-full md:max-w-7xl md:mx-auto md:px-8 lg:px-12">
+        <div className="h-[calc(100vh-340px)] md:h-[380px] lg:h-[420px] relative overflow-hidden rounded-none md:rounded-2xl">
+          <div className="relative w-full h-full">
+            {slides.map((slide, index) => (
+              <div
+                key={slide.id}
+                className={`absolute inset-0 transition-opacity duration-700 ${
+                  index === currentSlide ? 'opacity-100 z-10' : 'opacity-0 z-0'
+                }`}
+              >
+                <Image
+                  src={slide.image}
+                  alt={`Hero slide ${index + 1}`}
+                  fill
+                  className="object-contain object-center hidden md:block"
+                  priority={index === 0}
+                  sizes="100vw"
+                />
+                <Image
+                  src={(slide as any).mobileImage || slide.image}
+                  alt={`Hero slide ${index + 1}`}
+                  fill
+                  className="object-cover object-center md:hidden"
+                  priority={index === 0}
+                  sizes="100vw"
+                />
+              </div>
+            ))}
           </div>
-        ))}
-      </div>
 
-        {/* Arrows */}
+          {slides.length > 1 && !enquiryOpen && (
+            <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-20 flex gap-2">
+              {slides.map((_, index) => (
+                <button
+                  key={index}
+                  onClick={() => goToSlide(index)}
+                  className={`w-2 h-2 rounded-full transition-all ${
+                    index === currentSlide ? 'bg-white w-8' : 'bg-white/50 hover:bg-white/75'
+                  }`}
+                  aria-label={`Go to slide ${index + 1}`}
+                />
+              ))}
+            </div>
+          )}
+        </div>
+
         {slides.length > 1 && !enquiryOpen && (
           <>
             <button
               onClick={prevSlide}
-              className="absolute left-4 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white text-gray-800 p-2 rounded-full shadow-lg transition-all z-20 opacity-70 hover:opacity-100"
+              className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-1/2 bg-transparent text-black p-2 rounded-full border border-transparent shadow-none hover:bg-white/90 hover:border-gray-300 hover:shadow-md transition-all z-30"
               aria-label="Previous slide"
             >
               <FiChevronLeft className="w-5 h-5 md:w-6 md:h-6" />
             </button>
             <button
               onClick={nextSlide}
-              className="absolute right-4 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white text-gray-800 p-2 rounded-full shadow-lg transition-all z-20 opacity-70 hover:opacity-100"
+              className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-1/2 bg-transparent text.black p-2 rounded-full border border-transparent shadow-none hover:bg-white/90 hover:border-gray-300 hover:shadow-md transition-all z-30"
               aria-label="Next slide"
             >
               <FiChevronRight className="w-5 h-5 md:w-6 md:h-6" />
             </button>
           </>
-        )}
-
-        {/* Dots */}
-        {slides.length > 1 && !enquiryOpen && (
-          <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-20 flex gap-2">
-          {slides.map((_, index) => (
-            <button
-              key={index}
-              onClick={() => goToSlide(index)}
-              className={`w-2 h-2 rounded-full transition-all ${
-                index === currentSlide ? 'bg-white w-8' : 'bg-white/50 hover:bg-white/75'
-              }`}
-              aria-label={`Go to slide ${index + 1}`}
-            />
-          ))}
-        </div>
         )}
       </div>
     </section>

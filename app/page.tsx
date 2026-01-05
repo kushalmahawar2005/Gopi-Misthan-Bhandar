@@ -55,14 +55,16 @@ export default function Home() {
       setFeaturedProducts(featured);
       setCategories(categoriesData);
       
-      // Restrict Classic/Premium sections to Sweets category and its subcategories
+      // Restrict Classic/Premium sections to Sweets and well-known subcategories
       const sweetsCategory = categoriesData.find((c) => c.slug === 'sweets');
+      const defaultSweetsSubs = ['classic-sweets', 'premium-sweets'];
       const sweetsSlugs = sweetsCategory
-        ? [sweetsCategory.slug, ...(sweetsCategory.subCategories?.map((s: any) => s.slug) || [])]
-        : ['sweets'];
+        ? Array.from(new Set([sweetsCategory.slug, ...(sweetsCategory.subCategories?.map((s: any) => s.slug) || []), ...defaultSweetsSubs]))
+        : ['sweets', ...defaultSweetsSubs];
+      const isSweetCategory = (slug: string | undefined) => !!slug && /sweet/i.test(slug);
       
-      const classicFiltered = classicFlagged.filter((p) => sweetsSlugs.includes(p.category));
-      const premiumFiltered = premiumFlagged.filter((p) => sweetsSlugs.includes(p.category));
+      const classicFiltered = classicFlagged.filter((p) => sweetsSlugs.includes(p.category) || isSweetCategory(p.category));
+      const premiumFiltered = premiumFlagged.filter((p) => sweetsSlugs.includes(p.category) || isSweetCategory(p.category));
       
       setClassicProducts(classicFiltered.slice(0, 8));
       setPremiumProducts(premiumFiltered.slice(0, 8));

@@ -458,12 +458,54 @@ export default function CheckoutPage() {
       </div>
 
       <div className="max-w-7xl mx-auto px-4 md:px-8 py-8 md:py-12">
+        <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-4 md:p-6 mb-8">
+          <div className="flex items-center justify-between">
+            <button
+              type="button"
+              onClick={() =>
+                document.getElementById('shipping')?.scrollIntoView({ behavior: 'auto', block: 'start' })
+              }
+              className="flex items-center gap-3 text-gray-700 hover:text-primary-red transition-colors"
+            >
+              <span className="flex items-center justify-center w-8 h-8 rounded-full border-2 border-primary-red text-primary-red font-bold">
+                1
+              </span>
+              <span className="text-sm font-bold font-general-sans">Address</span>
+            </button>
+            <div className="flex-1 h-px bg-gray-200 mx-2"></div>
+            <button
+              type="button"
+              onClick={() =>
+                document.getElementById('billing')?.scrollIntoView({ behavior: 'auto', block: 'start' })
+              }
+              className="flex items-center gap-3 text-gray-700 hover:text-primary-red transition-colors"
+            >
+              <span className="flex items-center justify-center w-8 h-8 rounded-full border-2 border-primary-red text-primary-red font-bold">
+                2
+              </span>
+              <span className="text-sm font-bold font-general-sans">Billing</span>
+            </button>
+            <div className="flex-1 h-px bg-gray-200 mx-2"></div>
+            <button
+              type="button"
+              onClick={() =>
+                document.getElementById('payment')?.scrollIntoView({ behavior: 'auto', block: 'start' })
+              }
+              className="flex items-center gap-3 text-gray-700 hover:text-primary-red transition-colors"
+            >
+              <span className="flex items-center justify-center w-8 h-8 rounded-full border-2 border-primary-red text-primary-red font-bold">
+                3
+              </span>
+              <span className="text-sm font-bold font-general-sans">Payment</span>
+            </button>
+          </div>
+        </div>
         <form onSubmit={handlePlaceOrder}>
           <div className="grid lg:grid-cols-3 gap-8">
             {/* Left Column - Forms */}
             <div className="lg:col-span-2 space-y-8">
               {/* Shipping Information */}
-              <div className="bg-white rounded-lg shadow-md p-6 md:p-8">
+              <div id="shipping" className="bg-white rounded-xl border border-gray-200 shadow-sm p-6 md:p-8">
                 <h2 className="text-2xl font-bold font-general-sans mb-6 flex items-center gap-2">
                   <FiTruck className="w-6 h-6 text-primary-red" />
                   Shipping Information
@@ -659,9 +701,9 @@ export default function CheckoutPage() {
               </div>
 
               {/* Billing Information */}
-              <div className="bg-white rounded-lg shadow-md p-6 md:p-8">
+              <div id="billing" className="bg-white rounded-xl border border-gray-200 shadow-sm p-6 md:p-8">
                 <div className="flex items-center justify-between mb-6">
-                  <h2 className="text-2xl font-bold font-general-sansal-sansal-sansal-sansal-sansal-sans flex items-center gap-2">
+                  <h2 className="text-2xl font-bold font-general-sans flex items-center gap-2">
                     <FiCreditCard className="w-6 h-6 text-primary-red" />
                     Billing Information
                   </h2>
@@ -785,8 +827,8 @@ export default function CheckoutPage() {
               </div>
 
               {/* Payment Method */}
-              <div className="bg-white rounded-lg shadow-md p-6 md:p-8">
-                <h2 className="text-2xl font-bold font-general-sansal-sansal-sansal-sansal-sansal-sans mb-6">Payment Method</h2>
+              <div id="payment" className="bg-white rounded-xl border border-gray-200 shadow-sm p-6 md:p-8">
+                <h2 className="text-2xl font-bold font-general-sans mb-6">Payment Method</h2>
                 <div className="space-y-4">
                   <label className="flex items-center gap-4 p-4 border-2 border-gray-200 rounded-lg cursor-pointer hover:border-primary-red transition-colors">
                     <input
@@ -839,8 +881,8 @@ export default function CheckoutPage() {
 
             {/* Right Column - Order Summary */}
             <div className="lg:col-span-1">
-              <div className="bg-white rounded-lg shadow-md p-6 sticky top-24">
-                <h2 className="text-2xl font-bold font-general-sansal-sansal-sansal-sansal-sansal-sans mb-6">Order Summary</h2>
+              <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6 sticky top-24">
+                <h2 className="text-2xl font-bold font-general-sans mb-6">Order Summary</h2>
                 
                 {/* Cart Items */}
                 <div className="space-y-4 mb-6 max-h-96 overflow-y-auto">
@@ -856,7 +898,7 @@ export default function CheckoutPage() {
                         />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <h3 className="font-general-sansal-sansal-sansal-sansal-sansal-sans font-medium text-sm mb-1 line-clamp-2">
+                        <h3 className="font-general-sans font-medium text-sm mb-1 line-clamp-2">
                           {item.name}
                         </h3>
                         <p className="text-primary-red font-bold text-sm mb-2">
@@ -918,7 +960,7 @@ export default function CheckoutPage() {
                     <span className="text-gray-600">Tax (GST 5%)</span>
                     <span className="font-medium">₹{calculateTax().toLocaleString()}</span>
                   </div>
-                  <div className="flex justify-between text-lg font-bold font-general-sansal-sansal-sansal-sansal-sansal-sans pt-3 border-t border-gray-200">
+                  <div className="flex justify-between text-lg font-bold font-general-sans pt-3 border-t border-gray-200">
                     <span>Total</span>
                     <span className="text-primary-red">₹{calculateTotal().toLocaleString()}</span>
                   </div>
@@ -928,7 +970,7 @@ export default function CheckoutPage() {
                 <button
                   type="submit"
                   disabled={isPlacingOrder}
-                  className="w-full bg-primary-red text-white py-4 px-6 rounded-lg font-bold font-general-sansal-sansal-sansal-sansal-sansal-sans text-lg hover:bg-primary-darkRed transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="w-full bg-primary-red text-white py-4 px-6 rounded-lg font-bold font-general-sans text-lg hover:bg-primary-darkRed transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {isPlacingOrder ? 'Placing Order...' : 'Place Order'}
                 </button>

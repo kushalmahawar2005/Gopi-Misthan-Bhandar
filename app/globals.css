@@ -89,25 +89,23 @@
   transition: none !important;
 }
 
-/* Smooth scroll behavior - Enhanced for all browsers */
+/* Scroll behavior */
 html {
-  scroll-behavior: smooth;
+  scroll-behavior: auto;
   -webkit-overflow-scrolling: touch;
   scroll-padding-top: 80px; /* Account for fixed header */
 }
 
-/* Enhanced smooth scrolling for better performance */
 body {
-  scroll-behavior: smooth;
+  scroll-behavior: auto;
   -webkit-overflow-scrolling: touch;
 }
 
-/* Smooth scroll for main scrollable containers */
 main,
 section,
 [data-scroll-container],
 .scroll-container {
-  scroll-behavior: smooth;
+  scroll-behavior: auto;
 }
 
 /* Sora Font Family */

@@ -16,13 +16,13 @@ const CategoriesSection: React.FC<CategoriesSectionProps> = ({ categories }) => 
 
   if (!categories || categories.length === 0) {
     return (
-      <section className="py-12 md:py-20 px-4 bg-white w-full">
+      <section className="py-16 md:py-24 px-4 bg-white w-full">
         <div className="w-full">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-2xl lg:text-4xl text-black mb-4 font-bold ">
-              OUR CATEGORIES
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-4xl lg:text-5xl text-primary-brown mb-6 font-bold font-general-sans tracking-tight">
+              Our Categories
             </h2>
-            <p className="text-base md:text-lg font-jost text-gray-600 max-w-2xl mx-auto">
+            <p className="text-base md:text-lg font-general-sans text-gray-500 max-w-2xl mx-auto tracking-wide uppercase text-xs">
               Explore our wide range of traditional Indian sweets, snacks, and namkeen
             </p>
           </div>
@@ -112,13 +112,13 @@ const CategoriesSection: React.FC<CategoriesSectionProps> = ({ categories }) => 
   }, [categories]);
 
   return (
-    <section className="py-12 md:py-20 bg-[#f7db9d] w-full">
-      <div className="section-container w-full">
-        <div className="md:text-center mb-12">
-          <h2 className="text-3xl md:text-4xl lg:text-5xl font-jost  text-black mb-2 leading-relaxed font-[450]">
+    <section className="py-16 md:py-24 bg-white w-full">
+      <div className="section-container w-full max-w-7xl mx-auto px-4 md:px-8">
+        <div className="text-center mb-16">
+          <h2 className="text-3xl md:text-4xl lg:text-5xl font-general-sans font-bold text-primary-brown mb-4 tracking-tight">
             Our Categories
           </h2>
-          <p className="text-base md:text-lg font-jost text-gray-600 leading-relaxed max-w-2xl mx-auto">
+          <p className="text-xs md:text-sm font-general-sans text-gray-500 tracking-widest uppercase max-w-2xl mx-auto">
             Explore our wide range of traditional Indian sweets, snacks, and namkeen
           </p>
         </div>

@@ -37,10 +37,10 @@ const InstaPostSection: React.FC<InstaPostSectionProps> = ({ instaPosts }) => {
   }, [index]);
 
   return (
-    <section className="py-12 md:py-16 px-4 bg-white w-full">
+    <section className="py-16 md:py-24 px-4 bg-white w-full">
       <div className="w-full max-w-7xl mx-auto">
-        <h3 className="text-center text-xl md:text-2xl lg:text-3xl text-black mb-8 md:mb-12 font-general-sans font-[500]">
-          FOLLOW US ON INSTAGRAM
+        <h3 className="text-center text-2xl md:text-3xl lg:text-4xl text-primary-brown mb-10 md:mb-14 font-general-sans font-bold tracking-tight">
+          Follow Us On Instagram
         </h3>
 
         {/* Slider Container */}
@@ -56,7 +56,7 @@ const InstaPostSection: React.FC<InstaPostSectionProps> = ({ instaPosts }) => {
                 key={post._id}
                 href={post.instagramUrl}
                 target="_blank"
-                className="relative w-[220px] h-[260px] flex-shrink-0  overflow-hidden shadow-lg group cursor-pointer"
+                className="relative w-[220px] h-[260px] flex-shrink-0 overflow-hidden group cursor-pointer rounded-xl border border-gray-100 bg-white shadow-sm hover:shadow-lg transition-shadow"
 
               >
                 <Image
@@ -67,7 +67,7 @@ const InstaPostSection: React.FC<InstaPostSectionProps> = ({ instaPosts }) => {
                 />
 
                 {/* Shadow Overlay */}
-                <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
 
                 {/* Instagram Icon */}
                 <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
