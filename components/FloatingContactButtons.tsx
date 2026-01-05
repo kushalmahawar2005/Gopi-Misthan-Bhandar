@@ -176,8 +176,8 @@ export default function FloatingContactButtons() {
               </p>
             </div>
 
-            <form onSubmit={handleSubmit} className="flex-1 space-y-4 overflow-y-auto px-4 py-4 sm:px-6 sm:py-6">
-              <div className="grid gap-3 sm:gap-4 sm:grid-cols-2">
+            <form onSubmit={handleSubmit} className="flex-1 space-y-4 overflow-y-auto px-5 py-5 sm:px-6 sm:py-6">
+              <div className="grid gap-4 sm:grid-cols-2">
                 <div className="flex flex-col gap-2">
                   <label className="text-sm font-medium text-gray-700">
                     Name<span className="text-primary-red">*</span>
@@ -229,7 +229,7 @@ export default function FloatingContactButtons() {
                 </div>
               </div>
 
-              <div className="grid gap-3 sm:gap-4 sm:grid-cols-2">
+              <div className="grid gap-4 sm:grid-cols-2">
                 <div className="flex flex-col gap-2">
                   <label className="text-sm font-medium text-gray-700">Type of Gifts</label>
                   <select

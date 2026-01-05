@@ -165,80 +165,86 @@ export default function ProfilePage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
       <Header />
       <Navigation />
       <Cart />
 
-      {/* Page Header */}
-      <div className="bg-gradient-to-r from-primary-red to-primary-darkRed py-8 md:py-12 px-4">
-        <div className="max-w-7xl text-center mx-auto">
-          <h1 className="text-3xl md:text-4xl font-[500] font-general-sans text-white">
-            My Profile
-          </h1>
-          <p className="text-lg text-gray-100 mt-2">
-            Manage your account information and preferences
-          </p>
+      <div className="bg-gradient-to-br from-red-700 to-red-800">
+        <div className="max-w-7xl mx-auto px-4 md:px-8 py-10">
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
+            <div className="flex items-center gap-4">
+              <div className="w-16 h-16 md:w-20 md:h-20 rounded-full bg-white/10 ring-2 ring-white/30 flex items-center justify-center">
+                <FiUser className="w-8 h-8 md:w-10 md:h-10 text-white" />
+              </div>
+              <div>
+                <h1 className="text-2xl md:text-3xl font-semibold text-white">{user.name}</h1>
+                <p className="text-white/80">{user.email}</p>
+              </div>
+            </div>
+            <div className="grid grid-cols-3 gap-3 md:gap-6 w-full md:w-auto">
+              <div className="bg-white/10 backdrop-blur-sm rounded-lg px-4 py-3 text-center">
+                <p className="text-2xl font-bold text-white">{ordersCount}</p>
+                <p className="text-white/80 text-xs">Total Orders</p>
+              </div>
+              <div className="bg-white/10 backdrop-blur-sm rounded-lg px-4 py-3 text-center">
+                <p className="text-2xl font-bold text-white">{getWishlistCount()}</p>
+                <p className="text-white/80 text-xs">Wishlist</p>
+              </div>
+              <div className="bg-white/10 backdrop-blur-sm rounded-lg px-4 py-3 text-center">
+                <p className="text-2xl font-bold text-white">{pendingOrdersCount}</p>
+                <p className="text-white/80 text-xs">Pending</p>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 md:px-8 py-8 md:py-12">
+      <div className="max-w-7xl mx-auto px-4 md:px-8 py-10">
         <div className="grid md:grid-cols-3 gap-8">
-          {/* Sidebar */}
           <div className="md:col-span-1">
-            <div className="bg-white rounded-lg shadow-md p-6 sticky top-24">
-              {/* Profile Avatar */}
-              <div className="text-center mb-6">
-                <div className="w-24 h-24 bg-primary-red rounded-full mx-auto flex items-center justify-center mb-4">
-                  <FiUser className="w-12 h-12 text-white" />
-                </div>
-                <h2 className="text-xl font-[500] font-general-sans">{user.name}</h2>
-                <p className="text-gray-600 text-sm">{user.email}</p>
-              </div>
-
-              {/* Navigation Menu */}
-              <nav className="space-y-2">
+            <div className="rounded-xl border border-gray-200 bg-white shadow-sm p-6 sticky top-24">
+              <div className="space-y-3">
                 <button
                   onClick={() => setIsEditing(true)}
-                  className="w-full flex items-center gap-3 px-4 py-3 text-left text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
+                  className="w-full flex items-center gap-3 px-4 py-3 rounded-lg border border-gray-200 hover:border-gray-300 hover:bg-gray-50 transition-all"
                 >
-                  <FiEdit2 className="w-5 h-5" />
-                  <span>Edit Profile</span>
+                  <FiEdit2 className="w-5 h-5 text-gray-700" />
+                  <span className="text-gray-800">Edit Profile</span>
                 </button>
                 <button
                   onClick={() => router.push('/orders')}
-                  className="w-full flex items-center gap-3 px-4 py-3 text-left text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
+                  className="w-full flex items-center gap-3 px-4 py-3 rounded-lg border border-gray-200 hover:border-gray-300 hover:bg-gray-50 transition-all"
                 >
-                  <FiPackage className="w-5 h-5" />
-                  <span>My Orders</span>
+                  <FiPackage className="w-5 h-5 text-gray-700" />
+                  <span className="text-gray-800">My Orders</span>
                 </button>
                 <button
                   onClick={() => router.push('/wishlist')}
-                  className="w-full flex items-center gap-3 px-4 py-3 text-left text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
+                  className="w-full flex items-center gap-3 px-4 py-3 rounded-lg border border-gray-200 hover:border-gray-300 hover:bg-gray-50 transition-all"
                 >
-                  <FiHeart className="w-5 h-5" />
-                  <span>Wishlist</span>
+                  <FiHeart className="w-5 h-5 text-gray-700" />
+                  <span className="text-gray-800">Wishlist</span>
                 </button>
                 <button
                   onClick={handleLogout}
-                  className="w-full flex items-center gap-3 px-4 py-3 text-left text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                  className="w-full flex items-center gap-3 px-4 py-3 rounded-lg border border-red-200 text-red-700 hover:bg-red-50 hover:border-red-300 transition-all"
                 >
                   <FiLogOut className="w-5 h-5" />
                   <span>Logout</span>
                 </button>
-              </nav>
+              </div>
             </div>
           </div>
 
-          {/* Main Content */}
           <div className="md:col-span-2">
-            <div className="bg-white rounded-lg shadow-md p-6 md:p-8">
+            <div className="rounded-xl border border-gray-200 bg-white shadow-sm p-6 md:p-8">
               <div className="flex items-center justify-between mb-6">
-                <h2 className="text-2xl font-[500] font-general-sans">Personal Information</h2>
+                <h2 className="text-xl md:text-2xl font-semibold">Personal Information</h2>
                 {!isEditing && (
                   <button
                     onClick={() => setIsEditing(true)}
-                    className="flex items-center gap-2 text-primary-red hover:text-primary-darkRed font-medium"
+                    className="inline-flex items-center gap-2 px-4 py-2 rounded-md bg-red-700 text-white hover:bg-red-800 transition-colors"
                   >
                     <FiEdit2 className="w-5 h-5" />
                     Edit
@@ -387,7 +393,7 @@ export default function ProfilePage() {
                       type="button"
                       onClick={handleSave}
                       disabled={saveLoading}
-                      className="flex items-center gap-2 bg-primary-red text-white px-6 py-3 rounded-lg font-[450] font-general-sans hover:bg-primary-darkRed transition-colors disabled:opacity-50"
+                      className="inline-flex items-center gap-2 px-6 py-3 rounded-md bg-red-700 text-white hover:bg-red-800 transition-colors disabled:opacity-50"
                     >
                       <FiSave className="w-5 h-5" />
                       {saveLoading ? 'Saving...' : 'Save Changes'}
@@ -395,7 +401,7 @@ export default function ProfilePage() {
                     <button
                       type="button"
                       onClick={handleCancel}
-                      className="flex items-center gap-2 bg-gray-200 text-gray-700 px-6 py-3 rounded-lg font-[450] font-general-sans hover:bg-gray-300 transition-colors"
+                      className="inline-flex items-center gap-2 px-6 py-3 rounded-md bg-gray-200 text-gray-800 hover:bg-gray-300 transition-colors"
                     >
                       <FiX className="w-5 h-5" />
                       Cancel
@@ -405,21 +411,20 @@ export default function ProfilePage() {
               </form>
             </div>
 
-            {/* Quick Stats */}
             <div className="grid md:grid-cols-3 gap-6 mt-8">
-              <div className="bg-white rounded-lg shadow-md p-6 text-center">
-                <FiShoppingBag className="w-8 h-8 text-primary-red mx-auto mb-3" />
-                <p className="text-2xl font-bold font-general-sansal-sansal-sans">{ordersCount}</p>
+              <div className="rounded-xl border border-gray-200 bg-white shadow-sm p-6 text-center">
+                <FiShoppingBag className="w-7 h-7 text-red-700 mx-auto mb-3" />
+                <p className="text-2xl font-semibold">{ordersCount}</p>
                 <p className="text-gray-600 text-sm">Total Orders</p>
               </div>
-              <div className="bg-white rounded-lg shadow-md p-6 text-center">
-                <FiHeart className="w-8 h-8 text-primary-red mx-auto mb-3" />
-                <p className="text-2xl font-bold font-general-sansal-sansal-sans">{getWishlistCount()}</p>
+              <div className="rounded-xl border border-gray-200 bg-white shadow-sm p-6 text-center">
+                <FiHeart className="w-7 h-7 text-red-700 mx-auto mb-3" />
+                <p className="text-2xl font-semibold">{getWishlistCount()}</p>
                 <p className="text-gray-600 text-sm">Wishlist Items</p>
               </div>
-              <div className="bg-white rounded-lg shadow-md p-6 text-center">
-                <FiPackage className="w-8 h-8 text-primary-red mx-auto mb-3" />
-                <p className="text-2xl font-bold font-general-sansal-sansal-sans">{pendingOrdersCount}</p>
+              <div className="rounded-xl border border-gray-200 bg-white shadow-sm p-6 text-center">
+                <FiPackage className="w-7 h-7 text-red-700 mx-auto mb-3" />
+                <p className="text-2xl font-semibold">{pendingOrdersCount}</p>
                 <p className="text-gray-600 text-sm">Pending Orders</p>
               </div>
             </div>

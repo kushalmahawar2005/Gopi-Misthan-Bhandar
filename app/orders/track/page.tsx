@@ -111,14 +111,13 @@ function OrderTrackingContent() {
       <Navigation />
       <Cart />
 
-      {/* Page Header */}
-      <div className="bg-gradient-to-r from-primary-red to-primary-darkRed py-12 md:py-16 px-4">
+      <div className="bg-gradient-to-br from-red-700 to-red-800 py-12 md:py-16 px-4">
         <div className="max-w-4xl mx-auto text-center">
-          <h1 className="text-3xl md:text-4xl font-bold font-general-sansal-sansal-sans text-white mb-4">
+          <h1 className="text-3xl md:text-4xl font-semibold text-white mb-3">
             Track Your Order
           </h1>
-          <p className="text-lg text-gray-100">
-            Enter your order number to track the status of your order
+          <p className="text-white/80">
+            Enter your order number to check the latest status
           </p>
         </div>
       </div>
@@ -134,13 +133,13 @@ function OrderTrackingContent() {
                 value={orderNumber}
                 onChange={(e) => setOrderNumber(e.target.value.toUpperCase())}
                 placeholder="Enter Order Number (e.g., ORD-12345)"
-                className="w-full pl-12 pr-4 py-4 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-red focus:border-transparent text-lg"
+                className="w-full pl-12 pr-4 py-4 border-2 border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-700 focus:border-transparent text-lg"
               />
             </div>
             <button
               type="submit"
               disabled={loading}
-              className="px-8 py-4 bg-primary-red text-white rounded-lg font-bold hover:bg-primary-darkRed transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="px-8 py-4 bg-red-700 text-white rounded-md font-semibold hover:bg-red-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {loading ? 'Tracking...' : 'Track Order'}
             </button>

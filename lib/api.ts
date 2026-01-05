@@ -57,10 +57,10 @@ export const fetchProducts = async (params?: {
     const queryParams = new URLSearchParams();
     if (params?.category) queryParams.append('category', params.category);
     if (params?.featured) queryParams.append('featured', 'true');
-    if (params?.isClassic) queryParams.append('isClassic', 'true');
-    if (params?.isPremium) queryParams.append('isPremium', 'true');
     if (params?.search) queryParams.append('search', params.search);
     if (params?.limit) queryParams.append('limit', params.limit.toString());
+    if (params?.isClassic) queryParams.append('isClassic', 'true');
+    if (params?.isPremium) queryParams.append('isPremium', 'true');
 
     const response = await fetch(`/api/products?${queryParams.toString()}`);
     const data = await response.json();
@@ -275,4 +275,3 @@ export const fetchBlogs = async (): Promise<BlogItem[]> => {
     return [];
   }
 };
-

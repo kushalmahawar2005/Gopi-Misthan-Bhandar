@@ -11,11 +11,16 @@ interface InstaBookSectionProps {
 
 const InstaBookSection: React.FC<InstaBookSectionProps> = ({ instaBooks }) => {
   return (
-    <section className="py-12 md:py-16 px-4 bg-white w-full">
+    <section className="py-16 md:py-24 px-4 bg-white w-full">
       <div className="w-full">
-        <h2 className="text-center text-2xl md:text-3xl  text-black mb-10 md:mb-14 font-bold">
-          INSTABOOK
-        </h2>
+        <div className="text-center mb-12 md:mb-16">
+          <h2 className="text-3xl md:text-4xl lg:text-5xl text-primary-brown font-bold font-general-sans tracking-tight mb-4">
+            Follow Our Journey
+          </h2>
+          <p className="text-xs md:text-sm text-gray-500 font-general-sans uppercase tracking-widest">
+            @GopiMisthanBhandar
+          </p>
+        </div>
 
         <div className="flex justify-center gap-4 sm:gap-5 md:gap-6 lg:gap-8 flex-wrap">
           {instaBooks.map((item) => (
@@ -57,7 +62,7 @@ const VideoCard: React.FC<VideoCardProps> = ({ item }) => {
       {/* Video Container */}
       <div
         className="
-          relative rounded-lg overflow-hidden cursor-pointer shadow-lg
+          relative rounded-xl overflow-hidden cursor-pointer shadow-md hover:shadow-xl
           /* MOBILE — bigger reels */
           w-[88vw] max-w-[380px] sm:w-[85vw] sm:max-w-[400px] aspect-[9/16]
           /* DESKTOP/TABLET — revert to old sizes */
@@ -65,7 +70,7 @@ const VideoCard: React.FC<VideoCardProps> = ({ item }) => {
           lg:w-[180px] lg:h-[460px]
           xl:w-[220px] xl:h-[420px]
           2xl:w-[240px] 2xl:h-[420px]
-          transition-transform duration-300 hover:scale-[1.02]
+          transition-transform duration-300 hover:scale-[1.02] border border-gray-100
         "
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}

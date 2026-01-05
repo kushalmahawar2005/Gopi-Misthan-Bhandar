@@ -11,10 +11,10 @@ export async function GET(request: NextRequest) {
     const searchParams = request.nextUrl.searchParams;
     const category = searchParams.get('category');
     const featured = searchParams.get('featured');
-    const isClassic = searchParams.get('isClassic');
-    const isPremium = searchParams.get('isPremium');
     const search = searchParams.get('search');
     const limit = searchParams.get('limit');
+    const isClassic = searchParams.get('isClassic');
+    const isPremium = searchParams.get('isPremium');
 
     let query: any = {};
 
@@ -26,10 +26,10 @@ export async function GET(request: NextRequest) {
       query.featured = true;
     }
     
-    // Flags for special sections
     if (isClassic === 'true') {
       query.isClassic = true;
     }
+    
     if (isPremium === 'true') {
       query.isPremium = true;
     }

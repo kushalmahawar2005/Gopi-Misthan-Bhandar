@@ -38,33 +38,10 @@ const Navigation = () => {
   const [searchResults, setSearchResults] = useState<any[]>([]);
   const [searchLoading, setSearchLoading] = useState(false);
   const [showDropdown, setShowDropdown] = useState(false);
-  const [isVisible, setIsVisible] = useState(true);
-  const lastScrollY = useRef(0);
 
   const searchInputRef = useRef<HTMLInputElement | null>(null);
   const dropdownRef = useRef<HTMLDivElement | null>(null);
   const categoryDropdownRef = useRef<HTMLDivElement | null>(null);
-
-  // Handle scroll for navbar visibility
-  useEffect(() => {
-    const handleScroll = () => {
-      const currentScrollY = window.scrollY;
-      
-      if (currentScrollY > lastScrollY.current && currentScrollY > 100) {
-        setIsVisible(false);
-      } else {
-        setIsVisible(true);
-      }
-      
-      lastScrollY.current = currentScrollY;
-    };
-
-    window.addEventListener('scroll', handleScroll, { passive: true });
-
-    return () => {
-      window.removeEventListener('scroll', handleScroll);
-    };
-  }, []);
 
   // Fetch categories with subcategories
   useEffect(() => {
@@ -169,7 +146,7 @@ const Navigation = () => {
 
   return (
     <>
-      <nav className={`bg-white w-full border-b border-gray-200 shadow-sm sticky top-0 z-50 transition-transform duration-300 ${isVisible ? 'translate-y-0' : '-translate-y-full'}`}>
+      <nav className="bg-white w-full border-b border-gray-200 shadow-sm sticky top-0 z-50">
         
 
         {/* Header row */}
@@ -308,11 +285,7 @@ const Navigation = () => {
           {/* Right icons */}
           <div className="flex items-center gap-2 md:gap-3 ml-auto">
             <button
-              onClick={() => {
-                if (typeof window !== 'undefined') {
-                  window.dispatchEvent(new CustomEvent('open-wedding-enquiry'));
-                }
-              }}
+              onClick={() => router.push('/contact')}
               className="hidden md:flex items-center px-4 py-2 bg-black text-white rounded-lg hover:bg-amber-800 transition-colors text-sm font-medium"
             >
               Bulk Enquiry

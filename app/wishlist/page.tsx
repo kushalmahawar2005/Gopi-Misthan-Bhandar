@@ -38,13 +38,13 @@ export default function WishlistPage() {
 
   return (
     <ProtectedRoute>
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen bg-white">
         <Header />
         <Navigation />
         <Cart />
 
         {/* Page Header */}
-        <div className="bg-gradient-to-r from-primary-red to-primary-darkRed py-8 md:py-12 px-4">
+        <div className="bg-gradient-to-br from-red-700 to-red-800 py-8 md:py-12 px-4">
           <div className="max-w-7xl text-center mx-auto">
             <div className="flex items-center justify-between">
               <div className="text-center">
@@ -58,7 +58,7 @@ export default function WishlistPage() {
               {wishlistItems.length > 0 && (
                 <button
                   onClick={clearWishlist}
-                  className="px-4 py-2 bg-white/20 text-white rounded-lg hover:bg-white/30 transition-colors flex items-center gap-2"
+                  className="px-4 py-2 bg-white/15 text-white rounded-md hover:bg-white/25 transition-colors flex items-center gap-2 backdrop-blur-sm"
                 >
                   <FiTrash2 className="w-5 h-5" />
                   Clear All
@@ -68,12 +68,12 @@ export default function WishlistPage() {
           </div>
         </div>
 
-        <div className="max-w-7xl mx-auto px-4 md:px-8 py-8 md:py-12">
+        <div className="max-w-7xl mx-auto px-4 md:px-8 py-10">
           {wishlistItems.length === 0 ? (
             /* Empty State */
-            <div className="bg-white rounded-lg shadow-md p-12 text-center">
+            <div className="rounded-xl border border-gray-200 bg-white shadow-sm p-12 text-center">
               <FiHeart className="w-20 h-20 text-gray-300 mx-auto mb-6" />
-              <h2 className="text-2xl font-[500] font-general-sans text-gray-800 mb-4">
+              <h2 className="text-2xl font-semibold text-gray-800 mb-4">
                 Your Wishlist is Empty
               </h2>
               <p className="text-gray-600 mb-8 max-w-md mx-auto">
@@ -81,7 +81,7 @@ export default function WishlistPage() {
               </p>
               <Link
                 href="/products"
-                className="inline-flex items-center gap-2 bg-primary-red text-white px-8 py-3 rounded-lg font-[450] font-general-sans text-lg hover:bg-primary-darkRed transition-colors"
+                className="inline-flex items.center gap-2 bg-red-700 text-white px-8 py-3 rounded-md font-medium text-lg hover:bg-red-800 transition-colors"
               >
                 <FiShoppingBag className="w-5 h-5" />
                 Start Shopping
@@ -90,13 +90,13 @@ export default function WishlistPage() {
           ) : (
             <>
               {/* Wishlist Items */}
-              <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-3 gap-3 md:gap-4 lg:gap-5">
+              <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-3 gap-4 md:gap-6">
                 {wishlistItems.map((product) => (
                   <div key={product.id} className="relative group">
                     <ProductCard product={product} />
                     <button
                       onClick={() => removeFromWishlist(product.id)}
-                      className="absolute top-3 right-3 z-10 w-10 h-10 bg-white hover:bg-red-50 text-red-500 rounded-full flex items-center justify-center shadow-lg transition-all duration-300 opacity-0 group-hover:opacity-100"
+                      className="absolute top-3 right-3 z-10 w-10 h-10 bg-white hover:bg-red-50 text-red-600 rounded-full flex items-center justify-center shadow-md transition-all duration-300 opacity-0 group-hover:opacity-100"
                       aria-label="Remove from wishlist"
                     >
                       <FiTrash2 className="w-5 h-5" />
@@ -109,7 +109,7 @@ export default function WishlistPage() {
               <div className="mt-12 text-center">
                 <Link
                   href="/products"
-                  className="inline-flex items-center gap-2 bg-white border-2 border-primary-red text-primary-red px-8 py-3 rounded-lg font-bold font-general-sansal-sansal-sans text-lg hover:bg-primary-red hover:text-white transition-colors"
+                  className="inline-flex items-center gap-2 bg-white border-2 border-red-700 text-red-700 px-8 py-3 rounded-md font-semibold text-lg hover:bg-red-700 hover:text-white transition-colors"
                 >
                   <FiShoppingBag className="w-5 h-5" />
                   Continue Shopping

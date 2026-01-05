@@ -129,29 +129,24 @@ export default function OrdersPage() {
 
   return (
     <ProtectedRoute>
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen bg-white">
         <Header />
         <Navigation />
         <Cart />
 
-        {/* Page Header */}
-        <div className="bg-gradient-to-r from-primary-red to-primary-darkRed py-8 md:py-12 px-4">
-          <div className="max-w-7xl text-center mx-auto">
-            <h1 className="text-3xl md:text-4xl font-[500] font-general-sans text-white">
-              My Orders
-            </h1>
-            <p className="text-lg text-gray-100 mt-2">
-              View your order history and track deliveries
-            </p>
+        <div className="bg-gradient-to-br from-red-700 to-red-800 py-8 md:py-12 px-4">
+          <div className="max-w-7xl mx-auto">
+            <h1 className="text-2xl md:text-3xl font-semibold text-white">My Orders</h1>
+            <p className="text-white/80 text-sm">View your order history and track deliveries</p>
           </div>
         </div>
 
-        <div className="max-w-7xl mx-auto px-4 md:px-8 py-8 md:py-12">
+        <div className="max-w-7xl mx-auto px-4 md:px-8 py-10">
           {orders.length === 0 ? (
             /* Empty State */
-            <div className="bg-white rounded-lg shadow-md p-12 text-center">
+            <div className="rounded-xl border border-gray-200 bg-white shadow-sm p-12 text-center">
               <FiPackage className="w-20 h-20 text-gray-300 mx-auto mb-6" />
-              <h2 className="text-2xl font-bold font-general-sansal-sansal-sans text-gray-800 mb-4">
+              <h2 className="text-2xl font-semibold text-gray-800 mb-4">
                 No Orders Yet
               </h2>
               <p className="text-gray-600 mb-8 max-w-md mx-auto">
@@ -159,7 +154,7 @@ export default function OrdersPage() {
               </p>
               <Link
                 href="/products"
-                className="inline-flex items-center gap-2 bg-primary-red text-white px-8 py-3 rounded-lg font-bold font-general-sansal-sansal-sans text-lg hover:bg-primary-darkRed transition-colors"
+                className="inline-flex items-center gap-2 bg-red-700 text-white px-8 py-3 rounded-md font-semibold text-lg hover:bg-red-800 transition-colors"
               >
                 <FiShoppingBag className="w-5 h-5" />
                 Start Shopping
@@ -169,12 +164,12 @@ export default function OrdersPage() {
             /* Orders List */
             <div className="space-y-6">
               {orders.map((order) => (
-                <div key={order._id} className="bg-white rounded-lg shadow-md overflow-hidden">
+                <div key={order._id} className="rounded-xl border border-gray-200 bg-white shadow-sm overflow-hidden">
                   {/* Order Header */}
                   <div className="bg-gray-50 px-6 py-4 border-b border-gray-200">
                     <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                       <div>
-                        <h3 className="text-lg font-bold font-general-sansal-sansal-sans text-primary-brown">
+                        <h3 className="text-lg font-semibold text-primary-brown">
                           Order #{order.orderNumber}
                         </h3>
                         <div className="flex items-center gap-4 mt-2 text-sm text-gray-600">
@@ -194,7 +189,7 @@ export default function OrdersPage() {
                         </span>
                         <button
                           onClick={() => router.push(`/orders/track?orderNumber=${order.orderNumber}`)}
-                          className="flex items-center gap-2 px-4 py-2 bg-primary-red text-white rounded-lg hover:bg-primary-darkRed transition-colors text-sm font-medium"
+                          className="flex items-center gap-2 px-4 py-2 bg-red-700 text-white rounded-md hover:bg-red-800 transition-colors text-sm font-medium"
                         >
                           <FiEye className="w-4 h-4" />
                           Track Order
@@ -221,7 +216,7 @@ export default function OrdersPage() {
                             <p className="text-sm text-gray-600">Quantity: {item.quantity}</p>
                           </div>
                           <div className="text-right">
-                            <p className="font-bold text-primary-red">₹{(item.price * item.quantity).toLocaleString()}</p>
+                            <p className="font-semibold text-red-700">₹{(item.price * item.quantity).toLocaleString()}</p>
                             <p className="text-sm text-gray-500">₹{item.price.toLocaleString()} each</p>
                           </div>
                         </div>
