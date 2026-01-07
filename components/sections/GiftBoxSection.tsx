@@ -51,8 +51,8 @@ const GiftBoxSection: React.FC<GiftBoxSectionProps> = ({ giftBoxes }) => {
                 {/* Button shown on hover */}
                 <div className="absolute inset-x-4 bottom-4 flex justify-center opacity-0 translate-y-2 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300">
                   <Link
-                    href={`/products?category=${encodeURIComponent(item.category)}`}
-                    className="inline-flex items-center px-4 py-2 rounded-full bg-white text-black text-xs md:text-sm font-medium shadow-md hover:bg-gray-100"
+                    href={`/giftbox/${encodeURIComponent(item.category)}`}
+                    className="inline-flex items-center px-4 py-2 rounded-full bg-white text-black text-xs md:text-sm font-medium shadow-sm hover:shadow-md border border-gray-200 hover:bg-gray-50"
                   >
                     View Collection
                   </Link>
