@@ -18,12 +18,12 @@ const FeaturedProductCard: React.FC<{ product: Product }> = ({ product }) => {
   return (
     <Link href={`/product/${product.id}`} className="group block">
       <div
-        className="relative flex flex-col cursor-pointer mb-0 h-full"
+        className="relative flex flex-col cursor-pointer mb-0 h-full bg-white rounded-xl border border-gray-100 shadow-sm transition-all duration-300 hover:shadow-lg hover:border-gray-200 overflow-hidden"
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
       >
         {/* Rectangular Image Container */}
-        <div className="relative w-full aspect-[3/4] md:aspect-[4/5] overflow-hidden rounded-lg bg-gray-100">
+        <div className="relative w-full aspect-[3/4] md:aspect-[4/5] overflow-hidden rounded-xl bg-gray-100">
           <Image
             src={
               product.image && product.image.trim() !== ''
@@ -203,12 +203,12 @@ const FeaturedCollection: React.FC<FeaturedCollectionProps> = ({ products }) => 
     <section className="pt-12 pb-12 md:pt-16 md:pb-16 bg-white w-full">
       <div className="section-container max-w-7xl mx-auto px-4 md:px-8">
         {/* Header: Title on left, View All button and arrows on right */}
-        <div className="flex flex-col sm:flex-row items-end sm:items-center justify-between gap-4 mb-8 md:mb-12 border-b border-gray-100 pb-4">
-          <div>
-            <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-primary-brown font-general-sans mb-2 tracking-tight">
+        <div className="flex flex-col sm:flex-row justify-between gap-4 mb-8 md:mb-12 border-b border-gray-100 pb-4">
+          <div className="w-full">
+            <h2 className="text-center md:text-left text-3xl md:text-4xl lg:text-5xl  font-bold text-primary-brown font-general-sans mb-2 tracking-tight">
               New Arrivals
             </h2>
-            <p className="text-xs md:text-sm text-gray-500 font-general-sans uppercase tracking-widest">
+            <p className="text-center md:text-left text-xs md:text-sm  text-gray-500 font-general-sans uppercase tracking-widest">
               Fresh from our kitchen to your home
             </p>
           </div>
