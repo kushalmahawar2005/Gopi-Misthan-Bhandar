@@ -10,6 +10,28 @@ const HeroSection = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [loading, setLoading] = useState(true);
   const [enquiryOpen, setEnquiryOpen] = useState(false);
+  const touchStart = React.useRef<number | null>(null);
+  const touchEnd = React.useRef<number | null>(null);
+
+  // Touch Handlers for Swipe
+  const onTouchStart = (e: React.TouchEvent) => {
+    touchEnd.current = null;
+    touchStart.current = e.targetTouches[0].clientX;
+  };
+
+  const onTouchMove = (e: React.TouchEvent) => {
+    touchEnd.current = e.targetTouches[0].clientX;
+  };
+
+  const onTouchEnd = () => {
+    if (!touchStart.current || !touchEnd.current) return;
+    const distance = touchStart.current - touchEnd.current;
+    const isLeftSwipe = distance > 50;
+    const isRightSwipe = distance < -50;
+    
+    if (isLeftSwipe) nextSlide();
+    if (isRightSwipe) prevSlide();
+  };
 
   useEffect(() => {
     loadSlides();
@@ -82,7 +104,12 @@ const HeroSection = () => {
   return (
     <section className="relative w-full -mt-2 md:mt-6 mb-4 lg:mb-4">
       <div className="relative w-full md:max-w-7xl md:mx-auto md:px-8 lg:px-12">
-        <div className="h-[calc(100vh-340px)] md:h-[380px] lg:h-[420px] relative overflow-hidden rounded-none md:rounded-2xl">
+        <div 
+          className="h-[calc(100vh-340px)] md:h-[380px] lg:h-[420px] relative overflow-hidden rounded-none md:rounded-2xl"
+          onTouchStart={onTouchStart}
+          onTouchMove={onTouchMove}
+          onTouchEnd={onTouchEnd}
+        >
           <div className="relative w-full h-full">
             {slides.map((slide, index) => (
               <div

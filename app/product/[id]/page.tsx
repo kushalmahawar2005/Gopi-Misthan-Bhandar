@@ -24,6 +24,10 @@ import {
   FiCheckCircle,
   FiChevronDown,
   FiStar,
+  FiShare2,
+  FiChevronLeft,
+  FiChevronRight,
+  FiMaximize2,
 } from 'react-icons/fi';
 import { Product } from '@/types';
 
@@ -49,6 +53,12 @@ export default function ProductDetailPage() {
   
   // Size selection state
   const [selectedSize, setSelectedSize] = useState<{ weight: string; price: number; label?: string } | null>(null);
+
+  // Zoom and Slider State
+  const [isZoomed, setIsZoomed] = useState(false);
+  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+  const touchStart = useRef<number | null>(null);
+  const touchEnd = useRef<number | null>(null);
   
   // Get all product images (main image + additional images)
   const getAllImages = () => {
@@ -63,6 +73,65 @@ export default function ProductDetailPage() {
   const productImages = getAllImages();
   const currentImage = productImages[selectedImageIndex] || product?.image;
   
+  // Zoom Handlers
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    const { left, top, width, height } = e.currentTarget.getBoundingClientRect();
+    const x = ((e.clientX - left) / width) * 100;
+    const y = ((e.clientY - top) / height) * 100;
+    setMousePosition({ x, y });
+  };
+
+  // Slider Handlers
+  const handleNextImage = (e?: React.MouseEvent) => {
+    e?.stopPropagation();
+    setSelectedImageIndex((prev) => (prev + 1) % productImages.length);
+  };
+
+  const handlePrevImage = (e?: React.MouseEvent) => {
+    e?.stopPropagation();
+    setSelectedImageIndex((prev) => (prev - 1 + productImages.length) % productImages.length);
+  };
+
+  // Touch Handlers for Swipe
+  const onTouchStart = (e: React.TouchEvent) => {
+    touchEnd.current = null;
+    touchStart.current = e.targetTouches[0].clientX;
+  };
+
+  const onTouchMove = (e: React.TouchEvent) => {
+    touchEnd.current = e.targetTouches[0].clientX;
+  };
+
+  const onTouchEnd = () => {
+    if (!touchStart.current || !touchEnd.current) return;
+    const distance = touchStart.current - touchEnd.current;
+    const isLeftSwipe = distance > 50;
+    const isRightSwipe = distance < -50;
+    
+    if (isLeftSwipe) handleNextImage();
+    if (isRightSwipe) handlePrevImage();
+  };
+
+  // Share Handler
+  const handleShare = async () => {
+    const shareData = {
+      title: product?.name || 'Gopi Misthan Bhandar',
+      text: `Check out ${product?.name} on Gopi Misthan Bhandar!`,
+      url: window.location.href,
+    };
+
+    if (navigator.share) {
+      try {
+        await navigator.share(shareData);
+      } catch (err) {
+        console.log('Error sharing:', err);
+      }
+    } else {
+      navigator.clipboard.writeText(window.location.href);
+      alert('Link copied to clipboard!'); 
+    }
+  };
+
   useEffect(() => {
     loadProduct();
   }, [productId]);
@@ -73,31 +142,42 @@ export default function ProductDetailPage() {
     }
   }, [showReviews]);
 
-useEffect(() => {
-  if (!product) return;
-  if (typeof window === 'undefined') return;
+  useEffect(() => {
+    if (!product) return;
+    
+    // Prefetch related product images to make navigation faster
+    if (relatedProducts.length > 0) {
+      relatedProducts.forEach(p => {
+        if (p.image) {
+          const img = new window.Image();
+          img.src = p.image;
+        }
+      });
+    }
 
-  try {
-    const storageKey = 'recentlyViewedProducts';
-    const storedRaw = window.localStorage.getItem(storageKey);
-    let stored: LightweightProduct[] = storedRaw ? JSON.parse(storedRaw) : [];
+    if (typeof window === 'undefined') return;
 
-    stored = stored.filter((item) => item.id !== product.id);
+    try {
+      const storageKey = 'recentlyViewedProducts';
+      const storedRaw = window.localStorage.getItem(storageKey);
+      let stored: LightweightProduct[] = storedRaw ? JSON.parse(storedRaw) : [];
 
-    const newEntry: LightweightProduct = {
-      id: product.id,
-      name: product.name,
-      price: product.price,
-      image: product.image,
-      category: product.category,
-      images: product.images || [],
-    };
+      stored = stored.filter((item) => item.id !== product.id);
 
-    const updated = [newEntry, ...stored].slice(0, 8);
-    window.localStorage.setItem(storageKey, JSON.stringify(updated));
+      const newEntry: LightweightProduct = {
+        id: product.id,
+        name: product.name,
+        price: product.price,
+        image: product.image,
+        category: product.category,
+        images: product.images || [],
+      };
 
-    setRecentlyViewed(updated.filter((item) => item.id !== product.id));
-  } catch (error) {
+      const updated = [newEntry, ...stored].slice(0, 8);
+      window.localStorage.setItem(storageKey, JSON.stringify(updated));
+
+      setRecentlyViewed(updated.filter((item) => item.id !== product.id));
+    } catch (error) {
     console.error('Error updating recently viewed products:', error);
   }
 }, [product]);
@@ -344,16 +424,53 @@ const shortDescription =
       <div className="w-full px-4 py-6 sm:py-8 md:py-12">
         <div className="mx-auto flex w-full max-w-6xl flex-col gap-6 sm:gap-8 lg:grid lg:grid-cols-[1.1fr,1fr] lg:gap-10">
           {/* Product Images Gallery */}
-          <div className="space-y-6">
-            <div className="relative aspect-[4/3] w-full overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm sm:aspect-[5/4] lg:aspect-[4/3]">
+          <div className="space-y-6 select-none">
+            <div 
+              className="relative aspect-[4/3] w-full overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm sm:aspect-[5/4] lg:aspect-[4/3] group cursor-zoom-in"
+              onMouseEnter={() => setIsZoomed(true)}
+              onMouseLeave={() => setIsZoomed(false)}
+              onMouseMove={handleMouseMove}
+              onTouchStart={onTouchStart}
+              onTouchMove={onTouchMove}
+              onTouchEnd={onTouchEnd}
+            >
               <Image
                 src={currentImage || product.image}
                 alt={product.name}
                 fill
-                className="object-cover transition-transform duration-500"
+                className="object-cover transition-transform duration-200"
+                style={{
+                  transformOrigin: `${mousePosition.x}% ${mousePosition.y}%`,
+                  transform: isZoomed ? 'scale(2)' : 'scale(1)',
+                }}
                 priority
                 sizes="(max-width: 1024px) 100vw, 55vw"
               />
+              
+              {/* Navigation Arrows (Visible on Hover/Mobile) */}
+              {productImages.length > 1 && (
+                <>
+                  <button 
+                    onClick={handlePrevImage}
+                    className="absolute left-4 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white text-gray-800 p-2 rounded-full shadow-md opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10"
+                    aria-label="Previous image"
+                  >
+                    <FiChevronLeft className="w-6 h-6" />
+                  </button>
+                  <button 
+                    onClick={handleNextImage}
+                    className="absolute right-4 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white text-gray-800 p-2 rounded-full shadow-md opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10"
+                    aria-label="Next image"
+                  >
+                    <FiChevronRight className="w-6 h-6" />
+                  </button>
+                  
+                  {/* Image Counter Badge */}
+                  <div className="absolute bottom-4 right-4 bg-black/60 text-white text-xs px-3 py-1 rounded-full backdrop-blur-sm">
+                    {selectedImageIndex + 1} / {productImages.length}
+                  </div>
+                </>
+              )}
             </div>
 
             {productImages.length > 1 && (

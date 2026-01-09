@@ -29,9 +29,9 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, showAddToCart = true
   };
 
   return (
-    <Link href={`/product/${product.id}`} className="group block">
+    <Link href={`/product/${product.id}`} prefetch={true} className="group block h-full">
       <div 
-        className="flex flex-col w-full items-center cursor-pointer mb-0 h-full rounded-xl overflow-hidden"
+        className="flex flex-col w-full items-center cursor-pointer mb-0 h-full rounded-xl overflow-hidden active:scale-95 transform transition-transform duration-100"
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
       >
