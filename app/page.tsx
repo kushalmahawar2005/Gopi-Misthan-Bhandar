@@ -21,6 +21,7 @@ const CategoriesSection = dynamic(() => import('@/components/sections/Categories
 const ProductSection = dynamic(() => import('@/components/sections/ProductSection'));
 const InstaBookSection = dynamic(() => import('@/components/sections/InstaBookSection'));
 const InstaPostSection = dynamic(() => import('@/components/sections/InstaPostSection'));
+const MapSection = dynamic(() => import('@/components/sections/MapSection'));
 const GallerySection = dynamic(() => import('@/components/sections/GallerySection'));
 const GiftBoxSection = dynamic(() => import('@/components/sections/GiftBoxSection'));
 const BlogSection = dynamic(() => import('@/components/sections/BlogSection'));
@@ -163,6 +164,10 @@ export default function Home() {
           <InstaPostSection instaPosts={instaPosts} />
         </ScrollAnimation>
       )}
+
+      <ScrollAnimation delay={150}>
+        <MapSection />
+      </ScrollAnimation>
       
       {blogs.length > 0 && (
         <ScrollAnimation delay={200}>

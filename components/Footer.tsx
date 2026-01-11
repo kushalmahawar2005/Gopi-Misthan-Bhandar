@@ -42,10 +42,10 @@ const Footer = () => {
             <h3 className="text-primary-yellow text-xl font-bold font-jost tracking-wide mb-4">
               GOPI MISTHAN BHANDAR
             </h3>
-            <p className="text-sm  leading-relaxed text-gray-200 mb-4">
+            <p className="text-sm  leading-relaxed text-white mb-4">
               Serving Tradition & Sweetness Since 1968
             </p>
-            <p className="text-sm  text-gray-300 mb-4 flex items-center gap-2">
+            <p className="text-sm  text-white mb-4 flex items-center gap-2">
               <FiMapPin className="w-4 h-4" />
               Neemuch, Madhya Pradesh
             </p>
@@ -77,7 +77,7 @@ const Footer = () => {
                 <li key={link.label}>
                   <Link
                     href={link.href}
-                    className="text-gray-200 hover:text-primary-yellow transition-colors flex items-center gap-2"
+                    className="text-white hover:text-primary-yellow transition-colors flex items-center gap-2"
                   >
                     {link.label}
                   </Link>
@@ -91,7 +91,7 @@ const Footer = () => {
             <h4 className="text-primary-yellow text-lg font-bold font-general-sansal-sans mb-4">
               Contact Us
             </h4>
-            <ul className="space-y-3 text-sm text-gray-200">
+            <ul className="space-y-3 text-sm text-white">
               <li className="flex items-center gap-2">
                 <FiPhone className="w-4 h-4 text-primary-yellow" />
                 <a href="tel:+919876543210" className="hover:text-primary-yellow transition-colors">
@@ -116,7 +116,7 @@ const Footer = () => {
             <h4 className="text-primary-yellow text-lg font-bold  mb-4">
               Newsletter
             </h4>
-            <p className="text-sm font-jost tracking-wide text-gray-200 mb-4">
+            <p className="text-sm font-jost tracking-wide text-white mb-4">
               Subscribe to get updates on new products and special offers
             </p>
             <form onSubmit={handleSubscribe} className="space-y-3">
@@ -140,7 +140,7 @@ const Footer = () => {
 
         {/* Bottom Bar */}
         <div className="border-t border-white/20 pt-6 mt-8">
-          <div className="flex flex-col md:flex-row justify-between items-center text-sm text-gray-300 ">
+          <div className="flex flex-col md:flex-row justify-between items-center text-sm text-white">
             <p>© {new Date().getFullYear()} Gopi Misthan Bhandar. All rights reserved.</p>
             <div className="flex gap-4 mt-4 md:mt-0">
               <Link href="/privacy" className="hover:text-primary-yellow transition-colors">
