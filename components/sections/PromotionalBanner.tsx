@@ -151,7 +151,7 @@ const PromotionalBanner = () => {
           sparkCount={8}
           duration={400}
         >
-          <div className="py-6 md:py-8 lg:py-10 min-h-[90px] md:min-h-[110px] flex items-center relative px-4 md:px-6 lg:px-8">
+          <div className="py-6 md:py-8 lg:py-10 min-h-[85px] md:min-h-[110px] flex items-center relative px-4 md:px-6 lg:px-8">
           {/* Title - Mobile: Always show, Desktop: Animation */}
           {showTitle && (
             <div

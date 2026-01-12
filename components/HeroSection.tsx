@@ -158,14 +158,14 @@ const HeroSection = () => {
           <>
             <button
               onClick={prevSlide}
-              className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-1/2 bg-transparent text-black p-2 rounded-full border border-transparent shadow-none hover:bg-white/90 hover:border-gray-300 hover:shadow-md transition-all z-30"
+              className="hidden md:inline-flex absolute left-0 top-1/2 -translate-y-1/2 -translate-x-1/2 bg-transparent text-black p-2 rounded-full border border-transparent shadow-none hover:bg-white/90 hover:border-gray-300 hover:shadow-md transition-all z-30"
               aria-label="Previous slide"
             >
               <FiChevronLeft className="w-5 h-5 md:w-6 md:h-6" />
             </button>
             <button
               onClick={nextSlide}
-              className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-1/2 bg-transparent text.black p-2 rounded-full border border-transparent shadow-none hover:bg-white/90 hover:border-gray-300 hover:shadow-md transition-all z-30"
+              className="hidden md:inline-flex absolute right-0 top-1/2 -translate-y-1/2 translate-x-1/2 bg-transparent text-black p-2 rounded-full border border-transparent shadow-none hover:bg.white/90 hover:border-gray-300 hover:shadow-md transition-all z-30"
               aria-label="Next slide"
             >
               <FiChevronRight className="w-5 h-5 md:w-6 md:h-6" />
