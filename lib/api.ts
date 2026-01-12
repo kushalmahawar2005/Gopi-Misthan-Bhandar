@@ -231,6 +231,8 @@ export interface GiftBoxItem {
   title: string;
   description: string;
   imageUrl: string;
+  size?: 'small' | 'large';
+  price?: number;
   order: number;
   isActive: boolean;
 }

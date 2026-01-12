@@ -21,6 +21,8 @@ export interface IProduct extends Document {
   shelfLife?: string;
   deliveryTime?: string;
   stock?: number;
+  giftBoxSubCategory?: 'assorted' | 'dry-fruit' | 'souvenir'; // For Gift Box products
+  giftBoxSize?: 'small' | 'large'; // For Gift Box products
   createdAt: Date;
   updatedAt: Date;
 }
@@ -51,6 +53,14 @@ const ProductSchema = new Schema<IProduct>(
     shelfLife: { type: String },
     deliveryTime: { type: String },
     stock: { type: Number, default: 0 },
+    giftBoxSubCategory: {
+      type: String,
+      enum: ['assorted', 'dry-fruit', 'souvenir'],
+    },
+    giftBoxSize: {
+      type: String,
+      enum: ['small', 'large'],
+    },
   },
   {
     timestamps: true,

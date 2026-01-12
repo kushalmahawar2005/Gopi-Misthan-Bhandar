@@ -244,7 +244,7 @@ export default function BulkProductsPage() {
     <div className="space-y-4 sm:space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-2xl sm:text-3xl font-bold text-primary-brown font-general-sansal-sansal-sansal-sans">Bulk Product Operations</h1>
+        <h1 className="text-2xl sm:text-3xl font-bold text-primary-brown font-serif">Bulk Product Operations</h1>
         <p className="text-sm sm:text-base text-gray-600 mt-1">Import or export products in bulk</p>
       </div>
 
@@ -263,7 +263,7 @@ export default function BulkProductsPage() {
 
       {/* Export Section */}
       <div className="bg-white rounded-lg border border-gray-200 p-4 sm:p-6">
-        <h2 className="text-lg sm:text-xl font-bold font-general-sansal-sansal-sansal-sans mb-3 sm:mb-4 flex items-center gap-2">
+        <h2 className="text-lg sm:text-xl font-bold font-serif mb-3 sm:mb-4 flex items-center gap-2">
           <FiDownload className="text-primary-red" size={20} />
           Export Products
         </h2>
@@ -282,7 +282,7 @@ export default function BulkProductsPage() {
 
       {/* Import Section */}
       <div className="bg-white rounded-lg border border-gray-200 p-4 sm:p-6">
-        <h2 className="text-lg sm:text-xl font-bold font-general-sansal-sansal-sansal-sans mb-3 sm:mb-4 flex items-center gap-2">
+        <h2 className="text-lg sm:text-xl font-bold font-serif mb-3 sm:mb-4 flex items-center gap-2">
           <FiUpload className="text-primary-red" size={20} />
           Import Products
         </h2>
@@ -384,7 +384,7 @@ export default function BulkProductsPage() {
 
       {/* Sample CSV */}
       <div className="bg-white rounded-lg border border-gray-200 p-4 sm:p-6">
-        <h3 className="text-base sm:text-lg font-bold font-general-sansal-sansal-sansal-sans mb-3 sm:mb-4">Sample CSV Format</h3>
+        <h3 className="text-base sm:text-lg font-bold font-serif mb-3 sm:mb-4">Sample CSV Format</h3>
         <div className="bg-gray-50 p-3 sm:p-4 rounded-lg overflow-x-auto">
           <pre className="text-xs sm:text-sm whitespace-pre-wrap break-words">
 {`name,description,price,category,image,stock,defaultWeight,shelfLife,deliveryTime

@@ -13,6 +13,8 @@ export default function NewGiftBox() {
     title: '',
     description: '',
     imageUrl: '',
+    size: 'small' as 'small' | 'large',
+    price: 0,
     order: 0,
     isActive: true,
   });
@@ -35,6 +37,11 @@ export default function NewGiftBox() {
       return;
     }
     
+    if (!formData.price || formData.price <= 0) {
+      alert('Please enter a valid price');
+      return;
+    }
+    
     setLoading(true);
 
     try {
@@ -46,6 +53,8 @@ export default function NewGiftBox() {
           title: formData.title.trim(),
           description: formData.description.trim(),
           imageUrl: formData.imageUrl.trim(),
+          size: formData.size,
+          price: Number(formData.price) || 0,
           order: Number(formData.order) || 0,
           isActive: Boolean(formData.isActive),
         }),
@@ -105,6 +114,33 @@ export default function NewGiftBox() {
                 <option value="dry-fruit">Dry Fruit Gift Boxes</option>
                 <option value="souvenir">Souvenir Gift Boxes</option>
               </select>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Size *</label>
+              <select
+                value={formData.size}
+                onChange={(e) => setFormData({ ...formData, size: e.target.value as 'small' | 'large' })}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-red"
+                required
+              >
+                <option value="small">Small Size</option>
+                <option value="large">Large Size</option>
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Price (₹) *</label>
+              <input
+                type="number"
+                min="0"
+                step="0.01"
+                required
+                value={formData.price}
+                onChange={(e) => setFormData({ ...formData, price: Number(e.target.value) })}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-red"
+                placeholder="0.00"
+              />
             </div>
 
             <div>

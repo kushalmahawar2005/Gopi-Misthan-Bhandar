@@ -6,7 +6,7 @@ export async function GET() {
   try {
     await connectDB();
     const giftBoxes = await GiftBox.find({ isActive: true })
-      .select('category title description imageUrl order isActive')
+      .select('category title description imageUrl size price order isActive')
       .sort({ order: 1, createdAt: -1 })
       .lean();
     

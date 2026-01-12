@@ -221,7 +221,7 @@ export default function BulkImportPage() {
     <div className="space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-3xl font-bold text-primary-brown font-general-sansal-sansal-sans">Bulk Product Import</h1>
+        <h1 className="text-3xl font-bold text-primary-brown font-serif">Bulk Product Import</h1>
         <p className="text-gray-600 mt-1">Import products from CSV with image upload support</p>
       </div>
 
@@ -235,7 +235,7 @@ export default function BulkImportPage() {
 
       {/* Import Section */}
       <div className="bg-white rounded-lg border border-gray-200 p-6">
-        <h2 className="text-xl font-bold font-general-sansal-sansal-sans mb-4 flex items-center gap-2">
+        <h2 className="text-xl font-bold font-serif mb-4 flex items-center gap-2">
           <FiUpload className="text-primary-red" />
           Import Products
         </h2>
@@ -300,7 +300,7 @@ export default function BulkImportPage() {
       {/* Image Upload Section */}
       {file && (
         <div className="bg-white rounded-lg border border-gray-200 p-6">
-          <h3 className="text-lg font-bold font-general-sansal-sansal-sans mb-4">Upload Product Images</h3>
+          <h3 className="text-lg font-bold font-serif mb-4">Upload Product Images</h3>
           <p className="text-gray-600 mb-4 text-sm">
             If your CSV has product names but images need to be uploaded, you can upload them here.
             Images will be matched by product name and uploaded to Cloudinary.
