@@ -20,6 +20,8 @@ export interface Product {
   shelfLife?: string;
   deliveryTime?: string;
   stock?: number; // Stock quantity
+  giftBoxSubCategory?: 'assorted' | 'dry-fruit' | 'souvenir'; // For Gift Box products
+  giftBoxSize?: 'small' | 'large'; // For Gift Box products
 }
 
 export interface SubCategory {
@@ -37,6 +39,7 @@ export interface Category {
   description?: string;
   subCategories?: SubCategory[];
   order?: number;
+  productsCount?: number; // Product count for this category (including subcategories)
 }
 
 export interface InstagramPost {

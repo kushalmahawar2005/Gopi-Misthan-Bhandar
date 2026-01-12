@@ -21,6 +21,7 @@ const CategoriesSection = dynamic(() => import('@/components/sections/Categories
 const ProductSection = dynamic(() => import('@/components/sections/ProductSection'));
 const InstaBookSection = dynamic(() => import('@/components/sections/InstaBookSection'));
 const InstaPostSection = dynamic(() => import('@/components/sections/InstaPostSection'));
+const MapSection = dynamic(() => import('@/components/sections/MapSection'));
 const GallerySection = dynamic(() => import('@/components/sections/GallerySection'));
 const GiftBoxSection = dynamic(() => import('@/components/sections/GiftBoxSection'));
 const BlogSection = dynamic(() => import('@/components/sections/BlogSection'));
@@ -45,11 +46,12 @@ export default function Home() {
   const loadData = async () => {
     try {
       // Optimized: Fetch only what we need, avoid duplicate calls
-      const [featured, categoriesData, classicFlagged, premiumFlagged, instaBooksData, instaPostsData, galleryData, giftBoxesData, blogsData] = await Promise.all([
+      const [featured, categoriesData, classicFlagged, premiumFlagged, allProducts, instaBooksData, instaPostsData, galleryData, giftBoxesData, blogsData] = await Promise.all([
         fetchProducts({ featured: true, limit: 8 }),
         fetchCategories(),
         fetchProducts({ isClassic: true, limit: 8 }),
         fetchProducts({ isPremium: true, limit: 8 }),
+        fetchProducts(), // Fetch all products to count by category
         fetchInstaBooks(),
         fetchInstaPosts(),
         fetchGallery(),
@@ -58,18 +60,48 @@ export default function Home() {
       ]);
 
       setFeaturedProducts(featured);
-      setCategories(categoriesData);
       
-      // Restrict Classic/Premium sections to Sweets and well-known subcategories
-      const sweetsCategory = categoriesData.find((c) => c.slug === 'sweets');
+      // Calculate product counts for each category (including subcategories)
+      const categoriesWithCounts = categoriesData.map((category) => {
+        // Get all subcategory slugs for this category
+        const subCategorySlugs = category.subCategories?.map((sub) => sub.slug) || [];
+        // Include the category itself and all its subcategories
+        const relevantSlugs = [category.slug, ...subCategorySlugs];
+        
+        // Count products that match any of these slugs
+        const count = allProducts.filter((product) => 
+          relevantSlugs.includes(product.category)
+        ).length;
+        
+        return {
+          ...category,
+          productsCount: count,
+        };
+      });
+      
+      setCategories(categoriesWithCounts);
+      
+      // Filter Classic/Premium products - prefer sweets category but show all if none found
+      const sweetsCategory = categoriesWithCounts.find((c) => c.slug === 'sweets');
       const defaultSweetsSubs = ['classic-sweets', 'premium-sweets'];
       const sweetsSlugs = sweetsCategory
         ? Array.from(new Set([sweetsCategory.slug, ...(sweetsCategory.subCategories?.map((s: any) => s.slug) || []), ...defaultSweetsSubs]))
         : ['sweets', ...defaultSweetsSubs];
       const isSweetCategory = (slug: string | undefined) => !!slug && /sweet/i.test(slug);
       
-      const classicFiltered = classicFlagged.filter((p) => sweetsSlugs.includes(p.category) || isSweetCategory(p.category));
-      const premiumFiltered = premiumFlagged.filter((p) => sweetsSlugs.includes(p.category) || isSweetCategory(p.category));
+      // Filter classic products - prefer sweets but show all if no sweets found
+      let classicFiltered = classicFlagged.filter((p) => sweetsSlugs.includes(p.category) || isSweetCategory(p.category));
+      if (classicFiltered.length === 0) {
+        // If no sweets found, show all classic products
+        classicFiltered = classicFlagged;
+      }
+      
+      // Filter premium products - prefer sweets but show all if no sweets found
+      let premiumFiltered = premiumFlagged.filter((p) => sweetsSlugs.includes(p.category) || isSweetCategory(p.category));
+      if (premiumFiltered.length === 0) {
+        // If no sweets found, show all premium products
+        premiumFiltered = premiumFlagged;
+      }
       
       setClassicProducts(classicFiltered.slice(0, 8));
       setPremiumProducts(premiumFiltered.slice(0, 8));
@@ -163,6 +195,10 @@ export default function Home() {
           <InstaPostSection instaPosts={instaPosts} />
         </ScrollAnimation>
       )}
+
+      <ScrollAnimation delay={150}>
+        <MapSection />
+      </ScrollAnimation>
       
       {blogs.length > 0 && (
         <ScrollAnimation delay={200}>

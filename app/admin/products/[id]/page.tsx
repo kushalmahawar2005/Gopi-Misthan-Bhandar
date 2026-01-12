@@ -26,6 +26,8 @@ export default function EditProduct() {
     deliveryTime: '',
     defaultWeight: '',
     sizes: [] as { weight: string; price: string; label: string }[],
+    giftBoxSubCategory: '' as '' | 'assorted' | 'dry-fruit' | 'souvenir',
+    giftBoxSize: '' as '' | 'small' | 'large',
   });
 
   useEffect(() => {
@@ -57,6 +59,8 @@ export default function EditProduct() {
             price: s.price.toString(),
             label: s.label || '',
           })) || [],
+          giftBoxSubCategory: product.giftBoxSubCategory || '',
+          giftBoxSize: product.giftBoxSize || '',
         });
       }
     } catch (error) {
@@ -71,7 +75,7 @@ export default function EditProduct() {
     setSaving(true);
 
     try {
-      const productData = {
+      const productData: any = {
         ...formData,
         price: parseFloat(formData.price),
         stock: parseInt(formData.stock) || 0,
@@ -81,6 +85,16 @@ export default function EditProduct() {
           label: size.label,
         })),
       };
+
+      // Only include gift box fields if category is gifting
+      if (formData.category === 'gifting') {
+        productData.giftBoxSubCategory = formData.giftBoxSubCategory || undefined;
+        productData.giftBoxSize = formData.giftBoxSize || undefined;
+      } else {
+        // Remove gift box fields if category is not gifting
+        delete productData.giftBoxSubCategory;
+        delete productData.giftBoxSize;
+      }
 
       const response = await fetch(`/api/products/${params.id}`, {
         method: 'PUT',
@@ -170,7 +184,16 @@ export default function EditProduct() {
             <select
               required
               value={formData.category}
-              onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+              onChange={(e) => {
+                const newCategory = e.target.value;
+                setFormData({ 
+                  ...formData, 
+                  category: newCategory,
+                  // Reset gift box fields if category changes away from gifting
+                  giftBoxSubCategory: newCategory === 'gifting' ? formData.giftBoxSubCategory : '',
+                  giftBoxSize: newCategory === 'gifting' ? formData.giftBoxSize : '',
+                });
+              }}
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-red"
             >
               <option value="sweets">Sweets</option>
@@ -182,6 +205,39 @@ export default function EditProduct() {
               <option value="gifting">Gifting</option>
             </select>
           </div>
+
+          {formData.category === 'gifting' && (
+            <>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Gift Box Sub-Category *</label>
+                <select
+                  required
+                  value={formData.giftBoxSubCategory}
+                  onChange={(e) => setFormData({ ...formData, giftBoxSubCategory: e.target.value as 'assorted' | 'dry-fruit' | 'souvenir' })}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-red"
+                >
+                  <option value="">Select Sub-Category</option>
+                  <option value="assorted">Assorted Gift Boxes</option>
+                  <option value="dry-fruit">Dry Fruit Gift Boxes</option>
+                  <option value="souvenir">Souvenir Gift Boxes</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Gift Box Size *</label>
+                <select
+                  required
+                  value={formData.giftBoxSize}
+                  onChange={(e) => setFormData({ ...formData, giftBoxSize: e.target.value as 'small' | 'large' })}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-red"
+                >
+                  <option value="">Select Size</option>
+                  <option value="small">Small</option>
+                  <option value="large">Large</option>
+                </select>
+              </div>
+            </>
+          )}
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">Stock</label>

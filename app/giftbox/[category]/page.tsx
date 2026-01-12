@@ -16,6 +16,8 @@ interface GiftBoxItem {
   title: string;
   description: string;
   imageUrl: string;
+  size?: 'small' | 'large';
+  price?: number;
 }
 
 function GiftBoxCategoryContent() {
@@ -36,6 +38,9 @@ function GiftBoxCategoryContent() {
     };
     load();
   }, [categorySlug]);
+
+  const smallSizeBoxes = giftBoxes.filter((g) => g.size === 'small').sort((a, b) => (a.price || 0) - (b.price || 0));
+  const largeSizeBoxes = giftBoxes.filter((g) => g.size === 'large').sort((a, b) => (a.price || 0) - (b.price || 0));
 
   const headingMap: Record<string, string> = {
     'assorted': 'Assorted Gift Box',
@@ -73,28 +78,76 @@ function GiftBoxCategoryContent() {
               </Link>
             </div>
           ) : (
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
-              {giftBoxes.map((item) => (
-                <article key={item._id} className="group bg-white overflow-hidden rounded-xl border border-gray-100 shadow-sm hover:shadow-lg transition-shadow">
-                  <div className="relative w-full h-[220px] md:h-[260px] overflow-hidden">
-                    <Image
-                      src={item.imageUrl}
-                      alt={item.title}
-                      fill
-                      className="object-cover transition-transform duration-500 group-hover:scale-105"
-                      sizes="(max-width: 640px) 50vw, (max-width: 1024px) 25vw, 20vw"
-                    />
+            <div className="space-y-12">
+              {/* Small Size Gifts Section */}
+              {smallSizeBoxes.length > 0 && (
+                <div>
+                  <h2 className="text-2xl md:text-3xl font-bold text-primary-brown mb-6 font-general-sans">
+                    Small Size Gifts
+                  </h2>
+                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
+                    {smallSizeBoxes.map((item) => (
+                      <article key={item._id} className="group bg-white overflow-hidden rounded-xl border border-gray-100 shadow-sm hover:shadow-lg transition-shadow">
+                        <div className="relative w-full h-[220px] md:h-[260px] overflow-hidden">
+                          <Image
+                            src={item.imageUrl}
+                            alt={item.title}
+                            fill
+                            className="object-cover transition-transform duration-500 group-hover:scale-105"
+                            sizes="(max-width: 640px) 50vw, (max-width: 1024px) 25vw, 20vw"
+                          />
+                        </div>
+                        <div className="px-4 md:px-5 py-4">
+                          <h3 className="text-sm md:text-base font-general-sans font-semibold text-primary-brown">
+                            {item.title}
+                          </h3>
+                          <p className="text-[12px] sm:text-sm text-gray-600 mt-2 line-clamp-2">
+                            {item.description}
+                          </p>
+                          <p className="text-lg md:text-xl font-bold text-primary-red mt-3 font-general-sans">
+                            ₹{item.price ? item.price.toLocaleString('en-IN') : '0'}
+                          </p>
+                        </div>
+                      </article>
+                    ))}
                   </div>
-                  <div className="px-4 md:px-5 py-4">
-                    <h3 className="text-sm md:text-base font-general-sans font-semibold text-primary-brown">
-                      {item.title}
-                    </h3>
-                    <p className="text-[12px] sm:text-sm text-gray-600 mt-2">
-                      {item.description}
-                    </p>
+                </div>
+              )}
+
+              {/* Large Size Gifts Section */}
+              {largeSizeBoxes.length > 0 && (
+                <div>
+                  <h2 className="text-2xl md:text-3xl font-bold text-primary-brown mb-6 font-general-sans">
+                    Large Size Gifts
+                  </h2>
+                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
+                    {largeSizeBoxes.map((item) => (
+                      <article key={item._id} className="group bg-white overflow-hidden rounded-xl border border-gray-100 shadow-sm hover:shadow-lg transition-shadow">
+                        <div className="relative w-full h-[220px] md:h-[260px] overflow-hidden">
+                          <Image
+                            src={item.imageUrl}
+                            alt={item.title}
+                            fill
+                            className="object-cover transition-transform duration-500 group-hover:scale-105"
+                            sizes="(max-width: 640px) 50vw, (max-width: 1024px) 25vw, 20vw"
+                          />
+                        </div>
+                        <div className="px-4 md:px-5 py-4">
+                          <h3 className="text-sm md:text-base font-general-sans font-semibold text-primary-brown">
+                            {item.title}
+                          </h3>
+                          <p className="text-[12px] sm:text-sm text-gray-600 mt-2 line-clamp-2">
+                            {item.description}
+                          </p>
+                          <p className="text-lg md:text-xl font-bold text-primary-red mt-3 font-general-sans">
+                            ₹{item.price ? item.price.toLocaleString('en-IN') : '0'}
+                          </p>
+                        </div>
+                      </article>
+                    ))}
                   </div>
-                </article>
-              ))}
+                </div>
+              )}
             </div>
           )}
         </div>

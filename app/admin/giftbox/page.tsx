@@ -11,6 +11,8 @@ interface GiftBoxItem {
   title: string;
   description: string;
   imageUrl: string;
+  size?: 'small' | 'large';
+  price?: number;
   order: number;
   isActive: boolean;
 }
@@ -217,7 +219,19 @@ export default function GiftBoxPage() {
                 </span>
               </div>
               <h3 className="text-lg font-bold text-gray-800 mb-2 line-clamp-1">{item.title}</h3>
-              <p className="text-sm text-gray-600 mb-4 line-clamp-2">{item.description}</p>
+              <p className="text-sm text-gray-600 mb-2 line-clamp-2">{item.description}</p>
+              <div className="flex items-center gap-2 mb-2">
+                {item.size && (
+                  <span className={`text-xs font-semibold px-2 py-1 rounded ${
+                    item.size === 'small' ? 'bg-blue-100 text-blue-800' : 'bg-purple-100 text-purple-800'
+                  }`}>
+                    {item.size === 'small' ? 'Small' : 'Large'}
+                  </span>
+                )}
+                <span className="text-lg font-bold text-primary-red">
+                  ₹{item.price ? item.price.toLocaleString('en-IN') : '0'}
+                </span>
+              </div>
               <p className="text-xs text-gray-500 mb-4">Order: {item.order}</p>
               <div className="flex gap-2 flex-wrap">
                 <button

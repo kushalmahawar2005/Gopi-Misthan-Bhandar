@@ -9,7 +9,7 @@ export async function GET(
   try {
     await connectDB();
     const giftBox = await GiftBox.findById(params.id)
-      .select('category title description imageUrl order isActive')
+      .select('category title description imageUrl size price order isActive')
       .lean();
     if (!giftBox) {
       return NextResponse.json(
@@ -39,6 +39,8 @@ export async function PUT(
     if (body.title !== undefined && body.title !== null) updateData.title = body.title;
     if (body.description !== undefined && body.description !== null) updateData.description = body.description;
     if (body.imageUrl !== undefined && body.imageUrl !== null) updateData.imageUrl = body.imageUrl;
+    if (body.size !== undefined && body.size !== null) updateData.size = body.size;
+    if (body.price !== undefined && body.price !== null) updateData.price = Number(body.price);
     if (body.order !== undefined && body.order !== null) updateData.order = Number(body.order);
     if (body.isActive !== undefined && body.isActive !== null) updateData.isActive = Boolean(body.isActive);
     
@@ -46,7 +48,7 @@ export async function PUT(
       params.id,
       updateData,
       { new: true, runValidators: true }
-    ).select('category title description imageUrl order isActive');
+    ).select('category title description imageUrl size price order isActive');
     
     if (!giftBox) {
       return NextResponse.json(

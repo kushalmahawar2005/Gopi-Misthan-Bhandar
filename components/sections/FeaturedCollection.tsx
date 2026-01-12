@@ -18,12 +18,12 @@ const FeaturedProductCard: React.FC<{ product: Product }> = ({ product }) => {
   return (
     <Link href={`/product/${product.id}`} className="group block">
       <div
-        className="relative flex flex-col cursor-pointer mb-0 h-full bg-white rounded-xl border border-gray-100 shadow-sm transition-all duration-300 hover:shadow-lg hover:border-gray-200 overflow-hidden"
+        className="relative flex flex-col cursor-pointer mb-0 h-full"
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
       >
         {/* Rectangular Image Container */}
-        <div className="relative w-full aspect-[3/4] md:aspect-[4/5] overflow-hidden rounded-xl bg-gray-100">
+        <div className="relative w-full aspect-[3/4] md:aspect-[4/5] overflow-hidden rounded-lg bg-gray-100">
           <Image
             src={
               product.image && product.image.trim() !== ''
@@ -51,32 +51,22 @@ const FeaturedProductCard: React.FC<{ product: Product }> = ({ product }) => {
               src={product.images![0]}
               alt={`${product.name} - View 2`}
               fill
-              className={`object-cover transition-all duration-700 ease-in-out
+              className={`object-cover transition-all duration-500
                 ${isHovered ? 'opacity-100 scale-110' : 'opacity-0 scale-100'}
               `}
               sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
             />
           )}
-          
-          {/* Quick Add / Action Button overlay could go here */}
         </div>
 
         {/* Product Info Below Image */}
-        <div className="p-4 text-center flex-grow flex flex-col justify-between">
-          <div>
-            <h3 className="text-md md:text-md font-[450] text-primary-brown line-clamp-2 font-geom mb-1 transition-colors">
-              {product.name}
-            </h3>
-            <p className="text-xs text-gray-500 font-general-sans uppercase tracking-wide">
-              {product.category ? `${product.category.replace('-', ' ')}` : 'Sweet Delight'}
-            </p>
-          </div>
-          <div className="mt-3">
-             {/* Price could be added here if available in type */}
-             <span className="text-xs font-medium text-primary-red bg-primary-red/5 px-2 py-1 rounded-full">
-               View Details
-             </span>
-          </div>
+        <div className="mt-3 text-center px-2">
+          <h3 className="text-sm md:text-xl font-light text-black line-clamp-2 font-geom  mb-1">
+            {product.name}
+          </h3>
+          <p className="text-xs md:text-sm text-gray-600 font-jost">
+            {product.category ? `${product.category.replace('-', ' ')}` : 'Product'}
+          </p>
         </div>
       </div>
     </Link>
@@ -113,7 +103,7 @@ const FeaturedCollection: React.FC<FeaturedCollectionProps> = ({ products }) => 
         });
       } else {
         // Scroll to next
-        const scrollAmount = scrollContainerRef.current.clientWidth * 0.6;
+        const scrollAmount = scrollContainerRef.current.clientWidth * 0.8;
         scrollContainerRef.current.scrollBy({
           left: scrollAmount,
           behavior: 'smooth',
@@ -163,13 +153,9 @@ const FeaturedCollection: React.FC<FeaturedCollectionProps> = ({ products }) => 
   // Auto-scroll every 2 seconds
   useEffect(() => {
     if (products.length > 4) {
-      const isMobile =
-        typeof window !== 'undefined' &&
-        window.matchMedia('(max-width: 768px)').matches;
-      const intervalMs = isMobile ? 4000 : 4000;
       autoScrollIntervalRef.current = setInterval(() => {
         autoScroll();
-      }, intervalMs);
+      }, 2000);
 
       return () => {
         if (autoScrollIntervalRef.current) {
@@ -200,17 +186,14 @@ const FeaturedCollection: React.FC<FeaturedCollectionProps> = ({ products }) => 
   if (products.length === 0) return null;
 
   return (
-    <section className="pt-12 pb-12 md:pt-16 md:pb-16 bg-white w-full">
-      <div className="section-container max-w-7xl mx-auto px-4 md:px-8">
+    <section className="pt-8 pb-8 md:pt-12 md:pb-12 bg-white w-full">
+      <div className="section-container max-w-6xl lg:max-w-7xl mx-auto px-0 md:px-0">
         {/* Header: Title on left, View All button and arrows on right */}
-        <div className="flex flex-col sm:flex-row justify-between gap-4 mb-8 md:mb-12 border-b border-gray-100 pb-4">
-          <div className="w-full">
-            <h2 className="text-center md:text-left text-3xl md:text-4xl lg:text-5xl  font-bold text-primary-brown font-general-sans mb-2 tracking-tight">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6 md:mb-8 px-4 md:px-6">
+          <div>
+            <h2 className="text-3xl md:text-4xl lg:text-5xl font-[450] text-black font-general-sans mb-2">
               New Arrivals
             </h2>
-            <p className="text-center md:text-left text-xs md:text-sm  text-gray-500 font-general-sans uppercase tracking-widest">
-              Fresh from our kitchen to your home
-            </p>
           </div>
           {/* View All Button and Navigation Arrows - Desktop */}
           <div className="hidden md:flex items-center gap-3">
@@ -220,10 +203,10 @@ const FeaturedCollection: React.FC<FeaturedCollectionProps> = ({ products }) => 
                 <button
                   onClick={() => scroll('left')}
                   disabled={!canScrollLeft}
-                  className={`p-3 rounded-full transition-all ${
+                  className={`p-2 rounded-full transition-all ${
                     canScrollLeft
-                      ? 'bg-white text-primary-brown border border-gray-200 hover:border-primary-red hover:text-primary-red shadow-sm'
-                      : 'bg-gray-50 text-gray-300 border border-gray-100 cursor-not-allowed'
+                      ? 'bg-primary-red text-white hover:bg-primary-darkRed'
+                      : 'bg-gray-200 text-gray-400 cursor-not-allowed'
                   }`}
                   aria-label="Previous products"
                 >
@@ -232,10 +215,10 @@ const FeaturedCollection: React.FC<FeaturedCollectionProps> = ({ products }) => 
                 <button
                   onClick={() => scroll('right')}
                   disabled={!canScrollRight}
-                  className={`p-3 rounded-full transition-all ${
+                  className={`p-2 rounded-full transition-all ${
                     canScrollRight
-                      ? 'bg-white text-primary-brown border border-gray-200 hover:border-primary-red hover:text-primary-red shadow-sm'
-                      : 'bg-gray-50 text-gray-300 border border-gray-100 cursor-not-allowed'
+                      ? 'bg-primary-red text-white hover:bg-primary-darkRed'
+                      : 'bg-gray-200 text-gray-400 cursor-not-allowed'
                   }`}
                   aria-label="Next products"
                 >
@@ -246,7 +229,7 @@ const FeaturedCollection: React.FC<FeaturedCollectionProps> = ({ products }) => 
             {/* View All Button */}
             <Link
               href="/products"
-              className="inline-flex items-center gap-2 bg-primary-red text-white px-6 py-3 font-medium tracking-wide font-general-sans text-sm hover:bg-primary-darkRed transition-all duration-300 rounded-full shadow-md hover:shadow-lg ml-2"
+              className="inline-flex items-center gap-2 bg-primary-red text-white px-6 py-2.5 md:px-8 md:py-3 font-medium tracking-wide font-general-sans text-sm md:text-base hover:bg-primary-darkRed transition-all duration-300 rounded-lg shadow-md"
             >
               View All
             </Link>
@@ -254,10 +237,10 @@ const FeaturedCollection: React.FC<FeaturedCollectionProps> = ({ products }) => 
         </div>
 
         {/* Product Carousel - Scrollable */}
-        <div className="relative">
+        <div className="relative px-4 md:px-6">
           <div
             ref={scrollContainerRef}
-            className="flex gap-3 md:gap-6 overflow-x-auto scrollbar-hide scroll-smooth"
+            className="flex gap-4 md:gap-6 overflow-x-auto scrollbar-hide scroll-smooth"
             style={{
               scrollbarWidth: 'none',
               msOverflowStyle: 'none',

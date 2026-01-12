@@ -53,7 +53,7 @@ export default function RootLayout({
             <CartProvider>
               {children}
               <FloatingContactButtons />
-              <MobileBottomNav />
+              {/* <MobileBottomNav /> */}
             </CartProvider>
           </WishlistProvider>
         </AuthProvider>

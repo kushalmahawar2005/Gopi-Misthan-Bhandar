@@ -285,7 +285,11 @@ const Navigation = () => {
           {/* Right icons */}
           <div className="flex items-center gap-2 md:gap-3 ml-auto">
             <button
-              onClick={() => router.push('/contact')}
+              onClick={() => {
+                // Dispatch custom event to open enquiry modal
+                const event = new CustomEvent('open-wedding-enquiry');
+                window.dispatchEvent(event);
+              }}
               className="hidden md:flex items-center px-4 py-2 bg-black text-white rounded-lg hover:bg-amber-800 transition-colors text-sm font-medium"
             >
               Bulk Enquiry

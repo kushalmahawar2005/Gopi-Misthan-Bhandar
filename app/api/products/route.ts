@@ -25,11 +25,11 @@ export async function GET(request: NextRequest) {
     if (featured === 'true') {
       query.featured = true;
     }
-    
+
     if (isClassic === 'true') {
       query.isClassic = true;
     }
-    
+
     if (isPremium === 'true') {
       query.isPremium = true;
     }
