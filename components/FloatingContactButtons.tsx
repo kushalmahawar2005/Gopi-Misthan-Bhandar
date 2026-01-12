@@ -130,10 +130,10 @@ export default function FloatingContactButtons() {
         <button
           type="button"
           onClick={() => setIsModalOpen(true)}
-          className="group relative flex items-center rounded-full bg-primary-red p-3 text-white shadow-lg transition hover:scale-105 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-red"
+          className="group relative flex items-center justify-center rounded-full bg-primary-red w-[65px] h-[65px] text-white shadow-lg transition hover:scale-105 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-red"
         >
-          <div className="flex h-12 w-12 items-center justify-center rounded-full bg-white/15">
-            <FiGift className="h-6 w-6" />
+          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-white/15">
+            <FiGift className="h-5 w-5" />
           </div>
           <div className="pointer-events-none absolute right-[110%] hidden min-w-[200px] translate-y-1 rounded-xl bg-primary-red px-4 py-3 text-left text-white shadow-lg transition group-hover:flex">
             <span className="text-sm font-semibold uppercase tracking-wide">Bulk Enquiry</span>
@@ -145,11 +145,11 @@ export default function FloatingContactButtons() {
           href={whatsappHref}
           target="_blank"
           rel="noopener noreferrer"
-          className="group relative flex items-center rounded-full bg-[#25D366] p-3 text-white shadow-lg transition hover:scale-105 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#25D366]"
+          className="group relative flex items-center justify-center rounded-full bg-[#25D366] w-[65px] h-[65px] text-white shadow-lg transition hover:scale-105 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#25D366]"
           aria-label="Chat with us on WhatsApp"
         >
-          <div className="flex h-12 w-12 items-center justify-center rounded-full bg-white/15">
-            <FaWhatsapp className="h-6 w-6" />
+          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-white/15">
+            <FaWhatsapp className="h-5 w-5" />
           </div>
           <div className="pointer-events-none absolute right-[110%] hidden min-w-[200px] translate-y-1 rounded-xl bg-[#1fb455] px-4 py-3 text-left text-white shadow-lg transition group-hover:flex">
             <span className="text-sm font-semibold uppercase tracking-wide">WhatsApp</span>

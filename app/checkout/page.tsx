@@ -55,7 +55,7 @@ export default function CheckoutPage() {
     pincode: '',
   });
 
-  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('cod');
+  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('upi');
   const [isPlacingOrder, setIsPlacingOrder] = useState(false);
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [razorpayLoaded, setRazorpayLoaded] = useState(false);
@@ -223,6 +223,12 @@ export default function CheckoutPage() {
 
     setIsPlacingOrder(true);
 
+    if (paymentMethod === 'cod') {
+      alert('Cash on Delivery is currently unavailable. Please choose UPI or Card payment.');
+      setIsPlacingOrder(false);
+      return;
+    }
+
     try {
       // Prepare order items
       const orderItems = cartItems.map((item) => ({
@@ -270,144 +276,126 @@ export default function CheckoutPage() {
         paymentMethod,
       };
 
-      // Handle payment based on method
-      if (paymentMethod === 'cod') {
-        // Cash on Delivery - Create order directly
-        const response = await fetch('/api/orders', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(orderData),
-        });
-
-        const data = await response.json();
-
-        if (!data.success) {
-          alert('Error placing order: ' + data.error);
-          setIsPlacingOrder(false);
-          return;
-        }
-
-        // Store order in localStorage for success page
-        localStorage.setItem('lastOrder', JSON.stringify(data.data));
-
-        // Clear cart
-        clearCart();
-
-        // Redirect to order success page
-        router.push(`/checkout/success?orderId=${data.data.orderNumber}`);
-      } else {
-        // UPI or Card - Use Razorpay
-        if (!razorpayLoaded || !window.Razorpay) {
-          alert('Payment gateway is loading. Please wait...');
-          setIsPlacingOrder(false);
-          return;
-        }
-
-        // First create order in database
-        const orderResponse = await fetch('/api/orders', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            ...orderData,
-            paymentStatus: 'pending',
-          }),
-        });
-
-        const orderResult = await orderResponse.json();
-
-        if (!orderResult.success) {
-          alert('Error creating order: ' + orderResult.error);
-          setIsPlacingOrder(false);
-          return;
-        }
-
-        // Create Razorpay order
-        const paymentResponse = await fetch('/api/payment/create-order', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            amount: calculateTotal(),
-            orderId: orderResult.data.orderNumber,
-            notes: {
-              orderNumber: orderResult.data.orderNumber,
-              customerName: shippingAddress.name,
-              customerEmail: shippingAddress.email,
-            },
-          }),
-        });
-
-        const paymentData = await paymentResponse.json();
-
-        if (!paymentData.success) {
-          alert('Error initiating payment: ' + paymentData.error);
-          setIsPlacingOrder(false);
-          return;
-        }
-
-        // Open Razorpay checkout
-        const options = {
-          key: paymentData.keyId,
-          amount: Math.round(calculateTotal() * 100), // Amount in paise
-          currency: 'INR',
-          name: 'Gopi Misthan Bhandar',
-          description: `Order ${orderResult.data.orderNumber}`,
-          order_id: paymentData.orderId,
-          handler: async function (response: any) {
-            // Verify payment
-            const verifyResponse = await fetch('/api/payment/verify', {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-              },
-              body: JSON.stringify({
-                orderId: orderResult.data.orderNumber,
-                paymentId: response.razorpay_payment_id,
-                signature: response.razorpay_signature,
-                razorpayOrderId: response.razorpay_order_id,
-              }),
-            });
-
-            const verifyData = await verifyResponse.json();
-
-            if (verifyData.success) {
-              // Store order in localStorage for success page
-              localStorage.setItem('lastOrder', JSON.stringify(verifyData.order));
-
-              // Clear cart
-              clearCart();
-
-              // Redirect to order success page
-              router.push(`/checkout/success?orderId=${orderResult.data.orderNumber}`);
-            } else {
-              alert('Payment verification failed: ' + verifyData.error);
-              setIsPlacingOrder(false);
-            }
-          },
-          prefill: {
-            name: shippingAddress.name,
-            email: shippingAddress.email,
-            contact: shippingAddress.phone,
-          },
-          theme: {
-            color: '#ba0606',
-          },
-          modal: {
-            ondismiss: function () {
-              setIsPlacingOrder(false);
-            },
-          },
-        };
-
-        const razorpay = new window.Razorpay(options);
-        razorpay.open();
-        setIsPlacingOrder(false); // Reset as Razorpay modal is open
+      // Online Payments - Use Razorpay
+      if (!razorpayLoaded || !window.Razorpay) {
+        alert('Payment gateway is loading. Please wait...');
+        setIsPlacingOrder(false);
+        return;
       }
+
+      // First create order in database (pending payment)
+      const orderResponse = await fetch('/api/orders', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          ...orderData,
+          paymentStatus: 'pending',
+        }),
+      });
+
+      const orderResult = await orderResponse.json();
+
+      if (!orderResult.success) {
+        alert('Error creating order: ' + orderResult.error);
+        setIsPlacingOrder(false);
+        return;
+      }
+
+      // Create Razorpay order
+      const paymentResponse = await fetch('/api/payment/create-order', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          amount: calculateTotal(),
+          orderId: orderResult.data.orderNumber,
+          notes: {
+            orderNumber: orderResult.data.orderNumber,
+            customerName: shippingAddress.name,
+            customerEmail: shippingAddress.email,
+          },
+        }),
+      });
+
+      const paymentData = await paymentResponse.json();
+
+      if (!paymentData.success) {
+        // If payment gateway is not configured or failed, remove the pending order
+        if (orderResult.data?._id) {
+          try {
+            await fetch(`/api/orders/${orderResult.data._id}`, {
+              method: 'DELETE',
+            });
+          } catch (cleanupError) {
+            console.error('Error cleaning up pending order:', cleanupError);
+          }
+        }
+
+        alert('Error initiating payment: ' + paymentData.error);
+        setIsPlacingOrder(false);
+        return;
+      }
+
+      // Open Razorpay checkout
+      const options = {
+        key: paymentData.keyId,
+        amount: Math.round(calculateTotal() * 100), // Amount in paise
+        currency: 'INR',
+        name: 'Gopi Misthan Bhandar',
+        description: `Order ${orderResult.data.orderNumber}`,
+        order_id: paymentData.orderId,
+        handler: async function (response: any) {
+          // Verify payment
+          const verifyResponse = await fetch('/api/payment/verify', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              orderId: orderResult.data.orderNumber,
+              paymentId: response.razorpay_payment_id,
+              signature: response.razorpay_signature,
+              razorpayOrderId: response.razorpay_order_id,
+            }),
+          });
+
+          const verifyData = await verifyResponse.json();
+
+          if (verifyData.success) {
+            // Store order in localStorage for success page
+            localStorage.setItem('lastOrder', JSON.stringify(verifyData.order));
+
+            // Clear cart
+            clearCart();
+
+            // Redirect to order success page
+            router.push(`/checkout/success?orderId=${orderResult.data.orderNumber}`);
+          } else {
+            alert('Payment verification failed: ' + verifyData.error);
+            setIsPlacingOrder(false);
+          }
+        },
+        prefill: {
+          name: shippingAddress.name,
+          email: shippingAddress.email,
+          contact: shippingAddress.phone,
+        },
+        theme: {
+          color: '#ba0606',
+        },
+        modal: {
+          ondismiss: function () {
+            setIsPlacingOrder(false);
+          },
+        },
+      };
+
+      const razorpay = new window.Razorpay(options);
+      razorpay.open();
+      setIsPlacingOrder(false); // Reset as Razorpay modal is open
     } catch (error) {
       console.error('Error placing order:', error);
       alert('Error placing order. Please try again.');
@@ -451,7 +439,7 @@ export default function CheckoutPage() {
             <FiArrowLeft className="w-5 h-5" />
             <span>Back to Shopping</span>
           </Link>
-          <h1 className="text-3xl md:text-4xl font-bold font-general-sans text-white">
+          <h1 className="text-3xl md:text-4xl font-bold font-general-sans text-white text-center">
             Checkout
           </h1>
         </div>
@@ -830,19 +818,19 @@ export default function CheckoutPage() {
               <div id="payment" className="bg-white rounded-xl border border-gray-200 shadow-sm p-6 md:p-8">
                 <h2 className="text-2xl font-bold font-general-sans mb-6">Payment Method</h2>
                 <div className="space-y-4">
-                  <label className="flex items-center gap-4 p-4 border-2 border-gray-200 rounded-lg cursor-pointer hover:border-primary-red transition-colors">
+                  <label className="flex items-center gap-4 p-4 border-2 border-dashed border-gray-300 rounded-lg cursor-not-allowed bg-gray-50/80">
                     <input
                       type="radio"
                       name="paymentMethod"
                       value="cod"
                       checked={paymentMethod === 'cod'}
-                      onChange={(e) => setPaymentMethod(e.target.value as PaymentMethod)}
+                      disabled
                       className="w-5 h-5 text-primary-red border-gray-300 focus:ring-primary-red"
                     />
                     <FiTruck className="w-6 h-6 text-gray-600" />
                     <div className="flex-1">
                       <p className="font-bold font-general-sansal-sansal-sansal-sansal-sansal-sans">Cash on Delivery (COD)</p>
-                      <p className="text-sm text-gray-600">Pay when you receive</p>
+                      <p className="text-sm text-red-500 font-medium">Currently unavailable. Please pay online.</p>
                     </div>
                   </label>
                   <label className="flex items-center gap-4 p-4 border-2 border-gray-200 rounded-lg cursor-pointer hover:border-primary-red transition-colors">

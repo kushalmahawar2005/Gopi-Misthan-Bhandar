@@ -110,7 +110,7 @@ const Navigation = () => {
     { label: 'BACKERY ITEMS', href: '/category/bakery', slug: 'bakery' },
     { label: 'NAMKEEN', href: '/category/namkeen', slug: 'namkeen' },
     { label: 'SAVOURY SNACKS', href: '/category/savoury', slug: 'savoury' },
-    { label: 'GIFTING', href: '/category/gifting', slug: 'gifting' },
+    { label: 'GIFTING', href: '/#gifting', slug: 'gifting' },
   ];
 
   const isActive = (href: string) => {

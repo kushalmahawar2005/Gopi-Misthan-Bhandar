@@ -174,7 +174,9 @@ export default function Home() {
       
       {giftBoxes.length > 0 && (
         <ScrollAnimation delay={200}>
-          <GiftBoxSection giftBoxes={giftBoxes} />
+          <div id="gifting">
+            <GiftBoxSection giftBoxes={giftBoxes} />
+          </div>
         </ScrollAnimation>
       )}
       
