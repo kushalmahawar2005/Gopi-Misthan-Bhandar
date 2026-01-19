@@ -9,6 +9,7 @@ import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
 import Cart from '@/components/Cart';
 import { FiMail, FiLock, FiEye, FiEyeOff } from 'react-icons/fi';
+import { FcGoogle } from 'react-icons/fc';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -42,6 +43,11 @@ export default function LoginPage() {
     setIsLoading(false);
   };
 
+  const handleGoogleLogin = () => {
+    // TODO: Implement Google Login
+    console.log('Google login clicked');
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
       <Header />
@@ -51,7 +57,7 @@ export default function LoginPage() {
       {/* Page Header */}
       <div className="bg-gradient-to-r from-primary-red to-primary-darkRed py-8 md:py-12 px-4">
         <div className="max-w-7xl mx-auto text-center">
-          <h1 className="text-3xl md:text-4xl font-bold font-general-sansal-sansal-sans text-white">
+          <h1 className="text-3xl md:text-4xl font-bold font-general-sans text-white">
             Login
           </h1>
           <p className="text-lg text-gray-100 mt-2">
@@ -129,9 +135,27 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full bg-primary-red text-white py-3 px-6 rounded-lg font-bold font-general-sansal-sansal-sans text-lg hover:bg-primary-darkRed transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full bg-primary-red text-white py-3 px-6 rounded-lg font-bold font-general-sans text-lg hover:bg-primary-darkRed transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isLoading ? 'Logging in...' : 'Login'}
+            </button>
+
+            <div className="relative">
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t border-gray-300"></div>
+              </div>
+              <div className="relative flex justify-center text-sm">
+                <span className="px-2 bg-white text-gray-500">Or continue with</span>
+              </div>
+            </div>
+
+            <button
+              type="button"
+              onClick={handleGoogleLogin}
+              className="w-full flex items-center justify-center gap-2 bg-white text-gray-700 border border-gray-300 py-3 px-6 rounded-lg font-bold font-general-sans text-lg hover:bg-gray-50 transition-colors"
+            >
+              <FcGoogle className="w-6 h-6" />
+              Google
             </button>
 
             <div className="text-center">

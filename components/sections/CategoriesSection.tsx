@@ -14,33 +14,59 @@ const CategoriesSection: React.FC<CategoriesSectionProps> = ({ categories }) => 
   const autoScrollIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const isUserInteractingRef = useRef(false);
 
+  // Handle user interaction to pause auto-scroll
+  const handleUserInteractionStart = () => {
+    isUserInteractingRef.current = true;
+  };
+
+  const handleUserInteractionEnd = () => {
+    isUserInteractingRef.current = false;
+  };
+
   const autoScroll = () => {
     if (scrollContainerRef.current && !isUserInteractingRef.current) {
       const container = scrollContainerRef.current;
-      const scrollAmount = container.clientWidth * 0.6;
+      // Calculate width of one card + gap (approximate based on styling)
+      // We can get the first child's width if available
+      const firstCard = container.firstElementChild as HTMLElement;
+      const cardWidth = firstCard ? firstCard.clientWidth + 24 : container.clientWidth * 0.3; // 24px is gap-6
 
-      container.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+      const maxScroll = container.scrollWidth - container.clientWidth;
 
-      setTimeout(() => {
-        if (scrollContainerRef.current) {
-          const { scrollLeft, scrollWidth } = scrollContainerRef.current;
-          if (scrollLeft >= scrollWidth / 2) {
-            scrollContainerRef.current.scrollTo({ left: 0, behavior: 'auto' });
-          }
-        }
-      }, 500);
+      // If we are close to the end, scroll back to start
+      if (container.scrollLeft >= maxScroll - 10) {
+        container.scrollTo({ left: 0, behavior: 'smooth' });
+      } else {
+        // Otherwise scroll by one card width
+        container.scrollBy({ left: cardWidth, behavior: 'smooth' });
+      }
     }
   };
 
   useEffect(() => {
-    if (categories.length > 3) {
-      autoScrollIntervalRef.current = setInterval(autoScroll, 4000);
-      return () => {
-        if (autoScrollIntervalRef.current) {
-          clearInterval(autoScrollIntervalRef.current);
-        }
-      };
+    const container = scrollContainerRef.current;
+    if (container) {
+      container.addEventListener('touchstart', handleUserInteractionStart);
+      container.addEventListener('touchend', handleUserInteractionEnd);
+      container.addEventListener('mouseenter', handleUserInteractionStart);
+      container.addEventListener('mouseleave', handleUserInteractionEnd);
     }
+
+    if (categories.length > 0) {
+      autoScrollIntervalRef.current = setInterval(autoScroll, 10000); // 10 seconds interval
+    }
+
+    return () => {
+      if (autoScrollIntervalRef.current) {
+        clearInterval(autoScrollIntervalRef.current);
+      }
+      if (container) {
+        container.removeEventListener('touchstart', handleUserInteractionStart);
+        container.removeEventListener('touchend', handleUserInteractionEnd);
+        container.removeEventListener('mouseenter', handleUserInteractionStart);
+        container.removeEventListener('mouseleave', handleUserInteractionEnd);
+      }
+    };
   }, [categories]);
 
   return (

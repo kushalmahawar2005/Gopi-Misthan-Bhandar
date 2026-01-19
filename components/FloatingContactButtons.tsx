@@ -6,7 +6,7 @@ import { FaWhatsapp } from 'react-icons/fa';
 import { FiGift, FiSend, FiX } from 'react-icons/fi';
 
 const whatsappNumber =
-  (process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || '+919876543210').replace(/\s|\+/g, '') || '919876543210';
+  (process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || '+917746883645').replace(/\s|\+/g, '') || '917746883645';
 const whatsappMessage =
   process.env.NEXT_PUBLIC_WHATSAPP_MESSAGE ||
   'Hi%20Gopi%20Misthan%20Bhandar,%20I%20would%20like%20to%20know%20more%20about%20your%20wedding%20gift%20options.';
@@ -135,7 +135,7 @@ export default function FloatingContactButtons() {
           <div className="flex h-10 w-10 items-center justify-center rounded-full bg-white/15">
             <FiGift className="h-5 w-5" />
           </div>
-          <div className="pointer-events-none absolute right-[110%] hidden min-w-[200px] translate-y-1 rounded-xl bg-primary-red px-4 py-3 text-left text-white shadow-lg transition group-hover:flex">
+          <div className="pointer-events-none absolute right-[110%] hidden min-w-[200px] translate-y-1 flex-col rounded-xl bg-primary-red px-4 py-3 gap-2 text-left text-white shadow-lg transition group-hover:flex">
             <span className="text-sm font-semibold uppercase tracking-wide">Bulk Enquiry</span>
             <span className="text-xs text-white/80">Plan your custom gift hampers</span>
           </div>
@@ -151,7 +151,7 @@ export default function FloatingContactButtons() {
           <div className="flex h-10 w-10 items-center justify-center rounded-full bg-white/15">
             <FaWhatsapp className="h-5 w-5" />
           </div>
-          <div className="pointer-events-none absolute right-[110%] hidden min-w-[200px] translate-y-1 rounded-xl bg-[#1fb455] px-4 py-3 text-left text-white shadow-lg transition group-hover:flex">
+          <div className="pointer-events-none absolute right-[110%] hidden min-w-[200px] translate-y-1 flex-col rounded-xl bg-[#1fb455] px-4 py-3 text-left text-white shadow-lg transition group-hover:flex">
             <span className="text-sm font-semibold uppercase tracking-wide">WhatsApp</span>
             <span className="text-xs text-white/80">Chat with our team</span>
           </div>
@@ -212,7 +212,7 @@ export default function FloatingContactButtons() {
                     value={formData.phone}
                     onChange={handleInputChange('phone')}
                     required={!formData.email}
-                    placeholder="+91 98765 43210"
+                    placeholder="+91 7746883645"
                     className="w-full rounded-lg border border-gray-300 px-4 py-2.5 text-sm transition focus:border-primary-red focus:outline-none focus:ring-1 focus:ring-primary-red"
                   />
                 </div>
@@ -275,11 +275,10 @@ export default function FloatingContactButtons() {
 
               {statusMessage && (
                 <div
-                  className={`rounded-lg px-4 py-3 text-sm ${
-                    statusMessage.type === 'success'
-                      ? 'bg-green-50 text-green-700'
-                      : 'bg-red-50 text-red-600'
-                  }`}
+                  className={`rounded-lg px-4 py-3 text-sm ${statusMessage.type === 'success'
+                    ? 'bg-green-50 text-green-700'
+                    : 'bg-red-50 text-red-600'
+                    }`}
                 >
                   {statusMessage.text}
                 </div>

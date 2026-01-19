@@ -105,7 +105,7 @@ export default function CheckoutPage() {
 
   const checkDelivery = async () => {
     if (!formData.pincode || formData.pincode.length !== 6) return;
-    
+
     setCheckingDelivery(true);
     try {
       const subtotal = calculateSubtotal();
@@ -113,7 +113,7 @@ export default function CheckoutPage() {
         `/api/delivery/check?pincode=${formData.pincode}&amount=${subtotal}`
       );
       const data = await response.json();
-      
+
       if (data.success) {
         setDeliveryInfo(data.data);
         if (!data.data.isServiceable) {
@@ -205,9 +205,8 @@ export default function CheckoutPage() {
   };
 
   const calculateTax = () => {
-    const subtotal = calculateSubtotal();
-    // 5% GST
-    return Math.round(subtotal * 0.05);
+    // Tax is included in price
+    return 0;
   };
 
   const calculateTotal = () => {
@@ -255,14 +254,14 @@ export default function CheckoutPage() {
       const billingAddress = sameAsShipping
         ? shippingAddress
         : {
-            name: `${billingData.firstName} ${billingData.lastName}`,
-            email: formData.email,
-            phone: formData.phone,
-            street: billingData.address,
-            city: billingData.city,
-            state: billingData.state,
-            zipCode: billingData.pincode,
-          };
+          name: `${billingData.firstName} ${billingData.lastName}`,
+          email: formData.email,
+          phone: formData.phone,
+          street: billingData.address,
+          city: billingData.city,
+          state: billingData.state,
+          zipCode: billingData.pincode,
+        };
 
       // Create order data
       const orderData = {
@@ -425,9 +424,6 @@ export default function CheckoutPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <Header />
-      <Navigation />
-      <Cart />
 
       {/* Page Header */}
       <div className="bg-gradient-to-r from-primary-red to-primary-darkRed py-8 md:py-12 px-4">
@@ -439,7 +435,7 @@ export default function CheckoutPage() {
             <FiArrowLeft className="w-5 h-5" />
             <span>Back to Shopping</span>
           </Link>
-          <h1 className="text-3xl md:text-4xl font-bold font-general-sans text-white text-center">
+          <h1 className="text-3xl md:text-4xl font-bold font-general-sans text-white text-center -mt-4">
             Checkout
           </h1>
         </div>
@@ -508,9 +504,8 @@ export default function CheckoutPage() {
                       name="firstName"
                       value={formData.firstName}
                       onChange={handleInputChange}
-                      className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-red ${
-                        errors.firstName ? 'border-red-500' : 'border-gray-300'
-                      }`}
+                      className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-red ${errors.firstName ? 'border-red-500' : 'border-gray-300'
+                        }`}
                       required
                     />
                     {errors.firstName && (
@@ -526,9 +521,8 @@ export default function CheckoutPage() {
                       name="lastName"
                       value={formData.lastName}
                       onChange={handleInputChange}
-                      className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-red ${
-                        errors.lastName ? 'border-red-500' : 'border-gray-300'
-                      }`}
+                      className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-red ${errors.lastName ? 'border-red-500' : 'border-gray-300'
+                        }`}
                       required
                     />
                     {errors.lastName && (
@@ -544,9 +538,8 @@ export default function CheckoutPage() {
                       name="email"
                       value={formData.email}
                       onChange={handleInputChange}
-                      className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-red ${
-                        errors.email ? 'border-red-500' : 'border-gray-300'
-                      }`}
+                      className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-red ${errors.email ? 'border-red-500' : 'border-gray-300'
+                        }`}
                       required
                     />
                     {errors.email && (
@@ -562,9 +555,8 @@ export default function CheckoutPage() {
                       name="phone"
                       value={formData.phone}
                       onChange={handleInputChange}
-                      className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-red ${
-                        errors.phone ? 'border-red-500' : 'border-gray-300'
-                      }`}
+                      className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-red ${errors.phone ? 'border-red-500' : 'border-gray-300'
+                        }`}
                       required
                     />
                     {errors.phone && (
@@ -580,9 +572,8 @@ export default function CheckoutPage() {
                       value={formData.address}
                       onChange={handleInputChange}
                       rows={3}
-                      className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-red ${
-                        errors.address ? 'border-red-500' : 'border-gray-300'
-                      }`}
+                      className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-red ${errors.address ? 'border-red-500' : 'border-gray-300'
+                        }`}
                       required
                     />
                     {errors.address && (
@@ -610,9 +601,8 @@ export default function CheckoutPage() {
                       name="city"
                       value={formData.city}
                       onChange={handleInputChange}
-                      className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-red ${
-                        errors.city ? 'border-red-500' : 'border-gray-300'
-                      }`}
+                      className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-red ${errors.city ? 'border-red-500' : 'border-gray-300'
+                        }`}
                       required
                     />
                     {errors.city && (
@@ -628,9 +618,8 @@ export default function CheckoutPage() {
                       name="state"
                       value={formData.state}
                       onChange={handleInputChange}
-                      className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-red ${
-                        errors.state ? 'border-red-500' : 'border-gray-300'
-                      }`}
+                      className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-red ${errors.state ? 'border-red-500' : 'border-gray-300'
+                        }`}
                       required
                     />
                     {errors.state && (
@@ -648,9 +637,8 @@ export default function CheckoutPage() {
                         value={formData.pincode}
                         onChange={handleInputChange}
                         maxLength={6}
-                        className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-red ${
-                          errors.pincode ? 'border-red-500' : 'border-gray-300'
-                        }`}
+                        className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-red ${errors.pincode ? 'border-red-500' : 'border-gray-300'
+                          }`}
                         required
                         placeholder="Enter 6-digit pincode"
                       />
@@ -664,11 +652,10 @@ export default function CheckoutPage() {
                       <p className="text-red-500 text-sm mt-1">{errors.pincode}</p>
                     )}
                     {deliveryInfo && deliveryInfo.isServiceable && (
-                      <div className={`mt-2 p-3 rounded-lg text-sm ${
-                        deliveryInfo.deliveryCharge === 0 
-                          ? 'bg-green-50 text-green-800 border border-green-200' 
-                          : 'bg-blue-50 text-blue-800 border border-blue-200'
-                      }`}>
+                      <div className={`mt-2 p-3 rounded-lg text-sm ${deliveryInfo.deliveryCharge === 0
+                        ? 'bg-green-50 text-green-800 border border-green-200'
+                        : 'bg-blue-50 text-blue-800 border border-blue-200'
+                        }`}>
                         <div className="flex items-center justify-between">
                           <div>
                             <p className="font-semibold">{deliveryInfo.message}</p>
@@ -716,9 +703,8 @@ export default function CheckoutPage() {
                         name="firstName"
                         value={billingData.firstName}
                         onChange={handleBillingChange}
-                        className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-red ${
-                          errors.billingFirstName ? 'border-red-500' : 'border-gray-300'
-                        }`}
+                        className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-red ${errors.billingFirstName ? 'border-red-500' : 'border-gray-300'
+                          }`}
                       />
                       {errors.billingFirstName && (
                         <p className="text-red-500 text-sm mt-1">{errors.billingFirstName}</p>
@@ -733,9 +719,8 @@ export default function CheckoutPage() {
                         name="lastName"
                         value={billingData.lastName}
                         onChange={handleBillingChange}
-                        className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-red ${
-                          errors.billingLastName ? 'border-red-500' : 'border-gray-300'
-                        }`}
+                        className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-red ${errors.billingLastName ? 'border-red-500' : 'border-gray-300'
+                          }`}
                       />
                       {errors.billingLastName && (
                         <p className="text-red-500 text-sm mt-1">{errors.billingLastName}</p>
@@ -750,9 +735,8 @@ export default function CheckoutPage() {
                         value={billingData.address}
                         onChange={handleBillingChange}
                         rows={3}
-                        className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-red ${
-                          errors.billingAddress ? 'border-red-500' : 'border-gray-300'
-                        }`}
+                        className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-red ${errors.billingAddress ? 'border-red-500' : 'border-gray-300'
+                          }`}
                       />
                       {errors.billingAddress && (
                         <p className="text-red-500 text-sm mt-1">{errors.billingAddress}</p>
@@ -767,9 +751,8 @@ export default function CheckoutPage() {
                         name="city"
                         value={billingData.city}
                         onChange={handleBillingChange}
-                        className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-red ${
-                          errors.billingCity ? 'border-red-500' : 'border-gray-300'
-                        }`}
+                        className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-red ${errors.billingCity ? 'border-red-500' : 'border-gray-300'
+                          }`}
                       />
                       {errors.billingCity && (
                         <p className="text-red-500 text-sm mt-1">{errors.billingCity}</p>
@@ -784,9 +767,8 @@ export default function CheckoutPage() {
                         name="state"
                         value={billingData.state}
                         onChange={handleBillingChange}
-                        className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-red ${
-                          errors.billingState ? 'border-red-500' : 'border-gray-300'
-                        }`}
+                        className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-red ${errors.billingState ? 'border-red-500' : 'border-gray-300'
+                          }`}
                       />
                       {errors.billingState && (
                         <p className="text-red-500 text-sm mt-1">{errors.billingState}</p>
@@ -802,9 +784,8 @@ export default function CheckoutPage() {
                         value={billingData.pincode}
                         onChange={handleBillingChange}
                         maxLength={6}
-                        className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-red ${
-                          errors.billingPincode ? 'border-red-500' : 'border-gray-300'
-                        }`}
+                        className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-red ${errors.billingPincode ? 'border-red-500' : 'border-gray-300'
+                          }`}
                       />
                       {errors.billingPincode && (
                         <p className="text-red-500 text-sm mt-1">{errors.billingPincode}</p>
@@ -871,7 +852,7 @@ export default function CheckoutPage() {
             <div className="lg:col-span-1">
               <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6 sticky top-24">
                 <h2 className="text-2xl font-bold font-general-sans mb-6">Order Summary</h2>
-                
+
                 {/* Cart Items */}
                 <div className="space-y-4 mb-6 max-h-96 overflow-y-auto">
                   {cartItems.map((item) => (
@@ -945,8 +926,8 @@ export default function CheckoutPage() {
                     </p>
                   )}
                   <div className="flex justify-between text-sm">
-                    <span className="text-gray-600">Tax (GST 5%)</span>
-                    <span className="font-medium">₹{calculateTax().toLocaleString()}</span>
+                    <span className="text-gray-600">Tax (Included)</span>
+                    <span className="font-medium text-green-600">Included</span>
                   </div>
                   <div className="flex justify-between text-lg font-bold font-general-sans pt-3 border-t border-gray-200">
                     <span>Total</span>

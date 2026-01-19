@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { FiEye } from 'react-icons/fi';
+import { FiEye, FiPrinter } from 'react-icons/fi';
 import Link from 'next/link';
 
 interface Order {
@@ -21,9 +21,58 @@ export default function AdminOrders() {
   const [loading, setLoading] = useState(true);
   const [statusFilter, setStatusFilter] = useState('all');
 
+  const [autoPrintEnabled, setAutoPrintEnabled] = useState(false);
+  const [lastCheckTime, setLastCheckTime] = useState(Date.now());
+  const audioRef = React.useRef<HTMLAudioElement | null>(null);
+
+  useEffect(() => {
+    // Initialize audio
+    audioRef.current = new Audio('/notification.mp3'); // You'll need to add this file
+
+    fetchOrders();
+
+    // Poll for new orders every 30 seconds
+    const interval = setInterval(() => {
+      checkForNewOrders();
+    }, 30000);
+
+    return () => clearInterval(interval);
+  }, []);
+
+  const checkForNewOrders = async () => {
+    try {
+      // Fetch only orders created after last check
+      const response = await fetch(`/api/orders?status=pending`);
+      const data = await response.json();
+
+      if (data.success && data.data.length > 0) {
+        const newOrders = data.data.filter((o: Order) => new Date(o.createdAt).getTime() > lastCheckTime);
+
+        if (newOrders.length > 0) {
+          // Play sound
+          if (audioRef.current) {
+            audioRef.current.play().catch(e => console.log('Audio play failed:', e));
+          }
+
+          // Update list
+          fetchOrders();
+          setLastCheckTime(Date.now());
+
+          // Auto print if enabled
+          if (autoPrintEnabled) {
+            newOrders.forEach((order: Order) => {
+              window.open(`/admin/orders/${order._id}/print`, '_blank');
+            });
+          }
+        }
+      }
+    } catch (error) {
+      console.error('Error polling orders:', error);
+    }
+  };
+
   useEffect(() => {
     fetchOrders();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [statusFilter]);
 
   const fetchOrders = async () => {
@@ -94,18 +143,35 @@ export default function AdminOrders() {
             Manage customer orders
           </p>
         </div>
-        <select
-          value={statusFilter}
-          onChange={(e) => setStatusFilter(e.target.value)}
-          className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-red bg-white text-sm w-full sm:w-auto"
-        >
-          <option value="all">All Orders</option>
-          <option value="pending">Pending</option>
-          <option value="processing">Processing</option>
-          <option value="shipped">Shipped</option>
-          <option value="delivered">Delivered</option>
-          <option value="cancelled">Cancelled</option>
-        </select>
+        <div className="flex items-center gap-4">
+          {/* Auto-print Toggle */}
+          <label className="flex items-center gap-2 cursor-pointer bg-white px-3 py-2 border rounded-lg hover:bg-gray-50 transition-colors">
+            <input
+              type="checkbox"
+              checked={autoPrintEnabled}
+              onChange={(e) => setAutoPrintEnabled(e.target.checked)}
+              className="w-4 h-4 text-primary-red rounded focus:ring-primary-red"
+            />
+            <span className="text-sm font-medium text-gray-700 flex items-center gap-2">
+              <FiPrinter className={autoPrintEnabled ? "text-green-600" : "text-gray-400"} />
+              <span className="hidden sm:inline">Auto-Print Orders</span>
+              <span className="sm:hidden">Auto-Print</span>
+            </span>
+          </label>
+
+          <select
+            value={statusFilter}
+            onChange={(e) => setStatusFilter(e.target.value)}
+            className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-red bg-white text-sm w-full sm:w-auto"
+          >
+            <option value="all">All Orders</option>
+            <option value="pending">Pending</option>
+            <option value="processing">Processing</option>
+            <option value="shipped">Shipped</option>
+            <option value="delivered">Delivered</option>
+            <option value="cancelled">Cancelled</option>
+          </select>
+        </div>
       </div>
 
       {/* Orders Table - Desktop */}
@@ -212,6 +278,14 @@ export default function AdminOrders() {
                       >
                         <FiEye size={16} />
                       </Link>
+                      <Link
+                        href={`/admin/orders/${order._id}/print`}
+                        target="_blank"
+                        className="p-2 text-gray-600 hover:bg-gray-100 rounded transition-colors inline-block ml-2"
+                        title="Print Receipt"
+                      >
+                        <FiPrinter size={16} />
+                      </Link>
                     </td>
                   </tr>
                 ))
@@ -304,27 +378,29 @@ export default function AdminOrders() {
       </div>
 
       {/* Pagination */}
-      {orders.length > 0 && (
-        <div className="px-4 md:px-6 py-4 border-t border-gray-200 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <div className="text-xs sm:text-sm text-gray-600 text-center sm:text-left">
-            Showing 1 to {orders.length} of {orders.length} orders
+      {
+        orders.length > 0 && (
+          <div className="px-4 md:px-6 py-4 border-t border-gray-200 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div className="text-xs sm:text-sm text-gray-600 text-center sm:text-left">
+              Showing 1 to {orders.length} of {orders.length} orders
+            </div>
+            <div className="flex gap-2 w-full sm:w-auto justify-center">
+              <button
+                disabled
+                className="px-3 sm:px-4 py-2 text-xs sm:text-sm border border-gray-300 rounded-lg text-gray-400 cursor-not-allowed"
+              >
+                Previous
+              </button>
+              <button
+                disabled={orders.length <= 10}
+                className="px-3 sm:px-4 py-2 text-xs sm:text-sm border border-gray-300 rounded-lg bg-primary-red text-white hover:bg-primary-darkRed transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                Next
+              </button>
+            </div>
           </div>
-          <div className="flex gap-2 w-full sm:w-auto justify-center">
-            <button
-              disabled
-              className="px-3 sm:px-4 py-2 text-xs sm:text-sm border border-gray-300 rounded-lg text-gray-400 cursor-not-allowed"
-            >
-              Previous
-            </button>
-            <button
-              disabled={orders.length <= 10}
-              className="px-3 sm:px-4 py-2 text-xs sm:text-sm border border-gray-300 rounded-lg bg-primary-red text-white hover:bg-primary-darkRed transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              Next
-            </button>
-          </div>
-        </div>
-      )}
-    </div>
+        )
+      }
+    </div >
   );
 }

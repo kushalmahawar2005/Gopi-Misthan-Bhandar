@@ -24,12 +24,7 @@
     padding-bottom: env(safe-area-inset-bottom);
   }
 
-  /* Add bottom padding for mobile bottom navigation on all pages */
-  @media (max-width: 768px) {
-    body {
-      padding-bottom: 90px;
-    }
-  }
+
 }
 
 /* Hide horizontal scrollbar where supported */
