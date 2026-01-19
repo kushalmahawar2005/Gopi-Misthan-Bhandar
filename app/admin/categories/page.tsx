@@ -93,58 +93,51 @@ export default function AdminCategories() {
   };
 
   const updateOrder = async (id: string, direction: 'up' | 'down') => {
-    const item = categories.find((c) => c._id === id);
-    if (!item) return;
+    // Sort consistently to match display
+    const sortedItems = [...categories].sort((a, b) => {
+      const orderA = a.order || 0;
+      const orderB = b.order || 0;
+      if (orderA !== orderB) return orderA - orderB;
+      return a.name.localeCompare(b.name);
+    });
 
-    const sortedItems = [...categories].sort((a, b) => (a.order || 0) - (b.order || 0));
     const currentIndex = sortedItems.findIndex((c) => c._id === id);
+    if (currentIndex === -1) return;
+
+    let newItems = [...sortedItems];
 
     if (direction === 'up' && currentIndex > 0) {
-      const prevItem = sortedItems[currentIndex - 1];
-      const currentOrder = item.order ?? 0;
-      const prevOrder = prevItem.order ?? 0;
+      // Swap with previous
+      [newItems[currentIndex], newItems[currentIndex - 1]] = [
+        newItems[currentIndex - 1],
+        newItems[currentIndex],
+      ];
+    } else if (direction === 'down' && currentIndex < newItems.length - 1) {
+      // Swap with next
+      [newItems[currentIndex], newItems[currentIndex + 1]] = [
+        newItems[currentIndex + 1],
+        newItems[currentIndex],
+      ];
+    } else {
+      return; // No move needed
+    }
 
-      try {
-        await Promise.all([
-          fetch(`/api/categories/${id}`, {
+    try {
+      // Update all items with new sequential (1-based) order to ensure consistency
+      // This fixes issues where multiple items might have '0' or same order
+      await Promise.all(
+        newItems.map((item, index) =>
+          fetch(`/api/categories/${item._id}`, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ order: prevOrder }),
-          }),
-          fetch(`/api/categories/${prevItem._id}`, {
-            method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ order: currentOrder }),
-          }),
-        ]);
-        await fetchCategories();
-      } catch (error) {
-        console.error('Error updating order:', error);
-        alert('Error updating order');
-      }
-    } else if (direction === 'down' && currentIndex < sortedItems.length - 1) {
-      const nextItem = sortedItems[currentIndex + 1];
-      const currentOrder = item.order ?? 0;
-      const nextOrder = nextItem.order ?? 0;
-
-      try {
-        await Promise.all([
-          fetch(`/api/categories/${id}`, {
-            method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ order: nextOrder }),
-          }),
-          fetch(`/api/categories/${nextItem._id}`, {
-            method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ order: currentOrder }),
-          }),
-        ]);
-        await fetchCategories();
-      } catch (error) {
-        console.error('Error updating order:', error);
-        alert('Error updating order');
-      }
+            body: JSON.stringify({ order: index + 1 }),
+          })
+        )
+      );
+      await fetchCategories();
+    } catch (error) {
+      console.error('Error updating order:', error);
+      alert('Error updating order');
     }
   };
 
@@ -255,7 +248,7 @@ export default function AdminCategories() {
             {category.description && (
               <p className="text-sm text-gray-600 mb-4 line-clamp-2">{category.description}</p>
             )}
-            
+
             {/* Subcategories Section */}
             {category.subCategories && category.subCategories.length > 0 && expandedCategories.has(category._id) && (
               <div className="mb-4 border-t pt-4">

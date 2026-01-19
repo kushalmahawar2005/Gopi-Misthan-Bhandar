@@ -49,7 +49,7 @@ const Footer = () => {
               <FiMapPin className="w-4 h-4" />
               Neemuch, Madhya Pradesh
             </p>
-            
+
             {/* Social Media Links */}
             <div className="flex gap-4 mt-6">
               {socialLinks.map((social) => (
@@ -94,14 +94,14 @@ const Footer = () => {
             <ul className="space-y-3 text-sm text-white">
               <li className="flex items-center gap-2">
                 <FiPhone className="w-4 h-4 text-primary-yellow" />
-                <a href="tel:+919876543210" className="hover:text-primary-yellow transition-colors">
-                  +91 98765 43210
+                <a href="tel:+917746883645" className="hover:text-primary-yellow transition-colors">
+                  +91 7746883645
                 </a>
               </li>
               <li className="flex items-center gap-2">
                 <FiMail className="w-4 h-4 text-primary-yellow" />
-                <a href="mailto:info@gopimisthanbhandar.com" className="hover:text-primary-yellow transition-colors">
-                  info@gopimisthanbhandar.com
+                <a href="mailto:gopimisthan@hotmail.com" className="hover:text-primary-yellow transition-colors">
+                  gopimisthan@hotmail.com
                 </a>
               </li>
               <li className="flex items-start gap-2">

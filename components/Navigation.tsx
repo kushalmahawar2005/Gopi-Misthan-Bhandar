@@ -144,10 +144,45 @@ const Navigation = () => {
     setIsMobileMenuOpen(false);
   };
 
+  const [isVisible, setIsVisible] = useState(true);
+  const lastScrollY = useRef(0);
+
+  useEffect(() => {
+    // Only apply scroll logic on category pages
+    if (!pathname.startsWith('/category/')) {
+      setIsVisible(true);
+      return;
+    }
+
+    const controlNavbar = () => {
+      if (typeof window !== 'undefined') {
+        const currentScrollY = window.scrollY;
+
+        if (currentScrollY > lastScrollY.current && currentScrollY > 100) {
+          // Scrolling down & passed threshold -> Hide
+          setIsVisible(false);
+        } else {
+          // Scrolling up -> Show
+          setIsVisible(true);
+        }
+
+        lastScrollY.current = currentScrollY;
+      }
+    };
+
+    window.addEventListener('scroll', controlNavbar);
+    return () => window.removeEventListener('scroll', controlNavbar);
+  }, [pathname]);
+
   return (
     <>
-      <nav className="bg-white w-full border-b border-gray-200 shadow-sm sticky top-0 z-50">
-        
+      <nav
+        className={`bg-white w-full border-b border-gray-200 shadow-sm z-50 transition-transform duration-300 ${pathname.startsWith('/category/')
+            ? `fixed top-0 left-0 right-0 ${isVisible ? 'translate-y-0' : '-translate-y-full'}`
+            : 'sticky top-0'
+          }`}
+      >
+
 
         {/* Header row */}
         <div className="flex items-center justify-between px-4 md:px-6 lg:px-8 py-2 md:py-4 relative">
@@ -180,11 +215,10 @@ const Navigation = () => {
                     onBlur={() => {
                       setIsFocused(false);
                     }}
-                    className={`w-full pr-10 py-2.5 pl-4 text-md bg-white outline-none border transition-colors rounded-lg placeholder-gray-500 ${
-                      isFocused 
-                        ? 'border-primary-red focus:ring-2 focus:ring-primary-red focus:border-primary-red' 
-                        : 'border-gray-300 focus:border-primary-red focus:ring-2 focus:ring-primary-red'
-                    }`}
+                    className={`w-full pr-10 py-2.5 pl-4 text-md bg-white outline-none border transition-colors rounded-lg placeholder-gray-500 ${isFocused
+                      ? 'border-primary-red focus:ring-2 focus:ring-primary-red focus:border-primary-red'
+                      : 'border-gray-300 focus:border-primary-red focus:ring-2 focus:ring-primary-red'
+                      }`}
                     aria-label="Search products"
                   />
                   {/* Search button on the right */}
@@ -359,65 +393,63 @@ const Navigation = () => {
           {navItems.map((item) => {
             const category = item.slug ? getCategoryBySlug(item.slug) : null;
             const hasSubcategories = category?.subCategories && category.subCategories.length > 0;
-            
+
             return (
-              <div 
-                key={item.label} 
+              <div
+                key={item.label}
                 className="relative"
                 onMouseEnter={() => hasSubcategories ? setHoveredCategory(item.slug || null) : null}
                 onMouseLeave={() => setHoveredCategory(null)}
               >
                 <button
                   onClick={() => handleNavClick(item.href)}
-                  className={`text-xs md:text-sm font-geom tracking-wider transition-colors font-medium flex items-center gap-1 py-2 relative ${
-                    isActive(item.href) ? 'text-red-600' : 'text-black hover:text-red-600'
-                  }`}
+                  className={`text-xs md:text-sm font-geom tracking-wider transition-colors font-medium flex items-center gap-1 py-2 relative ${isActive(item.href) ? 'text-red-600' : 'text-black hover:text-red-600'
+                    }`}
                 >
                   {item.label}
                   {/* Underline on hover */}
-                  <span 
-                    className={`absolute bottom-0 left-0 h-0.5 bg-red-600 transition-all duration-300 ${
-                      hoveredCategory === item.slug || isActive(item.href)
-                        ? 'w-full opacity-100'
-                        : 'w-0 opacity-0'
-                    }`}
+                  <span
+                    className={`absolute bottom-0 left-0 h-0.5 bg-red-600 transition-all duration-300 ${hoveredCategory === item.slug || isActive(item.href)
+                      ? 'w-full opacity-100'
+                      : 'w-0 opacity-0'
+                      }`}
                   />
                 </button>
-                
+
                 {/* Subcategories Dropdown */}
                 {hasSubcategories && hoveredCategory === item.slug && (
-                  <div 
+                  <div
                     ref={categoryDropdownRef}
                     className="absolute top-full left-1/2 transform -translate-x-1/2 pt-2 bg-transparent z-50"
                     onMouseEnter={() => setHoveredCategory(item.slug || null)}
                     onMouseLeave={() => setHoveredCategory(null)}
                   >
                     <div className="bg-white border border-gray-200 rounded-md shadow-lg min-w-[180px] py-2">
-                    {/* All Category Link */}
-                    <Link
-                      href={item.href}
-                      onClick={() => setHoveredCategory(null)}
-                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-red-600 transition-colors font-medium"
-                    >
-                      All {item.label}
-                    </Link>
-                    
-                    {/* Divider */}
-                    {category.subCategories && category.subCategories.length > 0 && (
-                      <div className="border-t border-gray-200 my-1" />
-                    )}
-                    
-                    {/* Subcategories */}
-                    {category.subCategories?.map((subcategory) => (
+                      {/* All Category Link */}
                       <Link
-                        key={subcategory.slug}
-                        href={`/category/${item.slug}?subcategory=${subcategory.slug}`}
+                        href={item.href}
                         onClick={() => setHoveredCategory(null)}
-                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-red-600 transition-colors"
+                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-red-600 transition-colors font-medium"
                       >
-                        {subcategory.name}
+                        All {item.label}
                       </Link>
-                    ))}
+
+                      {/* Divider */}
+                      {category.subCategories && category.subCategories.length > 0 && (
+                        <div className="border-t border-gray-200 my-1" />
+                      )}
+
+                      {/* Subcategories */}
+                      {category.subCategories?.map((subcategory) => (
+                        <Link
+                          key={subcategory.slug}
+                          href={`/category/${item.slug}?subcategory=${subcategory.slug}`}
+                          onClick={() => setHoveredCategory(null)}
+                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-red-600 transition-colors"
+                        >
+                          {subcategory.name}
+                        </Link>
+                      ))}
                     </div>
                   </div>
                 )}
@@ -433,7 +465,7 @@ const Navigation = () => {
           <div
             className="fixed inset-0 bg-black/50 z-40 md:hidden"
             onClick={() => setIsMobileMenuOpen(false)}
-          />  
+          />
           <div className="fixed top-0 left-0 h-full w-3/4 max-w-sm bg-white shadow-2xl z-50 md:hidden overflow-y-auto">
             <div className="flex items-center justify-between p-4 border-b border-gray-200">
               <h2 className="text-lg font-bold text-amber-700 font-geom">Menu</h2>
@@ -446,101 +478,101 @@ const Navigation = () => {
               </button>
             </div>
             {/* Mobile Search Bar - At the very top */}
-        <div className="md:hidden w-full px-4 py-3 border-b border-gray-200 bg-white">
-          <div className="relative">
-            <input
-              ref={searchInputRef}
-              type="text"
-              placeholder="Search products..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              onFocus={() => {
-                setIsFocused(true);
-                if (searchQuery.trim().length >= 2) setShowDropdown(true);
-              }}
-              onBlur={() => {
-                setIsFocused(false);
-              }}
-              className="w-full px-4 py-2 pr-10 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-red focus:border-transparent"
-              aria-label="Search products"
-            />
-            <button
-              onClick={() => {
-                if (searchQuery.trim().length >= 2) {
-                  router.push(`/products?search=${encodeURIComponent(searchQuery)}`);
-                  setShowDropdown(false);
-                  setSearchQuery('');
-                } else {
-                  searchInputRef.current?.focus();
-                }
-              }}
-              className="absolute right-3 top-1/2 transform -translate-y-1/2 p-1"
-              aria-label="Search"
-            >
-              <FiSearch className="w-5 h-5 text-gray-600" />
-            </button>
-            
-            {/* Mobile Search Dropdown */}
-            {showDropdown && (
-              <div
-                ref={dropdownRef}
-                className="absolute left-0 right-0 mt-2 bg-white border border-gray-200 rounded-md shadow-lg z-50 max-h-80 overflow-y-auto"
-              >
-                {searchLoading ? (
-                  <div className="p-4 text-center text-gray-500">
-                    <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-red-600 mx-auto mb-2"></div>
-                    <div>Searching...</div>
-                  </div>
-                ) : searchResults.length === 0 ? (
-                  <div className="p-4 text-sm text-gray-500">
-                    No products found for "<span className="font-medium">{searchQuery}</span>"
-                  </div>
-                ) : (
-                  <div className="divide-y divide-gray-100">
-                    {searchResults.slice(0, 6).map((product) => (
-                      <Link
-                        key={product.id}
-                        href={`/product/${product.id}`}
-                        onClick={() => {
-                          setShowDropdown(false);
-                          setSearchQuery('');
-                        }}
-                        className="flex items-center gap-3 p-3 hover:bg-gray-50 transition-colors"
-                      >
-                        <div className="relative w-14 h-14 flex-shrink-0 rounded-md overflow-hidden bg-gray-100">
-                          <Image
-                            src={product.image || '/placeholder.png'}
-                            alt={product.name}
-                            fill
-                            className="object-cover"
-                            sizes="56px"
-                          />
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <p className="text-sm font-medium font-geom line-clamp-1">{product.name}</p>
-                          <p className="text-xs text-gray-500 capitalize">{product.category}</p>
-                        </div>
-                        <div className="text-sm font-bold text-red-600">₹{product.price}</div>
-                      </Link>
-                    ))}
-                    {searchResults.length > 6 && (
-                      <Link
-                        href={`/products?search=${encodeURIComponent(searchQuery)}`}
-                        onClick={() => {
-                          setShowDropdown(false);
-                          setSearchQuery('');
-                        }}
-                        className="block text-center text-red-600 font-medium py-3 hover:bg-gray-50 transition-colors"
-                      >
-                        View all {searchResults.length} results
-                      </Link>
+            <div className="md:hidden w-full px-4 py-3 border-b border-gray-200 bg-white">
+              <div className="relative">
+                <input
+                  ref={searchInputRef}
+                  type="text"
+                  placeholder="Search products..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  onFocus={() => {
+                    setIsFocused(true);
+                    if (searchQuery.trim().length >= 2) setShowDropdown(true);
+                  }}
+                  onBlur={() => {
+                    setIsFocused(false);
+                  }}
+                  className="w-full px-4 py-2 pr-10 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-red focus:border-transparent"
+                  aria-label="Search products"
+                />
+                <button
+                  onClick={() => {
+                    if (searchQuery.trim().length >= 2) {
+                      router.push(`/products?search=${encodeURIComponent(searchQuery)}`);
+                      setShowDropdown(false);
+                      setSearchQuery('');
+                    } else {
+                      searchInputRef.current?.focus();
+                    }
+                  }}
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 p-1"
+                  aria-label="Search"
+                >
+                  <FiSearch className="w-5 h-5 text-gray-600" />
+                </button>
+
+                {/* Mobile Search Dropdown */}
+                {showDropdown && (
+                  <div
+                    ref={dropdownRef}
+                    className="absolute left-0 right-0 mt-2 bg-white border border-gray-200 rounded-md shadow-lg z-50 max-h-80 overflow-y-auto"
+                  >
+                    {searchLoading ? (
+                      <div className="p-4 text-center text-gray-500">
+                        <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-red-600 mx-auto mb-2"></div>
+                        <div>Searching...</div>
+                      </div>
+                    ) : searchResults.length === 0 ? (
+                      <div className="p-4 text-sm text-gray-500">
+                        No products found for "<span className="font-medium">{searchQuery}</span>"
+                      </div>
+                    ) : (
+                      <div className="divide-y divide-gray-100">
+                        {searchResults.slice(0, 6).map((product) => (
+                          <Link
+                            key={product.id}
+                            href={`/product/${product.id}`}
+                            onClick={() => {
+                              setShowDropdown(false);
+                              setSearchQuery('');
+                            }}
+                            className="flex items-center gap-3 p-3 hover:bg-gray-50 transition-colors"
+                          >
+                            <div className="relative w-14 h-14 flex-shrink-0 rounded-md overflow-hidden bg-gray-100">
+                              <Image
+                                src={product.image || '/placeholder.png'}
+                                alt={product.name}
+                                fill
+                                className="object-cover"
+                                sizes="56px"
+                              />
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <p className="text-sm font-medium font-geom line-clamp-1">{product.name}</p>
+                              <p className="text-xs text-gray-500 capitalize">{product.category}</p>
+                            </div>
+                            <div className="text-sm font-bold text-red-600">₹{product.price}</div>
+                          </Link>
+                        ))}
+                        {searchResults.length > 6 && (
+                          <Link
+                            href={`/products?search=${encodeURIComponent(searchQuery)}`}
+                            onClick={() => {
+                              setShowDropdown(false);
+                              setSearchQuery('');
+                            }}
+                            className="block text-center text-red-600 font-medium py-3 hover:bg-gray-50 transition-colors"
+                          >
+                            View all {searchResults.length} results
+                          </Link>
+                        )}
+                      </div>
                     )}
                   </div>
                 )}
               </div>
-            )}
-          </div>
-        </div>
+            </div>
 
             <div className="flex flex-col py-2">
               {navItems.map((item) => (
@@ -550,11 +582,10 @@ const Navigation = () => {
                     handleNavClick(item.href);
                     setIsMobileMenuOpen(false);
                   }}
-                  className={`text-left w-full px-6 py-3 text-sm font-general-sans font-[500] tracking-wider transition-colors border-l-4 ${
-                    isActive(item.href)
-                      ? 'text-red-600 bg-red-50 border-red-600'
-                      : 'text-black hover:text-red-600 hover:bg-gray-50 border-transparent'
-                  }`}
+                  className={`text-left w-full px-6 py-3 text-sm font-general-sans font-[500] tracking-wider transition-colors border-l-4 ${isActive(item.href)
+                    ? 'text-red-600 bg-red-50 border-red-600'
+                    : 'text-black hover:text-red-600 hover:bg-gray-50 border-transparent'
+                    }`}
                 >
                   {item.label}
                 </button>
@@ -579,7 +610,7 @@ const Navigation = () => {
                   setIsMobileMenuOpen(false);
                 }}
                 className="px-6 py-3 text-sm font-geom tracking-wider transition-colors text-black hover:text-red-600 hover:bg-gray-50 flex items-center gap-2 border-l-4 border-transparent"
-              > 
+              >
                 <FiUser className="w-4 h-4" />
                 {isAuthenticated ? 'Profile' : 'Login'}
               </button>

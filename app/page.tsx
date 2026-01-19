@@ -12,8 +12,8 @@ import { fetchProducts, fetchCategories, fetchInstaBooks, fetchInstaPosts, fetch
 import { Product, Category, InstagramPost } from '@/types';
 
 // Dynamic Imports for performance
-const FeaturedCollection = dynamic(() => import('@/components/sections/FeaturedCollection'), { 
-  loading: () => <div className="h-96 w-full bg-gray-50 animate-pulse" /> 
+const FeaturedCollection = dynamic(() => import('@/components/sections/FeaturedCollection'), {
+  loading: () => <div className="h-96 w-full bg-gray-50 animate-pulse" />
 });
 const PromotionalBanner = dynamic(() => import('@/components/sections/PromotionalBanner'), { ssr: false });
 const AboutSection = dynamic(() => import('@/components/sections/AboutSection'));
@@ -60,27 +60,27 @@ export default function Home() {
       ]);
 
       setFeaturedProducts(featured);
-      
+
       // Calculate product counts for each category (including subcategories)
       const categoriesWithCounts = categoriesData.map((category) => {
         // Get all subcategory slugs for this category
         const subCategorySlugs = category.subCategories?.map((sub) => sub.slug) || [];
         // Include the category itself and all its subcategories
         const relevantSlugs = [category.slug, ...subCategorySlugs];
-        
+
         // Count products that match any of these slugs
-        const count = allProducts.filter((product) => 
+        const count = allProducts.filter((product) =>
           relevantSlugs.includes(product.category)
         ).length;
-        
+
         return {
           ...category,
           productsCount: count,
         };
       });
-      
+
       setCategories(categoriesWithCounts);
-      
+
       // Filter Classic/Premium products - prefer sweets category but show all if none found
       const sweetsCategory = categoriesWithCounts.find((c) => c.slug === 'sweets');
       const defaultSweetsSubs = ['classic-sweets', 'premium-sweets'];
@@ -88,24 +88,24 @@ export default function Home() {
         ? Array.from(new Set([sweetsCategory.slug, ...(sweetsCategory.subCategories?.map((s: any) => s.slug) || []), ...defaultSweetsSubs]))
         : ['sweets', ...defaultSweetsSubs];
       const isSweetCategory = (slug: string | undefined) => !!slug && /sweet/i.test(slug);
-      
+
       // Filter classic products - prefer sweets but show all if no sweets found
       let classicFiltered = classicFlagged.filter((p) => sweetsSlugs.includes(p.category) || isSweetCategory(p.category));
       if (classicFiltered.length === 0) {
         // If no sweets found, show all classic products
         classicFiltered = classicFlagged;
       }
-      
+
       // Filter premium products - prefer sweets but show all if no sweets found
       let premiumFiltered = premiumFlagged.filter((p) => sweetsSlugs.includes(p.category) || isSweetCategory(p.category));
       if (premiumFiltered.length === 0) {
         // If no sweets found, show all premium products
         premiumFiltered = premiumFlagged;
       }
-      
+
       setClassicProducts(classicFiltered.slice(0, 8));
       setPremiumProducts(premiumFiltered.slice(0, 8));
-      
+
       setInstaBooks(instaBooksData);
       setInstaPosts(instaPostsData);
       setGalleryItems(galleryData);
@@ -119,15 +119,15 @@ export default function Home() {
   };
 
   return (
-    <main className="min-h-screen bg-white w-full overflow-x-hidden pb-24 md:pb-0">
+    <main className="min-h-screen bg-white w-full overflow-x-hidden">
       <Header />
       <Navigation />
       <Cart />
       <HeroSection />
-      
+
       {/* Promotional Banner with Intro Animation */}
       <PromotionalBanner />
-      
+
       {featuredProducts.length > 0 && (
         <ScrollAnimation delay={100}>
           <div id="featured">
@@ -135,17 +135,17 @@ export default function Home() {
           </div>
         </ScrollAnimation>
       )}
-      
+
       {categories.length > 0 && (
         <ScrollAnimation delay={150}>
           <CategoriesSection categories={categories} />
         </ScrollAnimation>
       )}
-      
+
       {classicProducts.length > 0 && (
         <ScrollAnimation delay={200}>
           <div id="sweets">
-            <ProductSection 
+            <ProductSection
               title="Classic Sweets"
               subtitle="Savour The Timeless Taste of Tradition With Gopi Sweets"
               products={classicProducts}
@@ -154,10 +154,10 @@ export default function Home() {
           </div>
         </ScrollAnimation>
       )}
-      
+
       {premiumProducts.length > 0 && (
         <ScrollAnimation delay={200}>
-          <ProductSection 
+          <ProductSection
             title="Premium Sweets"
             subtitle="Savour The Timeless Taste of Tradition With Gopi Premium Sweets"
             products={premiumProducts}
@@ -165,13 +165,13 @@ export default function Home() {
           />
         </ScrollAnimation>
       )}
-      
+
       <ScrollAnimation delay={150}>
         <div id="about">
           <AboutSection />
         </div>
       </ScrollAnimation>
-      
+
       {giftBoxes.length > 0 && (
         <ScrollAnimation delay={200}>
           <div id="gifting">
@@ -179,19 +179,19 @@ export default function Home() {
           </div>
         </ScrollAnimation>
       )}
-      
+
       {instaBooks.length > 0 && (
         <ScrollAnimation delay={150}>
           <InstaBookSection instaBooks={instaBooks} />
         </ScrollAnimation>
       )}
-      
+
       {galleryItems.length > 0 && (
         <ScrollAnimation delay={200}>
           <GallerySection galleryItems={galleryItems} />
         </ScrollAnimation>
       )}
-      
+
       {instaPosts.length > 0 && (
         <ScrollAnimation delay={150}>
           <InstaPostSection instaPosts={instaPosts} />
@@ -201,13 +201,13 @@ export default function Home() {
       <ScrollAnimation delay={150}>
         <MapSection />
       </ScrollAnimation>
-      
+
       {blogs.length > 0 && (
         <ScrollAnimation delay={200}>
           <BlogSection blogs={blogs} />
         </ScrollAnimation>
       )}
-      
+
       <Footer />
     </main>
   );

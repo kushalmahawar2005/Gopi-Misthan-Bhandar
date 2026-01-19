@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
+import Link from 'next/link';
 import { FiChevronLeft, FiChevronRight } from 'react-icons/fi';
 import { fetchHeroSlides, HeroSlide } from '@/lib/api';
 
@@ -28,7 +29,7 @@ const HeroSection = () => {
     const distance = touchStart.current - touchEnd.current;
     const isLeftSwipe = distance > 50;
     const isRightSwipe = distance < -50;
-    
+
     if (isLeftSwipe) nextSlide();
     if (isRightSwipe) prevSlide();
   };
@@ -104,7 +105,7 @@ const HeroSection = () => {
   return (
     <section className="relative w-full -mt-2 md:mt-6 mb-8 md:mb-4">
       <div className="relative w-full md:max-w-7xl md:mx-auto md:px-8 lg:px-12">
-        <div 
+        <div
           className="aspect-[4/5] md:aspect-auto md:h-[380px] lg:h-[420px] relative overflow-hidden rounded-none md:rounded-2xl"
           onTouchStart={onTouchStart}
           onTouchMove={onTouchMove}
@@ -112,29 +113,31 @@ const HeroSection = () => {
         >
           <div className="relative w-full h-full">
             {slides.map((slide, index) => (
-              <div
+              <Link
                 key={slide.id}
-                className={`absolute inset-0 transition-opacity duration-700 ${
-                  index === currentSlide ? 'opacity-100 z-10' : 'opacity-0 z-0'
-                }`}
+                href="/category/sweets"
+                className={`absolute inset-0 transition-opacity duration-700 block ${index === currentSlide ? 'opacity-100 z-10' : 'opacity-0 z-0'
+                  }`}
               >
-                <Image
-                  src={slide.image}
-                  alt={`Hero slide ${index + 1}`}
-                  fill
-                  className="object-contain object-center hidden md:block"
-                  priority={index === 0}
-                  sizes="100vw"
-                />
-                <Image
-                  src={(slide as any).mobileImage || slide.image}
-                  alt={`Hero slide ${index + 1}`}
-                  fill
-                  className="object-contain object-center md:hidden"
-                  priority={index === 0}
-                  sizes="100vw"
-                />
-              </div>
+                <div className="relative w-full h-full">
+                  <Image
+                    src={slide.image}
+                    alt={`Hero slide ${index + 1}`}
+                    fill
+                    className="object-contain object-center hidden md:block"
+                    priority={index === 0}
+                    sizes="100vw"
+                  />
+                  <Image
+                    src={(slide as any).mobileImage || slide.image}
+                    alt={`Hero slide ${index + 1}`}
+                    fill
+                    className="object-contain object-center md:hidden"
+                    priority={index === 0}
+                    sizes="100vw"
+                  />
+                </div>
+              </Link>
             ))}
           </div>
 
@@ -144,9 +147,8 @@ const HeroSection = () => {
                 <button
                   key={index}
                   onClick={() => goToSlide(index)}
-                  className={`w-2 h-2 rounded-full transition-all ${
-                    index === currentSlide ? 'bg-white w-8' : 'bg-white/50 hover:bg-white/75'
-                  }`}
+                  className={`w-2 h-2 rounded-full transition-all ${index === currentSlide ? 'bg-white w-8' : 'bg-white/50 hover:bg-white/75'
+                    }`}
                   aria-label={`Go to slide ${index + 1}`}
                 />
               ))}

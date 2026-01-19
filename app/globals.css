@@ -10,36 +10,35 @@
     padding: 0;
     box-sizing: border-box;
   }
-  
-  html, body {
+
+  html,
+  body {
     margin: 0;
     padding: 0;
     width: 100%;
     overflow-x: hidden;
   }
-  
+
   body {
     @apply bg-white text-black;
     /* Mobile bottom navigation padding */
     padding-bottom: env(safe-area-inset-bottom);
   }
 
-  /* Add bottom padding for mobile bottom navigation on all pages */
-  @media (max-width: 768px) {
-    body {
-      padding-bottom: 90px;
-    }
-  }
+
 }
 
 /* Hide horizontal scrollbar where supported */
-.no-scrollbar {
-  -ms-overflow-style: none; /* IE/Edge */
-  scrollbar-width: none; /* Firefox */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  /* IE/Edge */
+  scrollbar-width: none;
+  /* Firefox */
 }
 
-.no-scrollbar::-webkit-scrollbar {
-  display: none; /* Chrome/Safari */
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+  /* Chrome/Safari */
 }
 
 /* Scroll Animations */
@@ -48,6 +47,7 @@
     opacity: 0;
     transform: translateY(30px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -58,6 +58,7 @@
   from {
     opacity: 0;
   }
+
   to {
     opacity: 1;
   }
@@ -93,7 +94,8 @@
 html {
   scroll-behavior: auto;
   -webkit-overflow-scrolling: touch;
-  scroll-padding-top: 80px; /* Account for fixed header */
+  scroll-padding-top: 80px;
+  /* Account for fixed header */
 }
 
 body {
@@ -160,6 +162,7 @@ section,
   0% {
     transform: translateX(0);
   }
+
   100% {
     transform: translateX(-33.333%);
   }
