@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useMemo, useEffect, Suspense } from 'react';
-import { useParams } from 'next/navigation';
+import { useParams, usePathname } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
 import { fetchCategoryBySlug, fetchProducts, fetchCategories } from '@/lib/api';
@@ -18,6 +18,7 @@ type SortOption = 'default' | 'price-low' | 'price-high' | 'name';
 
 function CategoryContent() {
   const params = useParams();
+  const pathname = usePathname();
   const slug = params.slug as string;
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [sortBy, setSortBy] = useState<SortOption>('default');
@@ -41,10 +42,10 @@ function CategoryContent() {
       ]);
       setCategory(categoryData);
       setCategories(allCategories);
-      
+
       // Fetch products: category + subcategories
       let allProducts: Product[] = [];
-      
+
       // Fetch main category products
       try {
         const categoryProducts = await fetchProducts({ category: slug });
@@ -52,7 +53,7 @@ function CategoryContent() {
       } catch (error) {
         console.error('Error fetching category products:', error);
       }
-      
+
       // Fetch subcategory products if category has subcategories
       if (categoryData && categoryData.subCategories && categoryData.subCategories.length > 0) {
         try {
@@ -64,7 +65,7 @@ function CategoryContent() {
               return [];
             }
           });
-          
+
           const subcategoryProductsArrays = await Promise.all(subcategoryProductsPromises);
           // Flatten and add to allProducts
           subcategoryProductsArrays.forEach(subProducts => {
@@ -74,21 +75,21 @@ function CategoryContent() {
           console.error('Error fetching subcategory products:', error);
         }
       }
-      
+
       // Remove duplicates based on product ID
       const uniqueProducts = allProducts.filter((product, index, self) =>
         index === self.findIndex((p) => p.id === product.id)
       );
-      
+
       setProducts(uniqueProducts);
-      
+
       // Fetch product counts for each category (including subcategories)
       const counts: Record<string, number> = {};
       await Promise.all(
         allCategories.map(async (cat) => {
           try {
             let catProducts = await fetchProducts({ category: cat.slug });
-            
+
             // Also include subcategory products in count
             if (cat.subCategories && cat.subCategories.length > 0) {
               const subcategoryProductsPromises = cat.subCategories.map(async (sub: any) => {
@@ -102,13 +103,13 @@ function CategoryContent() {
               subcategoryProductsArrays.forEach(subProducts => {
                 catProducts = [...catProducts, ...subProducts];
               });
-              
+
               // Remove duplicates
               catProducts = catProducts.filter((product, index, self) =>
                 index === self.findIndex((p) => p.id === product.id)
               );
             }
-            
+
             counts[cat.slug] = catProducts.length;
           } catch (error) {
             counts[cat.slug] = 0;
@@ -193,13 +194,13 @@ function CategoryContent() {
   }
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className={`min-h-screen bg-white ${pathname.startsWith('/category/') ? 'pt-[72px] md:pt-[88px]' : ''}`}>
       <Header />
       <Navigation />
       <Cart />
 
       {/* Categories List Section */}
-      <div className="w-full bg-[#f7db9d] py-6 md:py-8 px-4 overflow-x-auto">
+      <div className="w-full bg-[#f7db9d] py-6 md:py-8 px-4 overflow-x-auto scrollbar-hide">
         <div className="flex gap-4 md:gap-6 md:justify-center" style={{ width: 'max-content', minWidth: '100%' }}>
           {categories.map((cat) => {
             const isActive = cat.slug === slug;
@@ -208,17 +209,20 @@ function CategoryContent() {
               <Link
                 key={cat.id}
                 href={`/category/${cat.slug}`}
-                className={`flex-shrink-0 flex flex-col items-center bg-white rounded-xl overflow-hidden transition-all ${
-                  isActive 
-                    ? 'ring-4 ring-primary-red shadow-xl' 
-                    : 'hover:shadow-lg'
-                }`}
+                ref={isActive ? (el) => {
+                  if (el) {
+                    el.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+                  }
+                } : null}
+                className={`flex-shrink-0 flex flex-col items-center bg-white rounded-xl overflow-hidden transition-all ${isActive
+                  ? 'ring-4 ring-primary-red shadow-xl scale-105'
+                  : 'hover:shadow-lg'
+                  }`}
                 style={{ width: '150px', minWidth: '150px' }}
               >
                 {/* Category Image */}
-                <div className={`relative w-full aspect-square overflow-hidden ${
-                  isActive ? 'bg-primary-red' : 'bg-gray-100'
-                }`}>
+                <div className={`relative w-full aspect-square overflow-hidden ${isActive ? 'bg-primary-red' : 'bg-gray-100'
+                  }`}>
                   {cat.image ? (
                     <Image
                       src={cat.image}
@@ -233,12 +237,11 @@ function CategoryContent() {
                     </div>
                   )}
                 </div>
-                
+
                 {/* Category Info */}
                 <div className="w-full p-3 bg-white">
-                  <h3 className={`text-sm font-bold text-center mb-1 ${
-                    isActive ? 'text-primary-red' : 'text-gray-800'
-                  }`}>
+                  <h3 className={`text-sm font-bold text-center mb-1 ${isActive ? 'text-primary-red' : 'text-gray-800'
+                    }`}>
                     {cat.name}
                   </h3>
                   <p className="text-xs text-gray-600 text-center">
@@ -300,9 +303,8 @@ function CategoryContent() {
                           setSortBy(option.value);
                           setShowSortMenu(false);
                         }}
-                        className={`w-full text-left px-4 py-2 text-sm hover:bg-gray-50 first:rounded-t-lg last:rounded-b-lg ${
-                          sortBy === option.value ? 'bg-primary-red text-white' : 'text-gray-700'
-                        }`}
+                        className={`w-full text-left px-4 py-2 text-sm hover:bg-gray-50 first:rounded-t-lg last:rounded-b-lg ${sortBy === option.value ? 'bg-primary-red text-white' : 'text-gray-700'
+                          }`}
                       >
                         {option.label}
                       </button>
@@ -316,17 +318,15 @@ function CategoryContent() {
             <div className="flex items-center gap-1 border border-gray-300 rounded-lg p-1">
               <button
                 onClick={() => setViewMode('grid')}
-                className={`p-2 rounded transition-colors ${
-                  viewMode === 'grid' ? 'bg-primary-red text-white' : 'text-gray-600 hover:bg-gray-100'
-                }`}
+                className={`p-2 rounded transition-colors ${viewMode === 'grid' ? 'bg-primary-red text-white' : 'text-gray-600 hover:bg-gray-100'
+                  }`}
               >
                 <FiGrid className="w-4 h-4" />
               </button>
               <button
                 onClick={() => setViewMode('list')}
-                className={`p-2 rounded transition-colors ${
-                  viewMode === 'list' ? 'bg-primary-red text-white' : 'text-gray-600 hover:bg-gray-100'
-                }`}
+                className={`p-2 rounded transition-colors ${viewMode === 'list' ? 'bg-primary-red text-white' : 'text-gray-600 hover:bg-gray-100'
+                  }`}
               >
                 <FiList className="w-4 h-4" />
               </button>
