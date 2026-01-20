@@ -49,8 +49,8 @@ export const authOptions: NextAuthOptions = {
                     await connectDB();
                     const dbUser = await User.findOne({ email: session.user.email });
                     if (dbUser) {
-                        session.user.id = dbUser._id.toString();
-                        session.user.role = dbUser.role;
+                        session.user.id = (dbUser as any)._id.toString();
+                        session.user.role = (dbUser as any).role;
                     }
                 } catch (error) {
                     console.error('Error fetching user for session:', error);
