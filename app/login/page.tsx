@@ -10,6 +10,7 @@ import Footer from '@/components/Footer';
 import Cart from '@/components/Cart';
 import { FiMail, FiLock, FiEye, FiEyeOff } from 'react-icons/fi';
 import { FcGoogle } from 'react-icons/fc';
+import { signIn } from 'next-auth/react';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -43,9 +44,8 @@ export default function LoginPage() {
     setIsLoading(false);
   };
 
-  const handleGoogleLogin = () => {
-    // TODO: Implement Google Login
-    console.log('Google login clicked');
+  const handleGoogleLogin = async () => {
+    await signIn('google', { callbackUrl: '/profile' });
   };
 
   return (

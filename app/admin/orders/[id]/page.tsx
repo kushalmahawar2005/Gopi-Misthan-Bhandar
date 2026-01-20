@@ -128,7 +128,7 @@ export default function OrderDetails() {
             </div>
             <div className="space-y-2">
               <p><span className="font-medium">Order Number:</span> {order.orderNumber}</p>
-              <p><span className="font-medium">Status:</span> 
+              <p><span className="font-medium">Status:</span>
                 <select
                   value={order.status}
                   onChange={(e) => updateStatus(e.target.value)}
@@ -170,7 +170,7 @@ export default function OrderDetails() {
                 <span>₹{order.shippingCost.toLocaleString()}</span>
               </div>
               <div className="flex justify-between font-bold text-lg border-t pt-2">
-                <span>Total:</span>
+                <span>Total Amount:</span>
                 <span>₹{order.total.toLocaleString()}</span>
               </div>
             </div>

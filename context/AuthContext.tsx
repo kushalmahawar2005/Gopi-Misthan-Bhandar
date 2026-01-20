@@ -2,6 +2,7 @@
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { createToken, verifyToken, getToken, saveToken, removeToken, getUserFromToken } from '@/lib/jwt';
+import { useSession, signOut as nextAuthSignOut } from 'next-auth/react';
 
 export interface User {
   id?: string;
@@ -28,23 +29,40 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+// ...
+
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const { data: session } = useSession();
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Load user from token on mount
+  // Load user from token or session
   useEffect(() => {
-    const token = getToken();
-    if (token) {
-      const payload = verifyToken(token);
-      if (payload) {
-        // Try to fetch user from API, fallback to token payload
-        fetchUserData(payload.userId || payload.email)
-          .then((userData) => {
+    const initAuth = async () => {
+      // 1. Check NextAuth Session (Google Login)
+      if (session?.user) {
+        setUser({
+          id: (session.user as any).id, // Cast because we extended the session type in route.ts but typescript might not know here without types
+          userId: (session.user as any).id,
+          email: session.user.email || '',
+          name: session.user.name || '',
+          role: (session.user as any).role || 'user',
+          // Google login doesn't usually give these, but we could fetch from DB if needed
+        });
+        setIsLoading(false);
+        return;
+      }
+
+      // 2. Check Custom Token (Email/Pass Login)
+      const token = getToken();
+      if (token) {
+        const payload = verifyToken(token);
+        if (payload) {
+          try {
+            const userData = await fetchUserData(payload.userId || payload.email);
             if (userData) {
               setUser(userData);
             } else {
-              // Fallback to token data
               setUser({
                 id: payload.userId,
                 userId: payload.userId,
@@ -53,9 +71,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 role: (payload.role === 'admin' || payload.role === 'user') ? payload.role : 'user',
               });
             }
-          })
-          .catch(() => {
-            // Fallback to token data
+          } catch (error) {
             setUser({
               id: payload.userId,
               userId: payload.userId,
@@ -63,13 +79,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
               name: payload.name || '',
               role: (payload.role === 'admin' || payload.role === 'user') ? payload.role : 'user',
             });
-          });
-      } else {
-        removeToken();
+          }
+        } else {
+          removeToken();
+        }
       }
-    }
-    setIsLoading(false);
-  }, []);
+      setIsLoading(false);
+    };
+
+    initAuth();
+  }, [session]);
 
   const fetchUserData = async (userIdOrEmail: string): Promise<User | null> => {
     try {
@@ -112,7 +131,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       // Save token
       saveToken(data.data.token);
-      
+
       // Set user
       setUser({
         id: data.data.user.id,
@@ -157,7 +176,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       // Save token
       saveToken(data.data.token);
-      
+
       // Set user
       setUser({
         id: data.data.user.id,
@@ -177,6 +196,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const logout = () => {
     removeToken();
+    nextAuthSignOut({ redirect: false });
     setUser(null);
   };
 

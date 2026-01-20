@@ -34,6 +34,8 @@ export default function AdminDashboard() {
     couponUses: 0,
   });
 
+  const [recentOrders, setRecentOrders] = useState<any[]>([]);
+
   useEffect(() => {
     fetchStats();
   }, []);
@@ -51,6 +53,10 @@ export default function AdminDashboard() {
       const categoriesData = await categoriesRes.json();
       const ordersData = await ordersRes.json();
       const usersData = await usersRes.json();
+
+      if (ordersData.data) {
+        setRecentOrders(ordersData.data.slice(0, 8));
+      }
 
       const totalRevenue = ordersData.data?.reduce((sum: number, order: any) => sum + order.total, 0) || 0;
       const today = new Date().toISOString().split('T')[0];
@@ -207,7 +213,29 @@ export default function AdminDashboard() {
               View All
             </Link>
           </div>
-          <p className="text-gray-500 text-sm">No recent orders</p>
+          {recentOrders.length === 0 ? (
+            <p className="text-gray-500 text-sm">No recent orders</p>
+          ) : (
+            <div className="space-y-4">
+              {recentOrders.map((order) => (
+                <div key={order._id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+                  <div>
+                    <p className="text-sm font-medium text-primary-brown">{order.orderNumber}</p>
+                    <p className="text-xs text-gray-500">{order.shipping?.name || 'Guest User'}</p>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-sm font-bold text-primary-brown">₹{order.total}</p>
+                    <span className={`text-[10px] px-2 py-0.5 rounded-full uppercase tracking-wide font-medium ${order.status === 'delivered' ? 'bg-green-100 text-green-700' :
+                      order.status === 'cancelled' ? 'bg-red-100 text-red-700' :
+                        'bg-orange-100 text-orange-700'
+                      }`}>
+                      {order.status}
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
 
         <div className="bg-white rounded-lg border border-gray-200 p-6">

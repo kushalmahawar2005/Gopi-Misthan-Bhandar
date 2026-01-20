@@ -7,6 +7,7 @@ import FloatingContactButtons from '@/components/FloatingContactButtons'
 import MobileBottomNav from '@/components/MobileBottomNav'
 import SmoothScroll from '@/components/SmoothScroll'
 import TrendingBannerModal from '@/components/TrendingBannerModal'
+import NextAuthSessionProvider from '@/components/NextAuthSessionProvider'
 
 export const metadata: Metadata = {
   title: 'Gopi Misthan Bhandar Neemuch - Traditional Indian Sweets',
@@ -49,16 +50,18 @@ export default function RootLayout({
       </head>
       <body className="antialiased">
         <SmoothScroll />
-        <AuthProvider>
-          <WishlistProvider>
-            <CartProvider>
-              {children}
-              <FloatingContactButtons />
-              <TrendingBannerModal />
-              {/* <MobileBottomNav /> */}
-            </CartProvider>
-          </WishlistProvider>
-        </AuthProvider>
+        <NextAuthSessionProvider>
+          <AuthProvider>
+            <WishlistProvider>
+              <CartProvider>
+                {children}
+                <FloatingContactButtons />
+                <TrendingBannerModal />
+                {/* <MobileBottomNav /> */}
+              </CartProvider>
+            </WishlistProvider>
+          </AuthProvider>
+        </NextAuthSessionProvider>
       </body>
     </html>
   )

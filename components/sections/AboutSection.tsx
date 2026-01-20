@@ -45,7 +45,7 @@ const AboutHero: React.FC = () => {
     try {
       const data = await fetchAboutContent();
       if (data) {
-        
+
         // FIXED SORT FUNCTION (TS SAFE)
         if (data.aboutCards && Array.isArray(data.aboutCards) && data.aboutCards.length > 0) {
           data.aboutCards.sort((a: AboutCard, b: AboutCard) => (a?.order ?? 0) - (b?.order ?? 0));
@@ -189,9 +189,8 @@ const AboutHero: React.FC = () => {
             {cards.map((card, index) => (
               <div
                 key={index}
-                className={`transition-opacity duration-700 ${
-                  index === currentSlide ? 'opacity-100' : 'opacity-0 absolute inset-0'
-                }`}
+                className={`transition-opacity duration-700 ${index === currentSlide ? 'opacity-100' : 'opacity-0 absolute inset-0'
+                  }`}
               >
                 <div className="flex flex-col-reverse md:flex-row items-center gap-8 md:gap-12">
 
@@ -288,9 +287,8 @@ const AboutHero: React.FC = () => {
                   <button
                     key={index}
                     onClick={() => goToSlide(index)}
-                    className={`w-2 h-2 rounded-full transition-all ${
-                      index === currentSlide ? 'bg-[#a02126] w-8' : 'bg-white/50'
-                    }`}
+                    className={`w-2 h-2 rounded-full transition-all ${index === currentSlide ? 'bg-[#a02126] w-8' : 'bg-white/50'
+                      }`}
                   />
                 ))}
               </div>

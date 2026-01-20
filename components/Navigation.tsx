@@ -109,7 +109,7 @@ const Navigation = () => {
     { label: 'DRY FRUIT', href: '/category/dry-fruit', slug: 'dry-fruit' },
     { label: 'BACKERY ITEMS', href: '/category/bakery', slug: 'bakery' },
     { label: 'NAMKEEN', href: '/category/namkeen', slug: 'namkeen' },
-    { label: 'SAVOURY SNACKS', href: '/category/savoury', slug: 'savoury' },
+    { label: 'SAVOURY SNACKS', href: '/category/savoury-snacks', slug: 'savoury-snacks' },
     { label: 'GIFTING', href: '/#gifting', slug: 'gifting' },
   ];
 
@@ -178,8 +178,8 @@ const Navigation = () => {
     <>
       <nav
         className={`bg-white w-full border-b border-gray-200 shadow-sm z-50 transition-transform duration-300 ${pathname.startsWith('/category/')
-            ? `fixed top-0 left-0 right-0 ${isVisible ? 'translate-y-0' : '-translate-y-full'}`
-            : 'sticky top-0'
+          ? `fixed top-0 left-0 right-0 ${isVisible ? 'translate-y-0' : '-translate-y-full'}`
+          : 'sticky top-0'
           }`}
       >
 

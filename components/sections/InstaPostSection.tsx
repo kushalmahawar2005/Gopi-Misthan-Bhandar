@@ -15,26 +15,83 @@ interface InstaPostSectionProps {
 }
 
 const InstaPostSection: React.FC<InstaPostSectionProps> = ({ instaPosts }) => {
-  const [index, setIndex] = useState(0);
-  const sliderRef = useRef<HTMLDivElement>(null);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const autoScrollIntervalRef = useRef<NodeJS.Timeout | null>(null);
+  const isUserInteractingRef = useRef(false);
+
+  // If we have very few posts, duplicate them to create a seamless infinite scroll look
+  // rather than having empty whitespace.
+  const [displayPosts, setDisplayPosts] = useState<typeof instaPosts>([]);
+
+  useEffect(() => {
+    if (instaPosts && instaPosts.length > 0) {
+      let repeatedPosts = [...instaPosts];
+      // Repeat until we have at least 10 items for a smooth scroll experience
+      while (repeatedPosts.length < 10) {
+        repeatedPosts = [...repeatedPosts, ...instaPosts];
+      }
+      setDisplayPosts(repeatedPosts);
+    }
+  }, [instaPosts]);
 
   if (!instaPosts || instaPosts.length === 0) return null;
 
-  // Auto-slide every 3 sec
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setIndex((prev) => (prev + 1) % instaPosts.length);
-    }, 3000);
+  // Handle user interaction to pause auto-scroll
+  const handleUserInteractionStart = () => {
+    isUserInteractingRef.current = true;
+  };
 
-    return () => clearInterval(interval);
-  }, [instaPosts.length]);
+  const handleUserInteractionEnd = () => {
+    isUserInteractingRef.current = false;
+  };
 
-  // Slide logic
-  useEffect(() => {
-    if (sliderRef.current) {
-      sliderRef.current.style.transform = `translateX(-${index * 320}px)`;
+  const autoScroll = () => {
+    if (scrollContainerRef.current && !isUserInteractingRef.current) {
+      const container = scrollContainerRef.current;
+      // Calculate width of one card + gap (approximate based on styling)
+      // We can get the first child's width if available
+      const firstCard = container.firstElementChild as HTMLElement;
+      // 220px card width + 24px gap = 244px
+      const cardWidth = firstCard ? firstCard.clientWidth + 24 : 244;
+
+      const maxScroll = container.scrollWidth - container.clientWidth;
+
+      // If we are close to the end, scroll back to start
+      if (container.scrollLeft >= maxScroll - 10) {
+        container.scrollTo({ left: 0, behavior: 'smooth' });
+      } else {
+        // Otherwise scroll by one card width
+        container.scrollBy({ left: cardWidth, behavior: 'smooth' });
+      }
     }
-  }, [index]);
+  };
+
+  useEffect(() => {
+    const container = scrollContainerRef.current;
+    if (container) {
+      container.addEventListener('touchstart', handleUserInteractionStart);
+      container.addEventListener('touchend', handleUserInteractionEnd);
+      container.addEventListener('mouseenter', handleUserInteractionStart);
+      container.addEventListener('mouseleave', handleUserInteractionEnd);
+    }
+
+    if (instaPosts.length > 0) {
+      // Auto-scroll faster than categories for better engagement, e.g., 3s was original, try 4s
+      autoScrollIntervalRef.current = setInterval(autoScroll, 3000);
+    }
+
+    return () => {
+      if (autoScrollIntervalRef.current) {
+        clearInterval(autoScrollIntervalRef.current);
+      }
+      if (container) {
+        container.removeEventListener('touchstart', handleUserInteractionStart);
+        container.removeEventListener('touchend', handleUserInteractionEnd);
+        container.removeEventListener('mouseenter', handleUserInteractionStart);
+        container.removeEventListener('mouseleave', handleUserInteractionEnd);
+      }
+    };
+  }, [instaPosts]);
 
   return (
     <section className="py-16 md:py-24 px-4 bg-white w-full">
@@ -44,20 +101,20 @@ const InstaPostSection: React.FC<InstaPostSectionProps> = ({ instaPosts }) => {
         </h3>
 
         {/* Slider Container */}
-        <div className="relative overflow-hidden w-full">
-          {/* Track */}
-          <div
-            ref={sliderRef}
-            className="flex gap-6 transition-transform duration-700 ease-in-out"
-            style={{ width: `${instaPosts.length * 320}px` }}
-          >
-            {instaPosts.map((post) => (
+        <div
+          ref={scrollContainerRef}
+          className="flex gap-6 overflow-x-auto scroll-smooth no-scrollbar"
+          style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+        >
+          {displayPosts.map((post, index) => (
+            <div
+              key={`${post._id}-${index}`}
+              className="flex-shrink-0"
+            >
               <Link
-                key={post._id}
                 href={post.instagramUrl}
                 target="_blank"
-                className="relative w-[220px] h-[260px] flex-shrink-0 overflow-hidden group cursor-pointer rounded-xl border border-gray-100 bg-white shadow-sm hover:shadow-lg transition-shadow"
-
+                className="relative block w-[220px] h-[260px] overflow-hidden group cursor-pointer rounded-xl border border-gray-100 bg-white shadow-sm hover:shadow-lg transition-shadow"
               >
                 <Image
                   src={post.imageUrl || `https://picsum.photos/seed/ig${post._id}/300/340`}
@@ -74,10 +131,16 @@ const InstaPostSection: React.FC<InstaPostSectionProps> = ({ instaPosts }) => {
                   <FaInstagram className="text-white text-4xl drop-shadow-xl" />
                 </div>
               </Link>
-            ))}
-          </div>
+            </div>
+          ))}
         </div>
       </div>
+
+      <style jsx>{`
+        .no-scrollbar::-webkit-scrollbar {
+          display: none;
+        }
+      `}</style>
     </section>
   );
 };
