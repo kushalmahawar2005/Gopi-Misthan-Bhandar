@@ -77,7 +77,7 @@ const CategoriesSection: React.FC<CategoriesSectionProps> = ({ categories }) => 
           <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-primary-brown">
             Our Categories
           </h2>
-          <p className="text-xs md:text-sm text-gray-500 uppercase tracking-widest mt-3">
+          <p className="text-xs md:text-sm text-gray-500 uppercase tracking-widest mt-3 font-geom">
             Explore our wide range of traditional Indian sweets, snacks, and namkeen
           </p>
         </div>

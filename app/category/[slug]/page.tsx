@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useMemo, useEffect, Suspense } from 'react';
-import { useParams, usePathname } from 'next/navigation';
+import { useParams, usePathname, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
 import { fetchCategoryBySlug, fetchProducts, fetchCategories } from '@/lib/api';
@@ -19,6 +19,7 @@ type SortOption = 'default' | 'price-low' | 'price-high' | 'name';
 function CategoryContent() {
   const params = useParams();
   const pathname = usePathname();
+  const searchParams = useSearchParams();
   const slug = params.slug as string;
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [sortBy, setSortBy] = useState<SortOption>('default');
@@ -125,8 +126,26 @@ function CategoryContent() {
   };
 
   // Filter and sort products
+  const [selectedSubCategory, setSelectedSubCategory] = useState<string>('all');
+
+  useEffect(() => {
+    // Reset or set subcategory from URL query param when category changes or URL changes
+    const subParam = searchParams.get('subcategory');
+    if (subParam) {
+      setSelectedSubCategory(subParam);
+    } else {
+      setSelectedSubCategory('all');
+    }
+  }, [slug, searchParams]);
+
+  // Filter and sort products
   const filteredAndSortedProducts = useMemo(() => {
     let filtered = [...products];
+
+    // Subcategory filter
+    if (selectedSubCategory !== 'all') {
+      filtered = filtered.filter(product => product.category === selectedSubCategory);
+    }
 
     // Search filter - only search in product name
     if (searchQuery) {
@@ -152,7 +171,7 @@ function CategoryContent() {
     }
 
     return filtered;
-  }, [products, searchQuery, sortBy]);
+  }, [products, searchQuery, sortBy, selectedSubCategory]);
 
   const sortOptions: { value: SortOption; label: string }[] = [
     { value: 'default', label: 'Default' },
@@ -253,6 +272,44 @@ function CategoryContent() {
           })}
         </div>
       </div>
+
+      {/* Subcategories Filter (Pills) - New Feature */}
+      {category && category.subCategories && category.subCategories.length > 0 && (
+        <div className="w-full px-4 pt-6">
+          <div className="overflow-x-auto pb-2 scrollbar-hide">
+            <div className="flex gap-2 justify-center" style={{ width: 'max-content', minWidth: '100%' }}>
+              <button
+                onClick={() => setSelectedSubCategory('all')}
+                className={`px-4 py-2 rounded-full text-sm border transition-colors ${selectedSubCategory === 'all'
+                  ? 'bg-primary-red text-white border-primary-red'
+                  : 'bg-white text-gray-600 border-gray-300 hover:border-primary-red hover:text-primary-red'
+                  }`}
+              >
+                All ({products.length})
+              </button>
+              {category.subCategories.map((sub: any) => {
+                // Count products for this subcategory
+                // Since 'products' contains all products for the main category + subcategories,
+                // we can just filter the current 'products' state.
+                const count = products.filter(p => p.category === sub.slug).length;
+
+                return (
+                  <button
+                    key={sub.slug}
+                    onClick={() => setSelectedSubCategory(sub.slug)}
+                    className={`px-4 py-2 rounded-full text-sm border transition-colors ${selectedSubCategory === sub.slug
+                      ? 'bg-primary-red text-white border-primary-red'
+                      : 'bg-white text-gray-600 border-gray-300 hover:border-primary-red hover:text-primary-red'
+                      }`}
+                  >
+                    {sub.name} ({count})
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Filters and Controls */}
       <div className="w-full px-4 py-6 border-b border-gray-200">

@@ -23,9 +23,24 @@ export default function AdminProducts() {
   const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'inactive'>('all');
   const [categoryFilter, setCategoryFilter] = useState('all');
 
+  const [categories, setCategories] = useState<{ name: string; slug: string }[]>([]);
+
   useEffect(() => {
     fetchProducts();
+    fetchCategories();
   }, []);
+
+  const fetchCategories = async () => {
+    try {
+      const response = await fetch('/api/categories');
+      const data = await response.json();
+      if (data.success) {
+        setCategories(data.data);
+      }
+    } catch (error) {
+      console.error('Error fetching categories:', error);
+    }
+  };
 
   const fetchProducts = async () => {
     try {
@@ -71,8 +86,6 @@ export default function AdminProducts() {
     );
   }
 
-  const categories = ['all', 'sweets', 'snacks', 'namkeen', 'dry-fruit', 'gifting'];
-
   return (
     <div className="space-y-6 w-full">
       {/* Header */}
@@ -117,9 +130,10 @@ export default function AdminProducts() {
             onChange={(e) => setCategoryFilter(e.target.value)}
             className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-red bg-white"
           >
+            <option value="all">All Categories</option>
             {categories.map((cat) => (
-              <option key={cat} value={cat}>
-                {cat === 'all' ? 'All Categories' : cat.charAt(0).toUpperCase() + cat.slice(1)}
+              <option key={cat.slug} value={cat.slug}>
+                {cat.name}
               </option>
             ))}
           </select>

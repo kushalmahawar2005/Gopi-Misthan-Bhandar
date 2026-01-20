@@ -36,7 +36,7 @@ const GiftBoxSection: React.FC<GiftBoxSectionProps> = ({ giftBoxes }) => {
         <h2 className="text-4xl text-black mb-2 font-jost font-[500] text-center">
           GIFT BOX
         </h2>
-        <p className="text-gray-800 text-sm md:text-[15px] font-jost mb-6 md:mb-8 text-center max-w-3xl mx-auto leading-relaxed">
+        <p className="text-gray-800 text-sm md:text-[15px] font-geom mb-6 md:mb-8 text-center max-w-3xl mx-auto leading-relaxed">
           Exquisitely packaged to benefit every occasion, we celebrate your pride, happiness and relationships with absolute grandeur.
         </p>
 

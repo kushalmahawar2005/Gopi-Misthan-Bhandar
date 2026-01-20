@@ -22,20 +22,20 @@ const BlogSection: React.FC<BlogSectionProps> = ({ blogs }) => {
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', { 
-      year: 'numeric', 
-      month: 'long', 
-      day: 'numeric' 
+    return date.toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
     });
   };
 
   return (
     <section className="py-12 md:py-20 px-4 bg-white w-full">
       <div className="w-full max-w-7xl mx-auto">
-        <h2 className="text-center text-2xl md:text-3xl font-general-sansal-sansal-sansal-sansal-sansal-sans text-black mb-12 md:mb-16 font-medium">
+        <h2 className="text-center text-2xl md:text-3xl font-general-sans text-black mb-12 md:mb-16 font-medium">
           Latest Blogs
         </h2>
-        
+
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
           {blogs.map((blog) => (
             <div
@@ -52,13 +52,13 @@ const BlogSection: React.FC<BlogSectionProps> = ({ blogs }) => {
                   sizes="(max-width: 768px) 100vw, 33vw"
                 />
               </div>
-              
+
               {/* Content */}
               <div className="p-6 flex flex-col flex-grow">
                 <p className="text-sm text-gray-500 mb-3">
                   {formatDate(blog.publishedDate)}
                 </p>
-                <h3 className="text-xl md:text-2xl font-general-sansal-sansal-sansal-sansal-sansal-sans font-bold text-primary-brown mb-3 line-clamp-2">
+                <h3 className="text-xl md:text-2xl font-general-sans font-bold text-primary-brown mb-3 line-clamp-2">
                   {blog.title}
                 </h3>
                 <p className="text-gray-600 text-sm md:text-base mb-6 leading-relaxed line-clamp-3 flex-grow">

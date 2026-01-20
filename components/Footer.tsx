@@ -26,14 +26,14 @@ const Footer = () => {
 
   const quickLinks = [
     { label: 'Home', href: '/' },
-    { label: 'About Us', href: '#about' },
+    { label: 'About Us', href: '/#about' },
     { label: 'Products', href: '/products' },
-    { label: 'Categories', href: '#categories' },
-    { label: 'Contact', href: '#contact' },
+    { label: 'Categories', href: '/#categories' },
+    { label: 'Contact', href: '/#contact' },
   ];
 
   return (
-    <footer className="bg-primary-darkRed w-full">
+    <footer id="contact" className="bg-primary-darkRed w-full">
       {/* Content */}
       <div className="w-full px-4 py-12 md:py-16">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 md:gap-12 mb-8">

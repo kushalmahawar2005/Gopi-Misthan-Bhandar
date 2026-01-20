@@ -17,7 +17,7 @@ const InstaBookSection: React.FC<InstaBookSectionProps> = ({ instaBooks }) => {
           <h2 className="text-3xl md:text-4xl lg:text-5xl text-primary-brown font-bold font-general-sans tracking-tight mb-4">
             Follow Our Journey
           </h2>
-          <p className="text-xs md:text-sm text-gray-500 font-general-sans uppercase tracking-widest">
+          <p className="text-xs md:text-sm text-gray-500 font-geom uppercase tracking-widest">
             @GopiMisthanBhandar
           </p>
         </div>
@@ -106,9 +106,8 @@ const VideoCard: React.FC<VideoCardProps> = ({ item }) => {
 
             {/* Hover Controls (desktop) */}
             <div
-              className={`absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 via-black/50 to-transparent p-3 md:p-4 transition-opacity duration-300 z-20 ${
-                isHovered ? 'opacity-100' : 'opacity-0'
-              }`}
+              className={`absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 via-black/50 to-transparent p-3 md:p-4 transition-opacity duration-300 z-20 ${isHovered ? 'opacity-100' : 'opacity-0'
+                }`}
             >
               <div className="flex items-center justify-end gap-3 md:gap-4">
                 <button

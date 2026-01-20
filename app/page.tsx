@@ -138,7 +138,9 @@ export default function Home() {
 
       {categories.length > 0 && (
         <ScrollAnimation delay={150}>
-          <CategoriesSection categories={categories} />
+          <div id="categories">
+            <CategoriesSection categories={categories} />
+          </div>
         </ScrollAnimation>
       )}
 
