@@ -42,15 +42,30 @@ export const authOptions: NextAuthOptions = {
             }
             return true;
         },
+        async jwt({ token, user }: any) {
+            if (user) {
+                token.role = user.role;
+            }
+            return token;
+        },
         async session({ session, token }: any) {
             // Add user ID and role to session
             if (session.user) {
                 try {
-                    await connectDB();
-                    const dbUser = await User.findOne({ email: session.user.email });
-                    if (dbUser) {
-                        session.user.id = (dbUser as any)._id.toString();
-                        session.user.role = (dbUser as any).role;
+                    // Optimized: Use token data if available first
+                    if (token.role) {
+                        session.user.role = token.role;
+                        if (token.sub) session.user.id = token.sub;
+                    }
+
+                    // Only query DB if absolutely necessary (e.g., role not in token)
+                    if (!session.user.role) {
+                        await connectDB();
+                        const dbUser = await User.findOne({ email: session.user.email });
+                        if (dbUser) {
+                            session.user.id = (dbUser as any)._id.toString();
+                            session.user.role = (dbUser as any).role;
+                        }
                     }
                 } catch (error) {
                     console.error('Error fetching user for session:', error);
