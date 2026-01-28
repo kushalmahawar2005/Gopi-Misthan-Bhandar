@@ -11,9 +11,9 @@ interface InstaBookSectionProps {
 
 const InstaBookSection: React.FC<InstaBookSectionProps> = ({ instaBooks }) => {
   return (
-    <section className="py-16 md:py-24 px-4 bg-white w-full">
+    <section className="py-8 md:py-12 px-4 bg-white w-full">
       <div className="w-full">
-        <div className="text-center mb-12 md:mb-16">
+        <div className="text-center mb-12 md:mb-16 md:hidden">
           <h2 className="text-3xl md:text-4xl lg:text-5xl text-primary-brown font-bold font-general-sans tracking-tight mb-4">
             Follow Our Journey
           </h2>
@@ -22,7 +22,7 @@ const InstaBookSection: React.FC<InstaBookSectionProps> = ({ instaBooks }) => {
           </p>
         </div>
 
-        <div className="flex justify-center gap-4 sm:gap-5 md:gap-6 lg:gap-8 flex-wrap">
+        <div className="flex justify-center gap-3 md:gap-4 lg:gap-4 flex-wrap">
           {instaBooks.map((item) => (
             <VideoCard key={item.id} item={item} />
           ))}
@@ -66,10 +66,10 @@ const VideoCard: React.FC<VideoCardProps> = ({ item }) => {
           /* MOBILE — bigger reels */
           w-[88vw] max-w-[380px] sm:w-[85vw] sm:max-w-[400px] aspect-[9/16]
           /* DESKTOP/TABLET — revert to old sizes */
-          md:aspect-auto md:w-[190px] md:h-[490px]
-          lg:w-[180px] lg:h-[460px]
-          xl:w-[220px] xl:h-[420px]
-          2xl:w-[240px] 2xl:h-[420px]
+          md:aspect-auto md:w-[215px] md:h-[490px]
+          lg:w-[215px] lg:h-[460px]
+          xl:w-[250px] xl:h-[420px]
+          2xl:w-[270px] 2xl:h-[420px]
           transition-transform duration-300 hover:scale-[1.02] border border-gray-100
         "
         onMouseEnter={() => setIsHovered(true)}

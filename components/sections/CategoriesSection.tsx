@@ -70,11 +70,11 @@ const CategoriesSection: React.FC<CategoriesSectionProps> = ({ categories }) => 
   }, [categories]);
 
   return (
-    <section className="py-16 md:py-24 bg-white w-full">
+    <section className="py-8 md:py-12 bg-white w-full">
       <div className="max-w-[1400px] mx-auto px-4 md:px-8">
         {/* HEADING */}
         <div className="text-center mb-12">
-          <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-primary-brown">
+          <h2 className="text-3xl md:text-4xl lg:text-5xl font-general-sans text-black font-[500] tracking-wide">
             Our Categories
           </h2>
           <p className="text-xs md:text-sm text-gray-500 uppercase tracking-widest mt-3 font-geom">

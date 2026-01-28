@@ -125,8 +125,7 @@ export default function Home() {
       <Cart />
       <HeroSection />
 
-      {/* Promotional Banner with Intro Animation */}
-      <PromotionalBanner />
+
 
       {featuredProducts.length > 0 && (
         <ScrollAnimation delay={100}>
@@ -134,6 +133,15 @@ export default function Home() {
             <FeaturedCollection products={featuredProducts.slice(0, 8)} />
           </div>
         </ScrollAnimation>
+      )}
+
+      {/* Desktop Only: InstaBook Section moved below New Arrivals */}
+      {instaBooks.length > 0 && (
+        <div className="hidden md:block">
+          <ScrollAnimation delay={150}>
+            <InstaBookSection instaBooks={instaBooks} />
+          </ScrollAnimation>
+        </div>
       )}
 
       {categories.length > 0 && (
@@ -182,10 +190,16 @@ export default function Home() {
         </ScrollAnimation>
       )}
 
+      {/* Promotional Banner with Intro Animation */}
+      <PromotionalBanner />
+
+      {/* Mobile Only: InstaBook Section in original position */}
       {instaBooks.length > 0 && (
-        <ScrollAnimation delay={150}>
-          <InstaBookSection instaBooks={instaBooks} />
-        </ScrollAnimation>
+        <div className="block md:hidden">
+          <ScrollAnimation delay={150}>
+            <InstaBookSection instaBooks={instaBooks} />
+          </ScrollAnimation>
+        </div>
       )}
 
       {galleryItems.length > 0 && (

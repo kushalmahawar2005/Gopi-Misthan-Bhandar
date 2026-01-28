@@ -172,10 +172,10 @@ const AboutHero: React.FC = () => {
   return (
     <section
       aria-labelledby="about-hero-title"
-      className="w-full px-4 md:px-8 lg:px-16 pt-0 pb-12 md:pb-20"
+      className="w-full pt-0 pb-12 md:pb-20"
     >
       <div
-        className="mx-auto w-full rounded-xl overflow-hidden"
+        className="mx-auto w-full overflow-hidden"
         style={{
           backgroundColor: '#f7db9d',
           backgroundImage: "url('/about/bg-pattern.png')",
@@ -183,8 +183,9 @@ const AboutHero: React.FC = () => {
           backgroundSize: '520px',
         }}
       >
-        <div className="px-6 md:px-14 lg:px-12 py-10 md:py-14 lg:py-16 relative">
-          <div className="relative">
+        <div className="relative">
+          {/* Content Container - Constrained Width */}
+          <div className="container mx-auto px-6 md:px-14 lg:px-12 pt-10 pb-32 md:pt-14 md:pb-40 lg:pt-16 lg:pb-48 relative z-20">
 
             {cards.map((card, index) => (
               <div
@@ -282,7 +283,7 @@ const AboutHero: React.FC = () => {
             )}
 
             {cards.length > 1 && (
-              <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2 z-20">
+              <div className="absolute bottom-24 md:bottom-32 left-1/2 -translate-x-1/2 flex gap-2 z-20">
                 {cards.map((_, index) => (
                   <button
                     key={index}
@@ -295,23 +296,21 @@ const AboutHero: React.FC = () => {
             )}
           </div>
 
-          <div
-            aria-hidden="true"
-            className="pointer-events-none absolute inset-y-0 right-6 md:right-10 lg:right-16 flex items-center"
-            style={{ opacity: 0.12 }}
-          >
-            <div className="w-[420px] h-[420px]">
-              <Image
-                src="/floral.svg"
-                alt=""
-                width={420}
-                height={420}
-                className="object-contain"
-              />
-            </div>
-          </div>
-
         </div>
+
+        {/* Jaipur Skyline at Bottom - Full Width */}
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute bottom-0 left-0 right-0 w-full h-[100px] md:h-[160px] lg:h-[200px] z-10 mix-blend-multiply"
+        >
+          <Image
+            src="/jaipur-skyline.png"
+            alt="Jaipur Skyline"
+            fill
+            className="object-cover object-bottom"
+          />
+        </div>
+
       </div>
     </section>
   );

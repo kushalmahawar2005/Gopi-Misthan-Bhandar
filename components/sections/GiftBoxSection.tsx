@@ -30,10 +30,10 @@ const GiftBoxSection: React.FC<GiftBoxSectionProps> = ({ giftBoxes }) => {
     .sort((a, b) => (a.price || 0) - (b.price || 0));
 
   return (
-    <section className="py-6 mt-6 md:py-12 md:mt-8 px-4 bg-white w-full">
+    <section className="py-8 md:py-12 px-4 bg-white w-full">
       <div className="w-full max-w-7xl mx-auto">
         {/* Heading */}
-        <h2 className="text-4xl text-black mb-2 font-jost font-[500] text-center">
+        <h2 className="text-3xl md:text-4xl lg:text-5xl font-general-sans text-black font-[500] tracking-wide text-center">
           GIFT BOX
         </h2>
         <p className="text-gray-800 text-sm md:text-[15px] font-geom mb-6 md:mb-8 text-center max-w-3xl mx-auto leading-relaxed">
