@@ -32,9 +32,9 @@ const MarqueeBanner: React.FC<MarqueeBannerProps> = ({ text }) => {
 
   // Always render the banner
   return (
-    <div className="bg-gray-900 text-white w-full py-2.5 md:py-3">
+    <div className="bg-gray-800 text-white w-full py-2.5 md:py-3">
       <div className="max-w-7xl mx-auto px-4 md:px-6">
-        <p className="text-xs md:text-sm font-medium text-center leading-tight">
+        <p className="text-xs md:text-sm font-medium text-center tracking-wider uppercase">
           {marqueeText}
         </p>
       </div>

@@ -103,10 +103,10 @@ const HeroSection = () => {
   if (slides.length === 0) return null;
 
   return (
-    <section className="relative w-full -mt-2 md:mt-6 mb-8 md:mb-4">
-      <div className="relative w-full md:max-w-7xl md:mx-auto md:px-8 lg:px-12">
+    <section className="relative w-full -mt-2 md:mt-0 mb-8 md:mb-0">
+      <div className="relative w-full">
         <div
-          className="aspect-[4/5] md:aspect-auto md:h-[380px] lg:h-[420px] relative overflow-hidden rounded-none md:rounded-2xl"
+          className="w-full h-[35vh] md:h-[400px] lg:h-[480px] relative overflow-hidden"
           onTouchStart={onTouchStart}
           onTouchMove={onTouchMove}
           onTouchEnd={onTouchEnd}
@@ -124,7 +124,7 @@ const HeroSection = () => {
                     src={slide.image}
                     alt={`Hero slide ${index + 1}`}
                     fill
-                    className="object-contain object-center hidden md:block"
+                    className="object-fill object-center hidden md:block"
                     priority={index === 0}
                     sizes="100vw"
                   />
@@ -132,7 +132,7 @@ const HeroSection = () => {
                     src={(slide as any).mobileImage || slide.image}
                     alt={`Hero slide ${index + 1}`}
                     fill
-                    className="object-contain object-center md:hidden"
+                    className="object-fill object-center md:hidden"
                     priority={index === 0}
                     sizes="100vw"
                   />
@@ -142,7 +142,7 @@ const HeroSection = () => {
           </div>
 
           {slides.length > 1 && !enquiryOpen && (
-            <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-20 flex gap-2">
+            <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-20 flex gap-2">
               {slides.map((_, index) => (
                 <button
                   key={index}
@@ -160,17 +160,17 @@ const HeroSection = () => {
           <>
             <button
               onClick={prevSlide}
-              className="hidden md:inline-flex absolute left-0 top-1/2 -translate-y-1/2 -translate-x-1/2 bg-transparent text-black p-2 rounded-full border border-transparent shadow-none hover:bg-white/90 hover:border-gray-300 hover:shadow-md transition-all z-30"
+              className="hidden md:inline-flex absolute left-4 top-1/2 -translate-y-1/2 bg-white/20 hover:bg-white/40 backdrop-blur-sm text-white p-3 rounded-full transition-all z-30"
               aria-label="Previous slide"
             >
-              <FiChevronLeft className="w-5 h-5 md:w-6 md:h-6" />
+              <FiChevronLeft className="w-6 h-6" />
             </button>
             <button
               onClick={nextSlide}
-              className="hidden md:inline-flex absolute right-0 top-1/2 -translate-y-1/2 translate-x-1/2 bg-transparent text-black p-2 rounded-full border border-transparent shadow-none hover:bg.white/90 hover:border-gray-300 hover:shadow-md transition-all z-30"
+              className="hidden md:inline-flex absolute right-4 top-1/2 -translate-y-1/2 bg-white/20 hover:bg-white/40 backdrop-blur-sm text-white p-3 rounded-full transition-all z-30"
               aria-label="Next slide"
             >
-              <FiChevronRight className="w-5 h-5 md:w-6 md:h-6" />
+              <FiChevronRight className="w-6 h-6" />
             </button>
           </>
         )}

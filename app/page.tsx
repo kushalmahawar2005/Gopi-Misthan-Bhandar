@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import dynamic from 'next/dynamic';
+import Image from 'next/image';
 import Header from '@/components/Header';
 import Navigation from '@/components/Navigation';
 import Cart from '@/components/Cart';
@@ -137,12 +138,25 @@ export default function Home() {
       )}
 
       {categories.length > 0 && (
-        <ScrollAnimation delay={150}>
+        <ScrollAnimation delay={150} className="relative z-10">
           <div id="categories">
             <CategoriesSection categories={categories} />
           </div>
         </ScrollAnimation>
       )}
+
+      {/* Back Image Section */}
+      <div className="w-full relative z-0 -mt-80 md:-mt-96 lg:-mt-[500px] pointer-events-none">
+        <Image
+          src="/back.png"
+          alt="Banner"
+          width={0}
+          height={0}
+          sizes="100vw"
+          className="w-full h-full object-cover"
+          style={{ width: '100%', height: 'auto' }}
+        />
+      </div>
 
       {classicProducts.length > 0 && (
         <ScrollAnimation delay={200}>

@@ -177,7 +177,7 @@ const Navigation = () => {
   return (
     <>
       <nav
-        className={`bg-white w-full border-b border-gray-200 shadow-sm z-50 transition-transform duration-300 ${pathname.startsWith('/category/')
+        className={`bg-[#F9F3E7] w-full border-b border-gray-200 shadow-sm z-50 transition-transform duration-300 ${pathname.startsWith('/category/')
           ? `fixed top-0 left-0 right-0 ${isVisible ? 'translate-y-0' : '-translate-y-full'}`
           : 'sticky top-0'
           }`}
@@ -215,7 +215,7 @@ const Navigation = () => {
                     onBlur={() => {
                       setIsFocused(false);
                     }}
-                    className={`w-full pr-10 py-2.5 pl-4 text-md bg-white outline-none border transition-colors rounded-lg placeholder-gray-500 ${isFocused
+                    className={`w-full pr-10 py-2.5 pl-4 text-md bg-[#F9F3E7] outline-none border transition-colors rounded-lg placeholder-gray-500 ${isFocused
                       ? 'border-primary-red focus:ring-2 focus:ring-primary-red focus:border-primary-red'
                       : 'border-gray-300 focus:border-primary-red focus:ring-2 focus:ring-primary-red'
                       }`}
@@ -294,6 +294,9 @@ const Navigation = () => {
                             View all {searchResults.length} results
                           </Link>
                         )}
+
+
+
                       </div>
                     )}
                   </div>
@@ -303,13 +306,14 @@ const Navigation = () => {
           </div>
 
           {/* Center: Logo */}
-          <Link href="/" className="absolute left-1/2 transform -translate-x-1/2 py-2 md:py-3 mt-2">
-            <div className="relative w-20 h-12 md:w-32 md:h-16 lg:w-40 lg:h-20">
+          <Link href="/" className="absolute left-1/2 transform -translate-x-1/2 py-2 md:py-3 mt-2 mix-blend-multiply">
+            <div className="relative w-20 h-12 md:w-32 md:h-16 lg:w-40 lg:h-20 mix-blend-multiply">
               <Image
                 src="/logo.png"
                 alt="Logo"
                 fill
-                className="object-contain"
+                className="object-contain mix-blend-multiply"
+                style={{ mixBlendMode: 'multiply' }}
                 sizes="(max-width: 768px) 80px, (max-width: 1024px) 144px, 176px"
                 priority
               />
@@ -457,6 +461,7 @@ const Navigation = () => {
             );
           })}
         </div>
+        <div className="w-full h-1 bg-[#C8984E]"></div>
       </nav>
 
       {/* Mobile menu */}
@@ -478,7 +483,7 @@ const Navigation = () => {
               </button>
             </div>
             {/* Mobile Search Bar - At the very top */}
-            <div className="md:hidden w-full px-4 py-3 border-b border-gray-200 bg-white">
+            <div className="md:hidden w-full px-4 py-3 border-b border-gray-200 bg-[#F9F3E7]">
               <div className="relative">
                 <input
                   ref={searchInputRef}
@@ -493,7 +498,7 @@ const Navigation = () => {
                   onBlur={() => {
                     setIsFocused(false);
                   }}
-                  className="w-full px-4 py-2 pr-10 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-red focus:border-transparent"
+                  className="w-full px-4 py-2 pr-10 bg-[#F9F3E7] border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-red focus:border-transparent"
                   aria-label="Search products"
                 />
                 <button
