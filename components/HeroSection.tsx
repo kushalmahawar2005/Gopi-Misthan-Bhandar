@@ -103,10 +103,10 @@ const HeroSection = () => {
   if (slides.length === 0) return null;
 
   return (
-    <section className="relative w-full -mt-2 md:mt-0 mb-8 md:mb-0">
-      <div className="relative w-full">
+    <section className="relative w-full -mt-2 md:mt-6 mb-8">
+      <div className="relative w-full md:max-w-7xl md:mx-auto md:px-8 lg:px-12">
         <div
-          className="w-full h-[35vh] md:h-[400px] lg:h-[480px] relative overflow-hidden"
+          className="w-full h-[35vh] md:h-[400px] lg:h-[480px] relative overflow-hidden md:rounded-2xl"
           onTouchStart={onTouchStart}
           onTouchMove={onTouchMove}
           onTouchEnd={onTouchEnd}

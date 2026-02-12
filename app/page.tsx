@@ -26,6 +26,7 @@ const MapSection = dynamic(() => import('@/components/sections/MapSection'));
 const GallerySection = dynamic(() => import('@/components/sections/GallerySection'));
 const GiftBoxSection = dynamic(() => import('@/components/sections/GiftBoxSection'));
 const BlogSection = dynamic(() => import('@/components/sections/BlogSection'));
+const InternationalShippingBanner = dynamic(() => import('@/components/sections/InternationalShippingBanner'));
 
 export default function Home() {
   const [featuredProducts, setFeaturedProducts] = useState<Product[]>([]);
@@ -145,7 +146,6 @@ export default function Home() {
         </ScrollAnimation>
       )}
 
-      {/* Back Image Section */}
       <div className="w-full relative z-0 -mt-80 md:-mt-96 lg:-mt-[500px] pointer-events-none">
         <Image
           src="/back.png"
@@ -157,6 +157,10 @@ export default function Home() {
           style={{ width: '100%', height: 'auto' }}
         />
       </div>
+
+      <ScrollAnimation delay={200}>
+        <InternationalShippingBanner />
+      </ScrollAnimation>
 
       {classicProducts.length > 0 && (
         <ScrollAnimation delay={200}>
