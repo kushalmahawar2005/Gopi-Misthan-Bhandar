@@ -22,7 +22,7 @@ const InternationalShippingBanner = () => {
                 width: '85%',
             },
             {
-                width: '85%',
+                width: '95%',
                 scrollTrigger: {
                     trigger: sectionRef.current,
                     start: 'top bottom', // When top of section hits bottom of viewport
@@ -48,28 +48,28 @@ const InternationalShippingBanner = () => {
                     <div className="flex flex-col md:flex-row items-center gap-12 lg:gap-20">
 
                         {/* LEFT: Text Content */}
-                        <div className="w-full md:w-1/2 text-left animate-fade-in-up order-2 md:order-1">
+                        <div className="w-full md:w-1/2 text-center md:text-left animate-fade-in-up">
                             <h2 className="text-3xl md:text-5xl lg:text-6xl font-serif text-[#941B1F] mb-6 leading-tight tracking-wide">
                                 Let Authentic <br />
                                 Indian <span className="italic text-[#D4AF37]">Mithai</span> Melt into <br />
                                 Your Moments
                             </h2>
 
-                            <p className="text-[#5A2E2E] text-sm md:text-base leading-relaxed mb-8 tracking-wide font-medium max-w-xl">
+                            <p className="text-[#5A2E2E] text-sm md:text-base leading-relaxed mb-8 tracking-wide font-medium max-w-xl mx-auto md:mx-0">
                                 Discover the taste of perfection at <span className="font-bold">Gopi Misthan Bhandar</span>, a luxurious mithai gift boutique where each sweet is handcrafted to deliver an unforgettable experience.
                             </p>
 
-                            <Link href="/shop" className="inline-block bg-[#941B1F] text-[#FFF8F0] px-10 py-4 text-sm md:text-base font-bold tracking-widest hover:bg-[#7a1519] transition-all duration-300 uppercase shadow-lg transform hover:-translate-y-1">
+                            <Link href="/shop" className="inline-block bg-[#941B1F] text-[#FFF8F0] px-10 py-4 text-sm md:text-base font-bold tracking-widest hover:bg-[#7a1519] transition-all duration-300 uppercase shadow-lg transform hover:-translate-y-1 mx-auto md:mx-0">
                                 Shop Now
                             </Link>
                         </div>
 
                         {/* RIGHT: Image */}
-                        <div className="w-full md:w-1/2 relative h-[350px] md:h-[500px] order-1 md:order-2">
+                        <div className="w-full md:w-1/2 relative h-auto aspect-square md:aspect-auto md:h-[500px]">
                             <div className="relative w-full h-full border-[3px] border-[#D4AF37]/50 rounded-xl p-3 shadow-sm">
                                 <div className="relative w-full h-full rounded-lg overflow-hidden shadow-2xl">
                                     <Image
-                                        src="/Hamper.jpg"
+                                        src="/Hamper.png"
                                         alt="Gopi Misthan Bhandar Gift Hamper"
                                         fill
                                         className="object-cover hover:scale-105 transition-transform duration-700"

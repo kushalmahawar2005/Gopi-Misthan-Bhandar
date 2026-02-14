@@ -18,6 +18,7 @@ const FeaturedCollection = dynamic(() => import('@/components/sections/FeaturedC
 });
 const PromotionalBanner = dynamic(() => import('@/components/sections/PromotionalBanner'), { ssr: false });
 const AboutSection = dynamic(() => import('@/components/sections/AboutSection'));
+const ExclusiveFeatures = dynamic(() => import('@/components/sections/ExclusiveFeatures'));
 const CategoriesSection = dynamic(() => import('@/components/sections/CategoriesSection'));
 const ProductSection = dynamic(() => import('@/components/sections/ProductSection'));
 const InstaBookSection = dynamic(() => import('@/components/sections/InstaBookSection'));
@@ -190,6 +191,10 @@ export default function Home() {
         <div id="about">
           <AboutSection />
         </div>
+      </ScrollAnimation>
+
+      <ScrollAnimation delay={200}>
+        <ExclusiveFeatures />
       </ScrollAnimation>
 
       {giftBoxes.length > 0 && (

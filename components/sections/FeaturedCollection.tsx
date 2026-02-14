@@ -34,13 +34,6 @@ const FeaturedProductCard: React.FC<{ product: Product }> = ({ product }) => {
             fill
             className={`object-cover transition-all duration-500
               ${isHovered ? 'scale-110' : 'scale-100'}
-              ${
-                hasSecondImage
-                  ? isHovered
-                    ? 'opacity-0'
-                    : 'opacity-100'
-                  : 'opacity-100'
-              }
             `}
             sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
           />
@@ -93,7 +86,7 @@ const FeaturedCollection: React.FC<FeaturedCollectionProps> = ({ products }) => 
   const autoScroll = () => {
     if (scrollContainerRef.current && !isUserInteractingRef.current) {
       const { scrollLeft, scrollWidth, clientWidth } = scrollContainerRef.current;
-      
+
       // Check if we've reached the end
       if (scrollLeft >= scrollWidth - clientWidth - 10) {
         // Reset to beginning
@@ -117,7 +110,7 @@ const FeaturedCollection: React.FC<FeaturedCollectionProps> = ({ products }) => 
     const container = scrollContainerRef.current;
     if (container) {
       container.addEventListener('scroll', checkScroll);
-      
+
       // Handle user interaction
       const handleMouseEnter = () => {
         isUserInteractingRef.current = true;
@@ -169,13 +162,13 @@ const FeaturedCollection: React.FC<FeaturedCollectionProps> = ({ products }) => 
     if (scrollContainerRef.current) {
       // Pause auto-scroll when user manually scrolls
       isUserInteractingRef.current = true;
-      
+
       const scrollAmount = scrollContainerRef.current.clientWidth * 0.8;
       scrollContainerRef.current.scrollBy({
         left: direction === 'left' ? -scrollAmount : scrollAmount,
         behavior: 'smooth',
       });
-      
+
       // Resume auto-scroll after 3 seconds
       setTimeout(() => {
         isUserInteractingRef.current = false;
@@ -203,11 +196,10 @@ const FeaturedCollection: React.FC<FeaturedCollectionProps> = ({ products }) => 
                 <button
                   onClick={() => scroll('left')}
                   disabled={!canScrollLeft}
-                  className={`p-2 rounded-full transition-all ${
-                    canScrollLeft
-                      ? 'bg-primary-red text-white hover:bg-primary-darkRed'
-                      : 'bg-gray-200 text-gray-400 cursor-not-allowed'
-                  }`}
+                  className={`p-2 rounded-full transition-all ${canScrollLeft
+                    ? 'bg-primary-red text-white hover:bg-primary-darkRed'
+                    : 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                    }`}
                   aria-label="Previous products"
                 >
                   <FiChevronLeft className="w-5 h-5" />
@@ -215,11 +207,10 @@ const FeaturedCollection: React.FC<FeaturedCollectionProps> = ({ products }) => 
                 <button
                   onClick={() => scroll('right')}
                   disabled={!canScrollRight}
-                  className={`p-2 rounded-full transition-all ${
-                    canScrollRight
-                      ? 'bg-primary-red text-white hover:bg-primary-darkRed'
-                      : 'bg-gray-200 text-gray-400 cursor-not-allowed'
-                  }`}
+                  className={`p-2 rounded-full transition-all ${canScrollRight
+                    ? 'bg-primary-red text-white hover:bg-primary-darkRed'
+                    : 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                    }`}
                   aria-label="Next products"
                 >
                   <FiChevronRight className="w-5 h-5" />
