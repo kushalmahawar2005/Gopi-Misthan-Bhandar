@@ -2,6 +2,7 @@
 
 import React, { useRef } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { useGSAP } from '@gsap/react';
@@ -21,7 +22,7 @@ const InternationalShippingBanner = () => {
                 width: '85%',
             },
             {
-                width: '100%',
+                width: '85%',
                 scrollTrigger: {
                     trigger: sectionRef.current,
                     start: 'top bottom', // When top of section hits bottom of viewport
@@ -38,36 +39,45 @@ const InternationalShippingBanner = () => {
             {/* EXPANDING BACKGROUND */}
             <div
                 ref={bgRef}
-                className="mx-auto bg-[#941B1F] relative overflow-hidden py-20 md:py-32 pointer-events-auto will-change-[width]"
+                className="mx-auto bg-[#FFF8F0] relative overflow-hidden py-16 md:py-24 pointer-events-auto will-change-[width]"
             >
-                {/* Background Map Effect */}
-                <div className="absolute inset-0 opacity-10 pointer-events-none">
-                    <svg className="w-full h-full object-cover" viewBox="0 0 1000 500" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M200,150 Q250,100 300,150 T400,150 T500,150 T600,150 T700,150" fill="none" stroke="white" strokeWidth="2" />
-                        <circle cx="200" cy="150" r="50" fill="white" />
-                        <circle cx="800" cy="150" r="60" fill="white" />
-                        <circle cx="500" cy="300" r="80" fill="white" />
-                    </svg>
-                </div>
-
                 {/* Texture overlay */}
-                <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10"></div>
+                <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-5"></div>
 
-                <div className="container mx-auto px-4 relative z-10 text-center">
-                    <div className="animate-fade-in-up">
-                        <h2 className="text-4xl md:text-5xl lg:text-7xl font-serif italic text-white mb-4 tracking-wide">
-                            From You, <br className="md:hidden" />
-                            to <span className="italic">Anywhere</span> in the World
-                        </h2>
+                <div className="container mx-auto px-6 md:px-12 relative z-10">
+                    <div className="flex flex-col md:flex-row items-center gap-12 lg:gap-20">
 
-                        <p className="text-white/90 text-sm md:text-base tracking-widest uppercase mb-10 font-medium max-w-2xl mx-auto mt-6">
-                            LOVE KNOWS NO BORDERS WITH GOPI MISTHAN BHANDAR, <br className="hidden md:block" />
-                            NOW DELIVERING WORLDWIDE.
-                        </p>
+                        {/* LEFT: Text Content */}
+                        <div className="w-full md:w-1/2 text-left animate-fade-in-up order-2 md:order-1">
+                            <h2 className="text-3xl md:text-5xl lg:text-6xl font-serif text-[#941B1F] mb-6 leading-tight tracking-wide">
+                                Let Authentic <br />
+                                Indian <span className="italic text-[#D4AF37]">Mithai</span> Melt into <br />
+                                Your Moments
+                            </h2>
 
-                        <Link href="/contact" className="inline-block bg-[#F9F3E7] text-[#941B1F] px-8 py-4 text-sm md:text-base font-bold tracking-widest hover:bg-white transition-colors duration-300 uppercase shadow-lg ">
-                            SHIP INTERNATIONALLY
-                        </Link>
+                            <p className="text-[#5A2E2E] text-sm md:text-base leading-relaxed mb-8 tracking-wide font-medium max-w-xl">
+                                Discover the taste of perfection at <span className="font-bold">Gopi Misthan Bhandar</span>, a luxurious mithai gift boutique where each sweet is handcrafted to deliver an unforgettable experience.
+                            </p>
+
+                            <Link href="/shop" className="inline-block bg-[#941B1F] text-[#FFF8F0] px-10 py-4 text-sm md:text-base font-bold tracking-widest hover:bg-[#7a1519] transition-all duration-300 uppercase shadow-lg transform hover:-translate-y-1">
+                                Shop Now
+                            </Link>
+                        </div>
+
+                        {/* RIGHT: Image */}
+                        <div className="w-full md:w-1/2 relative h-[350px] md:h-[500px] order-1 md:order-2">
+                            <div className="relative w-full h-full border-[3px] border-[#D4AF37]/50 rounded-xl p-3 shadow-sm">
+                                <div className="relative w-full h-full rounded-lg overflow-hidden shadow-2xl">
+                                    <Image
+                                        src="/Hamper.jpg"
+                                        alt="Gopi Misthan Bhandar Gift Hamper"
+                                        fill
+                                        className="object-cover hover:scale-105 transition-transform duration-700"
+                                    />
+                                </div>
+                            </div>
+                        </div>
+
                     </div>
                 </div>
             </div>
