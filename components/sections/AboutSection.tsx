@@ -158,16 +158,15 @@ const AboutHero: React.FC = () => {
   return (
     <section
       aria-labelledby="about-hero-title"
-      className="w-full relative overflow-hidden flex flex-col items-center justify-center pb-16 md:pb-28 px-4 sm:px-12 md:px-16"
-      style={{ backgroundColor: '#FDE8D4' }}
+      className="w-full relative overflow-visible z-50 flex flex-col items-center justify-center pb-16 md:pb-28 px-4 sm:px-12 md:px-16 pt-0 md:pt-0 lg:pt-0 mt-24 md:mt-32 lg:mt-40"
+      style={{ backgroundColor: '#FFE3C2' }}
     >
-      {/* Decorative full-width banner separator right at the top */}
-      <div className="w-full absolute top-0 left-0 pointer-events-none z-0 overflow-hidden h-[180px] md:h-[220px] lg:h-[260px]">
+      {/* Decorative banner */}
+      <div className="absolute left-0 w-full bottom-full pointer-events-none z-10">
         <img
           src="/back3.png"
           alt="Decorative separator"
-          className="w-full h-full object-cover"
-          style={{ objectPosition: "center bottom" }}
+          className="w-full h-[120px] md:h-[150px] lg:h-[180px] object-cover block"
         />
       </div>
 

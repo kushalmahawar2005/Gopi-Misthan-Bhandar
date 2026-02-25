@@ -22,7 +22,7 @@ const InternationalShippingBanner = () => {
                 width: '85%',
             },
             {
-                width: '95%',
+                width: '100%',
                 scrollTrigger: {
                     trigger: sectionRef.current,
                     start: 'top bottom', // When top of section hits bottom of viewport
@@ -35,7 +35,7 @@ const InternationalShippingBanner = () => {
     }, []);
 
     return (
-        <section ref={sectionRef} className="w-full relative z-10 -mt-20 md:-mt-32 lg:-mt-48 overflow-visible pointer-events-none">
+        <section ref={sectionRef} className="w-full relative z-10 -mt-32 md:-mt-48 lg:-mt-80 xl:-mt-96 overflow-visible pointer-events-none">
             {/* EXPANDING BACKGROUND */}
             <div
                 ref={bgRef}
@@ -48,7 +48,7 @@ const InternationalShippingBanner = () => {
                     <div className="flex flex-col md:flex-row items-center gap-12 lg:gap-20">
 
                         {/* LEFT: Text Content */}
-                        <div className="w-full md:w-1/2 text-center md:text-left animate-fade-in-up">
+                        <div className="w-full md:w-1/2 text-center md:text-left">
                             <h2 className="text-3xl md:text-5xl lg:text-6xl font-serif text-[#941B1F] mb-6 leading-tight tracking-wide">
                                 Let Authentic <br />
                                 Indian <span className="italic text-[#D4AF37]">Mithai</span> Melt into <br />

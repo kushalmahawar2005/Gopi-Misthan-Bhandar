@@ -223,18 +223,18 @@ const ExclusiveFeatures = () => {
     };
 
     return (
-        <section className="w-full pt-0 relative overflow-hidden">
-            {/* Top decorative layer image - wrapped with overflow-hidden and negative margin to crop out the baked-in top background */}
-            <div className="w-full relative z-20 overflow-hidden line-h-0">
+        <section className="w-full relative overflow-visible z-20">
+            {/* Top decorative layer image bridging the sections - adding top background color behind transparent image */}
+            <div className="w-full relative pointer-events-none z-10 block" style={{ backgroundColor: '#FFE3C2' }}>
                 <img
                     src="/b1.png"
                     alt="Decorative header"
-                    className="w-full h-auto object-cover block relative -top-[30px] md:-top-[50px] lg:-top-[70px] -mb-[30px] md:-mb-[50px] lg:-mb-[70px]"
+                    className="w-full h-auto object-cover block"
                 />
             </div>
 
             {/* Main Content Area with Background */}
-            <div className="w-full pb-16 md:pb-24 pt-8 md:pt-12 relative" style={{ backgroundColor: '#FFE3DC' }}>
+            <div className="w-full pb-16 md:pb-24 pt-0 md:pt-4 relative -mt-2" style={{ backgroundColor: '#FFE3DC' }}>
                 {/* Background Texture Overlay */}
                 <div className="absolute inset-0 opacity-20 pointer-events-none"
                     style={{

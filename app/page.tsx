@@ -141,11 +141,11 @@ export default function Home() {
       )}
 
       {categories.length > 0 && (
-        <ScrollAnimation delay={150} className="relative z-10">
+        <div className="relative z-10">
           <div id="categories">
             <CategoriesSection categories={categories} />
           </div>
-        </ScrollAnimation>
+        </div>
       )}
 
       <div className="w-full relative z-0 -mt-80 md:-mt-96 lg:-mt-[500px] pointer-events-none">
@@ -160,9 +160,7 @@ export default function Home() {
         />
       </div>
 
-      <ScrollAnimation delay={200}>
-        <InternationalShippingBanner />
-      </ScrollAnimation>
+      <InternationalShippingBanner />
 
       {classicProducts.length > 0 && (
         <ScrollAnimation delay={200}>
@@ -188,11 +186,11 @@ export default function Home() {
         </ScrollAnimation>
       )}
 
-      <ScrollAnimation delay={150}>
+      <div className="relative z-50">
         <div id="about">
           <AboutSection />
         </div>
-      </ScrollAnimation>
+      </div>
 
       <ScrollAnimation delay={200}>
         <ExclusiveFeatures />

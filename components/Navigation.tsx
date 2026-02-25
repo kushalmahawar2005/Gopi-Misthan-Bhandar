@@ -177,7 +177,7 @@ const Navigation = () => {
   return (
     <>
       <nav
-        className={`bg-[#F9F3E7] w-full border-b border-gray-200 shadow-sm z-50 transition-transform duration-300 ${pathname.startsWith('/category/')
+        className={`bg-white w-full border-b border-gray-200 shadow-sm z-50 transition-transform duration-300 ${pathname.startsWith('/category/')
           ? `fixed top-0 left-0 right-0 ${isVisible ? 'translate-y-0' : '-translate-y-full'}`
           : 'sticky top-0'
           }`}
@@ -215,7 +215,7 @@ const Navigation = () => {
                     onBlur={() => {
                       setIsFocused(false);
                     }}
-                    className={`w-full pr-10 py-2.5 pl-4 text-md bg-[#F9F3E7] outline-none border transition-colors rounded-lg placeholder-gray-500 ${isFocused
+                    className={`w-full pr-10 py-2.5 pl-4 text-md bg-white outline-none border transition-colors rounded-lg placeholder-gray-500 ${isFocused
                       ? 'border-primary-red focus:ring-2 focus:ring-primary-red focus:border-primary-red'
                       : 'border-gray-300 focus:border-primary-red focus:ring-2 focus:ring-primary-red'
                       }`}
@@ -483,7 +483,7 @@ const Navigation = () => {
               </button>
             </div>
             {/* Mobile Search Bar - At the very top */}
-            <div className="md:hidden w-full px-4 py-3 border-b border-gray-200 bg-[#F9F3E7]">
+            <div className="md:hidden w-full px-4 py-3 border-b border-gray-200 bg-white">
               <div className="relative">
                 <input
                   ref={searchInputRef}
@@ -498,7 +498,7 @@ const Navigation = () => {
                   onBlur={() => {
                     setIsFocused(false);
                   }}
-                  className="w-full px-4 py-2 pr-10 bg-[#F9F3E7] border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-red focus:border-transparent"
+                  className="w-full px-4 py-2 pr-10 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-red focus:border-transparent"
                   aria-label="Search products"
                 />
                 <button

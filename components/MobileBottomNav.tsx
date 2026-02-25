@@ -70,12 +70,12 @@ const MobileBottomNav = () => {
   };
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 md:hidden bg-[#F5F1E8] border-t border-black/10 shadow-lg min-h-[45px]">
+    <nav className="fixed bottom-0 left-0 right-0 z-50 md:hidden bg-white border-t border-black/10 shadow-lg min-h-[45px]">
       <div className="flex items-center justify-around px-1.5 py-2.5">
         {navItems.map((item) => {
           const Icon = item.icon;
           const active = isActive(item.href);
-          
+
           return (
             <Link
               key={item.label}

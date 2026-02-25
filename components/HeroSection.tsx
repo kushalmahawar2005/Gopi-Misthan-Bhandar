@@ -89,7 +89,7 @@ const HeroSection = () => {
   if (loading) {
     return (
       <section className="w-full -mt-0 md:mt-6">
-        <div className="w-full md:max-w-7xl md:mx-auto md:px-8 lg:px-12 h-[calc(100vh-56px)] md:h-[380px] lg:h-[420px] relative overflow-hidden bg-gray-100 rounded-none md:rounded-2xl">
+        <div className="w-full md:max-w-[1360px] md:mx-auto md:px-4 lg:px-6 h-[calc(100vh-56px)] md:h-[330px] lg:h-[370px] relative overflow-hidden bg-gray-100 rounded-none md:rounded-2xl">
           <div className="flex items-center justify-center h-full">
             <div className="text-center">
               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-red mx-auto mb-4"></div>
@@ -104,9 +104,9 @@ const HeroSection = () => {
 
   return (
     <section className="relative w-full -mt-2 md:mt-6 mb-8">
-      <div className="relative w-full md:max-w-7xl md:mx-auto md:px-8 lg:px-12">
+      <div className="relative w-full md:max-w-[1260px] md:mx-auto md:px-4 lg:px-6">
         <div
-          className="w-full h-[35vh] md:h-[400px] lg:h-[480px] relative overflow-hidden md:rounded-2xl"
+          className="w-full h-[35vh] md:h-[350px] lg:h-[430px] relative overflow-hidden md:rounded-2xl"
           onTouchStart={onTouchStart}
           onTouchMove={onTouchMove}
           onTouchEnd={onTouchEnd}
