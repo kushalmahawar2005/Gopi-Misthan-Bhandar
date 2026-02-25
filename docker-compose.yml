@@ -1,0 +1,25 @@
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: .
+      # Development ke liye naya banaya gaya Dockerfile.dev use karega
+      dockerfile: Dockerfile.dev
+    container_name: gopi_misthan_bhandar_app
+    ports:
+      - "3000:3000"
+    volumes:
+      # Ye aapke local files ko docker container ke andar link (mount) kar dega
+      - .:/app
+      # Yeh ensure karega ki local node_modules container ke node_modules ke saath conflict na kare
+      - /app/node_modules
+      - /app/.next
+    environment:
+      - NODE_ENV=development
+      # Yeh flag ensure karte hain ki Next.js ko file changes pata chalein
+      - CHOKIDAR_USEPOLLING=true
+      - WATCHPACK_POLLING=true
+    env_file:
+      - .env
+    restart: unless-stopped

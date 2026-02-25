@@ -28,6 +28,7 @@ const GallerySection = dynamic(() => import('@/components/sections/GallerySectio
 const GiftBoxSection = dynamic(() => import('@/components/sections/GiftBoxSection'));
 const BlogSection = dynamic(() => import('@/components/sections/BlogSection'));
 const InternationalShippingBanner = dynamic(() => import('@/components/sections/InternationalShippingBanner'));
+const PinkPromoSection = dynamic(() => import('@/components/sections/PinkPromoSection'));
 
 export default function Home() {
   const [featuredProducts, setFeaturedProducts] = useState<Product[]>([]);
@@ -149,7 +150,7 @@ export default function Home() {
 
       <div className="w-full relative z-0 -mt-80 md:-mt-96 lg:-mt-[500px] pointer-events-none">
         <Image
-          src="/back.png"
+          src="/back.jpeg"
           alt="Banner"
           width={0}
           height={0}
@@ -195,6 +196,12 @@ export default function Home() {
 
       <ScrollAnimation delay={200}>
         <ExclusiveFeatures />
+      </ScrollAnimation>
+
+      <ScrollAnimation delay={200}>
+        <div className="relative z-10 -mt-1">
+          <PinkPromoSection />
+        </div>
       </ScrollAnimation>
 
       {giftBoxes.length > 0 && (

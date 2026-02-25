@@ -224,17 +224,17 @@ const ExclusiveFeatures = () => {
 
     return (
         <section className="w-full pt-0 relative overflow-hidden">
-            {/* Top decorative layer image */}
-            <div className="w-full relative z-20">
+            {/* Top decorative layer image - wrapped with overflow-hidden and negative margin to crop out the baked-in top background */}
+            <div className="w-full relative z-20 overflow-hidden line-h-0">
                 <img
-                    src="/back3.png"
+                    src="/b1.png"
                     alt="Decorative header"
-                    className="w-full h-auto object-cover block"
+                    className="w-full h-auto object-cover block relative -top-[30px] md:-top-[50px] lg:-top-[70px] -mb-[30px] md:-mb-[50px] lg:-mb-[70px]"
                 />
             </div>
 
             {/* Main Content Area with Background */}
-            <div className="w-full pb-16 md:pb-24 pt-8 md:pt-12 relative" style={{ backgroundColor: '#FFE3C2' }}>
+            <div className="w-full pb-16 md:pb-24 pt-8 md:pt-12 relative" style={{ backgroundColor: '#FFE3DC' }}>
                 {/* Background Texture Overlay */}
                 <div className="absolute inset-0 opacity-20 pointer-events-none"
                     style={{
@@ -242,31 +242,31 @@ const ExclusiveFeatures = () => {
                     }}>
                 </div>
 
-                <div className="container mx-auto px-4 relative z-10 text-center pt-10 pb-20 md:pb-24">
-                    {/* Background Mughal Watermark */}
-                    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[300px] md:w-[500px] h-[300px] md:h-[400px] opacity-[0.07] pointer-events-none z-0">
-                        <svg viewBox="0 0 282 348" className="w-full h-full" fill="none" stroke="currentColor" strokeWidth="1.5">
-                            <path d={BACKGROUND_PATH} />
-                        </svg>
-                    </div>
-
-                    <div className="relative z-10">
-                        <h3 className="font-serif text-lg md:text-2xl text-[#1e3a8a] mb-2 tracking-wide">
-                            The Heritage of Sweetness
-                        </h3>
-                        <h2 className="font-geom text-2xl md:text-4xl lg:text-5xl font-bold text-[#1e3a8a] mb-5 leading-tight">
-                            India’s Finest Mithai Experience
-                        </h2>
-
-                        <div className="flex items-center justify-center gap-3 text-[#db2777] mb-8">
-                            <span className="text-lg opacity-80">✦</span>
-                            <span className="font-serif text-2xl md:text-3xl font-bold tracking-[0.2em]">1985</span>
-                            <span className="text-lg opacity-80">✦</span>
+                <div className="container mx-auto px-4 relative z-10 text-center pt-10 pb-20 md:pb-24 flex flex-col items-center">
+                    <div className="relative inline-flex flex-col items-center justify-center w-full max-w-4xl">
+                        {/* Background Mughal Frame strictly bound to text */}
+                        <div className="absolute top-[35%] md:top-[40%] left-1/2 -translate-x-1/2 -translate-y-1/2 w-[200px] md:w-[260px] opacity-40 pointer-events-none z-0">
+                            <img src="/Frame.png" alt="Decorative Frame" className="w-full h-auto object-contain" />
                         </div>
 
-                        <p className="text-gray-800 max-w-2xl mx-auto leading-relaxed text-sm md:text-base font-medium">
-                            Become a part of our sweet legacy and experience handcrafted Indian mithai made with purity, tradition, and generations of expertise. From rich laddus to delicate kaju katli, every creation celebrates authentic flavor and timeless excellence.
-                        </p>
+                        <div className="relative z-10 flex flex-col items-center justify-center mt-4">
+                            <h3 className="font-serif text-base md:text-xl text-[#1e3a8a] mb-0 md:mb-1 font-bold tracking-tight">
+                                The Heritage of Sweetness
+                            </h3>
+                            <h2 className="font-serif text-2xl md:text-4xl lg:text-5xl font-bold text-[#1e3a8a] mb-5 leading-none tracking-tight">
+                                India’s Finest Mithai Experience
+                            </h2>
+
+                            <div className="flex items-center justify-center gap-3 text-[#db2777] mb-8">
+                                <span className="text-lg opacity-80">✦</span>
+                                <span className="font-serif text-2xl md:text-3xl font-bold tracking-[0.2em]">1985</span>
+                                <span className="text-lg opacity-80">✦</span>
+                            </div>
+
+                            <p className="text-gray-800 max-w-2xl mx-auto leading-relaxed text-sm md:text-base font-medium">
+                                Become a part of our sweet legacy and experience handcrafted Indian mithai made with purity, tradition, and generations of expertise. From rich laddus to delicate kaju katli, every creation celebrates authentic flavor and timeless excellence.
+                            </p>
+                        </div>
                     </div>
                 </div>
 
@@ -379,8 +379,19 @@ const ExclusiveFeatures = () => {
                             <path d="M12 5.5c-1.38 0-2.5 1.12-2.5 2.5 0 .28.05.55.14.8C7.9 8.25 6.45 9.15 6 11.35c-.09.43-.09.87.01 1.29-.98.54-1.51 1.63-1.51 2.86 0 1.23.53 2.32 1.51 2.86-.1.42-.1.86-.01 1.29.45 2.2 1.9 3.1 3.64 2.55-.09.25-.14.52-.14.8 0 1.38 1.12 2.5 2.5 2.5s2.5-1.12 2.5-2.5c0-.28-.05-.55-.14-.8 1.74.55 3.19-.35 3.64-2.55.09-.43.09-.87-.01-1.29.98-.54 1.51-1.63 1.51-2.86 0-1.23-.53-2.32-1.51-2.86.1-.42.1-.86.01-1.29-.45-2.2-1.9-3.1-3.64-2.55.09-.25.14-.52.14-.8 0-1.38-1.12-2.5-2.5-2.5z" />
                         </svg>
                     </button>
+
+                </div>
+
+                {/* Bottom decorative layer image */}
+                <div className="absolute bottom-0 left-0 w-full z-20" style={{ marginBottom: "-1px" }}>
+                    <img
+                        src="/t1.png"
+                        alt="Decorative footer"
+                        className="w-full h-auto object-cover block"
+                    />
                 </div>
             </div>
+
         </section>
     );
 };

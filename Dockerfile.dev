@@ -1,0 +1,18 @@
+FROM node:20-alpine
+
+WORKDIR /app
+
+# Pehle sirf package.json aur package-lock.json copy karenge taaki caching ka faayda mile
+COPY package.json package-lock.json* ./
+
+# Dependencies install karna
+RUN npm ci
+
+# Phir poora code copy karna
+COPY . .
+
+# Port expose karna
+EXPOSE 3000
+
+# Development server start karna jisme hot-reloading support hota hai
+CMD ["npm", "run", "dev"]

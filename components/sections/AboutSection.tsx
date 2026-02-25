@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { FiChevronLeft, FiChevronRight } from 'react-icons/fi';
+import { FiChevronLeft, FiChevronRight, FiArrowRight } from 'react-icons/fi';
 import { fetchAboutContent } from '@/lib/api';
 
 interface AboutCard {
@@ -45,12 +45,9 @@ const AboutHero: React.FC = () => {
     try {
       const data = await fetchAboutContent();
       if (data) {
-
-        // FIXED SORT FUNCTION (TS SAFE)
         if (data.aboutCards && Array.isArray(data.aboutCards) && data.aboutCards.length > 0) {
           data.aboutCards.sort((a: AboutCard, b: AboutCard) => (a?.order ?? 0) - (b?.order ?? 0));
           setContent(data);
-
         } else {
           setContent({
             aboutCards: [
@@ -66,9 +63,7 @@ const AboutHero: React.FC = () => {
             ],
           });
         }
-
       } else {
-
         setContent({
           aboutCards: [
             {
@@ -109,7 +104,7 @@ const AboutHero: React.FC = () => {
 
     const interval = setInterval(() => {
       setCurrentSlide((prev) => (prev + 1) % cards.length);
-    }, 5000);
+    }, 8000);
 
     return () => clearInterval(interval);
   }, [content?.aboutCards]);
@@ -128,20 +123,13 @@ const AboutHero: React.FC = () => {
     }
   };
 
-  const goToSlide = (index: number) => {
-    const cards = content?.aboutCards || [];
-    if (index >= 0 && index < cards.length) {
-      setCurrentSlide(index);
-    }
-  };
-
   if (loading) {
     return (
-      <section className="w-full px-4 md:px-8 lg:px-16 pt-0 pb-12 md:pb-20">
-        <div className="mx-auto w-full rounded-xl overflow-hidden bg-[#f7db9d] min-h-[400px] flex items-center justify-center">
+      <section className="w-full px-4 md:px-8 lg:px-16 py-12 md:py-20" style={{ backgroundColor: '#FFE3C2' }}>
+        <div className="mx-auto w-full min-h-[400px] flex items-center justify-center">
           <div className="text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#a02126] mx-auto mb-4"></div>
-            <p className="text-gray-600">Loading...</p>
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#ec2e7a] mx-auto mb-4"></div>
+            <p className="text-gray-600 font-medium">Loading details...</p>
           </div>
         </div>
       </section>
@@ -167,152 +155,120 @@ const AboutHero: React.FC = () => {
 
   if (cards.length === 0) return null;
 
-  const currentCard = cards[currentSlide] || cards[0];
-
   return (
     <section
       aria-labelledby="about-hero-title"
-      className="w-full px-4 md:px-8 lg:px-16 pt-0 pb-12 md:pb-20"
+      className="w-full relative overflow-hidden flex flex-col items-center justify-center pb-16 md:pb-28 px-4 sm:px-12 md:px-16"
+      style={{ backgroundColor: '#FDE8D4' }}
     >
-      <div
-        className="mx-auto w-full rounded-xl overflow-hidden"
-        style={{
-          backgroundColor: '#f7db9d',
-          backgroundImage: "url('/about/bg-pattern.png')",
-          backgroundRepeat: 'repeat',
-          backgroundSize: '520px',
-        }}
-      >
-        <div className="px-6 md:px-14 lg:px-12 py-10 md:py-14 lg:py-16 relative">
-          <div className="relative">
+      {/* Decorative full-width banner separator right at the top */}
+      <div className="w-full absolute top-0 left-0 pointer-events-none z-0 overflow-hidden h-[180px] md:h-[220px] lg:h-[260px]">
+        <img
+          src="/back3.png"
+          alt="Decorative separator"
+          className="w-full h-full object-cover"
+          style={{ objectPosition: "center bottom" }}
+        />
+      </div>
 
-            {cards.map((card, index) => (
-              <div
-                key={index}
-                className={`transition-opacity duration-700 ${index === currentSlide ? 'opacity-100' : 'opacity-0 absolute inset-0'
-                  }`}
-              >
-                <div className="flex flex-col-reverse md:flex-row items-center gap-8 md:gap-12">
+      {cards.length > 1 && (
+        <button
+          onClick={prevSlide}
+          className="absolute left-2 md:left-6 top-1/2 -translate-y-1/2 bg-[#ec2e7a] text-white p-3 md:p-4 rounded-lg shadow-xl z-30 hover:bg-[#d4266c] hover:-translate-x-1 transition-all"
+        >
+          <FiChevronLeft className="w-5 h-5 md:w-6 md:h-6" />
+        </button>
+      )}
 
-                  <div className="w-full md:w-6/12">
-                    {card.heading && (
-                      <h2
-                        id="about-hero-title"
-                        className="font-geom font-[450] text-3xl md:text-4xl lg:text-5xl text-[#121212] leading-tight mb-4"
-                      >
-                        {card.heading}
-                      </h2>
-                    )}
+      {cards.length > 1 && (
+        <button
+          onClick={nextSlide}
+          className="absolute right-2 md:right-6 top-1/2 -translate-y-1/2 bg-[#ec2e7a] text-white p-3 md:p-4 rounded-lg shadow-xl z-30 hover:bg-[#d4266c] hover:translate-x-1 transition-all"
+        >
+          <FiChevronRight className="w-5 h-5 md:w-6 md:h-6" />
+        </button>
+      )}
 
-                    {card.description && (
-                      <p className="text-sm md:text-base text-[#444444] mb-6 max-w-xl">
-                        {card.description}
-                      </p>
-                    )}
+      <div className="w-full max-w-7xl relative mx-auto min-h-[500px] flex items-center mt-12 md:mt-24 lg:mt-32">
+        {cards.map((card, index) => {
+          const isCurrent = index === currentSlide;
 
-                    <Link
-                      href="/about"
-                      className="inline-block bg-[#a02126] hover:bg-[#7f1a1f] text-white px-6 md:px-8 py-2.5 md:py-3 rounded-md font-medium transition-colors shadow-sm"
-                    >
-                      Learn More
-                    </Link>
-                  </div>
-
-                  <div className="w-full md:w-6/12 pr-0 md:pr-4 flex items-start gap-4">
-                    <div className="w-full md:w-2/3">
-                      <div className="relative rounded-md overflow-hidden shadow-sm">
-                        <Image
-                          src={card.mainImage || '/box-large.jpg'}
-                          alt={card.heading || 'Assorted sweets'}
-                          width={720}
-                          height={720}
-                          className="object-cover w-full h-[320px] md:h-[360px]"
-                          priority={index === 0}
-                        />
-                      </div>
-                    </div>
-
-                    <div className="hidden md:flex md:w-1/3 flex-col gap-4">
-                      {card.smallImage1 && (
-                        <div className="relative rounded-md overflow-hidden shadow-sm">
-                          <Image
-                            src={card.smallImage1}
-                            alt="Small image 1"
-                            width={320}
-                            height={180}
-                            className="object-cover w-full h-[180px]"
-                          />
-                        </div>
-                      )}
-
-                      {card.smallImage2 && (
-                        <div className="relative rounded-md overflow-hidden shadow-sm">
-                          <Image
-                            src={card.smallImage2}
-                            alt="Small image 2"
-                            width={320}
-                            height={180}
-                            className="object-cover w-full h-[180px]"
-                          />
-                        </div>
-                      )}
-                    </div>
-                  </div>
-
+          return (
+            <div
+              key={index}
+              className={`transition-all duration-1000 ease-in-out w-full flex flex-col lg:flex-row items-center gap-12 lg:gap-16 pt-12 md:pt-16 ${isCurrent
+                ? 'opacity-100 translate-y-0 relative z-20'
+                : 'opacity-0 absolute inset-0 pointer-events-none translate-y-8'
+                }`}
+            >
+              <div className="w-full lg:w-[45%] xl:w-[40%] flex justify-center">
+                <div className="relative w-full max-w-[380px] md:max-w-[420px] aspect-[4/5] rounded-t-full rounded-b-2xl overflow-hidden shadow-2xl ring-8 ring-white/30 transform transition-transform duration-700 hover:scale-[1.02]">
+                  <Image
+                    src={card.mainImage || '/box-large.jpg'}
+                    alt={card.heading || 'Assorted sweets'}
+                    fill
+                    className="object-cover object-center"
+                    priority={index === 0}
+                  />
+                  <div className="absolute inset-0 shadow-[inset_0_-40px_60px_rgba(0,0,0,0.1)] pointer-events-none rounded-t-full rounded-b-2xl"></div>
                 </div>
               </div>
-            ))}
 
-            {cards.length > 1 && (
-              <>
-                <button
-                  onClick={prevSlide}
-                  className="absolute left-0 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white text-gray-800 p-2 rounded-full shadow-lg z-20 opacity-70 hover:opacity-100"
-                >
-                  <FiChevronLeft className="w-6 h-6" />
-                </button>
+              <div className="w-full lg:w-[55%] xl:w-[60%] flex flex-col items-center flex-1 text-center mt-2 md:mt-0">
+                {card.heading && (
+                  <h2
+                    id="about-hero-title"
+                    className="font-serif text-3xl sm:text-4xl md:text-5xl lg:text-[54px] text-[#1e3a8a] font-bold tracking-tight leading-[1.15] mb-4 max-w-2xl px-2 drop-shadow-sm"
+                  >
+                    {card.heading}
+                  </h2>
+                )}
 
-                <button
-                  onClick={nextSlide}
-                  className="absolute right-0 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white text-gray-800 p-2 rounded-full shadow-lg z-20 opacity-70 hover:opacity-100"
-                >
-                  <FiChevronRight className="w-6 h-6" />
-                </button>
-              </>
-            )}
+                <div className="flex items-center justify-center gap-4 text-[#ec2e7a] my-5 md:my-6">
+                  <span className="text-xl md:text-2xl mt-1">✦</span>
+                  <span className="font-serif font-bold text-3xl md:text-4xl lg:text-5xl tracking-[0.2em]" style={{ color: '#ec2e7a' }}>
+                    2 0 2 5
+                  </span>
+                  <span className="text-xl md:text-2xl mt-1">✦</span>
+                </div>
 
-            {cards.length > 1 && (
-              <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2 z-20">
-                {cards.map((_, index) => (
-                  <button
-                    key={index}
-                    onClick={() => goToSlide(index)}
-                    className={`w-2 h-2 rounded-full transition-all ${index === currentSlide ? 'bg-[#a02126] w-8' : 'bg-white/50'
-                      }`}
-                  />
-                ))}
+                {card.description && (
+                  <p className="text-[#3a3a3a] font-medium text-base md:text-lg lg:text-[1.1rem] leading-[1.8] max-w-2xl mx-auto px-4 md:px-8 mb-8 md:mb-12">
+                    {card.description}
+                  </p>
+                )}
+
+                <div className="w-full flex justify-center lg:justify-end px-4 md:px-8 xl:px-12 mt-4">
+                  <Link
+                    href="/about"
+                    className="bg-[#ec2e7a] hover:bg-[#d4266c] text-white px-8 md:px-10 py-3 md:py-4 rounded-xl font-serif text-lg md:text-xl transition-all duration-300 hover:-translate-y-1 shadow-xl hover:shadow-2xl flex items-center gap-3 relative inline-flex group"
+                  >
+                    <span className="relative z-10">Read More</span>
+                    <FiArrowRight className="relative z-10 w-5 h-5 transition-transform group-hover:translate-x-1" />
+                    <span className="absolute -top-3 -right-3 text-yellow-400 text-3xl animate-[spin_6s_linear_infinite] pointer-events-none drop-shadow-md z-20">
+                      ✱
+                    </span>
+                  </Link>
+                </div>
               </div>
-            )}
-          </div>
-
-          <div
-            aria-hidden="true"
-            className="pointer-events-none absolute inset-y-0 right-6 md:right-10 lg:right-16 flex items-center"
-            style={{ opacity: 0.12 }}
-          >
-            <div className="w-[420px] h-[420px]">
-              <Image
-                src="/floral.svg"
-                alt=""
-                width={420}
-                height={420}
-                className="object-contain"
-              />
             </div>
-          </div>
-
-        </div>
+          );
+        })}
       </div>
+
+      {cards.length > 1 && (
+        <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-3 z-30">
+          {cards.map((_, index) => (
+            <button
+              key={index}
+              onClick={() => setCurrentSlide(index)}
+              className={`w-2.5 h-2.5 rounded-full transition-all duration-300 ${index === currentSlide ? 'bg-[#ec2e7a] w-8' : 'bg-[#ec2e7a]/30'
+                }`}
+              aria-label={`Go to slide ${index + 1}`}
+            />
+          ))}
+        </div>
+      )}
     </section>
   );
 };
