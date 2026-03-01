@@ -5,7 +5,7 @@ import { useCart } from '@/context/CartContext';
 import Image from 'next/image';
 import Link from 'next/link';
 import { FiX, FiMinus, FiPlus, FiShoppingBag } from 'react-icons/fi';
-
+ 
 const Cart: React.FC = () => {
   const {
     cartItems,
