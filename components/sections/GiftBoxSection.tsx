@@ -30,7 +30,7 @@ const GiftBoxSection: React.FC<GiftBoxSectionProps> = ({ giftBoxes }) => {
     .sort((a, b) => (a.price || 0) - (b.price || 0));
 
   return (
-    <section className="py-6 mt-6 md:py-12 md:mt-8 px-4 bg-white w-full">
+    <section className="py-6 mt-6 md:py-12 md:mt-8 px-4 bg-[#F59A5B] w-full">
       <div className="w-full max-w-7xl mx-auto">
         {/* Heading */}
         <h2 className="text-4xl text-black mb-2 font-jost font-[500] text-center">

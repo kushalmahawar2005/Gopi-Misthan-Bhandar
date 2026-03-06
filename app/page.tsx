@@ -174,6 +174,12 @@ export default function Home() {
         </div>
       </ScrollAnimation>
 
+      {instaBooks.length > 0 && (
+        <ScrollAnimation delay={150}>
+          <InstaBookSection instaBooks={instaBooks} />
+        </ScrollAnimation>
+      )}
+
       {giftBoxes.length > 0 && (
         <ScrollAnimation delay={200}>
           <div id="gifting">
@@ -182,15 +188,9 @@ export default function Home() {
         </ScrollAnimation>
       )}
 
-      {instaBooks.length > 0 && (
-        <ScrollAnimation delay={150}>
-          <InstaBookSection instaBooks={instaBooks} />
-        </ScrollAnimation>
-      )}
-
       {galleryItems.length > 0 && (
         <ScrollAnimation delay={200}>
-          <GallerySection galleryItems={galleryItems} />
+          <GallerySection galleryItems={galleryItems} topColor="#F6A666" />
         </ScrollAnimation>
       )}
 

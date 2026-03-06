@@ -91,7 +91,7 @@ const CategoriesSection: React.FC<CategoriesSectionProps> = ({ categories }) => 
           {categories.map((category) => (
             <div
               key={category.id}
-              className="flex-shrink-0 w-[70vw] sm:w-[48vw] md:w-[26%] lg:w-[24%]"
+              className="flex-shrink-0 w-[65vw] sm:w-[45vw] md:w-[24%] lg:w-[22%]"
             >
               <CategoryCard category={category} />
             </div>
