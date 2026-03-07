@@ -6,7 +6,7 @@ Traditional Indian sweets, snacks, and namkeen e-commerce website for Gopi Misth
 
 - **Next.js 14** - React framework with App Router
 - **TypeScript** - Type safety
-- **Tailwind CSS** - Styling
+- **Tailwind CSS** - Styling 
 - **React Icons** - Icon library
 
 ## Getting Started
