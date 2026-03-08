@@ -15,7 +15,7 @@ Traditional Indian sweets, snacks, and namkeen e-commerce website for Gopi Misth
 
 ```bash
 npm install
-```
+``` 
 
 ### Development
 
