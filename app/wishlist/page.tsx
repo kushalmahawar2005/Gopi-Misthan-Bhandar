@@ -21,7 +21,7 @@ export default function WishlistPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-white">
+      <div className="min-h-screen">
         <Header />
         <Navigation />
         <Cart />
@@ -38,7 +38,7 @@ export default function WishlistPage() {
 
   return (
     <ProtectedRoute>
-      <div className="min-h-screen bg-white">
+      <div className="min-h-screen">
         <Header />
         <Navigation />
         <Cart />

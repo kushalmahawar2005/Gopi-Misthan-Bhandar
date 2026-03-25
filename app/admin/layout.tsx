@@ -80,7 +80,6 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     { href: '/admin/blog', icon: FiFile, label: 'Blog Posts' },
     { href: '/admin/giftbox', icon: FiGift, label: 'Gift Box' },
     { href: '/admin/instabook', icon: FiEye, label: 'InstaBook' },
-    { href: '/admin/instapost', icon: FiInstagram, label: 'InstaPost' },
     { href: '/admin/gallery', icon: FiGrid, label: 'Gallery' },
     { href: '/admin/reviews', icon: FiStar, label: 'Reviews' },
   ];

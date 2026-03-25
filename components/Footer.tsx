@@ -1,22 +1,10 @@
 'use client';
 
-import React, { useState } from 'react';
+import React from 'react';
 import Link from 'next/link';
 import { FiPhone, FiMail, FiMapPin, FiFacebook, FiInstagram, FiTwitter, FiYoutube } from 'react-icons/fi';
 
 const Footer = () => {
-  const [email, setEmail] = useState('');
-  const [subscribed, setSubscribed] = useState(false);
-
-  const handleSubscribe = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (email) {
-      setSubscribed(true);
-      setEmail('');
-      setTimeout(() => setSubscribed(false), 3000);
-    }
-  };
-
   const socialLinks = [
     { icon: FiFacebook, href: '#', label: 'Facebook' },
     { icon: FiInstagram, href: '#', label: 'Instagram' },
@@ -33,32 +21,33 @@ const Footer = () => {
   ];
 
   return (
-    <footer id="contact" className="bg-primary-darkRed w-full">
+    <footer id="contact" className="bg-[#5A2525] w-full text-[#F3EEE9]">
       {/* Content */}
-      <div className="w-full px-4 py-12 md:py-16">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 md:gap-12 mb-8">
+      <div className="w-full px-4 md:px-12 py-16 md:py-24 max-w-[1400px] mx-auto">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 lg:gap-16 mb-12">
+
           {/* Company Info */}
-          <div className="text-white">
-            <h3 className="text-primary-yellow text-xl font-bold font-jost tracking-wide mb-4">
-              GOPI MISTHAN BHANDAR
+          <div className="space-y-6">
+            <h3 className="text-[#F3EEE9] text-2xl font-playfair font-bold tracking-[0.05em]">
+              Gopi Misthan Bhandar
             </h3>
-            <p className="text-sm  leading-relaxed text-white mb-4">
-              Serving Tradition & Sweetness Since 1968
+            <p className="text-[14px] leading-relaxed opacity-70 font-dm-sans max-w-[280px]">
+              Distilling generations of tradition into premium sweets since 1968. A legacy of taste and purity.
             </p>
-            <p className="text-sm  text-white mb-4 flex items-center gap-2">
-              <FiMapPin className="w-4 h-4" />
+            <p className="text-[14px] flex items-center gap-2 opacity-80 font-dm-sans">
+              <FiMapPin className="w-4 h-4 text-[#D4A373]" />
               Neemuch, Madhya Pradesh
             </p>
 
             {/* Social Media Links */}
-            <div className="flex gap-4 mt-6">
+            <div className="flex gap-4 mt-8">
               {socialLinks.map((social) => (
                 <a
                   key={social.label}
                   href={social.href}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="w-10 h-10 bg-white/10 hover:bg-primary-yellow rounded-full flex items-center justify-center text-white hover:text-primary-darkRed transition-all duration-300"
+                  className="w-11 h-11 border border-[#F3EEE9]/10 hover:border-[#F3EEE9]/40 rounded-full flex items-center justify-center text-[#F3EEE9]/60 hover:text-[#F3EEE9] transition-all duration-300 hover:scale-110"
                   aria-label={social.label}
                 >
                   <social.icon className="w-5 h-5" />
@@ -68,17 +57,18 @@ const Footer = () => {
           </div>
 
           {/* Quick Links */}
-          <div className="text-white">
-            <h4 className="text-primary-yellow text-lg font-bold font-general-sansal-sans mb-4">
+          <div className="space-y-6">
+            <h4 className="text-[#F3EEE9] text-lg font-playfair font-bold tracking-[0.1em] uppercase">
               Quick Links
             </h4>
-            <ul className="space-y-3 text-sm ">
+            <ul className="space-y-4 text-[14px] font-dm-sans">
               {quickLinks.map((link) => (
                 <li key={link.label}>
                   <Link
                     href={link.href}
-                    className="text-white hover:text-primary-yellow transition-colors flex items-center gap-2"
+                    className="opacity-70 hover:opacity-100 transition-opacity flex items-center gap-2 group"
                   >
+                    <span className="w-0 h-[1px] bg-[#D4A373] transition-all duration-300 group-hover:w-4" />
                     {link.label}
                   </Link>
                 </li>
@@ -87,71 +77,68 @@ const Footer = () => {
           </div>
 
           {/* Contact Info */}
-          <div className="text-white">
-            <h4 className="text-primary-yellow text-lg font-bold font-general-sansal-sans mb-4">
-              Contact Us
+          <div className="space-y-6">
+            <h4 className="text-[#F3EEE9] text-lg font-playfair font-bold tracking-[0.1em] uppercase">
+              Connect With Us
             </h4>
-            <ul className="space-y-3 text-sm text-white">
-              <li className="flex items-center gap-2">
-                <FiPhone className="w-4 h-4 text-primary-yellow" />
-                <a href="tel:+917746883645" className="hover:text-primary-yellow transition-colors">
+            <ul className="space-y-5 text-[14px] font-dm-sans">
+              <li className="flex items-center gap-3">
+                <FiPhone className="w-4 h-4 text-[#D4A373]" />
+                <a href="tel:+917746883645" className="opacity-70 hover:opacity-100 transition-opacity">
                   +91 7746883645
                 </a>
               </li>
-              <li className="flex items-center gap-2">
-                <FiMail className="w-4 h-4 text-primary-yellow" />
-                <a href="mailto:gopimisthan@hotmail.com" className="hover:text-primary-yellow transition-colors">
+              <li className="flex items-center gap-3">
+                <FiMail className="w-4 h-4 text-[#D4A373]" />
+                <a href="mailto:gopimisthan@hotmail.com" className="opacity-70 hover:opacity-100 transition-opacity">
                   gopimisthan@hotmail.com
                 </a>
               </li>
-              <li className="flex items-start gap-2">
-                <FiMapPin className="w-4 h-4 text-primary-yellow mt-1" />
-                <span>Shop No. 123, Main Street,<br />Neemuch, MP 458441</span>
+              <li className="flex items-start gap-3">
+                <FiMapPin className="w-4 h-4 text-[#D4A373] mt-1" />
+                <span className="opacity-70 leading-relaxed">Shop No. 123, Main Street,<br />Neemuch, MP 458441</span>
               </li>
             </ul>
           </div>
 
-          {/* Newsletter */}
-          <div className="text-white">
-            <h4 className="text-primary-yellow text-lg font-bold  mb-4">
-              Newsletter
+          {/* Find Us - Map Integration */}
+          <div className="space-y-6">
+            <h4 className="text-[#F3EEE9] text-lg font-playfair font-bold tracking-[0.1em] uppercase">
+              Locate Us
             </h4>
-            <p className="text-sm font-jost tracking-wide text-white mb-4">
-              Subscribe to get updates on new products and special offers
-            </p>
-            <form onSubmit={handleSubscribe} className="space-y-3">
-              <input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="Your email address"
-                className="w-full px-4 py-2 rounded-lg bg-white/10 border border-white/20 text-white placeholder-gray-400 focus:outline-none focus:border-primary-yellow transition-colors"
-                required
+            <div className="relative w-full h-[200px] rounded-2xl overflow-hidden shadow-2xl border border-white/5 group ring-1 ring-white/10">
+              <iframe
+                width="100%"
+                height="100%"
+                src="https://maps.google.com/maps?q=Gopi%20Misthan%20Bhandar%20Neemuch%20Madhya%20Pradesh&t=&z=14&ie=UTF8&iwloc=&output=embed"
+                frameBorder="0"
+                scrolling="no"
+                marginHeight={0}
+                marginWidth={0}
+                title="Gopi Misthan Bhandar Location"
+                className="w-full h-full grayscale hover:grayscale-0 transition-all duration-1000 opacity-60 group-hover:opacity-100"
               />
-              <button
-                type="submit"
-                className="w-full bg-primary-yellow text-primary-darkRed px-4 py-2 rounded-lg font-bold font-poppins hover:bg-yellow-400 transition-colors"
-              >
-                {subscribed ? 'Subscribed!' : 'Subscribe'}
-              </button>
-            </form>
+              <a
+                href="https://maps.google.com/?q=Gopi%20Misthan%20Bhandar%20Neemuch%20Madhya%20Pradesh"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="absolute inset-0 bg-transparent cursor-pointer z-10"
+              />
+            </div>
+            <p className="text-[12px] opacity-50 italic mt-4 font-dm-sans">
+              Experience the sweetness at our flagship store.
+            </p>
           </div>
         </div>
 
         {/* Bottom Bar */}
-        <div className="border-t border-white/20 pt-6 mt-8">
-          <div className="flex flex-col md:flex-row justify-between items-center text-sm text-white">
+        <div className="border-t border-[#F3EEE9]/10 pt-10 mt-16">
+          <div className="flex flex-col md:flex-row justify-between items-center gap-6 text-[13px] opacity-40 font-dm-sans">
             <p>© {new Date().getFullYear()} Gopi Misthan Bhandar. All rights reserved.</p>
-            <div className="flex gap-4 mt-4 md:mt-0">
-              <Link href="/privacy" className="hover:text-primary-yellow transition-colors">
-                Privacy Policy
-              </Link>
-              <Link href="/terms" className="hover:text-primary-yellow transition-colors">
-                Terms & Conditions
-              </Link>
-              <Link href="/refund-cancellation" className="hover:text-primary-yellow transition-colors">
-                Refund & Cancellation
-              </Link>
+            <div className="flex gap-8">
+              <Link href="/privacy" className="hover:opacity-100 transition-opacity">Privacy Policy</Link>
+              <Link href="/terms" className="hover:opacity-100 transition-opacity">Terms & Conditions</Link>
+              <Link href="/refund-cancellation" className="hover:opacity-100 transition-opacity">Refund & Cancellation</Link>
             </div>
           </div>
         </div>

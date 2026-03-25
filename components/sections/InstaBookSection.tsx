@@ -3,7 +3,8 @@
 import React, { useState, useRef } from 'react';
 import { InstagramPost } from '@/types';
 import Link from 'next/link';
-import { FiVolume2, FiVolumeX, FiMaximize2 } from 'react-icons/fi';
+import { FiVolume2, FiVolumeX, FiMaximize2, FiInstagram, FiFacebook } from 'react-icons/fi';
+import Image from 'next/image';
 
 interface InstaBookSectionProps {
   instaBooks: InstagramPost[];
@@ -11,18 +12,50 @@ interface InstaBookSectionProps {
 
 const InstaBookSection: React.FC<InstaBookSectionProps> = ({ instaBooks }) => {
   return (
-    <section className="py-16 md:py-24 px-4 bg-white w-full">
-      <div className="w-full">
-        <div className="text-center mb-12 md:mb-16">
-          <h2 className="text-3xl md:text-4xl lg:text-5xl text-primary-brown font-bold font-general-sans tracking-tight mb-4">
-            Follow Our Journey
-          </h2>
-          <p className="text-xs md:text-sm text-gray-500 font-geom uppercase tracking-widest">
-            @GopiMisthanBhandar
-          </p>
+    <section className="py-16 md:py-24 px-4 w-full bg-[#5A2525]">
+      <div className="max-w-[1400px] mx-auto w-full">
+        {/* Header: Title Left, Bird Center, Icons Right */}
+        <div className="flex flex-col md:flex-row items-center justify-between mb-16 md:mb-20 gap-8 px-4">
+
+          {/* Left: Title */}
+          <div className="text-center md:text-left flex-1">
+            <h2 className="text-3xl md:text-4xl lg:text-5xl text-white font-playfair leading-tight">
+              Follow Us For More <br className="hidden md:block" /> Mithai Stories
+            </h2>
+          </div>
+
+          {/* Center: Bird Illustration (Fixed size to match reference) */}
+          <div className="flex-shrink-0 relative w-[120px] h-[120px] md:w-[150px] md:h-[150px]">
+            {/* Using a bird illustration matching the artisanal theme */}
+            <Image
+              src="https://res.cloudinary.com/db67bu78t/image/upload/v1740337583/bird-illustration_ynzq6z.png"
+              alt="Gopi Man Logo"
+              fill
+              className="object-contain"
+            />
+          </div>
+
+          {/* Right: Social Icons */}
+          <div className="flex items-center gap-4 flex-1 justify-center md:justify-end">
+            <Link
+              href="https://instagram.com/gopimisthanbhandar"
+              target="_blank"
+              className="w-10 h-10 md:w-12 md:h-12 rounded-full border border-white/40 flex items-center justify-center text-white hover:bg-white hover:text-[#5A2525] transition-all duration-300"
+            >
+              <FiInstagram className="w-5 h-5 md:w-6 md:h-6" />
+            </Link>
+            <Link
+              href="https://facebook.com/gopimisthanbhandar"
+              target="_blank"
+              className="w-10 h-10 md:w-12 md:h-12 rounded-full border border-white/40 flex items-center justify-center text-white hover:bg-white hover:text-[#5A2525] transition-all duration-300"
+            >
+              <FiFacebook className="w-5 h-5 md:w-6 md:h-6" />
+            </Link>
+          </div>
         </div>
 
-        <div className="flex justify-center gap-4 sm:gap-5 md:gap-6 lg:gap-8 flex-wrap">
+        {/* Video Grid */}
+        <div className="flex justify-center gap-4 sm:gap-6 md:gap-8 lg:gap-10 flex-wrap">
           {instaBooks.map((item) => (
             <VideoCard key={item.id} item={item} />
           ))}
@@ -70,7 +103,7 @@ const VideoCard: React.FC<VideoCardProps> = ({ item }) => {
           lg:w-[180px] lg:h-[460px]
           xl:w-[220px] xl:h-[420px]
           2xl:w-[240px] 2xl:h-[420px]
-          transition-transform duration-300 hover:scale-[1.02] border border-gray-100
+          transition-transform duration-300 hover:scale-[1.02] border border-white/10
         "
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
@@ -142,7 +175,7 @@ const VideoCard: React.FC<VideoCardProps> = ({ item }) => {
       </div>
 
       {/* Label */}
-      <p className="text-black text-[23px] mb-8 mt-2  md:text-base font-jost mt-4 text-center font-medium">
+      <p className="text-white text-[15px] opacity-90 md:text-base font-jost mt-4 text-center font-medium">
         {item.label}
       </p>
     </div>

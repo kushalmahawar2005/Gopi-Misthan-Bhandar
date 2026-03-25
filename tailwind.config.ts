@@ -92,8 +92,23 @@ const config: Config = {
 			geom: [
 				'Geom',
 				'sans-serif'
-			]
-		},
+			],
+			platina: [
+				'Platina',
+				'sans-serif'
+			],
+			flama: [
+				'Flama',
+				'sans-serif'
+			],
+			'flama-condensed': [
+				'FlamaCondensed',
+				'sans-serif'
+			],
+        'instrument-sans': ['"Instrument Sans"', 'sans-serif'],
+        'playfair': ['"Playfair Display"', 'serif'],
+        'dm-sans': ['"DM Sans"', 'sans-serif'],
+      },
   		fontWeight: {
   			extralight: '200',
   			light: '300',

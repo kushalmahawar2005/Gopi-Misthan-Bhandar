@@ -32,7 +32,6 @@ export default function Home() {
   const [premiumProducts, setPremiumProducts] = useState<Product[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [instaBooks, setInstaBooks] = useState<InstagramPost[]>([]);
-  const [instaPosts, setInstaPosts] = useState<any[]>([]);
   const [galleryItems, setGalleryItems] = useState<any[]>([]);
   const [giftBoxes, setGiftBoxes] = useState<any[]>([]);
   const [blogs, setBlogs] = useState<any[]>([]);
@@ -46,14 +45,13 @@ export default function Home() {
   const loadData = async () => {
     try {
       // Optimized: Fetch only what we need, avoid duplicate calls
-      const [featured, categoriesData, classicFlagged, premiumFlagged, allProducts, instaBooksData, instaPostsData, galleryData, giftBoxesData, blogsData] = await Promise.all([
+      const [featured, categoriesData, classicFlagged, premiumFlagged, allProducts, instaBooksData, galleryData, giftBoxesData, blogsData] = await Promise.all([
         fetchProducts({ featured: true, limit: 8 }),
         fetchCategories(),
         fetchProducts({ isClassic: true, limit: 8 }),
         fetchProducts({ isPremium: true, limit: 8 }),
         fetchProducts(), // Fetch all products to count by category
         fetchInstaBooks(),
-        fetchInstaPosts(),
         fetchGallery(),
         fetchGiftBoxes(),
         fetchBlogs(),
@@ -107,7 +105,6 @@ export default function Home() {
       setPremiumProducts(premiumFiltered.slice(0, 8));
 
       setInstaBooks(instaBooksData);
-      setInstaPosts(instaPostsData);
       setGalleryItems(galleryData);
       setGiftBoxes(giftBoxesData);
       setBlogs(blogsData);
@@ -119,15 +116,14 @@ export default function Home() {
   };
 
   return (
-    <main className="min-h-screen bg-white w-full overflow-x-hidden">
+    <main className="min-h-screen w-full relative">
       <Header />
       <Navigation />
       <Cart />
       <HeroSection />
 
-      {/* Promotional Banner with Intro Animation */}
-      <PromotionalBanner />
-
+      {/* Promotional Banner removed as requested */}
+      {/* <PromotionalBanner /> */}
       {featuredProducts.length > 0 && (
         <ScrollAnimation delay={100}>
           <div id="featured">
@@ -149,7 +145,7 @@ export default function Home() {
           <div id="sweets">
             <ProductSection
               title="Classic Sweets"
-              subtitle="Savour The Timeless Taste of Tradition With Gopi Sweets"
+              subtitle="Timeless Traditional Flavors"
               products={classicProducts}
               viewMoreLink="/products?category=sweets"
             />
@@ -161,7 +157,7 @@ export default function Home() {
         <ScrollAnimation delay={200}>
           <ProductSection
             title="Premium Sweets"
-            subtitle="Savour The Timeless Taste of Tradition With Gopi Premium Sweets"
+            subtitle="The Luxury Signature Collection"
             products={premiumProducts}
             viewMoreLink="/products?category=sweets"
           />
@@ -174,13 +170,12 @@ export default function Home() {
         </div>
       </ScrollAnimation>
 
-      {giftBoxes.length > 0 && (
-        <ScrollAnimation delay={200}>
-          <div id="gifting">
-            <GiftBoxSection giftBoxes={giftBoxes} />
-          </div>
-        </ScrollAnimation>
-      )}
+      {/* Gift Box Section - New Split Panel Design */}
+      <ScrollAnimation delay={200}>
+        <div id="gifting">
+          <GiftBoxSection />
+        </div>
+      </ScrollAnimation>
 
       {instaBooks.length > 0 && (
         <ScrollAnimation delay={150}>
@@ -194,15 +189,9 @@ export default function Home() {
         </ScrollAnimation>
       )}
 
-      {instaPosts.length > 0 && (
-        <ScrollAnimation delay={150}>
-          <InstaPostSection instaPosts={instaPosts} />
-        </ScrollAnimation>
-      )}
+      {/* InstaPostSection removed as per request */}
 
-      <ScrollAnimation delay={150}>
-        <MapSection />
-      </ScrollAnimation>
+      {/* MapSection removed as per request, moved to Footer */}
 
       {blogs.length > 0 && (
         <ScrollAnimation delay={200}>

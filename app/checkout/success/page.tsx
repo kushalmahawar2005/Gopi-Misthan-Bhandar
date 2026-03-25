@@ -33,7 +33,7 @@ function OrderSuccessContent() {
 
   if (!orderData && !orderId) {
     return (
-      <div className="min-h-screen bg-white">
+      <div className="min-h-screen">
         <Header />
         <Navigation />
         <Cart />
@@ -240,7 +240,7 @@ function OrderSuccessContent() {
 export default function OrderSuccessPage() {
   return (
     <Suspense fallback={
-      <div className="min-h-screen bg-white">
+      <div className="min-h-screen">
         <Header />
         <Navigation />
         <Cart />

@@ -50,7 +50,7 @@ function GiftBoxCategoryContent() {
   const heading = headingMap[categorySlug] || 'Gift Box';
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen">
       <Header />
       <Navigation />
       <Cart />
@@ -162,7 +162,7 @@ export default function GiftBoxCategoryPage() {
   return (
     <Suspense
       fallback={
-        <div className="min-h-screen bg-white flex items-center justify-center">
+        <div className="min-h-screen flex items-center justify-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-red"></div>
         </div>
       }

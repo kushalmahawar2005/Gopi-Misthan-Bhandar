@@ -404,7 +404,7 @@ export default function CheckoutPage() {
 
   if (cartItems.length === 0) {
     return (
-      <div className="min-h-screen bg-white">
+      <div className="min-h-screen">
         <Header />
         <Navigation />
         <Cart />

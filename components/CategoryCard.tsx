@@ -15,7 +15,7 @@ export default function CategoryCard({ category }: CategoryCardProps) {
       : '/c-1.jpg';
 
   return (
-    <Link href={`/category/${category.slug}`} className="block">
+    <Link href={`/products?category=${category.slug}`} className="block">
       <div className="flex flex-col">
         {/* IMAGE */}
         <div className="relative w-full mb-2 aspect-[294/410] overflow-hidden rounded-[15px]">

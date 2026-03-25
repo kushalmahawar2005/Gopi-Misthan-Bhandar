@@ -409,7 +409,7 @@ const shortDescription =
             </Link>
             <span className="text-gray-400">/</span>
             <Link
-              href={`/category/${product.category}`}
+              href={`/products?category=${product.category}`}
               className="text-gray-600 hover:text-primary-red transition-colors capitalize"
             >
               {product.category}

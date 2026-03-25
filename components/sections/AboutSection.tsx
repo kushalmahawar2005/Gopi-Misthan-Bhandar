@@ -1,320 +1,154 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { FiChevronLeft, FiChevronRight } from 'react-icons/fi';
-import { fetchAboutContent } from '@/lib/api';
 
-interface AboutCard {
-  heading?: string;
-  description?: string;
-  mainImage?: string;
-  smallImage1?: string;
-  smallImage2?: string;
-  order?: number;
-}
+const AboutSection: React.FC = () => {
+  const [email, setEmail] = useState('');
+  const [isSubscribed, setIsSubscribed] = useState(false);
 
-interface AboutContent {
-  aboutCards?: AboutCard[];
-  title?: string;
-  description?: string;
-  content?: {
-    heading?: string;
-    text?: string;
-  };
-  images?: string[];
-}
-
-const AboutHero: React.FC = () => {
-  const [content, setContent] = useState<AboutContent | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [currentSlide, setCurrentSlide] = useState(0);
-
-  useEffect(() => {
-    loadContent();
-
-    const refreshInterval = setInterval(() => {
-      loadContent();
-    }, 30000);
-
-    return () => clearInterval(refreshInterval);
-  }, []);
-
-  const loadContent = async () => {
-    try {
-      const data = await fetchAboutContent();
-      if (data) {
-
-        // FIXED SORT FUNCTION (TS SAFE)
-        if (data.aboutCards && Array.isArray(data.aboutCards) && data.aboutCards.length > 0) {
-          data.aboutCards.sort((a: AboutCard, b: AboutCard) => (a?.order ?? 0) - (b?.order ?? 0));
-          setContent(data);
-
-        } else {
-          setContent({
-            aboutCards: [
-              {
-                heading: 'A Legacy of Sweet Excellence',
-                description:
-                  'With over four decades of mastery in crafting premium Indian sweets, Chhappanbhog stands as a hallmark of tradition, purity, and flavor.',
-                mainImage: '/box-large.jpg',
-                smallImage1: '/box-small1.jpg',
-                smallImage2: '/box-small2.jpg',
-                order: 0,
-              },
-            ],
-          });
-        }
-
-      } else {
-
-        setContent({
-          aboutCards: [
-            {
-              heading: 'A Legacy of Sweet Excellence',
-              description:
-                'With over four decades of mastery in crafting premium Indian sweets, Chhappanbhog stands as a hallmark of tradition, purity, and flavor.',
-              mainImage: '/box-large.jpg',
-              smallImage1: '/box-small1.jpg',
-              smallImage2: '/box-small2.jpg',
-              order: 0,
-            },
-          ],
-        });
-      }
-    } catch (error) {
-      console.error('Error loading about content:', error);
-      setContent({
-        aboutCards: [
-          {
-            heading: 'A Legacy of Sweet Excellence',
-            description:
-              'With over four decades of mastery in crafting premium Indian sweets, Chhappanbhog stands as a hallmark of tradition, purity, and flavor.',
-            mainImage: '/box-large.jpg',
-            smallImage1: '/box-small1.jpg',
-            smallImage2: '/box-small2.jpg',
-            order: 0,
-          },
-        ],
-      });
-    } finally {
-      setLoading(false);
+  const handleSubscribe = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (email) {
+      setIsSubscribed(true);
+      setEmail('');
+      setTimeout(() => setIsSubscribed(false), 3000);
     }
   };
-
-  useEffect(() => {
-    const cards = content?.aboutCards || [];
-    if (cards.length <= 1) return;
-
-    const interval = setInterval(() => {
-      setCurrentSlide((prev) => (prev + 1) % cards.length);
-    }, 5000);
-
-    return () => clearInterval(interval);
-  }, [content?.aboutCards]);
-
-  const nextSlide = () => {
-    const cards = content?.aboutCards || [];
-    if (cards.length > 0) {
-      setCurrentSlide((prev) => (prev + 1) % cards.length);
-    }
-  };
-
-  const prevSlide = () => {
-    const cards = content?.aboutCards || [];
-    if (cards.length > 0) {
-      setCurrentSlide((prev) => (prev - 1 + cards.length) % cards.length);
-    }
-  };
-
-  const goToSlide = (index: number) => {
-    const cards = content?.aboutCards || [];
-    if (index >= 0 && index < cards.length) {
-      setCurrentSlide(index);
-    }
-  };
-
-  if (loading) {
-    return (
-      <section className="w-full px-4 md:px-8 lg:px-16 pt-0 pb-12 md:pb-20">
-        <div className="mx-auto w-full rounded-xl overflow-hidden bg-[#f7db9d] min-h-[400px] flex items-center justify-center">
-          <div className="text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#a02126] mx-auto mb-4"></div>
-            <p className="text-gray-600">Loading...</p>
-          </div>
-        </div>
-      </section>
-    );
-  }
-
-  if (!content) return null;
-
-  const cards = content.aboutCards || [];
-  const hasCards = cards.length > 0;
-
-  if (!hasCards && (content.title || content.description || content.content)) {
-    const legacyCard: AboutCard = {
-      heading: content.title || content.content?.heading || 'A Legacy of Sweet Excellence',
-      description: content.description || content.content?.text || '',
-      mainImage: content.images?.[0] || '/box-large.jpg',
-      smallImage1: content.images?.[1] || '/box-small1.jpg',
-      smallImage2: content.images?.[2] || '/box-small2.jpg',
-      order: 0,
-    };
-    cards.push(legacyCard);
-  }
-
-  if (cards.length === 0) return null;
-
-  const currentCard = cards[currentSlide] || cards[0];
 
   return (
-    <section
-      aria-labelledby="about-hero-title"
-      className="w-full px-4 md:px-8 lg:px-16 pt-0 pb-12 md:pb-20"
-    >
-      <div
-        className="mx-auto w-full rounded-xl overflow-hidden"
-        style={{
-          backgroundColor: '#f7db9d',
-          backgroundImage: "url('/about/bg-pattern.png')",
-          backgroundRepeat: 'repeat',
-          backgroundSize: '520px',
-        }}
-      >
-        <div className="px-6 md:px-14 lg:px-12 py-10 md:py-14 lg:py-16 relative">
-          <div className="relative">
-
-            {cards.map((card, index) => (
-              <div
-                key={index}
-                className={`transition-opacity duration-700 ${index === currentSlide ? 'opacity-100' : 'opacity-0 absolute inset-0'
-                  }`}
-              >
-                <div className="flex flex-col-reverse md:flex-row items-center gap-8 md:gap-12">
-
-                  <div className="w-full md:w-6/12">
-                    {card.heading && (
-                      <h2
-                        id="about-hero-title"
-                        className="font-geom font-[450] text-3xl md:text-4xl lg:text-5xl text-[#121212] leading-tight mb-4"
-                      >
-                        {card.heading}
-                      </h2>
-                    )}
-
-                    {card.description && (
-                      <p className="text-sm md:text-base text-[#444444] mb-6 max-w-xl">
-                        {card.description}
-                      </p>
-                    )}
-
-                    <Link
-                      href="/about"
-                      className="inline-block bg-[#a02126] hover:bg-[#7f1a1f] text-white px-6 md:px-8 py-2.5 md:py-3 rounded-md font-medium transition-colors shadow-sm"
-                    >
-                      Learn More
-                    </Link>
-                  </div>
-
-                  <div className="w-full md:w-6/12 pr-0 md:pr-4 flex items-start gap-4">
-                    <div className="w-full md:w-2/3">
-                      <div className="relative rounded-md overflow-hidden shadow-sm">
-                        <Image
-                          src={card.mainImage || '/box-large.jpg'}
-                          alt={card.heading || 'Assorted sweets'}
-                          width={720}
-                          height={720}
-                          className="object-cover w-full h-[320px] md:h-[360px]"
-                          priority={index === 0}
-                        />
-                      </div>
-                    </div>
-
-                    <div className="hidden md:flex md:w-1/3 flex-col gap-4">
-                      {card.smallImage1 && (
-                        <div className="relative rounded-md overflow-hidden shadow-sm">
-                          <Image
-                            src={card.smallImage1}
-                            alt="Small image 1"
-                            width={320}
-                            height={180}
-                            className="object-cover w-full h-[180px]"
-                          />
-                        </div>
-                      )}
-
-                      {card.smallImage2 && (
-                        <div className="relative rounded-md overflow-hidden shadow-sm">
-                          <Image
-                            src={card.smallImage2}
-                            alt="Small image 2"
-                            width={320}
-                            height={180}
-                            className="object-cover w-full h-[180px]"
-                          />
-                        </div>
-                      )}
-                    </div>
-                  </div>
-
-                </div>
-              </div>
-            ))}
-
-            {cards.length > 1 && (
-              <>
-                <button
-                  onClick={prevSlide}
-                  className="absolute left-0 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white text-gray-800 p-2 rounded-full shadow-lg z-20 opacity-70 hover:opacity-100"
-                >
-                  <FiChevronLeft className="w-6 h-6" />
-                </button>
-
-                <button
-                  onClick={nextSlide}
-                  className="absolute right-0 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white text-gray-800 p-2 rounded-full shadow-lg z-20 opacity-70 hover:opacity-100"
-                >
-                  <FiChevronRight className="w-6 h-6" />
-                </button>
-              </>
-            )}
-
-            {cards.length > 1 && (
-              <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2 z-20">
-                {cards.map((_, index) => (
-                  <button
-                    key={index}
-                    onClick={() => goToSlide(index)}
-                    className={`w-2 h-2 rounded-full transition-all ${index === currentSlide ? 'bg-[#a02126] w-8' : 'bg-white/50'
-                      }`}
-                  />
-                ))}
-              </div>
-            )}
+    <section className="w-full flex flex-col bg-white overflow-hidden">
+      
+      {/* -----------------------------
+          BLOCK 1: IMAGE LEFT | TEXT RIGHT
+          ----------------------------- */}
+      <div className="flex flex-col md:flex-row min-h-[500px]">
+        {/* Image Part */}
+        <div className="w-full md:w-1/2 relative h-[400px] md:h-auto overflow-hidden">
+          <Image
+            src="https://images.unsplash.com/photo-1590089415225-401ed6f9db8e?q=80&w=1974&auto=format&fit=crop"
+            alt="Pure Ingredients"
+            fill
+            className="object-cover transition-transform duration-1000 hover:scale-105"
+          />
+        </div>
+        {/* Text Part */}
+        <div className="w-full md:w-1/2 flex items-center justify-center bg-[#F3EEE9] p-10 md:p-20 py-20">
+          <div className="max-w-md text-left">
+            <h2 className="text-2xl md:text-3xl font-flama-condensed tracking-[0.2em] uppercase text-[#503223] mb-6 leading-tight">
+              100% Pure & Authentic Ingredients
+            </h2>
+            <p className="text-[#503223]/80 font-dm-sans text-[15px] md:text-[16px] leading-[1.8] mb-8">
+              At Gopi Misthan Bhandar, we believe that true sweetness begins with the finest raw materials. Our dedicated team sources the purest saffron from Kashmir, hand-picked pistachios from the valleys of Iran, and farm-fresh organic milk, ensuring every bite is a testament to purity.
+            </p>
+            <Link 
+              href="/about" 
+              className="inline-block text-[13px] font-flama tracking-[0.2em] uppercase text-[#503223] border-b border-[#503223] pb-1 hover:opacity-60 transition-opacity"
+            >
+              Read More
+            </Link>
           </div>
-
-          <div
-            aria-hidden="true"
-            className="pointer-events-none absolute inset-y-0 right-6 md:right-10 lg:right-16 flex items-center"
-            style={{ opacity: 0.12 }}
-          >
-            <div className="w-[420px] h-[420px]">
-              <Image
-                src="/floral.svg"
-                alt=""
-                width={420}
-                height={420}
-                className="object-contain"
-              />
-            </div>
-          </div>
-
         </div>
       </div>
+
+      {/* -----------------------------
+          BLOCK 2: TEXT LEFT | IMAGE RIGHT
+          ----------------------------- */}
+      <div className="flex flex-col-reverse md:flex-row min-h-[500px]">
+        {/* Text Part */}
+        <div className="w-full md:w-1/2 flex items-center justify-center bg-[#F3EEE9] p-10 md:p-20 py-20">
+          <div className="max-w-md text-left">
+            <h2 className="text-2xl md:text-3xl font-flama-condensed tracking-[0.2em] uppercase text-[#503223] mb-6 leading-tight">
+              Crafting Joy Since 1995
+            </h2>
+            <p className="text-[#503223]/80 font-dm-sans text-[15px] md:text-[16px] leading-[1.8] mb-8">
+              For nearly three decades, we have been custodians of India&apos;s rich culinary heritage. Each sweet is handcrafted using centuries-old techniques, preserving the authentic flavors of Braj while embracing modern quality standards. Our Master Halwais combine passion with precision to keep the flame of tradition alive.
+            </p>
+            <Link 
+              href="/collections" 
+              className="inline-block text-[13px] font-flama tracking-[0.2em] uppercase text-[#503223] border-b border-[#503223] pb-1 hover:opacity-60 transition-opacity"
+            >
+              Discover More
+            </Link>
+          </div>
+        </div>
+        {/* Image Part */}
+        <div className="w-full md:w-1/2 relative h-[400px] md:h-auto overflow-hidden">
+          <Image
+            src="https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?q=80&w=2070&auto=format&fit=crop"
+            alt="Traditional Craftsmanship"
+            fill
+            className="object-cover transition-transform duration-1000 hover:scale-105"
+          />
+        </div>
+      </div>
+
+      {/* -----------------------------
+          BLOCK 3: IMAGE LEFT | NEWSLETTER RIGHT
+          ----------------------------- */}
+      <div className="flex flex-col md:flex-row min-h-[500px]">
+        {/* Image Part */}
+        <div className="w-full md:w-1/2 relative h-[400px] md:h-auto overflow-hidden">
+          <Image
+            src="https://images.unsplash.com/photo-1542841791-1925b02a2bcc?q=80&w=1974&auto=format&fit=crop"
+            alt="Gift of Tradition"
+            fill
+            className="object-cover transition-transform duration-1000 hover:scale-105"
+          />
+        </div>
+        {/* Newsletter Part */}
+        <div className="w-full md:w-1/2 flex items-center justify-center bg-[#F3EEE9] p-10 md:p-20 py-20">
+          <div className="max-w-md text-left w-full">
+            <h2 className="text-2xl md:text-3xl font-flama-condensed tracking-[0.2em] uppercase text-[#503223] mb-10 leading-tight">
+              Become A Gopi Insider
+            </h2>
+            
+            <div className="space-y-6 mb-12">
+              <div className="flex items-start gap-4">
+                <div className="mt-1">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#503223" strokeWidth="1.5">
+                    <path d="M20 7L12 15L4 7" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                </div>
+                <p className="text-[#503223]/80 font-dm-sans text-[14px]">Receive exclusive gift offers and discounts</p>
+              </div>
+              <div className="flex items-start gap-4">
+                <div className="mt-1">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#503223" strokeWidth="1.5">
+                    <path d="M12 2L15 8L22 9L17 14L18.5 21L12 17L5.5 21L7 14L2 9L9 8L12 2Z" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                </div>
+                <p className="text-[#503223]/80 font-dm-sans text-[14px]">Be the first to taste our limited-edition seasonal launches</p>
+              </div>
+            </div>
+
+            <form onSubmit={handleSubscribe} className="flex flex-col sm:flex-row gap-0 border border-[#503223]/20 bg-white">
+              <input
+                type="email"
+                placeholder="YOUR EMAIL"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="flex-grow px-5 py-4 text-[12px] font-dm-sans tracking-widest outline-none"
+                required
+              />
+              <button 
+                type="submit"
+                className="bg-[#C87961] hover:bg-[#B0654F] text-white px-8 py-4 text-[12px] font-flama tracking-[0.2em] uppercase transition-colors"
+              >
+                {isSubscribed ? 'Thank You' : 'Subscribe'}
+              </button>
+            </form>
+            
+            <p className="mt-6 text-[11px] text-[#503223]/60 italic font-dm-sans">
+              Gopi Misthan Bhandar uses your personal data as described in our <Link href="/privacy" className="underline">Privacy Policy</Link>
+            </p>
+          </div>
+        </div>
+      </div>
+
     </section>
   );
 };
 
-export default AboutHero;
+export default AboutSection;

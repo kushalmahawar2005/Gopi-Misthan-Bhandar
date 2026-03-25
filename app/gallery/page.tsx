@@ -28,7 +28,7 @@ export default function GalleryPage() {
 
   if (loading) {
     return (
-      <main className="min-h-screen bg-white w-full overflow-x-hidden">
+      <main className="min-h-screen w-full overflow-x-hidden">
         <Header />
         <Navigation />
         <div className="flex items-center justify-center min-h-[60vh]">
@@ -43,7 +43,7 @@ export default function GalleryPage() {
   }
 
   return (
-    <main className="min-h-screen bg-white w-full overflow-x-hidden">
+    <main className="min-h-screen w-full overflow-x-hidden">
       <Header />
       <Navigation />
       <GallerySection galleryItems={galleryItems} showAll={true} />

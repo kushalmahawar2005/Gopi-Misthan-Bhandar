@@ -1,153 +1,149 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 
-interface GiftBoxItem {
-  _id: string;
-  category: 'assorted' | 'dry-fruit' | 'souvenir' | string;
-  title: string;
-  description: string;
-  imageUrl: string;
-  size?: 'small' | 'large';
-  price?: number;
-}
-
-interface GiftBoxSectionProps {
-  giftBoxes: GiftBoxItem[];
-}
-
-const GiftBoxSection: React.FC<GiftBoxSectionProps> = ({ giftBoxes }) => {
-  if (!giftBoxes || giftBoxes.length === 0) return null;
-
-  // Group by size and sort by price
-  const smallSizeBoxes = giftBoxes
-    .filter((g) => g.size === 'small')
-    .sort((a, b) => (a.price || 0) - (b.price || 0));
-  const largeSizeBoxes = giftBoxes
-    .filter((g) => g.size === 'large')
-    .sort((a, b) => (a.price || 0) - (b.price || 0));
+const GiftBoxSection: React.FC = () => {
+  const [hoveredSide, setHoveredSide] = useState<'corporate' | 'wedding' | null>(null);
 
   return (
-    <section className="py-6 mt-6 md:py-12 md:mt-8 px-4 bg-white w-full">
-      <div className="w-full max-w-7xl mx-auto">
-        {/* Heading */}
-        <h2 className="text-4xl text-black mb-2 font-jost font-[500] text-center">
-          GIFT BOX
-        </h2>
-        <p className="text-gray-800 text-sm md:text-[15px] font-geom mb-6 md:mb-8 text-center max-w-3xl mx-auto leading-relaxed">
-          Exquisitely packaged to benefit every occasion, we celebrate your pride, happiness and relationships with absolute grandeur.
-        </p>
-
-        {/* Small Size Gifts */}
-        {smallSizeBoxes.length > 0 && (
-          <div className="mb-12">
-            <h3 className="text-2xl md:text-3xl font-bold text-primary-brown mb-6 font-general-sans text-center">
-              Small Size Gifts
-            </h3>
-            <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-5 lg:gap-6 items-start">
-              {smallSizeBoxes.map((item) => (
-                <article key={item._id} className="group bg-white overflow-hidden flex flex-col rounded-md">
-                  {/* Image block */}
-                  <div className="relative w-full h-[220px] sm:h-[240px] md:h-[260px] lg:h-[280px] overflow-hidden">
-                    <Image
-                      src={item.imageUrl}
-                      alt={item.title}
-                      fill
-                      className="object-cover transition-transform duration-500 group-hover:scale-105"
-                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                      priority={false}
-                    />
-
-                    {/* Hover gradient */}
-                    <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/40 via-black/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-
-                    {/* Button shown on hover */}
-                    <div className="absolute inset-x-4 bottom-4 flex justify-center opacity-0 translate-y-2 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300">
-                      <Link
-                        href={`/giftbox/${encodeURIComponent(item.category)}`}
-                        className="inline-flex items-center px-4 py-2 rounded-full bg-white text-black text-xs md:text-sm font-medium shadow-sm hover:shadow-md border border-gray-200 hover:bg-gray-50"
-                      >
-                        View Collection
-                      </Link>
-                    </div>
-                  </div>
-
-                  {/* Text area */}
-                  <div className="px-4 md:px-5 py-4 flex-1 flex flex-col justify-between">
-                    <div>
-                      <h3 className="text-sm md:text-base font-general-sans font-[600] text-primary-brown text-center md:text-left">
-                        {item.title}
-                      </h3>
-                      <p className="text-[12px] sm:text-sm text-gray-700 mt-2 text-center md:text-left leading-relaxed line-clamp-2">
-                        {item.description}
-                      </p>
-                      <p className="text-lg md:text-xl font-bold text-primary-red mt-3 font-general-sans text-center md:text-left">
-                        ₹{item.price ? item.price.toLocaleString('en-IN') : '0'}
-                      </p>
-                    </div>
-                  </div>
-                </article>
-              ))}
+    <section className="w-full h-[500px] md:h-[600px] flex flex-col md:flex-row overflow-hidden">
+      
+      {/* -----------------------------
+          LEFT PANEL: CORPORATE
+          ----------------------------- */}
+      <div 
+        className="relative w-full md:w-1/2 h-full cursor-pointer transition-all duration-700 ease-in-out"
+        onMouseEnter={() => setHoveredSide('corporate')}
+        onMouseLeave={() => setHoveredSide(null)}
+      >
+        {/* Default State: Image Background */}
+        <div className={`absolute inset-0 transition-opacity duration-700 ${hoveredSide === 'corporate' ? 'opacity-0' : 'opacity-100'}`}>
+          <Image
+            src="https://images.unsplash.com/photo-1549465225-b1ea61973649?q=80&w=2072&auto=format&fit=crop"
+            alt="Corporate Collections"
+            fill
+            className="object-cover"
+          />
+          {/* Overlay for text readability */}
+          <div className="absolute inset-0 bg-black/20 group-hover:bg-black/40 transition-colors duration-300" />
+          
+          <div className="absolute inset-0 flex flex-col items-center justify-center p-6 text-center">
+            <h2 className="text-4xl md:text-5xl lg:text-5.5xl text-white font-playfair italic leading-tight drop-shadow-lg">
+              Corporate Collections
+            </h2>
+            {/* Dots */}
+            <div className="flex gap-2 mt-6">
+              <span className="w-2 h-2 rounded-full bg-white/40" />
+              <span className="w-2 h-2 rounded-full bg-white" />
+              <span className="w-2 h-2 rounded-full bg-white/40" />
             </div>
           </div>
-        )}
+        </div>
 
-        {/* Large Size Gifts */}
-        {largeSizeBoxes.length > 0 && (
-          <div>
-            <h3 className="text-2xl md:text-3xl font-bold text-primary-brown mb-6 font-general-sans text-center">
-              Large Size Gifts
-            </h3>
-            <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-5 lg:gap-6 items-start">
-              {largeSizeBoxes.map((item) => (
-                <article key={item._id} className="group bg-white overflow-hidden flex flex-col rounded-md">
-                  {/* Image block */}
-                  <div className="relative w-full h-[220px] sm:h-[240px] md:h-[260px] lg:h-[280px] overflow-hidden">
-                    <Image
-                      src={item.imageUrl}
-                      alt={item.title}
-                      fill
-                      className="object-cover transition-transform duration-500 group-hover:scale-105"
-                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                      priority={false}
-                    />
-
-                    {/* Hover gradient */}
-                    <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/40 via-black/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-
-                    {/* Button shown on hover */}
-                    <div className="absolute inset-x-4 bottom-4 flex justify-center opacity-0 translate-y-2 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300">
-                      <Link
-                        href={`/giftbox/${encodeURIComponent(item.category)}`}
-                        className="inline-flex items-center px-4 py-2 rounded-full bg-white text-black text-xs md:text-sm font-medium shadow-sm hover:shadow-md border border-gray-200 hover:bg-gray-50"
-                      >
-                        View Collection
-                      </Link>
-                    </div>
-                  </div>
-
-                  {/* Text area */}
-                  <div className="px-4 md:px-5 py-4 flex-1 flex flex-col justify-between">
-                    <div>
-                      <h3 className="text-sm md:text-base font-general-sans font-[600] text-primary-brown text-center md:text-left">
-                        {item.title}
-                      </h3>
-                      <p className="text-[12px] sm:text-sm text-gray-700 mt-2 text-center md:text-left leading-relaxed line-clamp-2">
-                        {item.description}
-                      </p>
-                      <p className="text-lg md:text-xl font-bold text-primary-red mt-3 font-general-sans text-center md:text-left">
-                        ₹{item.price ? item.price.toLocaleString('en-IN') : '0'}
-                      </p>
-                    </div>
-                  </div>
-                </article>
-              ))}
+        {/* Hover State: Cream Background + Info */}
+        <div className={`absolute inset-0 bg-[#F3EEE9] flex flex-col items-center justify-center p-8 text-center transition-all duration-700 transform ${
+          hoveredSide === 'corporate' ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
+        }`}>
+          {/* Decorative Floral Frame for Circular Image */}
+          <div className="relative mb-8">
+            <div className="w-48 h-48 md:w-56 md:h-56 relative rounded-full overflow-hidden border-4 border-white shadow-xl z-10">
+              <Image
+                src="https://images.unsplash.com/photo-1549465225-b1ea61973649?q=80&w=2072&auto=format&fit=crop"
+                alt="Corporate Icon"
+                fill
+                className="object-cover"
+              />
             </div>
+            {/* Mock Floral Decoration (using an absolute image/div) */}
+            <div className="absolute -inset-6 border-[1px] border-[#503223]/20 rounded-full scale-110 pointer-events-none" />
+            <div className="absolute -inset-10 border-[1px] border-[#503223]/10 rounded-full scale-105 pointer-events-none" />
           </div>
-        )}
+
+          <h3 className="text-3xl md:text-4xl font-playfair italic text-[#503223] mb-4">
+            Corporate Collections
+          </h3>
+          <p className="text-[12px] md:text-[13px] font-dm-sans tracking-[0.15em] uppercase text-[#503223]/70 mb-8 max-w-[280px] leading-relaxed">
+            HANDPICKED DELIGHTS FOR YOUR EMPLOYEES AND PARTNERS.
+          </p>
+          
+          <Link 
+            href="/collections/corporate"
+            className="bg-[#7B1F2E] text-white px-10 py-3.5 text-[12px] font-flama tracking-[0.2em] uppercase transition-all duration-300 hover:bg-[#5D1722] hover:scale-105"
+          >
+            Explore Now
+          </Link>
+        </div>
       </div>
+
+      {/* -----------------------------
+          RIGHT PANEL: WEDDING
+          ----------------------------- */}
+      <div 
+        className="relative w-full md:w-1/2 h-full cursor-pointer transition-all duration-700 ease-in-out border-t md:border-t-0 md:border-l border-white/20"
+        onMouseEnter={() => setHoveredSide('wedding')}
+        onMouseLeave={() => setHoveredSide(null)}
+      >
+        {/* Default State: Image Background */}
+        <div className={`absolute inset-0 transition-opacity duration-700 ${hoveredSide === 'wedding' ? 'opacity-0' : 'opacity-100'}`}>
+          <Image
+            src="https://images.unsplash.com/photo-1542841791-1925b02a2bcc?q=80&w=1974&auto=format&fit=crop"
+            alt="Wedding Collections"
+            fill
+            className="object-cover"
+          />
+          {/* Overlay */}
+          <div className="absolute inset-0 bg-black/20 group-hover:bg-black/40 transition-colors duration-300" />
+          
+          <div className="absolute inset-0 flex flex-col items-center justify-center p-6 text-center">
+            <h2 className="text-4xl md:text-5xl lg:text-5.5xl text-white font-playfair italic leading-tight drop-shadow-lg">
+              Wedding Collections
+            </h2>
+            {/* Dots */}
+            <div className="flex gap-2 mt-6">
+              <span className="w-2 h-2 rounded-full bg-white/40" />
+              <span className="w-2 h-2 rounded-full bg-white" />
+              <span className="w-2 h-2 rounded-full bg-white/40" />
+            </div>
+          </div>
+        </div>
+
+        {/* Hover State: Cream Background + Info */}
+        <div className={`absolute inset-0 bg-[#F3EEE9] flex flex-col items-center justify-center p-8 text-center transition-all duration-700 transform ${
+          hoveredSide === 'wedding' ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
+        }`}>
+          {/* Decorative Floral Frame for Circular Image */}
+          <div className="relative mb-8">
+            <div className="w-48 h-48 md:w-56 md:h-56 relative rounded-full overflow-hidden border-4 border-white shadow-xl z-10">
+              <Image
+                src="https://images.unsplash.com/photo-1542841791-1925b02a2bcc?q=80&w=1974&auto=format&fit=crop"
+                alt="Wedding Icon"
+                fill
+                className="object-cover"
+              />
+            </div>
+            {/* Mock Floral Decoration */}
+            <div className="absolute -inset-6 border-[1px] border-[#503223]/20 rounded-full scale-110 pointer-events-none" />
+            <div className="absolute -inset-10 border-[1px] border-[#503223]/10 rounded-full scale-105 pointer-events-none" />
+          </div>
+
+          <h3 className="text-3xl md:text-4xl font-playfair italic text-[#503223] mb-4">
+            Wedding Collections
+          </h3>
+          <p className="text-[12px] md:text-[13px] font-dm-sans tracking-[0.15em] uppercase text-[#503223]/70 mb-8 max-w-[280px] leading-relaxed">
+            ELEGANT TREATS FOR YOUR SPECIAL DAY.
+          </p>
+          
+          <Link 
+            href="/collections/wedding"
+            className="bg-[#7B1F2E] text-white px-10 py-3.5 text-[12px] font-flama tracking-[0.2em] uppercase transition-all duration-300 hover:bg-[#5D1722] hover:scale-105"
+          >
+            Explore Now
+          </Link>
+        </div>
+      </div>
+
     </section>
   );
 };

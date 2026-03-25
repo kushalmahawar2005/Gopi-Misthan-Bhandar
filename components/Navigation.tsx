@@ -12,6 +12,8 @@ import {
   FiLogOut,
   FiSettings,
   FiHeart,
+  FiShoppingBag,
+  FiChevronDown,
 } from 'react-icons/fi';
 import { useCart } from '@/context/CartContext';
 import { useAuth } from '@/context/AuthContext';
@@ -105,11 +107,11 @@ const Navigation = () => {
 
   const navItems = [
     { label: 'HOME', href: '/' },
-    { label: 'SWEETS', href: '/category/sweets', slug: 'sweets' },
-    { label: 'DRY FRUIT', href: '/category/dry-fruit', slug: 'dry-fruit' },
-    { label: 'BACKERY ITEMS', href: '/category/bakery', slug: 'bakery' },
-    { label: 'NAMKEEN', href: '/category/namkeen', slug: 'namkeen' },
-    { label: 'SAVOURY SNACKS', href: '/category/savoury-snacks', slug: 'savoury-snacks' },
+    { label: 'SWEETS', href: '/products?category=sweets', slug: 'sweets' },
+    { label: 'DRY FRUIT', href: '/products?category=dry-fruits', slug: 'dry-fruits' },
+    { label: 'BAKERY ITEMS', href: '/products?category=bakery-items', slug: 'bakery-items' },
+    { label: 'NAMKEEN', href: '/products?category=namkeen', slug: 'namkeen' },
+    { label: 'SAVOURY SNACKS', href: '/products?category=savoury-snacks', slug: 'savoury-snacks' },
     { label: 'GIFTING', href: '/#gifting', slug: 'gifting' },
   ];
 
@@ -145,317 +147,306 @@ const Navigation = () => {
   };
 
   const [isVisible, setIsVisible] = useState(true);
+  const [isScrolled, setIsScrolled] = useState(false);
   const lastScrollY = useRef(0);
 
   useEffect(() => {
-    // Only apply scroll logic on category pages
-    if (!pathname.startsWith('/category/')) {
-      setIsVisible(true);
-      return;
-    }
-
-    const controlNavbar = () => {
+    const handleScroll = () => {
       if (typeof window !== 'undefined') {
-        const currentScrollY = window.scrollY;
-
-        if (currentScrollY > lastScrollY.current && currentScrollY > 100) {
-          // Scrolling down & passed threshold -> Hide
-          setIsVisible(false);
-        } else {
-          // Scrolling up -> Show
-          setIsVisible(true);
-        }
-
-        lastScrollY.current = currentScrollY;
+        setIsScrolled(window.scrollY > 50);
       }
     };
 
-    window.addEventListener('scroll', controlNavbar);
-    return () => window.removeEventListener('scroll', controlNavbar);
-  }, [pathname]);
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      if (typeof window !== 'undefined') {
+        const currentScrollY = window.scrollY;
+
+        // Determine if we are scrolled enough to use compact mode
+        setIsScrolled(currentScrollY > 120);
+
+        // Ensure navbar is always visible when sticky
+        setIsVisible(true);
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   return (
     <>
       <nav
-        className={`bg-white w-full border-b border-gray-200 shadow-sm z-50 transition-transform duration-300 ${pathname.startsWith('/category/')
-          ? `fixed top-0 left-0 right-0 ${isVisible ? 'translate-y-0' : '-translate-y-full'}`
-          : 'sticky top-0'
-          }`}
+        id="main-nav"
+        className={`bg-white w-full border-b border-[#d6cec6] z-[9999] transition-all duration-500 ease-in-out sticky top-0 left-0 right-0 ${isVisible ? 'translate-y-0' : '-translate-y-full'
+          } ${isScrolled ? 'py-1 md:py-2 shadow-md' : 'py-0'}`}
       >
+        {/* Main Content Area */}
+        <div className={`max-w-[1700px] mx-auto transition-all duration-500`}>
+          {/* Row 1: Header/Main Row */}
+          <div className={`flex items-center justify-between px-4 md:px-8 lg:px-12 relative transition-all duration-500 ${isScrolled ? 'h-[65px] md:h-[75px]' : 'h-[100px] md:h-[130px]'}`}>
 
-
-        {/* Header row */}
-        <div className="flex items-center justify-between px-4 md:px-6 lg:px-8 py-2 md:py-4 relative">
-          {/* Left: Search (desktop) + hamburger on mobile */}
-          <div className="flex items-center gap-3 flex-1 md:flex-initial">
-            {/* Mobile hamburger */}
-            <button
-              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className="md:hidden text-black p-2 hover:text-gray-700 transition-colors"
-              aria-label="Toggle menu"
-            >
-              {isMobileMenuOpen ? <FiX className="w-6 h-6" /> : <FiMenu className="w-6 h-6" />}
-            </button>
-
-            {/* Desktop search (with border and radius) */}
-            <div className="hidden md:flex items-center w-full max-w-md mt-4 relative ml-4 md:ml-6">
-              <div className="relative w-full">
-                {/* Input + icon-button aligned */}
-                <div className="relative flex items-center">
-                  <input
-                    ref={searchInputRef}
-                    type="text"
-                    placeholder="Search products"
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    onFocus={() => {
-                      setIsFocused(true);
-                      if (searchQuery.trim().length >= 2) setShowDropdown(true);
-                    }}
-                    onBlur={() => {
-                      setIsFocused(false);
-                    }}
-                    className={`w-full pr-10 py-2.5 pl-4 text-md bg-white outline-none border transition-colors rounded-lg placeholder-gray-500 ${isFocused
-                      ? 'border-primary-red focus:ring-2 focus:ring-primary-red focus:border-primary-red'
-                      : 'border-gray-300 focus:border-primary-red focus:ring-2 focus:ring-primary-red'
-                      }`}
-                    aria-label="Search products"
-                  />
-                  {/* Search button on the right */}
-                  <button
-                    onClick={() => {
-                      if (searchQuery.trim().length >= 2) {
-                        router.push(`/products?search=${encodeURIComponent(searchQuery)}`);
-                        setShowDropdown(false);
-                        setSearchQuery('');
-                      } else {
-                        searchInputRef.current?.focus();
-                      }
-                    }}
-                    className="absolute right-2 top-1/2 transform -translate-y-1/2 p-2 hover:bg-gray-100 rounded-lg transition-colors"
-                    aria-label="Search"
-                  >
-                    <FiSearch className="w-5 h-5 text-gray-600" />
-                  </button>
-                </div>
-
-                {/* Dropdown */}
-                {showDropdown && (
-                  <div
-                    ref={dropdownRef}
-                    className="absolute left-0 right-0 mt-2 bg-white border border-gray-200 rounded-md shadow-lg z-50 max-h-80 overflow-y-auto"
-                  >
-                    {searchLoading ? (
-                      <div className="p-4 text-center text-gray-500">
-                        <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-red-600 mx-auto mb-2"></div>
-                        <div>Searching...</div>
-                      </div>
-                    ) : searchResults.length === 0 ? (
-                      <div className="p-4 text-sm text-gray-500">
-                        No products found for "<span className="font-medium">{searchQuery}</span>"
-                      </div>
-                    ) : (
-                      <div className="divide-y divide-gray-100">
-                        {searchResults.slice(0, 6).map((product) => (
-                          <Link
-                            key={product.id}
-                            href={`/product/${product.id}`}
-                            onClick={() => {
-                              setShowDropdown(false);
-                              setSearchQuery('');
-                            }}
-                            className="flex items-center gap-3 p-3 hover:bg-gray-50 transition-colors"
-                          >
-                            <div className="relative w-14 h-14 flex-shrink-0 rounded-md overflow-hidden bg-gray-100">
-                              <Image
-                                src={product.image || '/placeholder.png'}
-                                alt={product.name}
-                                fill
-                                className="object-cover"
-                                sizes="56px"
-                              />
-                            </div>
-                            <div className="flex-1 min-w-0">
-                              <p className="text-sm font-medium font-geom line-clamp-1">{product.name}</p>
-                              <p className="text-xs text-gray-500 capitalize">{product.category}</p>
-                            </div>
-                            <div className="text-sm font-bold text-red-600">₹{product.price}</div>
-                          </Link>
-                        ))}
-                        {searchResults.length > 6 && (
-                          <Link
-                            href={`/products?search=${encodeURIComponent(searchQuery)}`}
-                            onClick={() => {
-                              setShowDropdown(false);
-                              setSearchQuery('');
-                            }}
-                            className="block text-center text-red-600 font-medium py-3 hover:bg-gray-50 transition-colors"
-                          >
-                            View all {searchResults.length} results
-                          </Link>
-                        )}
-                      </div>
-                    )}
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
-
-          {/* Center: Logo */}
-          <Link href="/" className="absolute left-1/2 transform -translate-x-1/2 py-2 md:py-3 mt-2">
-            <div className="relative w-20 h-12 md:w-32 md:h-16 lg:w-40 lg:h-20">
-              <Image
-                src="/logo.png"
-                alt="Logo"
-                fill
-                className="object-contain"
-                sizes="(max-width: 768px) 80px, (max-width: 1024px) 144px, 176px"
-                priority
-              />
-            </div>
-          </Link>
-
-          {/* Right icons */}
-          <div className="flex items-center gap-2 md:gap-3 ml-auto">
-            <button
-              onClick={() => {
-                // Dispatch custom event to open enquiry modal
-                const event = new CustomEvent('open-wedding-enquiry');
-                window.dispatchEvent(event);
-              }}
-              className="hidden md:flex items-center px-4 py-2 bg-black text-white rounded-lg hover:bg-amber-800 transition-colors text-sm font-medium"
-            >
-              Bulk Enquiry
-            </button>
-
-            {isAuthenticated && user?.role === 'admin' && (
+            {/* Left Section: Bulk Enquiry (hides on scroll) / Space for Logo (on scroll) */}
+            <div className="flex items-center gap-4 flex-1 md:flex-initial">
+              {/* Mobile hamburger */}
               <button
-                onClick={() => router.push('/admin')}
-                className="hidden md:flex relative p-2 hover:text-gray-700 transition-colors"
-                aria-label="Admin Panel"
-                title="Admin Panel"
+                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                className="md:hidden text-[#8B4513] p-2 hover:opacity-70 transition-opacity"
+                aria-label="Toggle menu"
               >
-                <FiSettings className="w-5 h-5" />
+                {isMobileMenuOpen ? <FiX className="w-6 h-6" /> : <FiMenu className="w-6 h-6" />}
               </button>
-            )}
 
-            <button
-              onClick={() => {
-                if (isAuthenticated) {
-                  router.push('/profile');
-                } else {
-                  router.push('/login');
-                }
-              }}
-              className="relative p-2 hover:text-gray-700 transition-colors"
-              aria-label={isAuthenticated ? 'Profile' : 'Login'}
-              title={isAuthenticated ? user?.name || 'Profile' : 'Login'}
-            >
-              <FiUser className="w-5 h-5 md:w-6 md:h-6" />
-            </button>
-
-            <button
-              onClick={() => router.push('/wishlist')}
-              className="relative p-2 hover:text-gray-700 transition-colors"
-              aria-label="Wishlist"
-              title="Wishlist"
-            >
-              <FiHeart className="w-5 h-5 md:w-6 md:h-6" />
-              {wishlistCount > 0 && (
-                <span className="absolute -top-1 -right-1 bg-red-600 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold">
-                  {wishlistCount > 9 ? '9+' : wishlistCount}
-                </span>
-              )}
-            </button>
-
-            <button
-              onClick={openCart}
-              className="relative p-2 hover:text-gray-700 transition-colors"
-              aria-label="Shopping cart"
-              title="Shopping cart"
-            >
-              <div className="relative w-5 h-5 md:w-6 md:h-6">
-                <Image src="/cart-icon.png" alt="Cart" fill className="object-contain" />
-              </div>
-              {cartItemsCount > 0 && (
-                <span className="absolute -top-1 -right-1 bg-red-600 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold">
-                  {cartItemsCount > 9 ? '9+' : cartItemsCount}
-                </span>
-              )}
-            </button>
-
-          </div>
-        </div>
-
-        {/* Bottom row: center nav links on desktop */}
-        <div className="hidden md:flex items-center justify-center gap-4 lg:gap-6 xl:gap-8 px-4 py-3">
-          {navItems.map((item) => {
-            const category = item.slug ? getCategoryBySlug(item.slug) : null;
-            const hasSubcategories = category?.subCategories && category.subCategories.length > 0;
-
-            return (
-              <div
-                key={item.label}
-                className="relative"
-                onMouseEnter={() => hasSubcategories ? setHoveredCategory(item.slug || null) : null}
-                onMouseLeave={() => setHoveredCategory(null)}
+              {/* Desktop: Bulk Enquiry - slides out on scroll */}
+              <button
+                onClick={() => {
+                  const event = new CustomEvent('open-wedding-enquiry');
+                  window.dispatchEvent(event);
+                }}
+                className={`hidden md:flex items-center gap-2 text-[#503223] hover:text-[#8B4513] transition-all duration-500 text-[16px] font-flama-condensed font-medium tracking-widest uppercase overflow-hidden whitespace-nowrap ${isScrolled ? 'w-0 opacity-0 -translate-x-10' : 'w-auto opacity-100 translate-x-0'
+                  }`}
               >
+                <div className="relative w-4 h-4">
+                  <Image src="/market.png" alt="Cart" fill className="object-contain" />
+                </div>
+                <span>Bulk Enquiry</span>
+              </button>
+            </div>
+
+            {/* Logo: Transitions from center to left */}
+            <Link
+              href="/"
+              className={`absolute top-1/2 transition-all duration-700 ease-[cubic-bezier(0.4,0,0.2,1)] z-20 ${isScrolled
+                ? 'left-4 md:left-8 lg:left-12 -translate-y-1/2 translate-x-0'
+                : 'left-1/2 -translate-x-1/2 -translate-y-1/2'
+                }`}
+            >
+              <div className={`relative transition-all duration-700 ease-[cubic-bezier(0.4,0,0.2,1)] ${isScrolled
+                ? 'w-[75px] h-[46px] md:w-[95px] md:h-[58px]'
+                : 'w-[106px] h-[66px] md:w-[138px] md:h-[74px] lg:w-[170px] lg:h-[90px]'
+                }`}>
+                <Image
+                  src="/logo.png"
+                  alt="Logo"
+                  fill
+                  className="object-contain"
+                  sizes="(max-width: 768px) 106px, (max-width: 1024px) 138px, 170px"
+                  priority
+                />
+              </div>
+            </Link>
+
+            {/* Scrolled Navigation Items: Only visible on scroll in the center */}
+            <div className={`hidden lg:flex items-center justify-center gap-5 xl:gap-8 transition-all duration-500 absolute left-1/2 -translate-x-1/2 ${isScrolled ? 'opacity-100 translate-y-0 pointer-events-auto' : 'opacity-0 translate-y-4 pointer-events-none'
+              }`}>
+              {navItems.map((item) => (
                 <button
+                  key={`scrolled-${item.label}`}
                   onClick={() => handleNavClick(item.href)}
-                  className={`text-xs md:text-sm font-geom tracking-wider transition-colors font-medium flex items-center gap-1 py-2 relative ${isActive(item.href) ? 'text-red-600' : 'text-black hover:text-red-600'
+                  className={`text-[13px] xl:text-[15px] font-flama-condensed tracking-[0.10em] uppercase transition-colors font-semibold py-2 hover:text-[#8B4513] whitespace-nowrap ${isActive(item.href) ? 'text-[#8B4513]' : 'text-[#503223]'
                     }`}
                 >
                   {item.label}
-                  {/* Underline on hover */}
-                  <span
-                    className={`absolute bottom-0 left-0 h-0.5 bg-red-600 transition-all duration-300 ${hoveredCategory === item.slug || isActive(item.href)
-                      ? 'w-full opacity-100'
-                      : 'w-0 opacity-0'
-                      }`}
-                  />
+                </button>
+              ))}
+            </div>
+
+            {/* Right Section: icons + Search */}
+            <div className="flex items-center gap-2 md:gap-4 ml-auto">
+              {/* Desktop Search */}
+              <div className="hidden md:flex items-center w-32 xl:w-44 relative">
+                <div className="relative w-full">
+                  <div className="relative flex items-center">
+                    <input
+                      ref={searchInputRef}
+                      type="text"
+                      placeholder="Search"
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      onFocus={() => {
+                        setIsFocused(true);
+                        if (searchQuery.trim().length >= 2) setShowDropdown(true);
+                      }}
+                      onBlur={() => setIsFocused(false)}
+                      className={`w-full pr-8 py-1 text-[10px] tracking-widest bg-transparent outline-none border-b transition-colors placeholder-[#8a7e74] font-flama ${isFocused || isScrolled
+                        ? 'border-[#8B4513] text-[#8B4513]'
+                        : 'border-[#c4b8ad] text-[#5a4e44]'
+                        }`}
+                    />
+                    <FiSearch
+                      className={`absolute right-0 top-1/2 transform -translate-y-1/2 w-4 h-4 transition-colors ${isFocused || isScrolled ? 'text-[#8B4513]' : 'text-[#8a7e74]'
+                        }`}
+                      onClick={() => searchInputRef.current?.focus()}
+                    />
+                  </div>
+
+                  {showDropdown && (
+                    <div
+                      ref={dropdownRef}
+                      className="absolute right-0 mt-2 bg-white border border-gray-200 rounded shadow-lg z-50 min-w-[280px] max-h-80 overflow-y-auto"
+                    >
+                      {searchLoading ? (
+                        <div className="p-4 text-center">
+                          <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-[#8B4513] mx-auto"></div>
+                        </div>
+                      ) : searchResults.length === 0 ? (
+                        <div className="p-4 text-xs text-gray-400">No results found</div>
+                      ) : (
+                        <div className="divide-y divide-gray-100">
+                          {searchResults.slice(0, 5).map((product) => (
+                            <Link
+                              key={product.id}
+                              href={`/product/${product.id}`}
+                              onClick={() => { setShowDropdown(false); setSearchQuery(''); }}
+                              className="flex items-center gap-3 p-2 hover:bg-gray-50"
+                            >
+                              <div className="relative w-10 h-10 flex-shrink-0 rounded bg-gray-100 overflow-hidden">
+                                <Image src={product.image || '/placeholder.png'} alt={product.name} fill className="object-cover" />
+                              </div>
+                              <div className="flex-1 min-w-0">
+                                <p className="text-[11px] font-bold text-[#5a4e44] line-clamp-1">{product.name}</p>
+                                <p className="text-[10px] text-gray-500">₹{product.price}</p>
+                              </div>
+                            </Link>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Icons */}
+              <div className="flex items-center gap-1">
+                {isAuthenticated && user?.role === 'admin' && (
+                  <button
+                    onClick={() => router.push('/admin')}
+                    className="p-1.5 text-[#8B4513] hover:opacity-70 transition-opacity"
+                    title="Admin Panel"
+                  >
+                    <FiSettings className="w-5 h-5" />
+                  </button>
+                )}
+
+                <button
+                  onClick={() => {
+                    if (isAuthenticated) router.push('/profile');
+                    else router.push('/login');
+                  }}
+                  className="p-1.5 text-[#8B4513] hover:opacity-70 transition-opacity"
+                  title={isAuthenticated ? user?.name : 'Login'}
+                >
+                  <FiUser className="w-5 h-5 md:w-6 md:h-6" />
                 </button>
 
-                {/* Subcategories Dropdown */}
-                {hasSubcategories && hoveredCategory === item.slug && (
-                  <div
-                    ref={categoryDropdownRef}
-                    className="absolute top-full left-1/2 transform -translate-x-1/2 pt-2 bg-transparent z-50"
-                    onMouseEnter={() => setHoveredCategory(item.slug || null)}
-                    onMouseLeave={() => setHoveredCategory(null)}
-                  >
-                    <div className="bg-white border border-gray-200 rounded-md shadow-lg min-w-[180px] py-2">
-                      {/* All Category Link */}
-                      <Link
-                        href={item.href}
-                        onClick={() => setHoveredCategory(null)}
-                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-red-600 transition-colors font-medium"
-                      >
-                        All {item.label}
-                      </Link>
+                <button
+                  onClick={() => router.push('/wishlist')}
+                  className="relative p-1.5 text-[#8B4513] hover:opacity-70 transition-opacity"
+                  title="Wishlist"
+                >
+                  <FiHeart className="w-5 h-5 md:w-6 md:h-6" />
+                  {wishlistCount > 0 && (
+                    <span className="absolute top-1 right-1 bg-[#8B4513] text-white text-[9px] rounded-full w-3.5 h-3.5 flex items-center justify-center font-bold">
+                      {wishlistCount > 9 ? '9+' : wishlistCount}
+                    </span>
+                  )}
+                </button>
 
-                      {/* Divider */}
-                      {category.subCategories && category.subCategories.length > 0 && (
-                        <div className="border-t border-gray-200 my-1" />
-                      )}
-
-                      {/* Subcategories */}
-                      {category.subCategories?.map((subcategory) => (
-                        <Link
-                          key={subcategory.slug}
-                          href={`/category/${item.slug}?subcategory=${subcategory.slug}`}
-                          onClick={() => setHoveredCategory(null)}
-                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-red-600 transition-colors"
-                        >
-                          {subcategory.name}
-                        </Link>
-                      ))}
-                    </div>
+                <button
+                  onClick={openCart}
+                  className="relative p-1.5 text-[#8B4513] hover:opacity-70 transition-opacity"
+                  title="Shopping cart"
+                >
+                  <div className="relative w-5 h-5 md:w-6 md:h-6">
+                    <Image src="/market.png" alt="Cart" fill className="object-contain" />
                   </div>
-                )}
+                  {cartItemsCount > 0 && (
+                    <span className="absolute top-1 right-1 bg-[#8B4513] text-white text-[9px] rounded-full w-3.5 h-3.5 flex items-center justify-center font-bold">
+                      {cartItemsCount > 9 ? '9+' : cartItemsCount}
+                    </span>
+                  )}
+                </button>
               </div>
-            );
-          })}
+            </div>
+          </div>
+
+          {/* Row 2: Navigation Links (hides on scroll) */}
+          <div className={`hidden md:flex items-center justify-center gap-8 lg:gap-10 xl:gap-12 px-4 py-3 transition-all duration-500 overflow-hidden ${isScrolled ? 'h-0 opacity-0 pointer-events-none' : 'h-auto opacity-100 pointer-events-auto'
+            }`}>
+            {navItems.map((item) => {
+              const category = item.slug ? getCategoryBySlug(item.slug) : null;
+              const hasSubcategories = category?.subCategories && category.subCategories.length > 0;
+
+              return (
+                <div
+                  key={item.label}
+                  className="relative"
+                  onMouseEnter={() => hasSubcategories ? setHoveredCategory(item.slug || null) : null}
+                  onMouseLeave={() => setHoveredCategory(null)}
+                >
+                  <button
+                    onClick={() => handleNavClick(item.href)}
+                    className={`text-[11px] md:text-[19px] font-flama-condensed tracking-[0.12em] uppercase transition-colors font-semibold flex items-center gap-1.5 py-2 relative ${isActive(item.href) ? 'text-[#8B4513]' : 'text-[#503223] hover:text-[#8B4513]'
+                      }`}
+                  >
+                    {item.label}
+                    {hasSubcategories && (
+                      <FiChevronDown className={`w-4 h-4 transition-transform duration-200 ${hoveredCategory === item.slug ? 'rotate-180' : ''}`} />
+                    )}
+                    {/* Underline on hover */}
+                    <span
+                      className={`absolute bottom-0 left-0 h-0.5 bg-[#8B4513] transition-all duration-300 ${hoveredCategory === item.slug || isActive(item.href)
+                        ? 'w-full opacity-100'
+                        : 'w-0 opacity-0'
+                        }`}
+                    />
+                  </button>
+
+                  {/* Subcategories Dropdown */}
+                  {hasSubcategories && hoveredCategory === item.slug && (
+                    <div
+                      ref={categoryDropdownRef}
+                      className="absolute top-full left-1/2 transform -translate-x-1/2 pt-2 bg-transparent z-50"
+                      onMouseEnter={() => setHoveredCategory(item.slug || null)}
+                      onMouseLeave={() => setHoveredCategory(null)}
+                    >
+                      <div className="bg-white border border-gray-200 rounded-md shadow-lg min-w-[180px] py-2">
+                        {/* All Category Link */}
+                        <Link
+                          href={item.href}
+                          onClick={() => setHoveredCategory(null)}
+                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-red-600 transition-colors font-medium"
+                        >
+                          All {item.label}
+                        </Link>
+
+                        {/* Divider */}
+                        {category.subCategories && category.subCategories.length > 0 && (
+                          <div className="border-t border-gray-200 my-1" />
+                        )}
+
+                        {/* Subcategories */}
+                        {category.subCategories?.map((subcategory) => (
+                          <Link
+                            key={subcategory.slug}
+                            href={`/products?category=${item.slug}&subcategory=${subcategory.slug}`}
+                            onClick={() => setHoveredCategory(null)}
+                            className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-red-600 transition-colors"
+                          >
+                            {subcategory.name}
+                          </Link>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
         </div>
       </nav>
 
@@ -478,7 +469,7 @@ const Navigation = () => {
               </button>
             </div>
             {/* Mobile Search Bar - At the very top */}
-            <div className="md:hidden w-full px-4 py-3 border-b border-gray-200 bg-white">
+            <div className="md:hidden w-full px-4 py-3 border-b border-gray-200 bg-[#FFFFFF]">
               <div className="relative">
                 <input
                   ref={searchInputRef}
@@ -493,7 +484,7 @@ const Navigation = () => {
                   onBlur={() => {
                     setIsFocused(false);
                   }}
-                  className="w-full px-4 py-2 pr-10 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-red focus:border-transparent"
+                  className="w-full px-4 py-2 pr-10 border border-[#c4b8ad] bg-[#FFFFFF] rounded-lg focus:outline-none focus:ring-1 focus:ring-[#8B4513] text-sm text-[#5a4e44] placeholder-[#8a7e74]"
                   aria-label="Search products"
                 />
                 <button
@@ -509,7 +500,7 @@ const Navigation = () => {
                   className="absolute right-3 top-1/2 transform -translate-y-1/2 p-1"
                   aria-label="Search"
                 >
-                  <FiSearch className="w-5 h-5 text-gray-600" />
+                  <FiSearch className="w-5 h-5 text-[#8B4513]" />
                 </button>
 
                 {/* Mobile Search Dropdown */}
@@ -582,9 +573,9 @@ const Navigation = () => {
                     handleNavClick(item.href);
                     setIsMobileMenuOpen(false);
                   }}
-                  className={`text-left w-full px-6 py-3 text-sm font-general-sans font-[500] tracking-wider transition-colors border-l-4 ${isActive(item.href)
-                    ? 'text-red-600 bg-red-50 border-red-600'
-                    : 'text-black hover:text-red-600 hover:bg-gray-50 border-transparent'
+                  className={`text-left w-full px-6 py-4 text-xs font-flama-condensed font-[500] tracking-[0.15em] uppercase transition-colors border-l-4 ${isActive(item.href)
+                    ? 'text-[#8B4513] bg-[#efe8e0] border-[#8B4513]'
+                    : 'text-[#5a4e44] hover:text-[#8B4513] hover:bg-gray-50 border-transparent'
                     }`}
                 >
                   {item.label}
@@ -609,9 +600,9 @@ const Navigation = () => {
                   router.push(isAuthenticated ? '/profile' : '/login');
                   setIsMobileMenuOpen(false);
                 }}
-                className="px-6 py-3 text-sm font-geom tracking-wider transition-colors text-black hover:text-red-600 hover:bg-gray-50 flex items-center gap-2 border-l-4 border-transparent"
+                className="px-6 py-4 text-xs font-flama tracking-[0.15em] uppercase transition-colors text-[#5a4e44] hover:text-[#8B4513] hover:bg-gray-50 flex items-center gap-3 border-l-4 border-transparent"
               >
-                <FiUser className="w-4 h-4" />
+                <FiUser className="w-4 h-4 text-[#8B4513]" />
                 {isAuthenticated ? 'Profile' : 'Login'}
               </button>
 
@@ -622,9 +613,9 @@ const Navigation = () => {
                     setIsMobileMenuOpen(false);
                     router.push('/');
                   }}
-                  className="px-6 py-3 text-sm font-geom tracking-wider transition-colors text-black hover:text-red-600 hover:bg-gray-50 text-left flex items-center gap-2 w-full border-l-4 border-transparent"
+                  className="px-6 py-4 text-xs font-flama tracking-[0.15em] uppercase transition-colors text-[#5a4e44] hover:text-[#8B4513] hover:bg-gray-50 text-left flex items-center gap-3 w-full border-l-4 border-transparent"
                 >
-                  <FiLogOut className="w-4 h-4" />
+                  <FiLogOut className="w-4 h-4 text-[#8B4513]" />
                   Logout
                 </button>
               )}
