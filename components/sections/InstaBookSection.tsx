@@ -28,7 +28,7 @@ const InstaBookSection: React.FC<InstaBookSectionProps> = ({ instaBooks }) => {
           <div className="flex-shrink-0 relative w-[120px] h-[120px] md:w-[150px] md:h-[150px]">
             {/* Using a bird illustration matching the artisanal theme */}
             <Image
-              src="https://res.cloudinary.com/db67bu78t/image/upload/v1740337583/bird-illustration_ynzq6z.png"
+              src="/man.png"
               alt="Gopi Man Logo"
               fill
               className="object-contain"

@@ -118,9 +118,20 @@ const CategoriesSection: React.FC<CategoriesSectionProps> = ({ categories }) => 
               {/* Animated Left Border Accent */}
               <div className="absolute left-0 top-0 bottom-0 w-[3px] bg-[#B85C38] origin-top scale-y-0 transition-transform duration-300 group-hover:scale-y-100"></div>
               
-              {/* Icon Box */}
-              <div className="flex-shrink-0 w-11 h-11 flex items-center justify-center bg-[#FAF0E6] rounded-[10px] text-2xl">
-                {getEmoji(category.slug)}
+              {/* Image Box */}
+              <div className="flex-shrink-0 w-12 h-12 relative rounded-[10px] overflow-hidden bg-[#FAF0E6] shadow-sm">
+                {category.image ? (
+                  <Image 
+                    src={category.image} 
+                    alt={category.name} 
+                    fill 
+                    className="object-cover transition-transform duration-500 group-hover:scale-110"
+                  />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center text-2xl">
+                    {getEmoji(category.slug)}
+                  </div>
+                )}
               </div>
 
               {/* Text */}

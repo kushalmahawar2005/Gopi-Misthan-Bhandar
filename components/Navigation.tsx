@@ -153,23 +153,9 @@ const Navigation = () => {
   useEffect(() => {
     const handleScroll = () => {
       if (typeof window !== 'undefined') {
-        setIsScrolled(window.scrollY > 50);
-      }
-    };
-
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
-
-  useEffect(() => {
-    const handleScroll = () => {
-      if (typeof window !== 'undefined') {
         const currentScrollY = window.scrollY;
-
-        // Determine if we are scrolled enough to use compact mode
-        setIsScrolled(currentScrollY > 120);
-
-        // Ensure navbar is always visible when sticky
+        // Smooth transition trigger around 60px
+        setIsScrolled(currentScrollY > 60);
         setIsVisible(true);
       }
     };
@@ -183,12 +169,12 @@ const Navigation = () => {
       <nav
         id="main-nav"
         className={`bg-white w-full border-b border-[#d6cec6] z-[9999] transition-all duration-500 ease-in-out sticky top-0 left-0 right-0 ${isVisible ? 'translate-y-0' : '-translate-y-full'
-          } ${isScrolled ? 'py-1 md:py-2 shadow-md' : 'py-0'}`}
+          } ${isScrolled ? 'py-0 shadow-md' : 'py-0'}`}
       >
         {/* Main Content Area */}
         <div className={`max-w-[1700px] mx-auto transition-all duration-500`}>
           {/* Row 1: Header/Main Row */}
-          <div className={`flex items-center justify-between px-4 md:px-8 lg:px-12 relative transition-all duration-500 ${isScrolled ? 'h-[65px] md:h-[75px]' : 'h-[100px] md:h-[130px]'}`}>
+          <div className={`flex items-center justify-between px-4 md:px-8 lg:px-12 relative transition-all duration-500 ${isScrolled ? 'h-[55px] md:h-[65px]' : 'h-[90px] md:h-[115px]'}`}>
 
             {/* Left Section: Bulk Enquiry (hides on scroll) / Space for Logo (on scroll) */}
             <div className="flex items-center gap-4 flex-1 md:flex-initial">
@@ -207,13 +193,10 @@ const Navigation = () => {
                   const event = new CustomEvent('open-wedding-enquiry');
                   window.dispatchEvent(event);
                 }}
-                className={`hidden md:flex items-center gap-2 text-[#503223] hover:text-[#8B4513] transition-all duration-500 text-[16px] font-flama-condensed font-medium tracking-widest uppercase overflow-hidden whitespace-nowrap ${isScrolled ? 'w-0 opacity-0 -translate-x-10' : 'w-auto opacity-100 translate-x-0'
+                className={`hidden md:flex items-center justify-center bg-transparent text-[#503223] hover:bg-[#503223] hover:text-white hover:text-white transition-all duration-300 text-[14px] md:text-[15px] font-medium px-4 py-2 overflow-hidden whitespace-nowrap ${isScrolled ? 'max-w-0 opacity-0 px-0 -translate-x-4 pointer-events-none' : 'max-w-[200px] opacity-100 translate-x-0'
                   }`}
               >
-                <div className="relative w-4 h-4">
-                  <Image src="/market.png" alt="Cart" fill className="object-contain" />
-                </div>
-                <span>Bulk Enquiry</span>
+                Bulk Enquiry
               </button>
             </div>
 
@@ -226,8 +209,8 @@ const Navigation = () => {
                 }`}
             >
               <div className={`relative transition-all duration-700 ease-[cubic-bezier(0.4,0,0.2,1)] ${isScrolled
-                ? 'w-[75px] h-[46px] md:w-[95px] md:h-[58px]'
-                : 'w-[106px] h-[66px] md:w-[138px] md:h-[74px] lg:w-[170px] lg:h-[90px]'
+                ? 'w-[70px] h-[42px] md:w-[85px] md:h-[52px]'
+                : 'w-[106px] h-[66px] md:w-[138px] md:h-[74px] lg:w-[160px] lg:h-[85px]'
                 }`}>
                 <Image
                   src="/logo.png"
@@ -241,13 +224,13 @@ const Navigation = () => {
             </Link>
 
             {/* Scrolled Navigation Items: Only visible on scroll in the center */}
-            <div className={`hidden lg:flex items-center justify-center gap-5 xl:gap-8 transition-all duration-500 absolute left-1/2 -translate-x-1/2 ${isScrolled ? 'opacity-100 translate-y-0 pointer-events-auto' : 'opacity-0 translate-y-4 pointer-events-none'
+            <div className={`hidden lg:flex items-center justify-center gap-6 lg:gap-8 xl:gap-10 transition-all duration-500 absolute left-[150px] lg:left-[160px] right-[320px] xl:right-[380px] ${isScrolled ? 'opacity-100 translate-y-0 pointer-events-auto' : 'opacity-0 translate-y-4 pointer-events-none'
               }`}>
               {navItems.map((item) => (
                 <button
                   key={`scrolled-${item.label}`}
                   onClick={() => handleNavClick(item.href)}
-                  className={`text-[13px] xl:text-[15px] font-flama-condensed tracking-[0.10em] uppercase transition-colors font-semibold py-2 hover:text-[#8B4513] whitespace-nowrap ${isActive(item.href) ? 'text-[#8B4513]' : 'text-[#503223]'
+                  className={`text-[13px] xl:text-[15px] font-flama-condensed tracking-[0.15em] uppercase transition-colors font-semibold py-2 hover:text-[#8B4513] whitespace-nowrap ${isActive(item.href) ? 'text-[#8B4513]' : 'text-[#503223]'
                     }`}
                 >
                   {item.label}
@@ -272,7 +255,7 @@ const Navigation = () => {
                         if (searchQuery.trim().length >= 2) setShowDropdown(true);
                       }}
                       onBlur={() => setIsFocused(false)}
-                      className={`w-full pr-8 py-1 text-[10px] tracking-widest bg-transparent outline-none border-b transition-colors placeholder-[#8a7e74] font-flama ${isFocused || isScrolled
+                      className={`w-full pr-8 py-1.5 text-[14px] tracking-wide bg-transparent outline-none border-b transition-colors placeholder:text-[#8a7e74] font-flama ${isFocused || isScrolled
                         ? 'border-[#8B4513] text-[#8B4513]'
                         : 'border-[#c4b8ad] text-[#5a4e44]'
                         }`}
@@ -375,7 +358,7 @@ const Navigation = () => {
           </div>
 
           {/* Row 2: Navigation Links (hides on scroll) */}
-          <div className={`hidden md:flex items-center justify-center gap-8 lg:gap-10 xl:gap-12 px-4 py-3 transition-all duration-500 overflow-hidden ${isScrolled ? 'h-0 opacity-0 pointer-events-none' : 'h-auto opacity-100 pointer-events-auto'
+          <div className={`hidden md:flex items-center justify-center gap-6 lg:gap-8 xl:gap-12 px-4 transition-all duration-500 overflow-hidden ${isScrolled ? 'max-h-0 py-0 opacity-0 pointer-events-none' : 'max-h-[100px] py-3 opacity-100 pointer-events-auto'
             }`}>
             {navItems.map((item) => {
               const category = item.slug ? getCategoryBySlug(item.slug) : null;
@@ -390,7 +373,7 @@ const Navigation = () => {
                 >
                   <button
                     onClick={() => handleNavClick(item.href)}
-                    className={`text-[11px] md:text-[19px] font-flama-condensed tracking-[0.12em] uppercase transition-colors font-semibold flex items-center gap-1.5 py-2 relative ${isActive(item.href) ? 'text-[#8B4513]' : 'text-[#503223] hover:text-[#8B4513]'
+                    className={`text-[11px] md:text-[19px] font-flama-condensed tracking-[0.18em] uppercase transition-colors font-semibold flex items-center gap-1.5 py-2 relative ${isActive(item.href) ? 'text-[#8B4513]' : 'text-[#503223] hover:text-[#8B4513]'
                       }`}
                   >
                     {item.label}
