@@ -14,6 +14,7 @@ interface GalleryItem {
 
 interface GallerySectionProps {
   galleryItems: GalleryItem[];
+  showAll?: boolean;
 }
 
 const branches = [
@@ -43,7 +44,7 @@ const branches = [
   }
 ];
 
-const GallerySection: React.FC<GallerySectionProps> = ({ galleryItems }) => {
+const GallerySection: React.FC<GallerySectionProps> = ({ galleryItems, showAll }) => {
   return (
     <section className="py-16 md:py-24 w-full bg-white">
       <div className="max-w-[1400px] mx-auto px-4 md:px-8">

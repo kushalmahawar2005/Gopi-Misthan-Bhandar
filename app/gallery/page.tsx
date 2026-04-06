@@ -33,7 +33,7 @@ export default function GalleryPage() {
         <Navigation />
         <div className="flex items-center justify-center min-h-[60vh]">
           <div className="text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-red mx-auto mb-4"></div>
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#F88E0C] mx-auto mb-4"></div>
             <p className="text-gray-600">Loading Gallery...</p>
           </div>
         </div>
