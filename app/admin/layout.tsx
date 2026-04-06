@@ -33,20 +33,26 @@ import {
 import { useState } from 'react';
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
-  const { user, logout } = useAuth();
+  const { user, logout, isLoading } = useAuth();
   const router = useRouter();
   const pathname = usePathname();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   // Redirect if not admin
   React.useEffect(() => {
+    if (isLoading) return;
+
     if (user && user.role !== 'admin') {
       router.push('/');
     }
     if (!user) {
       router.push('/login');
     }
-  }, [user, router]);
+  }, [user, isLoading, router]);
+
+  if (isLoading) {
+    return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
+  }
 
   if (!user || user.role !== 'admin') {
     return null;
@@ -90,6 +96,12 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     }
     return pathname.startsWith(href);
   };
+
+  const isPrintPage = pathname.endsWith('/print');
+
+  if (isPrintPage) {
+    return <main className="bg-white min-h-screen">{children}</main>;
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">
