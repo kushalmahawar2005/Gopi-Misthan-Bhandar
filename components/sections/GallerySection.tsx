@@ -14,6 +14,7 @@ interface GalleryItem {
 
 interface GallerySectionProps {
   galleryItems: GalleryItem[];
+  showAll?: boolean;
 }
 
 const branches = [
@@ -44,7 +45,7 @@ const GallerySection: React.FC<GallerySectionProps> = ({ galleryItems }) => {
   return (
     <section className="py-16 md:py-24 w-full bg-[#FAEDE9]">
       <div className="max-w-[1400px] mx-auto px-4 md:px-8">
-        
+
         {/* Premium Heading Style */}
         <div className="text-center mb-16 md:mb-20">
           <p className="text-[12px] md:text-[14px] font-flama tracking-[0.3em] uppercase text-[#8b4513] mb-3">
@@ -58,11 +59,10 @@ const GallerySection: React.FC<GallerySectionProps> = ({ galleryItems }) => {
         {/* 3 Branches Side-by-Side */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-10 md:gap-12 lg:gap-16 items-start">
           {branches.map((branch, index) => (
-            <div 
-              key={index} 
-              className={`flex flex-col items-center text-center group transition-all duration-700 ${
-                index === 1 ? 'md:translate-y-12' : 'md:-translate-y-6'
-              }`}
+            <div
+              key={index}
+              className={`flex flex-col items-center text-center group transition-all duration-700 ${index === 1 ? 'md:translate-y-12' : 'md:-translate-y-6'
+                }`}
             >
               {/* Large Image with Rounded Corners */}
               <div className="relative w-full aspect-[4/5] rounded-[24px] overflow-hidden shadow-lg border border-white mb-8">
@@ -92,7 +92,7 @@ const GallerySection: React.FC<GallerySectionProps> = ({ galleryItems }) => {
               </div>
 
               {/* Contact Now Button - Maroon */}
-              <Link 
+              <Link
                 href={`tel:${branch.phone.replace(/\s+/g, '')}`}
                 className="inline-flex items-center gap-2 bg-[#7B1F2E] text-white px-8 md:px-10 py-3.5 text-[12px] font-flama tracking-[0.2em] uppercase rounded-full transition-all duration-300 hover:bg-[#5D1722] hover:scale-105 shadow-md active:scale-95"
               >
