@@ -108,10 +108,9 @@ const Navigation = () => {
   const navItems = [
     { label: 'HOME', href: '/' },
     { label: 'SWEETS', href: '/products?category=sweets', slug: 'sweets' },
-    { label: 'DRY FRUIT', href: '/products?category=dry-fruits', slug: 'dry-fruits' },
-    { label: 'BAKERY ITEMS', href: '/products?category=bakery-items', slug: 'bakery-items' },
     { label: 'NAMKEEN', href: '/products?category=namkeen', slug: 'namkeen' },
-    { label: 'SAVOURY SNACKS', href: '/products?category=savoury-snacks', slug: 'savoury-snacks' },
+    { label: 'BAKERY', href: '/products?category=bakery-items', slug: 'bakery-items' },
+    { label: 'SAVOURY', href: '/products?category=savoury-snacks', slug: 'savoury-snacks' },
     { label: 'GIFTING', href: '/#gifting', slug: 'gifting' },
   ];
 

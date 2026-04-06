@@ -108,6 +108,7 @@ const config: Config = {
         'instrument-sans': ['"Instrument Sans"', 'sans-serif'],
         'playfair': ['"Playfair Display"', 'serif'],
         'dm-sans': ['"DM Sans"', 'sans-serif'],
+        'fjalla-one': ['"Fjalla One"', 'sans-serif'],
       },
   		fontWeight: {
   			extralight: '200',

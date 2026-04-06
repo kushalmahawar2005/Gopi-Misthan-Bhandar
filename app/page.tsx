@@ -27,179 +27,41 @@ const GiftBoxSection = dynamic(() => import('@/components/sections/GiftBoxSectio
 const BlogSection = dynamic(() => import('@/components/sections/BlogSection'));
 
 export default function Home() {
-  const [featuredProducts, setFeaturedProducts] = useState<Product[]>([]);
-  const [classicProducts, setClassicProducts] = useState<Product[]>([]);
-  const [premiumProducts, setPremiumProducts] = useState<Product[]>([]);
-  const [categories, setCategories] = useState<Category[]>([]);
-  const [instaBooks, setInstaBooks] = useState<InstagramPost[]>([]);
-  const [galleryItems, setGalleryItems] = useState<any[]>([]);
-  const [giftBoxes, setGiftBoxes] = useState<any[]>([]);
-  const [blogs, setBlogs] = useState<any[]>([]);
-  // loading state is kept for data fetching logic but not used to block UI
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    loadData();
-  }, []);
-
-  const loadData = async () => {
-    try {
-      // Optimized: Fetch only what we need, avoid duplicate calls
-      const [featured, categoriesData, classicFlagged, premiumFlagged, allProducts, instaBooksData, galleryData, giftBoxesData, blogsData] = await Promise.all([
-        fetchProducts({ featured: true, limit: 8 }),
-        fetchCategories(),
-        fetchProducts({ isClassic: true, limit: 8 }),
-        fetchProducts({ isPremium: true, limit: 8 }),
-        fetchProducts(), // Fetch all products to count by category
-        fetchInstaBooks(),
-        fetchGallery(),
-        fetchGiftBoxes(),
-        fetchBlogs(),
-      ]);
-
-      setFeaturedProducts(featured);
-
-      // Calculate product counts for each category (including subcategories)
-      const categoriesWithCounts = categoriesData.map((category) => {
-        // Get all subcategory slugs for this category
-        const subCategorySlugs = category.subCategories?.map((sub) => sub.slug) || [];
-        // Include the category itself and all its subcategories
-        const relevantSlugs = [category.slug, ...subCategorySlugs];
-
-        // Count products that match any of these slugs
-        const count = allProducts.filter((product) =>
-          relevantSlugs.includes(product.category)
-        ).length;
-
-        return {
-          ...category,
-          productsCount: count,
-        };
-      });
-
-      setCategories(categoriesWithCounts);
-
-      // Filter Classic/Premium products - prefer sweets category but show all if none found
-      const sweetsCategory = categoriesWithCounts.find((c) => c.slug === 'sweets');
-      const defaultSweetsSubs = ['classic-sweets', 'premium-sweets'];
-      const sweetsSlugs = sweetsCategory
-        ? Array.from(new Set([sweetsCategory.slug, ...(sweetsCategory.subCategories?.map((s: any) => s.slug) || []), ...defaultSweetsSubs]))
-        : ['sweets', ...defaultSweetsSubs];
-      const isSweetCategory = (slug: string | undefined) => !!slug && /sweet/i.test(slug);
-
-      // Filter classic products - prefer sweets but show all if no sweets found
-      let classicFiltered = classicFlagged.filter((p) => sweetsSlugs.includes(p.category) || isSweetCategory(p.category));
-      if (classicFiltered.length === 0) {
-        // If no sweets found, show all classic products
-        classicFiltered = classicFlagged;
-      }
-
-      // Filter premium products - prefer sweets but show all if no sweets found
-      let premiumFiltered = premiumFlagged.filter((p) => sweetsSlugs.includes(p.category) || isSweetCategory(p.category));
-      if (premiumFiltered.length === 0) {
-        // If no sweets found, show all premium products
-        premiumFiltered = premiumFlagged;
-      }
-
-      setClassicProducts(classicFiltered.slice(0, 8));
-      setPremiumProducts(premiumFiltered.slice(0, 8));
-
-      setInstaBooks(instaBooksData);
-      setGalleryItems(galleryData);
-      setGiftBoxes(giftBoxesData);
-      setBlogs(blogsData);
-    } catch (error) {
-      console.error('Error loading data:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
   return (
-    <main className="min-h-screen w-full relative">
-      <Header />
-      <Navigation />
-      <Cart />
-      <HeroSection />
+    <main className="min-h-screen w-full flex flex-col items-center justify-center bg-[#FFFFFF] relative overflow-hidden">
+      {/* Background decoration */}
+      <div className="absolute inset-0 opacity-10 pointer-events-none flex items-center justify-center">
+        <div className="w-[800px] h-[800px] rounded-full border-[1px] border-[#8B4513] absolute" />
+        <div className="w-[600px] h-[600px] rounded-full border-[1px] border-[#8B4513] absolute" />
+        <div className="w-[400px] h-[400px] rounded-full border-[1px] border-[#8B4513] absolute" />
+      </div>
 
-      {/* Promotional Banner removed as requested */}
-      {/* <PromotionalBanner /> */}
-      {featuredProducts.length > 0 && (
-        <ScrollAnimation delay={100}>
-          <div id="featured">
-            <FeaturedCollection products={featuredProducts.slice(0, 8)} />
-          </div>
-        </ScrollAnimation>
-      )}
-
-      {categories.length > 0 && (
-        <ScrollAnimation delay={150}>
-          <div id="categories">
-            <CategoriesSection categories={categories} />
-          </div>
-        </ScrollAnimation>
-      )}
-
-      {classicProducts.length > 0 && (
-        <ScrollAnimation delay={200}>
-          <div id="sweets">
-            <ProductSection
-              title="Classic Sweets"
-              subtitle="Timeless Traditional Flavors"
-              products={classicProducts}
-              viewMoreLink="/products?category=sweets"
-            />
-          </div>
-        </ScrollAnimation>
-      )}
-
-      {premiumProducts.length > 0 && (
-        <ScrollAnimation delay={200}>
-          <ProductSection
-            title="Premium Sweets"
-            subtitle="The Luxury Signature Collection"
-            products={premiumProducts}
-            viewMoreLink="/products?category=sweets"
+      <div className="z-10 text-center space-y-8 p-8 max-w-2xl mx-auto flex flex-col items-center">
+        <div className="w-[120px] h-[80px] md:w-[180px] md:h-[120px] relative mb-4">
+          {/* We assume there is a logo.png in the public folder */}
+          <img
+            src="/logo.png"
+            alt="Gopi Misthan Bhandar"
+            className="w-full h-full object-contain"
           />
-        </ScrollAnimation>
-      )}
-
-      <ScrollAnimation delay={150}>
-        <div id="about">
-          <AboutSection />
         </div>
-      </ScrollAnimation>
 
-      {/* Gift Box Section - New Split Panel Design */}
-      <ScrollAnimation delay={200}>
-        <div id="gifting">
-          <GiftBoxSection />
+        <h1 className="text-4xl md:text-6xl font-bold font-serif tracking-[0.1em] text-[#503223] uppercase">
+          Coming Soon
+        </h1>
+
+        <div className="w-16 h-1 bg-[#8B4513] mx-auto rounded-full" />
+
+        <p className="text-lg md:text-xl font-light tracking-wide text-[#5a4e44] font-flama">
+          We are currently crafting something sweet for you.
+          <br className="hidden md:block" />
+          Our new website will be launching very soon.
+        </p>
+
+        <div className="pt-12 text-[#8B4513] font-flama-condensed tracking-[0.2em] text-sm uppercase">
+          Serving Tradition & Sweetness Since 1968
         </div>
-      </ScrollAnimation>
-
-      {instaBooks.length > 0 && (
-        <ScrollAnimation delay={150}>
-          <InstaBookSection instaBooks={instaBooks} />
-        </ScrollAnimation>
-      )}
-
-      {galleryItems.length > 0 && (
-        <ScrollAnimation delay={200}>
-          <GallerySection galleryItems={galleryItems} />
-        </ScrollAnimation>
-      )}
-
-      {/* InstaPostSection removed as per request */}
-
-      {/* MapSection removed as per request, moved to Footer */}
-
-      {blogs.length > 0 && (
-        <ScrollAnimation delay={200}>
-          <BlogSection blogs={blogs} />
-        </ScrollAnimation>
-      )}
-
-      <Footer />
+      </div>
     </main>
   );
 }
