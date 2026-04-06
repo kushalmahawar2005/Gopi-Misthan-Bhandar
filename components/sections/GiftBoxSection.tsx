@@ -43,7 +43,7 @@ const GiftBoxSection: React.FC = () => {
         </div>
 
         {/* Hover State: Cream Background + Info */}
-        <div className={`absolute inset-0 bg-[#F3EEE9] flex flex-col items-center justify-center p-8 text-center transition-all duration-700 transform ${
+        <div className={`absolute inset-0 bg-[#FFFFFF] flex flex-col items-center justify-center p-8 text-center transition-all duration-700 transform ${
           hoveredSide === 'corporate' ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
         }`}>
           {/* Decorative Floral Frame for Circular Image */}
@@ -70,7 +70,7 @@ const GiftBoxSection: React.FC = () => {
           
           <Link 
             href="/collections/corporate"
-            className="bg-[#7B1F2E] text-white px-10 py-3.5 text-[12px] font-flama tracking-[0.2em] uppercase transition-all duration-300 hover:bg-[#5D1722] hover:scale-105"
+            className="bg-[#F88E0C] text-white px-10 py-3.5 text-[12px] font-flama tracking-[0.2em] uppercase transition-all duration-300 hover:bg-[#D87A0A] hover:scale-105"
           >
             Explore Now
           </Link>
@@ -110,7 +110,7 @@ const GiftBoxSection: React.FC = () => {
         </div>
 
         {/* Hover State: Cream Background + Info */}
-        <div className={`absolute inset-0 bg-[#F3EEE9] flex flex-col items-center justify-center p-8 text-center transition-all duration-700 transform ${
+        <div className={`absolute inset-0 bg-[#FFFFFF] flex flex-col items-center justify-center p-8 text-center transition-all duration-700 transform ${
           hoveredSide === 'wedding' ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
         }`}>
           {/* Decorative Floral Frame for Circular Image */}
@@ -137,7 +137,7 @@ const GiftBoxSection: React.FC = () => {
           
           <Link 
             href="/collections/wedding"
-            className="bg-[#7B1F2E] text-white px-10 py-3.5 text-[12px] font-flama tracking-[0.2em] uppercase transition-all duration-300 hover:bg-[#5D1722] hover:scale-105"
+            className="bg-[#F88E0C] text-white px-10 py-3.5 text-[12px] font-flama tracking-[0.2em] uppercase transition-all duration-300 hover:bg-[#D87A0A] hover:scale-105"
           >
             Explore Now
           </Link>

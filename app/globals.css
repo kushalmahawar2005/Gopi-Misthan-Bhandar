@@ -89,7 +89,7 @@
 
   body {
     @apply text-black antialiased;
-    background-color: #F3EEE9;
+    background-color: #FFFFFF;
     /* Mobile bottom navigation padding */
     padding-bottom: env(safe-area-inset-bottom);
   }

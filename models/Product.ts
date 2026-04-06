@@ -12,7 +12,8 @@ export interface IProduct extends Document {
   price: number;
   image: string; // Main image (for backward compatibility)
   images?: string[]; // Multiple images array
-  category: string; // Can be category slug or subcategory slug
+  category: string; // Main category slug
+  subcategory?: string; // Optional subcategory slug
   featured?: boolean;
   isPremium?: boolean;
   isClassic?: boolean;
@@ -43,7 +44,10 @@ const ProductSchema = new Schema<IProduct>(
     category: {
       type: String,
       required: true,
-      // Allow any string - validation happens in API to support subcategories
+    },
+    subcategory: {
+      type: String,
+      required: false,
     },
     featured: { type: Boolean, default: false },
     isPremium: { type: Boolean, default: false },

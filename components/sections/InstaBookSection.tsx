@@ -12,7 +12,7 @@ interface InstaBookSectionProps {
 
 const InstaBookSection: React.FC<InstaBookSectionProps> = ({ instaBooks }) => {
   return (
-    <section className="py-16 md:py-24 px-4 w-full bg-[#5A2525]">
+    <section className="py-16 md:py-24 px-4 w-full bg-[#FE8E02]">
       <div className="max-w-[1400px] mx-auto w-full">
         {/* Header: Title Left, Bird Center, Icons Right */}
         <div className="flex flex-col md:flex-row items-center justify-between mb-16 md:mb-20 gap-8 px-4">
@@ -31,7 +31,7 @@ const InstaBookSection: React.FC<InstaBookSectionProps> = ({ instaBooks }) => {
               src="/man.png"
               alt="Gopi Man Logo"
               fill
-              className="object-contain"
+              className="object-contain h-[120px] w-[120px]"
             />
           </div>
 
@@ -40,14 +40,14 @@ const InstaBookSection: React.FC<InstaBookSectionProps> = ({ instaBooks }) => {
             <Link
               href="https://instagram.com/gopimisthanbhandar"
               target="_blank"
-              className="w-10 h-10 md:w-12 md:h-12 rounded-full border border-white/40 flex items-center justify-center text-white hover:bg-white hover:text-[#5A2525] transition-all duration-300"
+              className="w-10 h-10 md:w-12 md:h-12 rounded-full border border-white/40 flex items-center justify-center text-white hover:bg-white hover:text-[#F88E0C] transition-all duration-300"
             >
               <FiInstagram className="w-5 h-5 md:w-6 md:h-6" />
             </Link>
             <Link
               href="https://facebook.com/gopimisthanbhandar"
               target="_blank"
-              className="w-10 h-10 md:w-12 md:h-12 rounded-full border border-white/40 flex items-center justify-center text-white hover:bg-white hover:text-[#5A2525] transition-all duration-300"
+              className="w-10 h-10 md:w-12 md:h-12 rounded-full border border-white/40 flex items-center justify-center text-white hover:bg-white hover:text-[#F88E0C] transition-all duration-300"
             >
               <FiFacebook className="w-5 h-5 md:w-6 md:h-6" />
             </Link>

@@ -16,7 +16,7 @@ const CategoriesSection: React.FC<CategoriesSectionProps> = ({ categories }) => 
 
   // Define colors for the bento grid cards
   const cardColors = [
-    { bg: '#B85C38', label: 'Terracotta' }, // Hero
+    { bg: '#F88E0C', label: 'Terracotta' }, // Hero
     { bg: '#2A1A0E', label: 'Dark Brown' },
     { bg: '#2D4B37', label: 'Forest Green' },
     { bg: '#D4A017', label: 'Amber' },
@@ -37,11 +37,11 @@ const CategoriesSection: React.FC<CategoriesSectionProps> = ({ categories }) => 
   };
 
   return (
-    <section className="pt-8 pb-20 md:pt-10 md:pb-28 w-full bg-[#F3EEE9]">
+    <section className="pt-8 pb-20 md:pt-10 md:pb-28 w-full bg-[#FFFFFF]">
       <div className="max-w-[1440px] mx-auto px-6 md:px-[50px]">
         {/* HEADER */}
         <div className="text-center mb-16 md:mb-20">
-          <p className="text-[12px] md:text-[14px] font-dm-sans tracking-[0.25em] uppercase text-[#B85C38] font-semibold mb-3">
+          <p className="text-[12px] md:text-[14px] font-dm-sans tracking-[0.25em] uppercase text-[#F88E0C] font-semibold mb-3">
             Explore Our Collection
           </p>
           <h2 className="text-4xl md:text-6xl font-flama-condensed uppercase tracking-[0.05em] text-[#2A1A0E] mb-4">
@@ -50,7 +50,7 @@ const CategoriesSection: React.FC<CategoriesSectionProps> = ({ categories }) => 
           <p className="text-sm md:text-base text-[#8B6B52] font-dm-sans max-w-2xl mx-auto">
             A curated selection of authentic Indian flavors, crafted with tradition and love.
           </p>
-          <div className="w-[40px] h-[1.5px] bg-[#B85C38] mx-auto mt-6"></div>
+          <div className="w-[40px] h-[1.5px] bg-[#F88E0C] mx-auto mt-6"></div>
         </div>
 
         {/* BENTO GRID */}
@@ -116,7 +116,7 @@ const CategoriesSection: React.FC<CategoriesSectionProps> = ({ categories }) => 
               className="group relative flex items-center gap-4 bg-white p-4 border-[0.5px] border-[#2A1A0E]/10 rounded-[12px] transition-all duration-300 hover:-translate-y-[2px] hover:shadow-lg overflow-hidden"
             >
               {/* Animated Left Border Accent */}
-              <div className="absolute left-0 top-0 bottom-0 w-[3px] bg-[#B85C38] origin-top scale-y-0 transition-transform duration-300 group-hover:scale-y-100"></div>
+              <div className="absolute left-0 top-0 bottom-0 w-[3px] bg-[#F88E0C] origin-top scale-y-0 transition-transform duration-300 group-hover:scale-y-100"></div>
               
               {/* Image Box */}
               <div className="flex-shrink-0 w-12 h-12 relative rounded-[10px] overflow-hidden bg-[#FAF0E6] shadow-sm">

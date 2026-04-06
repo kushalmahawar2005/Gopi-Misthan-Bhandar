@@ -181,7 +181,7 @@ const Navigation = () => {
               {/* Mobile hamburger */}
               <button
                 onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                className="md:hidden text-[#8B4513] p-2 hover:opacity-70 transition-opacity"
+                className="md:hidden text-[#F88E0C] p-2 hover:opacity-70 transition-opacity"
                 aria-label="Toggle menu"
               >
                 {isMobileMenuOpen ? <FiX className="w-6 h-6" /> : <FiMenu className="w-6 h-6" />}
@@ -230,7 +230,7 @@ const Navigation = () => {
                 <button
                   key={`scrolled-${item.label}`}
                   onClick={() => handleNavClick(item.href)}
-                  className={`text-[13px] xl:text-[15px] font-flama-condensed tracking-[0.15em] uppercase transition-colors font-semibold py-2 hover:text-[#8B4513] whitespace-nowrap ${isActive(item.href) ? 'text-[#8B4513]' : 'text-[#503223]'
+                  className={`text-[13px] xl:text-[15px] font-flama-condensed tracking-[0.15em] uppercase transition-colors font-semibold py-2 hover:text-[#F88E0C] whitespace-nowrap ${isActive(item.href) ? 'text-[#F88E0C]' : 'text-[#503223]'
                     }`}
                 >
                   {item.label}
@@ -256,12 +256,12 @@ const Navigation = () => {
                       }}
                       onBlur={() => setIsFocused(false)}
                       className={`w-full pr-8 py-1.5 text-[14px] tracking-wide bg-transparent outline-none border-b transition-colors placeholder:text-[#8a7e74] font-flama ${isFocused || isScrolled
-                        ? 'border-[#8B4513] text-[#8B4513]'
+                        ? 'border-[#F88E0C] text-[#F88E0C]'
                         : 'border-[#c4b8ad] text-[#5a4e44]'
                         }`}
                     />
                     <FiSearch
-                      className={`absolute right-0 top-1/2 transform -translate-y-1/2 w-4 h-4 transition-colors ${isFocused || isScrolled ? 'text-[#8B4513]' : 'text-[#8a7e74]'
+                      className={`absolute right-0 top-1/2 transform -translate-y-1/2 w-4 h-4 transition-colors ${isFocused || isScrolled ? 'text-[#F88E0C]' : 'text-[#8a7e74]'
                         }`}
                       onClick={() => searchInputRef.current?.focus()}
                     />
@@ -274,7 +274,7 @@ const Navigation = () => {
                     >
                       {searchLoading ? (
                         <div className="p-4 text-center">
-                          <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-[#8B4513] mx-auto"></div>
+                          <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-[#F88E0C] mx-auto"></div>
                         </div>
                       ) : searchResults.length === 0 ? (
                         <div className="p-4 text-xs text-gray-400">No results found</div>
@@ -308,7 +308,7 @@ const Navigation = () => {
                 {isAuthenticated && user?.role === 'admin' && (
                   <button
                     onClick={() => router.push('/admin')}
-                    className="p-1.5 text-[#8B4513] hover:opacity-70 transition-opacity"
+                    className="p-1.5 text-[#F88E0C] hover:opacity-70 transition-opacity"
                     title="Admin Panel"
                   >
                     <FiSettings className="w-5 h-5" />
@@ -320,7 +320,7 @@ const Navigation = () => {
                     if (isAuthenticated) router.push('/profile');
                     else router.push('/login');
                   }}
-                  className="p-1.5 text-[#8B4513] hover:opacity-70 transition-opacity"
+                  className="p-1.5 text-[#F88E0C] hover:opacity-70 transition-opacity"
                   title={isAuthenticated ? user?.name : 'Login'}
                 >
                   <FiUser className="w-5 h-5 md:w-6 md:h-6" />
@@ -328,12 +328,12 @@ const Navigation = () => {
 
                 <button
                   onClick={() => router.push('/wishlist')}
-                  className="relative p-1.5 text-[#8B4513] hover:opacity-70 transition-opacity"
+                  className="relative p-1.5 text-[#F88E0C] hover:opacity-70 transition-opacity"
                   title="Wishlist"
                 >
                   <FiHeart className="w-5 h-5 md:w-6 md:h-6" />
                   {wishlistCount > 0 && (
-                    <span className="absolute top-1 right-1 bg-[#8B4513] text-white text-[9px] rounded-full w-3.5 h-3.5 flex items-center justify-center font-bold">
+                    <span className="absolute top-1 right-1 bg-[#F88E0C] text-white text-[9px] rounded-full w-3.5 h-3.5 flex items-center justify-center font-bold">
                       {wishlistCount > 9 ? '9+' : wishlistCount}
                     </span>
                   )}
@@ -341,14 +341,14 @@ const Navigation = () => {
 
                 <button
                   onClick={openCart}
-                  className="relative p-1.5 text-[#8B4513] hover:opacity-70 transition-opacity"
+                  className="relative p-1.5 text-[#F88E0C] hover:opacity-70 transition-opacity"
                   title="Shopping cart"
                 >
                   <div className="relative w-5 h-5 md:w-6 md:h-6">
                     <Image src="/market.png" alt="Cart" fill className="object-contain" />
                   </div>
                   {cartItemsCount > 0 && (
-                    <span className="absolute top-1 right-1 bg-[#8B4513] text-white text-[9px] rounded-full w-3.5 h-3.5 flex items-center justify-center font-bold">
+                    <span className="absolute top-1 right-1 bg-[#F88E0C] text-white text-[9px] rounded-full w-3.5 h-3.5 flex items-center justify-center font-bold">
                       {cartItemsCount > 9 ? '9+' : cartItemsCount}
                     </span>
                   )}
@@ -358,7 +358,7 @@ const Navigation = () => {
           </div>
 
           {/* Row 2: Navigation Links (hides on scroll) */}
-          <div className={`hidden md:flex items-center justify-center gap-6 lg:gap-8 xl:gap-12 px-4 transition-all duration-500 overflow-hidden ${isScrolled ? 'max-h-0 py-0 opacity-0 pointer-events-none' : 'max-h-[100px] py-3 opacity-100 pointer-events-auto'
+          <div className={`hidden md:flex items-center justify-center gap-6 lg:gap-8 xl:gap-12 px-4 transition-all duration-500 ${isScrolled ? 'max-h-0 py-0 opacity-0 pointer-events-none overflow-hidden' : 'max-h-[100px] py-3 opacity-100 pointer-events-auto overflow-visible'
             }`}>
             {navItems.map((item) => {
               const category = item.slug ? getCategoryBySlug(item.slug) : null;
@@ -373,7 +373,7 @@ const Navigation = () => {
                 >
                   <button
                     onClick={() => handleNavClick(item.href)}
-                    className={`text-[11px] md:text-[19px] font-flama-condensed tracking-[0.18em] uppercase transition-colors font-semibold flex items-center gap-1.5 py-2 relative ${isActive(item.href) ? 'text-[#8B4513]' : 'text-[#503223] hover:text-[#8B4513]'
+                    className={`text-[11px] md:text-[19px] font-flama-condensed tracking-[0.18em] uppercase transition-colors font-semibold flex items-center gap-1.5 py-2 relative ${isActive(item.href) ? 'text-[#F88E0C]' : 'text-[#503223] hover:text-[#F88E0C]'
                       }`}
                   >
                     {item.label}
@@ -382,7 +382,7 @@ const Navigation = () => {
                     )}
                     {/* Underline on hover */}
                     <span
-                      className={`absolute bottom-0 left-0 h-0.5 bg-[#8B4513] transition-all duration-300 ${hoveredCategory === item.slug || isActive(item.href)
+                      className={`absolute bottom-0 left-0 h-0.5 bg-[#F88E0C] transition-all duration-300 ${hoveredCategory === item.slug || isActive(item.href)
                         ? 'w-full opacity-100'
                         : 'w-0 opacity-0'
                         }`}
@@ -467,7 +467,7 @@ const Navigation = () => {
                   onBlur={() => {
                     setIsFocused(false);
                   }}
-                  className="w-full px-4 py-2 pr-10 border border-[#c4b8ad] bg-[#FFFFFF] rounded-lg focus:outline-none focus:ring-1 focus:ring-[#8B4513] text-sm text-[#5a4e44] placeholder-[#8a7e74]"
+                  className="w-full px-4 py-2 pr-10 border border-[#c4b8ad] bg-[#FFFFFF] rounded-lg focus:outline-none focus:ring-1 focus:ring-[#F88E0C] text-sm text-[#5a4e44] placeholder-[#8a7e74]"
                   aria-label="Search products"
                 />
                 <button
@@ -483,7 +483,7 @@ const Navigation = () => {
                   className="absolute right-3 top-1/2 transform -translate-y-1/2 p-1"
                   aria-label="Search"
                 >
-                  <FiSearch className="w-5 h-5 text-[#8B4513]" />
+                  <FiSearch className="w-5 h-5 text-[#F88E0C]" />
                 </button>
 
                 {/* Mobile Search Dropdown */}
@@ -557,8 +557,8 @@ const Navigation = () => {
                     setIsMobileMenuOpen(false);
                   }}
                   className={`text-left w-full px-6 py-4 text-xs font-flama-condensed font-[500] tracking-[0.15em] uppercase transition-colors border-l-4 ${isActive(item.href)
-                    ? 'text-[#8B4513] bg-[#efe8e0] border-[#8B4513]'
-                    : 'text-[#5a4e44] hover:text-[#8B4513] hover:bg-gray-50 border-transparent'
+                    ? 'text-[#F88E0C] bg-[#efe8e0] border-[#F88E0C]'
+                    : 'text-[#5a4e44] hover:text-[#F88E0C] hover:bg-gray-50 border-transparent'
                     }`}
                 >
                   {item.label}
@@ -583,9 +583,9 @@ const Navigation = () => {
                   router.push(isAuthenticated ? '/profile' : '/login');
                   setIsMobileMenuOpen(false);
                 }}
-                className="px-6 py-4 text-xs font-flama tracking-[0.15em] uppercase transition-colors text-[#5a4e44] hover:text-[#8B4513] hover:bg-gray-50 flex items-center gap-3 border-l-4 border-transparent"
+                className="px-6 py-4 text-xs font-flama tracking-[0.15em] uppercase transition-colors text-[#5a4e44] hover:text-[#F88E0C] hover:bg-gray-50 flex items-center gap-3 border-l-4 border-transparent"
               >
-                <FiUser className="w-4 h-4 text-[#8B4513]" />
+                <FiUser className="w-4 h-4 text-[#F88E0C]" />
                 {isAuthenticated ? 'Profile' : 'Login'}
               </button>
 
@@ -596,9 +596,9 @@ const Navigation = () => {
                     setIsMobileMenuOpen(false);
                     router.push('/');
                   }}
-                  className="px-6 py-4 text-xs font-flama tracking-[0.15em] uppercase transition-colors text-[#5a4e44] hover:text-[#8B4513] hover:bg-gray-50 text-left flex items-center gap-3 w-full border-l-4 border-transparent"
+                  className="px-6 py-4 text-xs font-flama tracking-[0.15em] uppercase transition-colors text-[#5a4e44] hover:text-[#F88E0C] hover:bg-gray-50 text-left flex items-center gap-3 w-full border-l-4 border-transparent"
                 >
-                  <FiLogOut className="w-4 h-4 text-[#8B4513]" />
+                  <FiLogOut className="w-4 h-4 text-[#F88E0C]" />
                   Logout
                 </button>
               )}

@@ -32,7 +32,7 @@ const MarqueeBanner: React.FC<MarqueeBannerProps> = ({ text }) => {
 
   // Always render the banner
   return (
-    <div className="bg-[#5A2525] text-white w-full h-[37px] flex items-center justify-center">
+    <div className="bg-[#F88E0C] text-white w-full h-[37px] flex items-center justify-center">
       <div className="max-w-7xl mx-auto px-4 md:px-6">
         <p className="text-xs md:text-sm font-flama font-medium text-center leading-tight">
           {marqueeText}

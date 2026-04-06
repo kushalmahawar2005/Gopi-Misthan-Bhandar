@@ -81,14 +81,17 @@ function ProductsContent() {
     // Category filter
     if (selectedCategory !== 'all') {
       if (selectedSubCategory !== 'all') {
-        filtered = filtered.filter(product => product.category === selectedSubCategory);
+        filtered = filtered.filter(product => product.category === selectedSubCategory || product.subcategory === selectedSubCategory);
       } else {
         // Include products from main category AND its subcategories
         const currentCategory = categories.find(c => c.slug === selectedCategory);
         const subCategorySlugs = currentCategory?.subCategories?.map(s => s.slug) || [];
         
         filtered = filtered.filter(product => 
-          product.category === selectedCategory || subCategorySlugs.includes(product.category)
+          product.category === selectedCategory || 
+          subCategorySlugs.includes(product.category) ||
+          product.subcategory === selectedCategory ||
+          (product.subcategory && subCategorySlugs.includes(product.subcategory))
         );
       }
     }
@@ -135,11 +138,14 @@ function ProductsContent() {
       const relevantSlugs = [cat.slug, ...subCategorySlugs];
       
       // Count products that match any of these slugs
-      counts[cat.slug] = products.filter(p => relevantSlugs.includes(p.category)).length;
+      counts[cat.slug] = products.filter(p => 
+        relevantSlugs.includes(p.category) || 
+        (p.subcategory && relevantSlugs.includes(p.subcategory))
+      ).length;
       
       // Also calculate counts for each subcategory individually
       cat.subCategories?.forEach(sub => {
-        counts[sub.slug] = products.filter(p => p.category === sub.slug).length;
+        counts[sub.slug] = products.filter(p => p.category === sub.slug || p.subcategory === sub.slug).length;
       });
     });
     

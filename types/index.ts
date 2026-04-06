@@ -11,7 +11,8 @@ export interface Product {
   price: number;
   image: string; // Main image (for backward compatibility)
   images?: string[]; // Multiple images array
-  category: string; // Can be category slug or subcategory slug
+  category: string; // Main category slug
+  subcategory?: string; // Optional subcategory slug
   featured?: boolean;
   isPremium?: boolean;
   isClassic?: boolean;
