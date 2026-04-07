@@ -3,7 +3,8 @@
 import React, { useState, useRef } from 'react';
 import { InstagramPost } from '@/types';
 import Link from 'next/link';
-import { FiVolume2, FiVolumeX, FiMaximize2 } from 'react-icons/fi';
+import { FiVolume2, FiVolumeX, FiMaximize2, FiInstagram, FiFacebook, FiYoutube } from 'react-icons/fi';
+import Image from 'next/image';
 
 interface InstaBookSectionProps {
   instaBooks: InstagramPost[];
@@ -11,18 +12,56 @@ interface InstaBookSectionProps {
 
 const InstaBookSection: React.FC<InstaBookSectionProps> = ({ instaBooks }) => {
   return (
-    <section className="py-16 md:py-24 px-4 bg-white w-full">
-      <div className="w-full">
-        <div className="text-center mb-12 md:mb-16">
-          <h2 className="text-3xl md:text-4xl lg:text-5xl text-primary-brown font-bold font-general-sans tracking-tight mb-4">
-            Follow Our Journey
-          </h2>
-          <p className="text-xs md:text-sm text-gray-500 font-geom uppercase tracking-widest">
-            @GopiMisthanBhandar
-          </p>
+    <section className="py-16 md:py-24 px-4 w-full bg-[#FE8E02]">
+      <div className="max-w-[1400px] mx-auto w-full">
+        {/* Header: Logo Top, Socials Middle, Title Bottom */}
+        <div className="flex flex-col items-center justify-center mb-10 md:mb-16 px-4">
+          
+          {/* Logo */}
+          <div className="flex-shrink-0 relative w-[100px] h-[100px] md:w-[130px] md:h-[130px] mb-4 md:mb-6">
+            <Image
+              src="/man.png"
+              alt="Gopi Man Logo"
+              fill
+              className="object-contain"
+            />
+          </div>
+
+          {/* Social Icons */}
+          <div className="flex items-center justify-center gap-3 md:gap-5 mb-6 md:mb-8">
+            <Link
+              href="https://instagram.com/gopimisthanbhandar"
+              target="_blank"
+              className="w-9 h-9 md:w-11 md:h-11 rounded-full border border-white/40 flex items-center justify-center text-white hover:bg-white hover:text-[#FE8E02] transition-all duration-300"
+            >
+              <FiInstagram className="w-4 h-4 md:w-5 md:h-5" />
+            </Link>
+            <Link
+              href="https://facebook.com/gopimisthanbhandar"
+              target="_blank"
+              className="w-9 h-9 md:w-11 md:h-11 rounded-full border border-white/40 flex items-center justify-center text-white hover:bg-white hover:text-[#FE8E02] transition-all duration-300"
+            >
+              <FiFacebook className="w-4 h-4 md:w-5 md:h-5" />
+            </Link>
+            <Link
+              href="https://youtube.com/"
+              target="_blank"
+              className="w-9 h-9 md:w-11 md:h-11 rounded-full border border-white/40 flex items-center justify-center text-white hover:bg-white hover:text-[#FE8E02] transition-all duration-300"
+            >
+              <FiYoutube className="w-4 h-4 md:w-5 md:h-5" />
+            </Link>
+          </div>
+
+          {/* Title Section */}
+          <div className="text-center w-full">
+            <h2 className="text-[28px] md:text-4xl lg:text-5xl text-white font-playfair leading-snug">
+              Follow Us For More <br className="hidden md:block" /> Mithai Stories
+            </h2>
+          </div>
         </div>
 
-        <div className="flex justify-center gap-4 sm:gap-5 md:gap-6 lg:gap-8 flex-wrap">
+        {/* Video Grid */}
+        <div className="flex justify-center gap-4 sm:gap-6 md:gap-8 lg:gap-10 flex-wrap">
           {instaBooks.map((item) => (
             <VideoCard key={item.id} item={item} />
           ))}
@@ -70,7 +109,7 @@ const VideoCard: React.FC<VideoCardProps> = ({ item }) => {
           lg:w-[180px] lg:h-[460px]
           xl:w-[220px] xl:h-[420px]
           2xl:w-[240px] 2xl:h-[420px]
-          transition-transform duration-300 hover:scale-[1.02] border border-gray-100
+          transition-transform duration-300 hover:scale-[1.02] border border-white/10
         "
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
@@ -142,7 +181,7 @@ const VideoCard: React.FC<VideoCardProps> = ({ item }) => {
       </div>
 
       {/* Label */}
-      <p className="text-black text-[23px] mb-8 mt-2  md:text-base font-jost mt-4 text-center font-medium">
+      <p className="text-white text-[15px] opacity-90 md:text-base font-jost mt-4 text-center font-medium">
         {item.label}
       </p>
     </div>

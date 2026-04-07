@@ -94,7 +94,7 @@ const InstaPostSection: React.FC<InstaPostSectionProps> = ({ instaPosts }) => {
   }, [instaPosts]);
 
   return (
-    <section className="py-16 md:py-24 px-4 bg-white w-full">
+    <section className="py-16 md:py-24 px-4 w-full">
       <div className="w-full max-w-7xl mx-auto">
         <h3 className="text-center text-2xl md:text-3xl lg:text-4xl text-primary-brown mb-10 md:mb-14 font-general-sans font-bold tracking-tight">
           Follow Us On Instagram

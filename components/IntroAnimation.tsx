@@ -61,7 +61,7 @@ const IntroAnimation = () => {
       {showTitle && (
         <div
           ref={titleRef}
-          className="fixed inset-0 z-50 flex items-center justify-center bg-white"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-[#FFFFFF]"
           style={{ pointerEvents: 'none' }}
         >
           <div className="text-center px-4">

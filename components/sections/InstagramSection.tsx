@@ -15,7 +15,7 @@ interface InstagramSectionProps {
 
 const InstagramSection: React.FC<InstagramSectionProps> = ({ instaBooks, instaPosts }) => {
   return (
-    <section className="py-12 md:py-16 px-4 bg-white w-full">
+    <section className="py-12 md:py-16 px-4 w-full">
       <div className="w-full">
         {/* INSTABOOK Section - Videos Only */}
         <h2 className="text-center text-2xl md:text-3xl font-general-sansal-sansal-sansal-sansal-sans text-black mb-12 md:mb-16 font-medium">

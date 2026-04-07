@@ -6,7 +6,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useCart } from '@/context/CartContext';
 import { useWishlist } from '@/context/WishlistContext';
-import { FiShoppingCart, FiEye, FiHeart } from 'react-icons/fi';
+import { FiHeart } from 'react-icons/fi';
 
 interface ProductCardProps {
   product: Product;
@@ -25,135 +25,114 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, showAddToCart = true
     e.stopPropagation();
     setIsAdding(true);
     addToCart(product, 1);
-    setTimeout(() => setIsAdding(false), 500);
+    setTimeout(() => setIsAdding(false), 800);
   };
 
+  // Mock data for visual consistency with reference image
+  // Using product.id to keep it consistent for the same product
+  const seed = parseInt(product.id.substring(0, 8), 16) || 0;
+  const rating = (4.5 + (seed % 5) * 0.1).toFixed(1);
+  
+  // Random badges for variety like in the image
+  const badges = ["Best Seller", "Mumbai only", "Seasonal", "Trending"];
+  const badge = badges[seed % badges.length];
+  const badgeColor = badge === "Mumbai only" ? "bg-[#503223]" : (badge === "Seasonal" ? "bg-[#D4A373]" : "bg-[#503223]");
+
   return (
-    <Link href={`/product/${product.id}`} prefetch={true} className="group block h-full">
+    <div className="group block h-full">
       <div 
-        className="flex flex-col w-full items-center cursor-pointer mb-0 h-full rounded-xl overflow-hidden active:scale-95 transform transition-transform duration-100"
+        className="flex flex-col w-full cursor-pointer mb-0 h-full transition-all duration-300"
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
       >
-        {/* Image Container */}
-        <div className="relative w-full aspect-[4/5] md:aspect-[2/2] mb-0 rounded-xl overflow-hidden bg-gray-100">
-          {/* Main Image */}
-          <Image
-            src={product.image && product.image.trim() !== '' ? product.image : `https://picsum.photos/seed/product${product.id}/240/240`}
-            alt={product.name}
-            fill
-            className={`object-cover object-center transition-all duration-500 ${
-              isHovered && product.images && product.images.length > 0 ? 'opacity-0 scale-110' : 'opacity-100 scale-100'
-            }`}
-            sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
-          />
-          {/* Second Image on Hover */}
-          {product.images && product.images.length > 0 && (
+        {/* Image Container - Square with Rounded Corners */}
+        <div className="relative w-full aspect-square mb-4 rounded-[20px] overflow-hidden bg-[#F9F6F3] border border-gray-100/50">
+          <Link href={`/product/${product.id}`} className="block relative w-full h-full">
+            {/* Main Image */}
             <Image
-              src={product.images[0]}
-              alt={`${product.name} - View 2`}
+              src={product.image && product.image.trim() !== '' ? product.image : `https://picsum.photos/seed/product${product.id}/500/500`}
+              alt={product.name}
               fill
-              className={`object-cover object-center transition-all duration-500 ${
-                isHovered ? 'opacity-100 scale-100' : 'opacity-0 scale-110'
+              className={`object-cover object-center transition-opacity duration-700 ${
+                isHovered && product.images && product.images.length > 0 ? 'opacity-0' : 'opacity-100'
               }`}
               sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
             />
-          )}
-          
-          {/* Dark overlay background - appears on hover */}
-          <div className={`absolute inset-0  transition-opacity duration-300 ${isHovered ? 'opacity-100' : 'opacity-0'}`}></div>
-          
-          {/* Icons Stack - Top Right - Vertical Layout - Slides from Right */}
-          <div className={`absolute top-3 right-3 flex flex-col gap-2 z-10 transition-all duration-500 ease-out ${
-            isHovered 
-              ? 'opacity-100 translate-x-0' 
-              : 'opacity-0 translate-x-full'
-          } group-hover:opacity-100 group-hover:translate-x-0`}>
-            {/* Wishlist Button - Top */}
-            <button
-              onClick={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                if (isFavorite) {
-                  removeFromWishlist(product.id);
-                } else {
-                  addToWishlist(product);
-                }
-              }}
-              className="w-9 h-9 md:w-10 md:h-10 bg-white hover:bg-gray-100 text-black flex items-center justify-center transition-all duration-300 hover:scale-110 shadow-lg"
-              aria-label={isFavorite ? 'Remove from wishlist' : 'Add to wishlist'}
-            >
-              <FiHeart className={`w-4 h-4 md:w-5 md:h-5 transition-colors ${isFavorite ? 'fill-red-500 text-red-500' : 'text-black'}`} />
-            </button>
-
-            {/* Quick View Button - Below Heart */}
-            <Link
-              href={`/product/${product.id}`}
-              onClick={(e) => e.stopPropagation()}
-              className="w-9 h-9 md:w-10 md:h-10 bg-white hover:bg-gray-100 text-black  flex items-center justify-center transition-all duration-300 hover:scale-110 shadow-lg"
-              aria-label="Quick view"
-            >
-              <FiEye className="w-4 h-4 md:w-5 md:h-5 text-black" />
-            </Link>
-
-            {/* Add to Cart Button - Below Quick View */}
-            {showAddToCart && (
-              <button
-                onClick={handleAddToCart}
-                disabled={isAdding}
-                className="w-9 h-9 md:w-10 md:h-10 bg-white hover:bg-primary-red hover:text-white text-black  flex items-center justify-center transition-all duration-300 hover:scale-110 disabled:opacity-50 shadow-lg"
-                aria-label="Add to cart"
-              >
-                {isAdding ? (
-                  <span className="text-sm font-bold text-green-600">✓</span>
-                ) : (
-                  <FiShoppingCart className="w-4 h-4 md:w-5 md:h-5" />
-                )}
-              </button>
+            {/* Second Image on Hover (if available) */}
+            {product.images && product.images.length > 0 && (
+              <Image
+                src={product.images[0]}
+                alt={`${product.name} - Alternate View`}
+                fill
+                className={`object-cover object-center transition-opacity duration-700 ${
+                  isHovered ? 'opacity-100' : 'opacity-0'
+                }`}
+                sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
+              />
             )}
+          </Link>
+          
+          {/* Badge Top Left (e.g., Mumbai Only) */}
+          <div className={`absolute top-3 left-3 px-2.5 py-1 ${badgeColor} text-white text-[10px] md:text-[11px] font-bold tracking-wider uppercase rounded-sm z-10`}>
+            {badge}
           </div>
+
+          {/* Rating Badge Bottom Right */}
+          <div className="absolute bottom-3 right-3 bg-[#0A2647] bg-opacity-[0.85] text-white px-2 py-1 rounded-md flex items-center gap-1 z-10 backdrop-blur-sm">
+            <span className="text-[10px] md:text-[11px] font-bold">{rating}</span>
+            <span className="text-[10px] text-yellow-400">★</span>
+          </div>
+          
+          {/* Heart Icon Top Right - Subtly visible */}
+          <button
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              if (isFavorite) {
+                removeFromWishlist(product.id);
+              } else {
+                addToWishlist(product);
+              }
+            }}
+            className="absolute top-3 right-3 w-8 h-8 flex items-center justify-center rounded-full bg-white bg-opacity-80 hover:bg-opacity-100 transition-all z-10 shadow-sm"
+          >
+            <FiHeart className={`w-4 h-4 transition-colors ${isFavorite ? 'fill-[#FE8E02] text-[#FE8E02]' : 'text-gray-500 hover:text-[#FE8E02]'}`} />
+          </button>
         </div>
         
-        {/* Product Info Section with Background Color */}
-        <div className="w-full relative" style={{ backgroundColor: 'white' }}>
-          {/* Product Name on Colored Background */}
-          <div className="px-3 pt-4 pb-2 md:px-4 md:pt-5">
-            <p className="text-black text-sm md:text-base font-light  line-clamp-2 font-geom leading-tight">
+        {/* Product Info Section - Left Aligned */}
+        <div className="w-full flex-grow flex flex-col items-start text-left px-1">
+          <Link href={`/product/${product.id}`} className="block mb-2 group-hover:opacity-80 transition-opacity">
+            <h3 className="text-[#2D2D2D] text-[14px] md:text-[15px] font-medium font-geom leading-relaxed line-clamp-2">
               {product.name}
-            </p>
-          </div>
+            </h3>
+          </Link>
           
-          {/* Category */}
-          <div className="px-3 pb-1 md:px-4">
-            <p className="text-gray-600 text-xs md:text-sm  font-jost capitalize">
-              {product.category ? product.category.replace('-', ' ') : 'Product'}
-            </p>
-          </div>
-          
-          {/* Price with Cart Icon */}
-          <div className="px-3 pb-4 md:px-4 md:pb-5 relative">
-            <p className="text-black font-[450] text-md md:text-lg font-inter ">
+          {/* Price Section - Bold Current, Struckthrough Original, Tag for Discount */}
+          <div className="flex items-center flex-wrap gap-2 mb-4">
+            <span className="text-[#503223] font-bold text-[16px] md:text-[17px] font-inter">
               ₹{product.price}
-            </p>
-            {/* Cart Icon on Bottom Right */}
-            {showAddToCart && (
-              <button
-                onClick={handleAddToCart}
-                disabled={isAdding}
-                className="absolute bottom-2 right-3 md:right-4 w-8 h-8 md:w-9 md:h-9 bg-white hover:bg-primary-black hover:text-primary-red text-black flex items-center justify-center transition-all duration-300 hover:scale-110 rounded-full  disabled:opacity-50"
-                aria-label="Add to cart"
-              >
-                {isAdding ? (
-                  <span className="text-sm font-bold text-green-600">✓</span>
-                ) : (
-                  <FiShoppingCart className="w-4 h-4 md:w-5 md:h-5" />
-                )}
-              </button>
-            )}
+            </span>
           </div>
+          
+          {/* Add to Cart Button - Maroon, Full Width, Premium Style */}
+          <button
+            onClick={handleAddToCart}
+            disabled={isAdding}
+            className="mt-auto w-full py-3 md:py-3.5 bg-white text-[#503223] border-2 border-[#503223]/20 text-[11px] md:text-[12px] font-bold tracking-[0.15em] uppercase rounded-lg transition-all duration-500 hover:bg-[#FE8E02] hover:border-[#FE8E02] hover:text-white hover:shadow-lg active:scale-[0.97] disabled:opacity-75 flex items-center justify-center overflow-hidden relative group"
+          >
+            <span className={`transition-all duration-300 ${isAdding ? 'translate-y-10 opacity-0' : 'translate-y-0 opacity-100'}`}>
+              ADD TO CART
+            </span>
+            {isAdding && (
+              <span className="absolute inset-0 flex items-center justify-center text-white bg-green-600 animate-in fade-in zoom-in duration-300">
+                ADDED!
+              </span>
+            )}
+          </button>
         </div>
       </div>
-    </Link>
+    </div>
   );
 };
 

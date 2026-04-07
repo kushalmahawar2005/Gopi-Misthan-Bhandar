@@ -2,7 +2,7 @@ import React from 'react';
 
 const MapSection = () => {
   return (
-    <section className="w-full py-16 bg-white relative overflow-hidden">
+    <section className="w-full py-16 relative overflow-hidden">
       <div className="container mx-auto px-4">
         <div className="text-center mb-12">
           <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4 font-heading">

@@ -90,7 +90,7 @@ export default function AdminDashboard() {
     { label: "Today's Orders", value: stats.todayOrders, icon: FiCalendar, color: 'text-blue-600' },
     { label: "Today's Revenue", value: `₹${stats.todayRevenue.toLocaleString()}`, icon: FiDollarSign, color: 'text-green-600' },
     { label: 'Avg Order Value', value: `₹${stats.avgOrderValue.toLocaleString()}`, icon: FiTrendingUp, color: 'text-purple-600' },
-    { label: 'Low Stock Items', value: stats.lowStockItems, icon: FiAlertTriangle, color: 'text-red-600', highlight: stats.lowStockItems > 0 },
+    { label: 'Low Stock Items', value: stats.lowStockItems, icon: FiAlertTriangle, color: 'text-primary-red', highlight: stats.lowStockItems > 0 },
     { label: 'Coupon Uses', value: stats.couponUses, icon: FiGift, color: 'text-yellow-600' },
   ];
 
@@ -226,7 +226,7 @@ export default function AdminDashboard() {
                   <div className="text-right">
                     <p className="text-sm font-bold text-primary-brown">₹{order.total}</p>
                     <span className={`text-[10px] px-2 py-0.5 rounded-full uppercase tracking-wide font-medium ${order.status === 'delivered' ? 'bg-green-100 text-green-700' :
-                      order.status === 'cancelled' ? 'bg-red-100 text-red-700' :
+                      order.status === 'cancelled' ? 'bg-red-100 text-primary-red' :
                         'bg-orange-100 text-orange-700'
                       }`}>
                       {order.status}

@@ -40,16 +40,17 @@ function ProductsContent() {
     if (category) {
       setSelectedCategory(category);
     }
+    const subcategory = searchParams.get('subcategory');
+    if (subcategory) {
+      setSelectedSubCategory(subcategory);
+    }
   }, [searchParams]);
 
   useEffect(() => {
     loadData();
   }, []);
 
-  // Reset subcategory when category changes
-  useEffect(() => {
-    setSelectedSubCategory('all');
-  }, [selectedCategory]);
+
 
   const loadData = async () => {
     try {
@@ -80,14 +81,17 @@ function ProductsContent() {
     // Category filter
     if (selectedCategory !== 'all') {
       if (selectedSubCategory !== 'all') {
-        filtered = filtered.filter(product => product.category === selectedSubCategory);
+        filtered = filtered.filter(product => product.category === selectedSubCategory || product.subcategory === selectedSubCategory);
       } else {
         // Include products from main category AND its subcategories
         const currentCategory = categories.find(c => c.slug === selectedCategory);
         const subCategorySlugs = currentCategory?.subCategories?.map(s => s.slug) || [];
         
         filtered = filtered.filter(product => 
-          product.category === selectedCategory || subCategorySlugs.includes(product.category)
+          product.category === selectedCategory || 
+          subCategorySlugs.includes(product.category) ||
+          product.subcategory === selectedCategory ||
+          (product.subcategory && subCategorySlugs.includes(product.subcategory))
         );
       }
     }
@@ -134,11 +138,14 @@ function ProductsContent() {
       const relevantSlugs = [cat.slug, ...subCategorySlugs];
       
       // Count products that match any of these slugs
-      counts[cat.slug] = products.filter(p => relevantSlugs.includes(p.category)).length;
+      counts[cat.slug] = products.filter(p => 
+        relevantSlugs.includes(p.category) || 
+        (p.subcategory && relevantSlugs.includes(p.subcategory))
+      ).length;
       
       // Also calculate counts for each subcategory individually
       cat.subCategories?.forEach(sub => {
-        counts[sub.slug] = products.filter(p => p.category === sub.slug).length;
+        counts[sub.slug] = products.filter(p => p.category === sub.slug || p.subcategory === sub.slug).length;
       });
     });
     
@@ -154,7 +161,7 @@ function ProductsContent() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-white">
+      <div className="min-h-screen">
         <Header />
         <Navigation />
         <Cart />
@@ -170,7 +177,7 @@ function ProductsContent() {
   }
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen">
       <Header />
       <Navigation />
       <Cart />
@@ -187,7 +194,10 @@ function ProductsContent() {
                 <h3 className="text-sm font-semibold text-gray-700 mb-3">Categories</h3>
                 <div className="space-y-2">
                   <button
-                    onClick={() => setSelectedCategory('all')}
+                    onClick={() => {
+                      setSelectedCategory('all');
+                      setSelectedSubCategory('all');
+                    }}
                     className={`w-full text-left px-3 py-2 rounded-lg text-sm transition-colors ${
                       selectedCategory === 'all'
                         ? 'bg-primary-red text-white'
@@ -199,7 +209,10 @@ function ProductsContent() {
                   {categories.map((category) => (
                     <button
                       key={category.id}
-                      onClick={() => setSelectedCategory(category.slug)}
+                      onClick={() => {
+                        setSelectedCategory(category.slug);
+                        setSelectedSubCategory('all');
+                      }}
                       className={`w-full text-left px-3 py-2 rounded-lg text-sm transition-colors ${
                         selectedCategory === category.slug
                           ? 'bg-primary-red text-white'
@@ -418,6 +431,7 @@ function ProductsContent() {
                   <button
                     onClick={() => {
                       setSelectedCategory('all');
+                      setSelectedSubCategory('all');
                       setShowFilterMenu(false);
                     }}
                     className={`w-full text-left px-3 py-2.5 rounded-lg text-sm transition-colors ${
@@ -428,11 +442,12 @@ function ProductsContent() {
                   >
                     All Products ({categoryCounts.all || 0})
                   </button>
-                  {categories.map((category) => (
+                   {categories.map((category) => (
                     <button
                       key={category.id}
                       onClick={() => {
                         setSelectedCategory(category.slug);
+                        setSelectedSubCategory('all');
                         setShowFilterMenu(false);
                       }}
                       className={`w-full text-left px-3 py-2.5 rounded-lg text-sm transition-colors ${
@@ -515,7 +530,7 @@ function ProductsContent() {
 export default function ProductsPage() {
   return (
     <Suspense fallback={
-      <div className="min-h-screen bg-white flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-red"></div>
       </div>
     }>

@@ -2,6 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { FiHome, FiUser, FiShoppingBag, FiHeart, FiShoppingCart } from 'react-icons/fi';
 import { useCart } from '@/context/CartContext';
@@ -70,7 +71,7 @@ const MobileBottomNav = () => {
   };
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 md:hidden bg-[#F5F1E8] border-t border-black/10 shadow-lg min-h-[45px]">
+    <nav className="fixed bottom-0 left-0 right-0 z-50 md:hidden bg-[#FFFFFF] border-t border-black/10 shadow-lg min-h-[45px]">
       <div className="flex items-center justify-around px-1.5 py-2.5">
         {navItems.map((item) => {
           const Icon = item.icon;
@@ -90,7 +91,13 @@ const MobileBottomNav = () => {
               aria-label={item.label}
             >
               <div className={`relative`}>
-                <Icon className={`w-6 h-6 ${active && item.href === '/' ? '' : ''}`} />
+                {item.label === 'Cart' ? (
+                  <div className="relative w-6 h-6">
+                    <Image src="/market.png" alt="Cart" fill className="object-contain" />
+                  </div>
+                ) : (
+                  <Icon className={`w-6 h-6 ${active && item.href === '/' ? '' : ''}`} />
+                )}
                 {item.badge > 0 && (
                   <span className="absolute -top-2 -right-2 bg-primary-red text-white text-xs font-bold rounded-full w-4 h-4 flex items-center justify-center min-w-[20px]">
                     {item.badge > 9 ? '9+' : item.badge}

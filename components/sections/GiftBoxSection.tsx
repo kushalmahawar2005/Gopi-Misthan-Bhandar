@@ -1,150 +1,127 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 
-interface GiftBoxItem {
+interface GiftBox {
   _id: string;
-  category: 'assorted' | 'dry-fruit' | 'souvenir' | string;
+  category: string;
   title: string;
   description: string;
   imageUrl: string;
-  size?: 'small' | 'large';
-  price?: number;
+  size: string;
+  price: number;
+  order: number;
+  isActive: boolean;
 }
 
-interface GiftBoxSectionProps {
-  giftBoxes: GiftBoxItem[];
-}
+const GiftBoxSection: React.FC = () => {
+  const [giftBoxes, setGiftBoxes] = useState<GiftBox[]>([]);
+  const [loading, setLoading] = useState(true);
 
-const GiftBoxSection: React.FC<GiftBoxSectionProps> = ({ giftBoxes }) => {
-  if (!giftBoxes || giftBoxes.length === 0) return null;
+  useEffect(() => {
+    const fetchGiftBoxes = async () => {
+      try {
+        const response = await fetch('/api/giftbox');
+        const data = await response.json();
+        if (data.success && data.data.length > 0) {
+          setGiftBoxes(data.data.slice(0, 6));
+        }
+      } catch (error) {
+        console.error('Error fetching gift boxes:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchGiftBoxes();
+  }, []);
 
-  // Group by size and sort by price
-  const smallSizeBoxes = giftBoxes
-    .filter((g) => g.size === 'small')
-    .sort((a, b) => (a.price || 0) - (b.price || 0));
-  const largeSizeBoxes = giftBoxes
-    .filter((g) => g.size === 'large')
-    .sort((a, b) => (a.price || 0) - (b.price || 0));
+  // Don't render if no gift boxes from admin
+  if (!loading && giftBoxes.length === 0) return null;
 
   return (
-    <section className="py-6 mt-6 md:py-12 md:mt-8 px-4 bg-white w-full">
-      <div className="w-full max-w-7xl mx-auto">
-        {/* Heading */}
-        <h2 className="text-4xl text-black mb-2 font-jost font-[500] text-center">
-          GIFT BOX
-        </h2>
-        <p className="text-gray-800 text-sm md:text-[15px] font-geom mb-6 md:mb-8 text-center max-w-3xl mx-auto leading-relaxed">
-          Exquisitely packaged to benefit every occasion, we celebrate your pride, happiness and relationships with absolute grandeur.
-        </p>
+    <section className="w-full bg-white py-16 md:py-24">
+      <div className="max-w-7xl mx-auto px-4 md:px-8">
+        {/* Section Heading */}
+        <div className="text-center mb-14 md:mb-20">
+          <h2 className="text-3xl md:text-4xl font-flama-condensed tracking-[0.15em] uppercase text-[#503223] mb-4">
+            Gift Boxes & Hampers
+          </h2>
+          <p className="text-[#503223]/60 font-dm-sans text-[14px] md:text-[15px] max-w-lg mx-auto">
+            Handcrafted gift boxes for every celebration — made with love, packed with tradition.
+          </p>
+          <div className="w-16 h-[2px] bg-[#FE8E02] mx-auto mt-5"></div>
+        </div>
 
-        {/* Small Size Gifts */}
-        {smallSizeBoxes.length > 0 && (
-          <div className="mb-12">
-            <h3 className="text-2xl md:text-3xl font-bold text-primary-brown mb-6 font-general-sans text-center">
-              Small Size Gifts
-            </h3>
-            <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-5 lg:gap-6 items-start">
-              {smallSizeBoxes.map((item) => (
-                <article key={item._id} className="group bg-white overflow-hidden flex flex-col rounded-md">
-                  {/* Image block */}
-                  <div className="relative w-full h-[220px] sm:h-[240px] md:h-[260px] lg:h-[280px] overflow-hidden">
-                    <Image
-                      src={item.imageUrl}
-                      alt={item.title}
-                      fill
-                      className="object-cover transition-transform duration-500 group-hover:scale-105"
-                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                      priority={false}
-                    />
-
-                    {/* Hover gradient */}
-                    <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/40 via-black/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-
-                    {/* Button shown on hover */}
-                    <div className="absolute inset-x-4 bottom-4 flex justify-center opacity-0 translate-y-2 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300">
-                      <Link
-                        href={`/giftbox/${encodeURIComponent(item.category)}`}
-                        className="inline-flex items-center px-4 py-2 rounded-full bg-white text-black text-xs md:text-sm font-medium shadow-sm hover:shadow-md border border-gray-200 hover:bg-gray-50"
-                      >
-                        View Collection
-                      </Link>
-                    </div>
-                  </div>
-
-                  {/* Text area */}
-                  <div className="px-4 md:px-5 py-4 flex-1 flex flex-col justify-between">
-                    <div>
-                      <h3 className="text-sm md:text-base font-general-sans font-[600] text-primary-brown text-center md:text-left">
-                        {item.title}
-                      </h3>
-                      <p className="text-[12px] sm:text-sm text-gray-700 mt-2 text-center md:text-left leading-relaxed line-clamp-2">
-                        {item.description}
-                      </p>
-                      <p className="text-lg md:text-xl font-bold text-primary-red mt-3 font-general-sans text-center md:text-left">
-                        ₹{item.price ? item.price.toLocaleString('en-IN') : '0'}
-                      </p>
-                    </div>
-                  </div>
-                </article>
-              ))}
-            </div>
+        {/* Loading Skeleton */}
+        {loading && (
+          <div className="grid grid-cols-3 sm:grid-cols-3 md:grid-cols-3 gap-3 md:gap-8">
+            {[...Array(6)].map((_, i) => (
+              <div key={i} className="animate-pulse">
+                <div className="w-full aspect-[4/3] bg-gray-200 rounded-sm" />
+                <div className="mt-2 md:mt-4 flex flex-col items-center gap-1.5 md:gap-2">
+                  <div className="h-3 md:h-4 bg-gray-200 rounded w-2/3" />
+                  <div className="h-2 md:h-3 bg-gray-100 rounded w-1/2" />
+                </div>
+              </div>
+            ))}
           </div>
         )}
 
-        {/* Large Size Gifts */}
-        {largeSizeBoxes.length > 0 && (
-          <div>
-            <h3 className="text-2xl md:text-3xl font-bold text-primary-brown mb-6 font-general-sans text-center">
-              Large Size Gifts
-            </h3>
-            <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-5 lg:gap-6 items-start">
-              {largeSizeBoxes.map((item) => (
-                <article key={item._id} className="group bg-white overflow-hidden flex flex-col rounded-md">
-                  {/* Image block */}
-                  <div className="relative w-full h-[220px] sm:h-[240px] md:h-[260px] lg:h-[280px] overflow-hidden">
-                    <Image
-                      src={item.imageUrl}
-                      alt={item.title}
-                      fill
-                      className="object-cover transition-transform duration-500 group-hover:scale-105"
-                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                      priority={false}
-                    />
-
-                    {/* Hover gradient */}
-                    <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/40 via-black/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-
-                    {/* Button shown on hover */}
-                    <div className="absolute inset-x-4 bottom-4 flex justify-center opacity-0 translate-y-2 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300">
-                      <Link
-                        href={`/giftbox/${encodeURIComponent(item.category)}`}
-                        className="inline-flex items-center px-4 py-2 rounded-full bg-white text-black text-xs md:text-sm font-medium shadow-sm hover:shadow-md border border-gray-200 hover:bg-gray-50"
-                      >
-                        View Collection
-                      </Link>
+        {/* 2 Rows × 3 Columns Grid */}
+        {!loading && giftBoxes.length > 0 && (
+          <div className="grid grid-cols-3 sm:grid-cols-3 md:grid-cols-3 gap-3 md:gap-8">
+            {giftBoxes.map((box, index) => (
+              <Link
+                key={box._id}
+                href={`/giftbox`}
+                className="group block"
+              >
+                {/* Card Image */}
+                <div className="relative w-full aspect-[4/3] overflow-hidden rounded-sm bg-gray-100">
+                  <Image
+                    src={box.imageUrl}
+                    alt={box.title}
+                    fill
+                    className="object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+                  />
+                  {/* Price Badge */}
+                  {box.price > 0 && (
+                    <div className="absolute top-2 right-2 md:top-3 md:right-3 bg-[#503223]/90 text-white px-1.5 py-0.5 md:px-3 md:py-1.5 text-[9px] md:text-[11px] font-flama tracking-wider rounded-sm">
+                      ₹{box.price}
                     </div>
-                  </div>
+                  )}
+                  {/* Hover overlay */}
+                  <div className="absolute inset-0 bg-[#503223]/0 group-hover:bg-[#503223]/15 transition-colors duration-500" />
+                </div>
 
-                  {/* Text area */}
-                  <div className="px-4 md:px-5 py-4 flex-1 flex flex-col justify-between">
-                    <div>
-                      <h3 className="text-sm md:text-base font-general-sans font-[600] text-primary-brown text-center md:text-left">
-                        {item.title}
-                      </h3>
-                      <p className="text-[12px] sm:text-sm text-gray-700 mt-2 text-center md:text-left leading-relaxed line-clamp-2">
-                        {item.description}
-                      </p>
-                      <p className="text-lg md:text-xl font-bold text-primary-red mt-3 font-general-sans text-center md:text-left">
-                        ₹{item.price ? item.price.toLocaleString('en-IN') : '0'}
-                      </p>
-                    </div>
+                {/* Name & Info Below Card */}
+                <div className="mt-3 md:mt-4 text-center px-1">
+                  <h3 className="text-[11.5px] md:text-[16px] font-flama tracking-wide md:tracking-[0.05em] uppercase text-[#503223] leading-tight line-clamp-2">
+                    {box.title}
+                  </h3>
+                  <p className="text-[#503223]/60 text-[9.5px] md:text-[12px] mt-1 line-clamp-1">
+                    {box.description}
+                  </p>
+                  <div className="inline-block px-1.5 py-0.5 md:px-3 md:py-1 bg-[#FDF8F3] text-[#FE8E02] text-[8.5px] md:text-[10px] font-flama uppercase tracking-wide mt-1.5 md:mt-2 rounded-sm border border-[#FE8E02]/10">
+                    {box.category}
                   </div>
-                </article>
-              ))}
-            </div>
+                </div>
+              </Link>
+            ))}
+          </div>
+        )}
+
+        {/* View All Link */}
+        {!loading && giftBoxes.length > 0 && (
+          <div className="text-center mt-12">
+            <Link
+              href="/giftbox"
+              className="inline-block text-[12px] font-flama tracking-[0.2em] uppercase text-[#503223] border-b border-[#503223]/40 pb-1 hover:border-[#FE8E02] hover:text-[#FE8E02] transition-all duration-300"
+            >
+              View All Gift Boxes
+            </Link>
           </div>
         )}
       </div>

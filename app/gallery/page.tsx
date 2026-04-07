@@ -28,12 +28,12 @@ export default function GalleryPage() {
 
   if (loading) {
     return (
-      <main className="min-h-screen bg-white w-full overflow-x-hidden">
+      <main className="min-h-screen w-full overflow-x-hidden">
         <Header />
         <Navigation />
         <div className="flex items-center justify-center min-h-[60vh]">
           <div className="text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-red mx-auto mb-4"></div>
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#FE8E02] mx-auto mb-4"></div>
             <p className="text-gray-600">Loading Gallery...</p>
           </div>
         </div>
@@ -43,7 +43,7 @@ export default function GalleryPage() {
   }
 
   return (
-    <main className="min-h-screen bg-white w-full overflow-x-hidden">
+    <main className="min-h-screen w-full overflow-x-hidden">
       <Header />
       <Navigation />
       <GallerySection galleryItems={galleryItems} showAll={true} />

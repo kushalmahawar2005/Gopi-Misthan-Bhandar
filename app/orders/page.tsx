@@ -118,7 +118,7 @@ export default function OrdersPage() {
         <Cart />
         <div className="flex items-center justify-center min-h-[60vh]">
           <div className="text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-red mx-auto mb-4"></div>
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#FE8E02] mx-auto mb-4"></div>
             <p className="text-gray-600">Loading...</p>
           </div>
         </div>
@@ -134,10 +134,19 @@ export default function OrdersPage() {
         <Navigation />
         <Cart />
 
-        <div className="bg-gradient-to-br from-red-700 to-red-800 py-8 md:py-12 px-4">
-          <div className="max-w-7xl mx-auto">
-            <h1 className="text-2xl md:text-3xl font-semibold text-white">My Orders</h1>
-            <p className="text-white/80 text-sm">View your order history and track deliveries</p>
+        <div className="max-w-7xl mx-auto px-4 md:px-6 pt-12 md:pt-16">
+          <div className="flex justify-start mb-6 md:mb-2">
+            <button onClick={() => router.push('/')} className="inline-flex items-center justify-center gap-2 text-[#503223]/60 hover:text-[#FE8E02] transition-colors text-[11px] font-flama tracking-[0.2em] uppercase cursor-pointer">
+              <svg fill="none" strokeWidth="2" stroke="currentColor" viewBox="0 0 24 24" className="w-4 h-4"><path strokeLinecap="round" strokeLinejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg> Back to Home Page
+            </button>
+          </div>
+          <div className="text-center">
+            <h1 className="text-3xl md:text-5xl font-flama-condensed tracking-[0.1em] uppercase text-[#503223]">
+              My Orders
+            </h1>
+            <p className="text-[#FE8E02] text-[12px] font-flama tracking-[0.15em] uppercase mt-3 mb-4">
+              View your order history and track deliveries
+            </p>
           </div>
         </div>
 
@@ -154,7 +163,7 @@ export default function OrdersPage() {
               </p>
               <Link
                 href="/products"
-                className="inline-flex items-center gap-2 bg-red-700 text-white px-8 py-3 rounded-md font-semibold text-lg hover:bg-red-800 transition-colors"
+                className="inline-flex items-center gap-2 bg-[#FE8E02] text-white px-8 py-3 rounded-md font-semibold text-lg hover:bg-[#FF9D2E] transition-colors"
               >
                 <FiShoppingBag className="w-5 h-5" />
                 Start Shopping
@@ -189,7 +198,7 @@ export default function OrdersPage() {
                         </span>
                         <button
                           onClick={() => router.push(`/orders/track?orderNumber=${order.orderNumber}`)}
-                          className="flex items-center gap-2 px-4 py-2 bg-red-700 text-white rounded-md hover:bg-red-800 transition-colors text-sm font-medium"
+                          className="flex items-center gap-2 px-4 py-2 bg-[#FE8E02] text-white rounded-md hover:bg-[#FF9D2E] transition-colors text-sm font-medium"
                         >
                           <FiEye className="w-4 h-4" />
                           Track Order
@@ -216,7 +225,7 @@ export default function OrdersPage() {
                             <p className="text-sm text-gray-600">Quantity: {item.quantity}</p>
                           </div>
                           <div className="text-right">
-                            <p className="font-semibold text-red-700">₹{(item.price * item.quantity).toLocaleString()}</p>
+                            <p className="font-semibold text-[#FE8E02]">₹{(item.price * item.quantity).toLocaleString()}</p>
                             <p className="text-sm text-gray-500">₹{item.price.toLocaleString()} each</p>
                           </div>
                         </div>
@@ -244,10 +253,9 @@ export default function OrdersPage() {
                       <span className="font-semibold capitalize">{order.paymentMethod}</span>
                       <span className="text-gray-400">|</span>
                       <span className="text-gray-600">Payment Status:</span>
-                      <span className={`font-semibold capitalize ${
-                        order.paymentStatus === 'paid' ? 'text-green-600' : 
+                      <span className={`font-semibold capitalize ${order.paymentStatus === 'paid' ? 'text-green-600' :
                         order.paymentStatus === 'pending' ? 'text-yellow-600' : 'text-red-600'
-                      }`}>
+                        }`}>
                         {order.paymentStatus}
                       </span>
                     </div>

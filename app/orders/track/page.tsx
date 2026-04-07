@@ -106,7 +106,7 @@ function OrderTrackingContent() {
   };
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen">
       <Header />
       <Navigation />
       <Cart />

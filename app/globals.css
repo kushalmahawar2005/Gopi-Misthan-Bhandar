@@ -1,3 +1,71 @@
+@import url('https://fonts.googleapis.com/css2?family=Instrument+Sans:ital,wght@0,400..700;1,400..700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&display=swap');
+
+@font-face {
+  font-family: 'Platina';
+  src: url('/fonts/platina/PLATINA.otf') format('opentype'),
+       url('/fonts/platina/PLATINA.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Flama';
+  src: url('/fonts/flama/FlamaTrial-Basic.otf') format('opentype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Flama';
+  src: url('/fonts/flama/FlamaTrial-Bold.otf') format('opentype');
+  font-weight: bold;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Flama';
+  src: url('/fonts/flama/FlamaTrial-Light.otf') format('opentype');
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'FlamaCondensed';
+  src: url('/fonts/flama/FlamaCondensedTrial-Basic.otf') format('opentype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'FlamaCondensed';
+  src: url('/fonts/flama/FlamaCondensedTrial-Bold.otf') format('opentype');
+  font-weight: bold;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'FlamaCondensed';
+  src: url('/fonts/flama/FlamaCondensedTrial-SemiBold.otf') format('opentype');
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'FlamaCondensed';
+  src: url('/fonts/flama/FlamaCondensedTrial-Medium.otf') format('opentype');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
 /* Custom local @font-face declarations removed for build compatibility */
 
 @tailwind base;
@@ -20,7 +88,8 @@
   }
 
   body {
-    @apply bg-white text-black;
+    @apply text-black antialiased;
+    background-color: #FFFFFF;
     /* Mobile bottom navigation padding */
     padding-bottom: env(safe-area-inset-bottom);
   }
@@ -166,4 +235,22 @@ section,
   100% {
     transform: translateX(-33.333%);
   }
+}
+
+/* Purity Marquee Animation */
+@keyframes purityMarquee {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.animate-purity-marquee {
+  animation: purityMarquee 30s linear infinite;
+}
+
+.animate-purity-marquee:hover {
+  animation-play-state: paused;
 }

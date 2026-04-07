@@ -17,7 +17,8 @@ export default function EditProduct() {
     price: '',
     image: '',
     images: [] as string[],
-    category: 'sweets',
+    category: '',
+    subcategory: '',
     featured: false,
     isPremium: false,
     isClassic: false,
@@ -30,9 +31,24 @@ export default function EditProduct() {
     giftBoxSize: '' as '' | 'small' | 'large',
   });
 
+  const [categories, setCategories] = useState<any[]>([]);
+
   useEffect(() => {
+    fetchCategories();
     fetchProduct();
   }, [params.id]);
+
+  const fetchCategories = async () => {
+    try {
+      const response = await fetch('/api/categories');
+      const data = await response.json();
+      if (data.success) {
+        setCategories(data.data);
+      }
+    } catch (error) {
+      console.error('Error fetching categories:', error);
+    }
+  };
 
   const fetchProduct = async () => {
     try {
@@ -47,6 +63,7 @@ export default function EditProduct() {
           image: product.image,
           images: product.images || [],
           category: product.category,
+          subcategory: product.subcategory || '',
           featured: product.featured || false,
           isPremium: product.isPremium || false,
           isClassic: product.isClassic || false,
@@ -189,6 +206,7 @@ export default function EditProduct() {
                 setFormData({ 
                   ...formData, 
                   category: newCategory,
+                  subcategory: '',
                   // Reset gift box fields if category changes away from gifting
                   giftBoxSubCategory: newCategory === 'gifting' ? formData.giftBoxSubCategory : '',
                   giftBoxSize: newCategory === 'gifting' ? formData.giftBoxSize : '',
@@ -196,15 +214,29 @@ export default function EditProduct() {
               }}
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-red"
             >
-              <option value="sweets">Sweets</option>
-              <option value="classic-sweets">Classic Sweets</option>
-              <option value="premium-sweets">Premium Sweets</option>
-              <option value="snacks">Snacks</option>
-              <option value="namkeen">Namkeen</option>
-              <option value="dry-fruit">Dry Fruit</option>
-              <option value="gifting">Gifting</option>
+              <option value="">Select Category</option>
+              {categories.map((cat: any) => (
+                <option key={cat._id} value={cat.slug}>{cat.name}</option>
+              ))}
             </select>
           </div>
+
+          {categories.find(c => c.slug === formData.category)?.subCategories?.length > 0 && (
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Subcategory *</label>
+              <select
+                required
+                value={formData.subcategory}
+                onChange={(e) => setFormData({ ...formData, subcategory: e.target.value })}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-red"
+              >
+                <option value="">Select Subcategory</option>
+                {categories.find(c => c.slug === formData.category)?.subCategories.map((sub: any) => (
+                  <option key={sub.slug} value={sub.slug}>{sub.name}</option>
+                ))}
+              </select>
+            </div>
+          )}
 
           {formData.category === 'gifting' && (
             <>
@@ -385,7 +417,7 @@ export default function EditProduct() {
               <button
                 type="button"
                 onClick={() => removeSize(index)}
-                className="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition-colors"
+                className="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-primary-red transition-colors"
               >
                 Remove
               </button>

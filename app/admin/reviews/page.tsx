@@ -234,7 +234,7 @@ export default function ReviewsPage() {
                     </Link>
                     <button
                       onClick={() => handleDelete(review._id)}
-                      className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                      className="p-2 text-primary-red hover:bg-red-50 rounded-lg transition-colors"
                       title="Delete"
                     >
                       <FiTrash2 size={20} />

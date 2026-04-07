@@ -114,7 +114,7 @@ export default function AdminOrders() {
       case 'delivered':
         return 'bg-green-100 text-green-800 border-green-200';
       case 'cancelled':
-        return 'bg-red-100 text-red-800 border-red-200';
+        return 'bg-red-100 text-primary-red border-red-200';
       default:
         return 'bg-gray-100 text-gray-800 border-gray-200';
     }
@@ -281,7 +281,8 @@ export default function AdminOrders() {
                       <Link
                         href={`/admin/orders/${order._id}/print`}
                         target="_blank"
-                        className="p-2 text-gray-600 hover:bg-gray-100 rounded transition-colors inline-block ml-2"
+                        rel="noopener noreferrer"
+                        className="p-2 text-[#F88E0C] hover:bg-orange-50 rounded transition-colors inline-block ml-2"
                         title="Print Receipt"
                       >
                         <FiPrinter size={16} />
@@ -320,13 +321,24 @@ export default function AdminOrders() {
                       {order.shipping.email}
                     </p>
                   </div>
-                  <Link
-                    href={`/admin/orders/${order._id}`}
-                    className="p-2 text-primary-red hover:bg-red-50 rounded transition-colors flex-shrink-0"
-                    title="View Order"
-                  >
-                    <FiEye size={18} />
-                  </Link>
+                  <div className="flex items-center gap-2">
+                    <Link
+                      href={`/admin/orders/${order._id}`}
+                      className="p-2 text-[#F88E0C] hover:bg-orange-50 rounded transition-colors flex-shrink-0"
+                      title="View Order"
+                    >
+                      <FiEye size={18} />
+                    </Link>
+                    <Link
+                      href={`/admin/orders/${order._id}/print`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="p-2 text-gray-600 hover:bg-gray-100 rounded transition-colors"
+                      title="Print Receipt"
+                    >
+                      <FiPrinter size={18} />
+                    </Link>
+                  </div>
                 </div>
                 <div className="space-y-2 pt-3 border-t border-gray-100">
                   <div className="flex items-center justify-between text-sm">

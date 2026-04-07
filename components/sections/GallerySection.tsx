@@ -1,6 +1,9 @@
-import React from 'react';
+'use client';
+
+import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { FiPhone, FiMapPin } from 'react-icons/fi';
 
 interface GalleryItem {
   _id: string;
@@ -14,67 +17,196 @@ interface GallerySectionProps {
   showAll?: boolean;
 }
 
-const GallerySection: React.FC<GallerySectionProps> = ({ galleryItems, showAll = false }) => {
-  if (!galleryItems || galleryItems.length === 0) {
-    return null;
+const branches = [
+  {
+    name: 'Main Branch',
+    address: '304, Tilak Marg Neemuch (M.P)',
+    phone: '+91 9425105945',
+    rating: 5,
+    imageUrl: '/shop1.jpeg',
+    mapUrl: 'https://maps.app.goo.gl/mPwca1HtWDBKUE3j9?g_st=aw'
+  },
+  {
+    name: 'Patel Plaza Branch',
+    address: 'G-3, Patel Plaza, Tagore Marg Neemuch (M.P)',
+    phone: '+91 9425105945',
+    rating: 5,
+    imageUrl: '/shop3.jpeg',
+    mapUrl: 'https://maps.app.goo.gl/wpkPv8cpT1EzRuGt8?g_st=aw'
+  },
+  {
+    name: 'Outlet at Mandsaur',
+    address: '01, Narayan Tower, Gandhi Chouraha Mandsaur (M.P)',
+    phone: '+91 9425105945',
+    rating: 5,
+    imageUrl: '/shop2.jpeg',
+    mapUrl: 'https://maps.app.goo.gl/KbF23a6WooP91WsaA?g_st=aw'
   }
+];
 
-  // Show only first 4 items on homepage, all items on gallery page
-  const displayedItems = showAll ? galleryItems : galleryItems.slice(0, 4);
+const GallerySection: React.FC<GallerySectionProps> = ({ galleryItems, showAll }) => {
+  const [currentSlide, setCurrentSlide] = useState(0);
+
+  // Auto-slide every 4 seconds for mobile
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentSlide((prev) => (prev + 1) % branches.length);
+    }, 4000);
+    return () => clearInterval(timer);
+  }, []);
 
   return (
-    <section className="py-16 md:py-24 bg-white w-full">
-      <div className="section-container w-full max-w-7xl mx-auto px-4 md:px-8">
-        <h2 className="text-center text-3xl md:text-4xl lg:text-5xl text-primary-brown mb-12 md:mb-16 font-general-sans font-bold tracking-tight">
-          Our Shop Gallery
-        </h2>
-        
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
-          {displayedItems.map((item) => (
-            <div
-              key={item._id}
-              className="relative group overflow-hidden rounded-xl border border-gray-100 bg-white shadow-sm hover:shadow-lg transition-shadow duration-300"
+    <section className="py-16 md:py-24 w-full bg-white overflow-hidden">
+      <div className="max-w-[1400px] mx-auto px-4 md:px-8">
+
+        {/* Premium Heading Style */}
+        <div className="text-center mb-12 md:mb-20">
+          <p className="text-[12px] md:text-[14px] font-flama tracking-[0.3em] uppercase text-[#FE8E02] mb-3">
+            Our Presence
+          </p>
+          <h2 className="text-3xl md:text-5xl lg:text-6xl font-flama-condensed tracking-[0.1em] uppercase text-[#503223]">
+            Visit Our Shops
+          </h2>
+        </div>
+
+        {/* =========================================
+            MOBILE VIEW: AUTO-LOOPING SLIDER 
+        ========================================= */}
+        <div className="block md:hidden w-full relative">
+          <div className="overflow-hidden w-full">
+            <div 
+              className="flex transition-transform duration-700 ease-in-out"
+              style={{ transform: `translateX(-${currentSlide * 100}%)` }}
             >
-              <div className="relative w-full aspect-[4/3] sm:aspect-[3/2] lg:aspect-[4/3]">
-                <Image
-                  src={item.imageUrl}
-                  alt={item.title || 'Gallery image'}
-                  fill
-                  className="object-cover transition-transform duration-300 group-hover:scale-105"
-                  sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                />
-                {(item.title || item.description) && (
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                    <div className="absolute bottom-0 left-0 right-0 p-4 md:p-6 text-white">
-                      {item.title && (
-                        <h3 className="text-lg md:text-xl font-general-sans font-semibold mb-2">
-                          {item.title}
-                        </h3>
-                      )}
-                      {item.description && (
-                        <p className="text-sm md:text-base text-white/90 line-clamp-2">
-                          {item.description}
-                        </p>
-                      )}
-                    </div>
+              {branches.map((branch, index) => (
+                <div key={index} className="w-full flex-shrink-0 flex flex-col items-center text-center px-1">
+                  {/* Large Image with Rounded Corners */}
+                  <div className="relative w-full aspect-[4/5] rounded-[24px] overflow-hidden shadow-sm border border-white mb-6">
+                    <Image
+                      src={branch.imageUrl}
+                      alt={branch.name}
+                      fill
+                      className="object-cover"
+                    />
                   </div>
-                )}
+
+                  {/* Branch Name - Serif */}
+                  <h3 className="text-2xl font-playfair font-bold text-[#503223] mb-3">
+                    {branch.name}
+                  </h3>
+
+                  {/* Address - Sans */}
+                  <p className="text-[13px] text-[#503223]/70 font-dm-sans mb-3 px-4 leading-relaxed max-w-[280px]">
+                    {branch.address}
+                  </p>
+
+                  {/* Stars */}
+                  <div className="flex gap-1 mb-6">
+                    {[...Array(branch.rating)].map((_, i) => (
+                      <span key={i} className="text-[#D4A373] text-xl">★</span>
+                    ))}
+                  </div>
+
+                  {/* Links */}
+                  <div className="flex flex-col items-center gap-3 w-full">
+                    <Link
+                      href={`tel:${branch.phone.replace(/\s+/g, '')}`}
+                      className="inline-flex items-center justify-center gap-2 bg-[#FE8E02] text-white px-6 py-3 text-[11px] font-flama tracking-[0.2em] uppercase rounded-full shadow-md w-[220px]"
+                    >
+                      <FiPhone className="w-3.5 h-3.5" />
+                      Contact Now
+                    </Link>
+
+                    <Link
+                      href={branch.mapUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-2 text-[12px] font-flama tracking-[0.2em] uppercase text-[#503223] border-b border-[#503223]/40 pb-1 mt-2"
+                    >
+                      <FiMapPin className="w-3.5 h-3.5" />
+                      View on Map
+                    </Link>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+          
+          {/* Pagination Dots */}
+          <div className="flex justify-center gap-2 mt-10">
+            {branches.map((_, idx) => (
+              <button
+                key={idx}
+                onClick={() => setCurrentSlide(idx)}
+                className={`h-2 rounded-full transition-all duration-300 ${
+                  currentSlide === idx ? 'w-6 bg-[#FE8E02]' : 'w-2 bg-[#E5DCD3]'
+                }`}
+                aria-label={`Go to slide ${idx + 1}`}
+              />
+            ))}
+          </div>
+        </div>
+
+        {/* =========================================
+            DESKTOP VIEW: 3 BRANCHES SIDE-BY-SIDE 
+        ========================================= */}
+        <div className="hidden md:grid grid-cols-3 gap-10 md:gap-12 lg:gap-16 items-start">
+          {branches.map((branch, index) => (
+            <div
+              key={index}
+              className={`flex flex-col items-center text-center group transition-all duration-700 ${index === 1 ? 'md:translate-y-12' : 'md:-translate-y-6'
+                }`}
+            >
+              {/* Large Image with Rounded Corners */}
+              <div className="relative w-full aspect-[4/5] rounded-[24px] overflow-hidden shadow-lg border border-white mb-8">
+                <Image
+                  src={branch.imageUrl}
+                  alt={branch.name}
+                  fill
+                  className="object-cover transition-transform duration-700 group-hover:scale-110"
+                />
+              </div>
+
+              {/* Branch Name - Serif */}
+              <h3 className="text-2xl md:text-3xl font-playfair font-bold text-[#503223] mb-4">
+                {branch.name}
+              </h3>
+
+              {/* Address - Sans */}
+              <p className="text-[13px] md:text-[14px] text-[#503223]/70 font-dm-sans mb-3 px-4 leading-relaxed max-w-[280px]">
+                {branch.address}
+              </p>
+
+              {/* Stars */}
+              <div className="flex gap-1 mb-8">
+                {[...Array(branch.rating)].map((_, i) => (
+                  <span key={i} className="text-[#D4A373] text-xl">★</span>
+                ))}
+              </div>
+
+              {/* Links */}
+              <div className="flex flex-col items-center gap-3 mt-2">
+                <Link
+                  href={`tel:${branch.phone.replace(/\s+/g, '')}`}
+                  className="inline-flex items-center justify-center gap-2 bg-[#FE8E02] text-white px-6 py-3 text-[11px] font-flama tracking-[0.2em] uppercase rounded-full transition-all duration-300 hover:bg-[#D87A0A] hover:scale-105 shadow-md active:scale-95 w-full max-w-[220px]"
+                >
+                  <FiPhone className="w-3.5 h-3.5" />
+                  Contact Now
+                </Link>
+
+                <Link
+                  href={branch.mapUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 text-[12px] font-flama tracking-[0.2em] uppercase text-[#503223] border-b border-[#503223]/40 pb-1 hover:border-[#FE8E02] hover:text-[#FE8E02] transition-all duration-300"
+                >
+                  <FiMapPin className="w-3.5 h-3.5" />
+                  View on Map
+                </Link>
               </div>
             </div>
           ))}
         </div>
-
-        {/* More Images Button - Only show on homepage when there are more than 4 items */}
-        {!showAll && galleryItems.length > 4 && (
-          <div className="text-center mt-12">
-            <Link
-              href="/gallery"
-              className="inline-block px-8 py-3 bg-primary-red text-white rounded-full hover:bg-primary-darkRed transition-colors font-medium text-sm md:text-base font-general-sans shadow-md hover:shadow-lg"
-            >
-              More Images
-            </Link>
-          </div>
-        )}
       </div>
     </section>
   );

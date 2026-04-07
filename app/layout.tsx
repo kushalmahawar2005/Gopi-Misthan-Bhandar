@@ -48,7 +48,7 @@ export default function RootLayout({
         <meta name="apple-mobile-web-app-title" content="Gopi Sweets" />
         <link rel="apple-touch-icon" href="/logo.png" />
       </head>
-      <body className="antialiased">
+      <body className="antialiased overflow-x-hidden w-full relative min-h-screen">
         <SmoothScroll />
         <NextAuthSessionProvider>
           <AuthProvider>

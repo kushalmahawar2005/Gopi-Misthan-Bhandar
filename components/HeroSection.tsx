@@ -88,8 +88,8 @@ const HeroSection = () => {
 
   if (loading) {
     return (
-      <section className="w-full -mt-0 md:mt-6">
-        <div className="w-full md:max-w-7xl md:mx-auto md:px-8 lg:px-12 h-[calc(100vh-56px)] md:h-[380px] lg:h-[420px] relative overflow-hidden bg-gray-100 rounded-none md:rounded-2xl">
+      <section className="w-full -mt-0">
+        <div className="w-full h-[485px] relative overflow-hidden bg-gray-100">
           <div className="flex items-center justify-center h-full">
             <div className="text-center">
               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-red mx-auto mb-4"></div>
@@ -103,10 +103,10 @@ const HeroSection = () => {
   if (slides.length === 0) return null;
 
   return (
-    <section className="relative w-full -mt-2 md:mt-6 mb-8 md:mb-4">
-      <div className="relative w-full md:max-w-7xl md:mx-auto md:px-8 lg:px-12">
+    <section className="relative w-full -mt-0 mb-8 md:mb-4">
+      <div className="relative w-full">
         <div
-          className="aspect-[4/5] md:aspect-auto md:h-[380px] lg:h-[420px] relative overflow-hidden rounded-none md:rounded-2xl"
+          className="w-full h-[550px] sm:h-[650px] md:h-[485px] lg:h-[550px] relative overflow-hidden bg-[#FDF8F3]"
           onTouchStart={onTouchStart}
           onTouchMove={onTouchMove}
           onTouchEnd={onTouchEnd}
@@ -115,7 +115,7 @@ const HeroSection = () => {
             {slides.map((slide, index) => (
               <Link
                 key={slide.id}
-                href="/category/sweets"
+                href="/products"
                 className={`absolute inset-0 transition-opacity duration-700 block ${index === currentSlide ? 'opacity-100 z-10' : 'opacity-0 z-0'
                   }`}
               >
@@ -124,7 +124,7 @@ const HeroSection = () => {
                     src={slide.image}
                     alt={`Hero slide ${index + 1}`}
                     fill
-                    className="object-contain object-center hidden md:block"
+                    className="object-cover object-center hidden md:block"
                     priority={index === 0}
                     sizes="100vw"
                   />
@@ -132,7 +132,7 @@ const HeroSection = () => {
                     src={(slide as any).mobileImage || slide.image}
                     alt={`Hero slide ${index + 1}`}
                     fill
-                    className="object-contain object-center md:hidden"
+                    className="object-contain object-top md:hidden"
                     priority={index === 0}
                     sizes="100vw"
                   />

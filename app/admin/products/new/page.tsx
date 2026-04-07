@@ -15,7 +15,8 @@ export default function NewProduct() {
     price: '',
     image: '',
     images: [] as string[],
-    category: 'sweets',
+    category: '',
+    subcategory: '',
     featured: false,
     isPremium: false,
     isClassic: false,
@@ -27,6 +28,21 @@ export default function NewProduct() {
     giftBoxSubCategory: '' as '' | 'assorted' | 'dry-fruit' | 'souvenir',
     giftBoxSize: '' as '' | 'small' | 'large',
   });
+
+  const [categories, setCategories] = useState<any[]>([]);
+
+  React.useEffect(() => {
+    fetch('/api/categories')
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.success) {
+          setCategories(data.data);
+          if (data.data.length > 0) {
+            setFormData(prev => ({ ...prev, category: data.data[0].slug }));
+          }
+        }
+      });
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -149,6 +165,7 @@ export default function NewProduct() {
                 setFormData({ 
                   ...formData, 
                   category: newCategory,
+                  subcategory: '',
                   // Reset gift box fields if category changes away from gifting
                   giftBoxSubCategory: newCategory === 'gifting' ? formData.giftBoxSubCategory : '',
                   giftBoxSize: newCategory === 'gifting' ? formData.giftBoxSize : '',
@@ -156,15 +173,29 @@ export default function NewProduct() {
               }}
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-red"
             >
-              <option value="sweets">Sweets</option>
-              <option value="classic-sweets">Classic Sweets</option>
-              <option value="premium-sweets">Premium Sweets</option>
-              <option value="snacks">Snacks</option>
-              <option value="namkeen">Namkeen</option>
-              <option value="dry-fruit">Dry Fruit</option>
-              <option value="gifting">Gifting</option>
+              <option value="">Select Category</option>
+              {categories.map((cat: any) => (
+                <option key={cat._id} value={cat.slug}>{cat.name}</option>
+              ))}
             </select>
           </div>
+
+          {categories.find(c => c.slug === formData.category)?.subCategories?.length > 0 && (
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Subcategory *</label>
+              <select
+                required
+                value={formData.subcategory}
+                onChange={(e) => setFormData({ ...formData, subcategory: e.target.value })}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-red"
+              >
+                <option value="">Select Subcategory</option>
+                {categories.find(c => c.slug === formData.category)?.subCategories.map((sub: any) => (
+                  <option key={sub.slug} value={sub.slug}>{sub.name}</option>
+                ))}
+              </select>
+            </div>
+          )}
 
           {formData.category === 'gifting' && (
             <>
@@ -345,7 +376,7 @@ export default function NewProduct() {
               <button
                 type="button"
                 onClick={() => removeSize(index)}
-                className="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition-colors"
+                className="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-primary-red transition-colors"
               >
                 Remove
               </button>

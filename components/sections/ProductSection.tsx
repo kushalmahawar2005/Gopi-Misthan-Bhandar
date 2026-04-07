@@ -22,23 +22,22 @@ const ProductSection: React.FC<ProductSectionProps> = ({
   viewMoreLink = '/products',
 }) => {
   return (
-    <section className="w-full pt-8 pb-8 md:pt-12 md:pb-12 bg-white">
+    <section className="w-full pt-8 pb-8 md:pt-12 md:pb-12">
       <div className="section-container max-w-6xl lg:max-w-7xl mx-auto px-0 md:px-0 w-full">
 
         {/* ----------------------
             HEADING + SUBTITLE
         ---------------------- */}
         {title && (
-          <div className="text-center mb-6 md:mb-8 px-4 md:px-6">
-            <h2 className="text-3xl md:text-4xl lg:text-5xl font-general-sans text-black font-[500] tracking-wide">
-              {title}
-            </h2>
-
+          <div className="text-center mb-12 md:mb-16 px-4 md:px-6">
             {subtitle && (
-              <p className="text-base md:text-lg text-gray-600 mt-4 max-w-3xl mx-auto leading-relaxed font-geom">
+              <p className="text-[12px] md:text-[14px] font-flama tracking-[0.3em] uppercase text-[#FE8E02] mb-3">
                 {subtitle}
               </p>
             )}
+            <h2 className="text-3xl md:text-5xl font-flama-condensed tracking-[0.1em] uppercase text-[#503223]">
+              {title}
+            </h2>
           </div>
         )}
 
@@ -52,8 +51,8 @@ const ProductSection: React.FC<ProductSectionProps> = ({
             sm:grid-cols-2
             md:grid-cols-3
             lg:grid-cols-4
-            gap-4
-            md:gap-4
+            gap-6
+            md:gap-[50px]
             mb-8
           "
         >
@@ -68,13 +67,15 @@ const ProductSection: React.FC<ProductSectionProps> = ({
             VIEW MORE BUTTON
         ---------------------- */}
         {showViewMore && products.length > 0 && (
-          <div className="text-center px-4 md:px-6">
+          <div className="text-center mt-12 md:mt-16">
             <Link
               href={viewMoreLink}
-              className="inline-flex items-center gap-1.5 bg-red-700 text-white px-4 py-2 md:px-5 md:py-2.5 font-light text-xs md:text-sm rounded-md transition-all duration-300 hover:bg-red-800 hover:scale-105 shadow-md"
+              className="group relative inline-flex items-center justify-center py-[14px] px-[40px] font-flama tracking-[0.15em] uppercase text-[13px] border-2 border-[#FE8E02] transition-colors duration-500 overflow-hidden"
             >
-              View More Products
-              <FiArrowRight className="w-3.5 h-3.5 md:w-4 md:h-4" />
+              <span className="absolute inset-0 bg-[#FE8E02] transition-transform duration-[450ms] [transition-timing-function:cubic-bezier(0.785,0.135,0.15,0.86)] group-hover:translate-x-full"></span>
+              <span className="relative z-10 text-white transition-colors duration-[450ms] [transition-timing-function:cubic-bezier(0.785,0.135,0.15,0.86)] group-hover:text-[#FE8E02]">
+                View All
+              </span>
             </Link>
           </div>
         )}

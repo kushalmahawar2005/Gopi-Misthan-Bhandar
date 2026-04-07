@@ -250,7 +250,7 @@ export default function BulkProductsPage() {
 
       {message && (
         <div className={`p-4 rounded-lg flex items-center gap-2 ${
-          message.type === 'success' ? 'bg-green-50 text-green-800' : 'bg-red-50 text-red-800'
+          message.type === 'success' ? 'bg-green-50 text-green-800' : 'bg-red-50 text-primary-red'
         }`}>
           {message.type === 'success' ? (
             <FiCheckCircle size={20} />
@@ -325,7 +325,7 @@ export default function BulkProductsPage() {
             {file && (
               <button
                 onClick={() => setFile(null)}
-                className="text-red-600 hover:text-red-800 text-sm px-3 py-2 sm:px-0 sm:py-0"
+                className="text-primary-red hover:text-primary-red text-sm px-3 py-2 sm:px-0 sm:py-0"
               >
                 Remove
               </button>
@@ -362,7 +362,7 @@ export default function BulkProductsPage() {
                 <FiCheckCircle size={18} />
                 <span>Success: {importResults.success}</span>
               </div>
-              <div className="flex items-center gap-2 text-red-600">
+              <div className="flex items-center gap-2 text-primary-red">
                 <FiAlertCircle size={18} />
                 <span>Failed: {importResults.failed}</span>
               </div>
@@ -370,8 +370,8 @@ export default function BulkProductsPage() {
             
             {importResults.errors.length > 0 && (
               <div className="bg-red-50 border border-red-200 rounded-lg p-4 max-h-60 overflow-y-auto">
-                <p className="font-semibold text-red-800 mb-2">Errors:</p>
-                <ul className="text-sm text-red-700 space-y-1">
+                <p className="font-semibold text-primary-red mb-2">Errors:</p>
+                <ul className="text-sm text-primary-red space-y-1">
                   {importResults.errors.map((error, index) => (
                     <li key={index}>{error}</li>
                   ))}

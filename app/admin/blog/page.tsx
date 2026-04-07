@@ -251,7 +251,7 @@ export default function BlogPage() {
                 </button>
                 <button
                   onClick={() => handleDelete(item._id)}
-                  className="p-2 bg-red-600 text-white rounded hover:bg-red-700 transition-colors"
+                  className="p-2 bg-primary-red text-white rounded hover:bg-primary-red transition-colors"
                 >
                   <FiTrash2 size={14} />
                 </button>
