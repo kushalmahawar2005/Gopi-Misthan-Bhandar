@@ -375,7 +375,7 @@ export default function EditSiteContent() {
                 <button
                   type="button"
                   onClick={() => removeStat(index)}
-                  className="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition-colors"
+                  className="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-primary-red transition-colors"
                 >
                   <FiTrash2 size={16} className="mx-auto" />
                 </button>
@@ -412,7 +412,7 @@ export default function EditSiteContent() {
                 <button
                   type="button"
                   onClick={() => removeImage(index)}
-                  className="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition-colors"
+                  className="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-primary-red transition-colors"
                 >
                   <FiTrash2 size={16} />
                 </button>

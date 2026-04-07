@@ -147,7 +147,7 @@ export default function AdminUsers() {
                   <td className="px-4 lg:px-6 py-4 whitespace-nowrap">
                     <button
                       onClick={() => handleDelete(user._id)}
-                      className="p-2 text-red-600 hover:bg-red-50 rounded transition-colors"
+                      className="p-2 text-primary-red hover:bg-red-50 rounded transition-colors"
                       title="Delete"
                     >
                       <FiTrash2 size={16} />
@@ -180,7 +180,7 @@ export default function AdminUsers() {
               </div>
               <button
                 onClick={() => handleDelete(user._id)}
-                className="p-2 text-red-600 hover:bg-red-50 rounded transition-colors flex-shrink-0"
+                className="p-2 text-primary-red hover:bg-red-50 rounded transition-colors flex-shrink-0"
                 title="Delete"
               >
                 <FiTrash2 size={16} />

@@ -165,109 +165,139 @@ export default function ProfilePage() {
   }
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-[#FDF8F3] font-sans">
       <Header />
       <Navigation />
       <Cart />
 
-      <div className="bg-gradient-to-br from-red-700 to-red-800">
-        <div className="max-w-7xl mx-auto px-4 md:px-8 py-10">
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
-            <div className="flex items-center gap-4">
-              <div className="w-16 h-16 md:w-20 md:h-20 rounded-full bg-white/10 ring-2 ring-white/30 flex items-center justify-center">
-                <FiUser className="w-8 h-8 md:w-10 md:h-10 text-white" />
-              </div>
-              <div>
-                <h1 className="text-2xl md:text-3xl font-semibold text-white">{user.name}</h1>
-                <p className="text-white/80">{user.email}</p>
-              </div>
-            </div>
-            <div className="grid grid-cols-3 gap-3 md:gap-6 w-full md:w-auto">
-              <div className="bg-white/10 backdrop-blur-sm rounded-lg px-4 py-3 text-center">
-                <p className="text-2xl font-bold text-white">{ordersCount}</p>
-                <p className="text-white/80 text-xs">Total Orders</p>
-              </div>
-              <div className="bg-white/10 backdrop-blur-sm rounded-lg px-4 py-3 text-center">
-                <p className="text-2xl font-bold text-white">{getWishlistCount()}</p>
-                <p className="text-white/80 text-xs">Wishlist</p>
-              </div>
-              <div className="bg-white/10 backdrop-blur-sm rounded-lg px-4 py-3 text-center">
-                <p className="text-2xl font-bold text-white">{pendingOrdersCount}</p>
-                <p className="text-white/80 text-xs">Pending</p>
-              </div>
-            </div>
-          </div>
+      <div className="max-w-6xl lg:max-w-7xl mx-auto px-4 md:px-6 pt-12 md:pt-20 pb-20">
+        
+        {/* Back Button */}
+        <div className="flex justify-start mb-6 md:mb-2">
+          <button onClick={() => router.push('/')} className="inline-flex items-center justify-center gap-2 text-[#503223]/60 hover:text-[#FE8E02] transition-colors text-[11px] font-flama tracking-[0.2em] uppercase cursor-pointer">
+            <svg fill="none" strokeWidth="2" stroke="currentColor" viewBox="0 0 24 24" className="w-4 h-4"><path strokeLinecap="round" strokeLinejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg> Back to Home Page
+          </button>
         </div>
-      </div>
+        
+        {/* Page Title */}
+        <div className="text-center mb-12">
+          <p className="text-[12px] md:text-[14px] font-flama tracking-[0.3em] uppercase text-[#FE8E02] mb-3">
+            YOUR ACCOUNT
+          </p>
+          <h2 className="text-3xl md:text-5xl font-flama-condensed tracking-[0.1em] uppercase text-[#503223]">
+            PROFILE SETTINGS
+          </h2>
+        </div>
 
-      <div className="max-w-7xl mx-auto px-4 md:px-8 py-10">
-        <div className="grid md:grid-cols-3 gap-8">
-          <div className="md:col-span-1">
-            <div className="rounded-xl border border-gray-200 bg-white shadow-sm p-6 sticky top-24">
-              <div className="space-y-3">
+        <div className="flex flex-col lg:flex-row gap-8 lg:gap-12">
+          
+          {/* Left Sidebar (Profile Info & Nav) */}
+          <div className="w-full lg:w-[320px] shrink-0">
+            <div className="bg-white rounded-none border border-gray-200 p-8 shadow-sm">
+              <div className="flex flex-col items-center text-center pb-8 border-b border-gray-100">
+                <div className="w-24 h-24 mb-6 rounded-full border border-gray-200 bg-[#FDF8F3] flex items-center justify-center relative overflow-hidden">
+                  <FiUser className="w-10 h-10 text-[#FE8E02] opacity-80" />
+                </div>
+                <h1 className="text-2xl font-flama-condensed tracking-[0.1em] uppercase text-[#503223] mb-2">{user?.name || 'User'}</h1>
+                <p className="text-gray-500 text-[13px] font-flama tracking-wide mb-4">{user?.email}</p>
+                <div className="text-[#FE8E02] px-4 py-1.5 text-[10px] font-bold font-flama tracking-[0.2em] uppercase border border-[#FE8E02]">
+                  Premium Member
+                </div>
+              </div>
+
+              <nav className="mt-8 space-y-3">
                 <button
                   onClick={() => setIsEditing(true)}
-                  className="w-full flex items-center gap-3 px-4 py-3 rounded-lg border border-gray-200 hover:border-gray-300 hover:bg-gray-50 transition-all"
+                  className={`w-full flex items-center gap-4 px-4 py-3 border transition-colors duration-300 font-flama tracking-[0.1em] text-[13px] uppercase ${isEditing ? 'border-[#FE8E02] bg-[#FE8E02]/5 text-[#FE8E02]' : 'border-transparent text-[#503223] hover:text-[#FE8E02] hover:bg-gray-50'}`}
                 >
-                  <FiEdit2 className="w-5 h-5 text-gray-700" />
-                  <span className="text-gray-800">Edit Profile</span>
+                  <FiUser className="w-4 h-4 flex-shrink-0" />
+                  <span>Personal Info</span>
                 </button>
                 <button
                   onClick={() => router.push('/orders')}
-                  className="w-full flex items-center gap-3 px-4 py-3 rounded-lg border border-gray-200 hover:border-gray-300 hover:bg-gray-50 transition-all"
+                  className="w-full flex items-center gap-4 px-4 py-3 border border-transparent transition-colors duration-300 font-flama tracking-[0.1em] text-[13px] uppercase text-[#503223] hover:text-[#FE8E02] hover:bg-gray-50 group"
                 >
-                  <FiPackage className="w-5 h-5 text-gray-700" />
-                  <span className="text-gray-800">My Orders</span>
+                  <FiPackage className="w-4 h-4 flex-shrink-0" />
+                  <span>Order History</span>
+                  {ordersCount > 0 && <span className="ml-auto bg-[#FE8E02] text-white py-0.5 px-2 rounded-full text-[10px] font-bold">{ordersCount}</span>}
                 </button>
                 <button
                   onClick={() => router.push('/wishlist')}
-                  className="w-full flex items-center gap-3 px-4 py-3 rounded-lg border border-gray-200 hover:border-gray-300 hover:bg-gray-50 transition-all"
+                  className="w-full flex items-center gap-4 px-4 py-3 border border-transparent transition-colors duration-300 font-flama tracking-[0.1em] text-[13px] uppercase text-[#503223] hover:text-[#FE8E02] hover:bg-gray-50 group"
                 >
-                  <FiHeart className="w-5 h-5 text-gray-700" />
-                  <span className="text-gray-800">Wishlist</span>
+                  <FiHeart className="w-4 h-4 flex-shrink-0" />
+                  <span>My Wishlist</span>
+                  {getWishlistCount() > 0 && <span className="ml-auto bg-[#FE8E02] text-white py-0.5 px-2 rounded-full text-[10px] font-bold">{getWishlistCount()}</span>}
                 </button>
-                <button
-                  onClick={handleLogout}
-                  className="w-full flex items-center gap-3 px-4 py-3 rounded-lg border border-red-200 text-red-700 hover:bg-red-50 hover:border-red-300 transition-all"
-                >
-                  <FiLogOut className="w-5 h-5" />
-                  <span>Logout</span>
-                </button>
-              </div>
+                <div className="pt-4 border-t border-gray-100">
+                  <button
+                    onClick={handleLogout}
+                    className="w-full flex items-center gap-4 px-4 py-3 border border-transparent transition-colors duration-300 font-flama tracking-[0.1em] text-[13px] uppercase text-red-600 hover:bg-red-50"
+                  >
+                    <FiLogOut className="w-4 h-4 flex-shrink-0" />
+                    <span>Logout Account</span>
+                  </button>
+                </div>
+              </nav>
             </div>
           </div>
 
-          <div className="md:col-span-2">
-            <div className="rounded-xl border border-gray-200 bg-white shadow-sm p-6 md:p-8">
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-xl md:text-2xl font-semibold">Personal Information</h2>
+          {/* Right Main Content */}
+          <div className="flex-1 space-y-8">
+            
+            {/* Stats Row */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+              {[
+                { label: 'Total Orders', value: ordersCount, icon: FiShoppingBag },
+                { label: 'Wishlist Items', value: getWishlistCount(), icon: FiHeart },
+                { label: 'Pending Orders', value: pendingOrdersCount, icon: FiPackage },
+              ].map((stat, idx) => (
+                <div key={idx} className={`bg-white rounded-none border border-gray-200 p-6 flex flex-col items-center text-center justify-center gap-3 transition-colors duration-300 hover:border-[#FE8E02] group`}>
+                  <div className={`w-12 h-12 rounded-full bg-[#FDF8F3] text-[#FE8E02] flex items-center justify-center text-xl group-hover:scale-110 transition-transform duration-300`}>
+                    <stat.icon />
+                  </div>
+                  <div>
+                    <p className="text-3xl font-flama-condensed text-[#503223] mb-1">{stat.value}</p>
+                    <p className="text-[#503223]/70 text-[11px] font-flama tracking-[0.15em] uppercase">{stat.label}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Form Card */}
+            <div className="bg-white rounded-none shadow-sm border border-gray-200 p-8">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 mb-10 pb-6 border-b border-gray-100">
+                <div>
+                  <h3 className="text-2xl font-flama-condensed tracking-[0.1em] uppercase text-[#503223] mb-2">Personal Information</h3>
+                  <p className="text-[#FE8E02] text-[11px] font-flama tracking-[0.15em] uppercase">Manage your delivery addresses and account details</p>
+                </div>
                 {!isEditing && (
                   <button
                     onClick={() => setIsEditing(true)}
-                    className="inline-flex items-center gap-2 px-4 py-2 rounded-md bg-red-700 text-white hover:bg-red-800 transition-colors"
+                    className="inline-flex items-center justify-center gap-2 px-[32px] py-[12px] bg-[#FE8E02] text-white border-2 border-[#FE8E02] font-flama tracking-[0.15em] uppercase text-[12px] hover:bg-transparent hover:text-[#FE8E02] transition-colors duration-500"
                   >
-                    <FiEdit2 className="w-5 h-5" />
-                    Edit
+                    <FiEdit2 className="w-3.5 h-3.5" />
+                    Edit Details
                   </button>
                 )}
               </div>
 
               {saveMessage && (
-                <div className={`mb-6 px-4 py-3 rounded-lg ${
+                <div className={`mb-8 px-5 py-4 flex items-center gap-3 font-flama tracking-wide text-sm ${
                   saveMessage.includes('success') 
-                    ? 'bg-green-50 border border-green-200 text-green-700' 
-                    : 'bg-red-50 border border-red-200 text-red-700'
+                    ? 'bg-emerald-50 border border-emerald-100 text-emerald-800' 
+                    : 'bg-red-50 border border-red-100 text-red-800'
                 }`}>
-                  {saveMessage}
+                  <p className="font-medium text-sm">{saveMessage}</p>
                 </div>
               )}
 
               <form className="space-y-6">
-                <div className="grid md:grid-cols-2 gap-6">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      <FiUser className="inline w-4 h-4 mr-2" />
-                      Full Name
+                <div className="grid sm:grid-cols-2 gap-x-8 gap-y-8">
+                  {/* Name field */}
+                  <div className="space-y-3">
+                    <label className="text-[11px] font-flama font-bold tracking-[0.15em] text-[#503223] uppercase flex items-center gap-2">
+                      <FiUser className="text-[#FE8E02]" /> Full Name
                     </label>
                     <input
                       type="text"
@@ -275,30 +305,30 @@ export default function ProfilePage() {
                       value={formData.name}
                       onChange={handleChange}
                       disabled={!isEditing}
-                      className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-red ${
-                        isEditing ? 'border-gray-300' : 'border-gray-200 bg-gray-50'
+                      className={`w-full px-4 py-3.5 border-2 rounded-lg bg-transparent focus:outline-none transition-all font-sans text-sm ${
+                        isEditing ? 'border-gray-200 focus:border-[#FE8E02] text-gray-800' : 'border-gray-100 bg-gray-50 text-gray-500'
                       }`}
                     />
                   </div>
 
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      <FiMail className="inline w-4 h-4 mr-2" />
-                      Email
+                  {/* Email field */}
+                  <div className="space-y-3">
+                    <label className="text-[11px] font-flama font-bold tracking-[0.15em] text-[#503223] uppercase flex items-center gap-2">
+                      <FiMail className="text-[#FE8E02]" /> Email Address
                     </label>
                     <input
                       type="email"
                       name="email"
                       value={formData.email}
                       disabled
-                      className="w-full px-4 py-3 border border-gray-200 bg-gray-50 rounded-lg cursor-not-allowed"
+                      className="w-full px-4 py-3.5 border-2 border-gray-100 rounded-lg bg-gray-50 text-gray-400 cursor-not-allowed font-sans text-sm"
                     />
                   </div>
 
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      <FiPhone className="inline w-4 h-4 mr-2" />
-                      Phone Number
+                  {/* Phone field */}
+                  <div className="space-y-3">
+                    <label className="text-[11px] font-flama font-bold tracking-[0.15em] text-[#503223] uppercase flex items-center gap-2">
+                      <FiPhone className="text-[#FE8E02]" /> Phone Number
                     </label>
                     <input
                       type="tel"
@@ -306,17 +336,17 @@ export default function ProfilePage() {
                       value={formData.phone}
                       onChange={handleChange}
                       disabled={!isEditing}
-                      className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-red ${
-                        isEditing ? 'border-gray-300' : 'border-gray-200 bg-gray-50'
+                      className={`w-full px-4 py-3.5 border-2 rounded-lg bg-transparent focus:outline-none transition-all font-sans text-sm ${
+                        isEditing ? 'border-gray-200 focus:border-[#FE8E02] text-gray-800' : 'border-gray-100 bg-gray-50 text-gray-500'
                       }`}
-                      placeholder="+91 98765 43210"
+                      placeholder="+91"
                     />
                   </div>
 
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      <FiMapPin className="inline w-4 h-4 mr-2" />
-                      City
+                  {/* City field */}
+                  <div className="space-y-3">
+                    <label className="text-[11px] font-flama font-bold tracking-[0.15em] text-[#503223] uppercase flex items-center gap-2">
+                      <FiMapPin className="text-[#FE8E02]" /> City
                     </label>
                     <input
                       type="text"
@@ -324,17 +354,16 @@ export default function ProfilePage() {
                       value={formData.city}
                       onChange={handleChange}
                       disabled={!isEditing}
-                      className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-red ${
-                        isEditing ? 'border-gray-300' : 'border-gray-200 bg-gray-50'
+                      className={`w-full px-4 py-3.5 border-2 rounded-lg bg-transparent focus:outline-none transition-all font-sans text-sm ${
+                        isEditing ? 'border-gray-200 focus:border-[#FE8E02] text-gray-800' : 'border-gray-100 bg-gray-50 text-gray-500'
                       }`}
-                      placeholder="City"
                     />
                   </div>
 
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      <FiMapPin className="inline w-4 h-4 mr-2" />
-                      State
+                  {/* State field */}
+                  <div className="space-y-3">
+                    <label className="text-[11px] font-flama font-bold tracking-[0.15em] text-[#503223] uppercase flex items-center gap-2">
+                      <FiMapPin className="text-[#FE8E02]" /> State
                     </label>
                     <input
                       type="text"
@@ -342,17 +371,16 @@ export default function ProfilePage() {
                       value={formData.state}
                       onChange={handleChange}
                       disabled={!isEditing}
-                      className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-red ${
-                        isEditing ? 'border-gray-300' : 'border-gray-200 bg-gray-50'
+                      className={`w-full px-4 py-3.5 border-2 rounded-lg bg-transparent focus:outline-none transition-all font-sans text-sm ${
+                        isEditing ? 'border-gray-200 focus:border-[#FE8E02] text-gray-800' : 'border-gray-100 bg-gray-50 text-gray-500'
                       }`}
-                      placeholder="State"
                     />
                   </div>
 
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      <FiMapPin className="inline w-4 h-4 mr-2" />
-                      Pincode
+                  {/* Pincode field */}
+                  <div className="space-y-3">
+                    <label className="text-[11px] font-flama font-bold tracking-[0.15em] text-[#503223] uppercase flex items-center gap-2">
+                      <FiMapPin className="text-[#FE8E02]" /> Pincode
                     </label>
                     <input
                       type="text"
@@ -360,19 +388,18 @@ export default function ProfilePage() {
                       value={formData.pincode}
                       onChange={handleChange}
                       disabled={!isEditing}
-                      className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-red ${
-                        isEditing ? 'border-gray-300' : 'border-gray-200 bg-gray-50'
-                      }`}
-                      placeholder="Pincode"
                       maxLength={6}
+                      className={`w-full px-4 py-3.5 border-2 rounded-lg bg-transparent focus:outline-none transition-all font-sans text-sm tracking-wide ${
+                        isEditing ? 'border-gray-200 focus:border-[#FE8E02] text-gray-800' : 'border-gray-100 bg-gray-50 text-gray-500'
+                      }`}
                     />
                   </div>
                 </div>
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    <FiMapPin className="inline w-4 h-4 mr-2" />
-                    Address
+                {/* Full Address */}
+                <div className="space-y-3 pt-4">
+                  <label className="text-[11px] font-flama font-bold tracking-[0.15em] text-[#503223] uppercase flex items-center gap-2">
+                    <FiMapPin className="text-[#FE8E02]" /> Full Address
                   </label>
                   <textarea
                     name="address"
@@ -380,54 +407,37 @@ export default function ProfilePage() {
                     onChange={handleChange}
                     disabled={!isEditing}
                     rows={3}
-                    className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-red ${
-                      isEditing ? 'border-gray-300' : 'border-gray-200 bg-gray-50'
+                    className={`w-full px-4 py-3.5 border-2 rounded-lg bg-transparent focus:outline-none transition-all resize-none font-sans text-sm leading-relaxed ${
+                      isEditing ? 'border-gray-200 focus:border-[#FE8E02] text-gray-800' : 'border-gray-100 bg-gray-50 text-gray-500'
                     }`}
-                    placeholder="Your full address"
+                    placeholder="Enter your complete delivery address"
                   />
                 </div>
 
                 {isEditing && (
-                  <div className="flex gap-4 pt-4">
+                  <div className="flex flex-col sm:flex-row gap-4 pt-10 mt-6 border-t border-gray-100">
                     <button
                       type="button"
                       onClick={handleSave}
                       disabled={saveLoading}
-                      className="inline-flex items-center gap-2 px-6 py-3 rounded-md bg-red-700 text-white hover:bg-red-800 transition-colors disabled:opacity-50"
+                      className="inline-flex items-center justify-center gap-2 px-[40px] py-[14px] bg-[#FE8E02] text-white border-2 border-[#FE8E02] font-flama tracking-[0.15em] uppercase text-[12px] hover:bg-transparent hover:text-[#FE8E02] transition-colors duration-500 disabled:opacity-75"
                     >
-                      <FiSave className="w-5 h-5" />
-                      {saveLoading ? 'Saving...' : 'Save Changes'}
+                      <FiSave className="w-4 h-4 flex-shrink-0" />
+                      {saveLoading ? 'SAVING...' : 'SAVE CHANGES'}
                     </button>
                     <button
                       type="button"
                       onClick={handleCancel}
-                      className="inline-flex items-center gap-2 px-6 py-3 rounded-md bg-gray-200 text-gray-800 hover:bg-gray-300 transition-colors"
+                      className="inline-flex items-center justify-center gap-2 px-[40px] py-[14px] bg-transparent text-[#503223] border-2 border-gray-200 font-flama tracking-[0.15em] uppercase text-[12px] hover:border-[#503223] transition-colors duration-500"
                     >
-                      <FiX className="w-5 h-5" />
-                      Cancel
+                      <FiX className="w-4 h-4 flex-shrink-0" />
+                      CANCEL
                     </button>
                   </div>
                 )}
               </form>
             </div>
-
-            <div className="grid md:grid-cols-3 gap-6 mt-8">
-              <div className="rounded-xl border border-gray-200 bg-white shadow-sm p-6 text-center">
-                <FiShoppingBag className="w-7 h-7 text-red-700 mx-auto mb-3" />
-                <p className="text-2xl font-semibold">{ordersCount}</p>
-                <p className="text-gray-600 text-sm">Total Orders</p>
-              </div>
-              <div className="rounded-xl border border-gray-200 bg-white shadow-sm p-6 text-center">
-                <FiHeart className="w-7 h-7 text-red-700 mx-auto mb-3" />
-                <p className="text-2xl font-semibold">{getWishlistCount()}</p>
-                <p className="text-gray-600 text-sm">Wishlist Items</p>
-              </div>
-              <div className="rounded-xl border border-gray-200 bg-white shadow-sm p-6 text-center">
-                <FiPackage className="w-7 h-7 text-red-700 mx-auto mb-3" />
-                <p className="text-2xl font-semibold">{pendingOrdersCount}</p>
-                <p className="text-gray-600 text-sm">Pending Orders</p>
-              </div>
-            </div>
+            
           </div>
         </div>
       </div>
@@ -436,4 +446,3 @@ export default function ProfilePage() {
     </div>
   );
 }
-

@@ -156,7 +156,7 @@ export default function SettingsPage() {
 
       {message && (
         <div className={`p-4 rounded-lg ${
-          message.type === 'success' ? 'bg-green-50 text-green-800' : 'bg-red-50 text-red-800'
+          message.type === 'success' ? 'bg-green-50 text-green-800' : 'bg-red-50 text-primary-red'
         }`}>
           {message.text}
         </div>

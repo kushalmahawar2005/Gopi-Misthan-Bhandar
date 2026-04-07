@@ -21,7 +21,7 @@ const Footer = () => {
   ];
 
   return (
-    <footer id="contact" className="bg-[#F88E0C] w-full text-white">
+    <footer id="contact" className="bg-[#FE8E02] w-full text-white">
       {/* Content */}
       <div className="w-full px-4 md:px-12 py-16 md:py-24 max-w-[1400px] mx-auto">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 lg:gap-16 mb-12">

@@ -167,7 +167,7 @@ export default function DeliveryManagementPage() {
       case 'distant':
         return 'bg-yellow-100 text-yellow-800';
       case 'remote':
-        return 'bg-red-100 text-red-800';
+        return 'bg-red-100 text-primary-red';
       default:
         return 'bg-gray-100 text-gray-800';
     }
@@ -215,7 +215,7 @@ export default function DeliveryManagementPage() {
 
       {message && (
         <div className={`p-4 rounded-lg ${
-          message.type === 'success' ? 'bg-green-50 text-green-800' : 'bg-red-50 text-red-800'
+          message.type === 'success' ? 'bg-green-50 text-green-800' : 'bg-red-50 text-primary-red'
         }`}>
           {message.text}
         </div>
@@ -353,7 +353,7 @@ export default function DeliveryManagementPage() {
                       {pincode}
                       <button
                         onClick={() => handleRemovePincode(pincode)}
-                        className="text-red-600 hover:text-red-800"
+                        className="text-primary-red hover:text-primary-red"
                       >
                         <FiX size={14} />
                       </button>
@@ -488,7 +488,7 @@ export default function DeliveryManagementPage() {
                       </button>
                       <button
                         onClick={() => handleDelete(zone._id)}
-                        className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                        className="p-2 text-primary-red hover:bg-red-50 rounded-lg transition-colors"
                         title="Delete"
                       >
                         <FiTrash2 size={18} />

@@ -32,13 +32,11 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, showAddToCart = true
   // Using product.id to keep it consistent for the same product
   const seed = parseInt(product.id.substring(0, 8), 16) || 0;
   const rating = (4.5 + (seed % 5) * 0.1).toFixed(1);
-  const originalPrice = Math.round(product.price * 1.25);
-  const discount = "25%";
   
   // Random badges for variety like in the image
   const badges = ["Best Seller", "Mumbai only", "Seasonal", "Trending"];
   const badge = badges[seed % badges.length];
-  const badgeColor = badge === "Mumbai only" ? "bg-[#7B1F2E]" : (badge === "Seasonal" ? "bg-[#D4A373]" : "bg-[#7B1F2E]");
+  const badgeColor = badge === "Mumbai only" ? "bg-[#503223]" : (badge === "Seasonal" ? "bg-[#D4A373]" : "bg-[#503223]");
 
   return (
     <div className="group block h-full">
@@ -98,7 +96,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, showAddToCart = true
             }}
             className="absolute top-3 right-3 w-8 h-8 flex items-center justify-center rounded-full bg-white bg-opacity-80 hover:bg-opacity-100 transition-all z-10 shadow-sm"
           >
-            <FiHeart className={`w-4 h-4 transition-colors ${isFavorite ? 'fill-[#7B1F2E] text-[#7B1F2E]' : 'text-gray-500 hover:text-[#7B1F2E]'}`} />
+            <FiHeart className={`w-4 h-4 transition-colors ${isFavorite ? 'fill-[#FE8E02] text-[#FE8E02]' : 'text-gray-500 hover:text-[#FE8E02]'}`} />
           </button>
         </div>
         
@@ -112,14 +110,8 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, showAddToCart = true
           
           {/* Price Section - Bold Current, Struckthrough Original, Tag for Discount */}
           <div className="flex items-center flex-wrap gap-2 mb-4">
-            <span className="text-[#7B1F2E] font-bold text-[16px] md:text-[17px] font-inter">
+            <span className="text-[#503223] font-bold text-[16px] md:text-[17px] font-inter">
               ₹{product.price}
-            </span>
-            <span className="text-gray-400 line-through text-[13px] md:text-[14px]">
-              ₹{originalPrice}
-            </span>
-            <span className="bg-[#FFE5E9] text-[#7B1F2E] text-[10px] md:text-[11px] px-2 py-0.5 rounded-full font-bold">
-              {discount} OFF
             </span>
           </div>
           
@@ -127,7 +119,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, showAddToCart = true
           <button
             onClick={handleAddToCart}
             disabled={isAdding}
-            className="mt-auto w-full py-3 md:py-3.5 bg-[#7B1F2E] text-white text-[11px] md:text-[12px] font-bold tracking-[0.15em] uppercase rounded-lg transition-all duration-500 hover:bg-[#5D1722] hover:shadow-lg active:scale-[0.97] disabled:opacity-75 flex items-center justify-center overflow-hidden relative group"
+            className="mt-auto w-full py-3 md:py-3.5 bg-white text-[#503223] border-2 border-[#503223]/20 text-[11px] md:text-[12px] font-bold tracking-[0.15em] uppercase rounded-lg transition-all duration-500 hover:bg-[#FE8E02] hover:border-[#FE8E02] hover:text-white hover:shadow-lg active:scale-[0.97] disabled:opacity-75 flex items-center justify-center overflow-hidden relative group"
           >
             <span className={`transition-all duration-300 ${isAdding ? 'translate-y-10 opacity-0' : 'translate-y-0 opacity-100'}`}>
               ADD TO CART

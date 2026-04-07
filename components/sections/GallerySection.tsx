@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { FiPhone, FiMapPin } from 'react-icons/fi';
@@ -19,39 +19,49 @@ interface GallerySectionProps {
 
 const branches = [
   {
-    name: 'Main Branch - Holi Gate',
-    address: 'Holi Gate, Chhatta Bazar, Mathura, Uttar Pradesh 281001',
-    phone: '+91 565 240 1234',
+    name: 'Main Branch',
+    address: '304, Tilak Marg Neemuch (M.P)',
+    phone: '+91 9425105945',
     rating: 5,
-    imageUrl: 'https://images.unsplash.com/photo-1578916171728-46686eac8d58?q=80&w=1974&auto=format&fit=crop',
-    mapUrl: 'https://www.google.com/maps/search/?api=1&query=Gopi+Misthan+Bhandar+Holi+Gate+Mathura'
+    imageUrl: '/shop1.jpeg',
+    mapUrl: 'https://maps.app.goo.gl/mPwca1HtWDBKUE3j9?g_st=aw'
   },
   {
-    name: 'Junction Road Branch',
-    address: 'Near Railway Station, Junction Road, Mathura, Uttar Pradesh 281001',
-    phone: '+91 565 240 5678',
+    name: 'Patel Plaza Branch',
+    address: 'G-3, Patel Plaza, Tagore Marg Neemuch (M.P)',
+    phone: '+91 9425105945',
     rating: 5,
-    imageUrl: 'https://images.unsplash.com/photo-1626708722669-951101967e78?q=80&w=2074&auto=format&fit=crop',
-    mapUrl: 'https://www.google.com/maps/search/?api=1&query=Gopi+Misthan+Bhandar+Junction+Road+Mathura'
+    imageUrl: '/shop3.jpeg',
+    mapUrl: 'https://maps.app.goo.gl/wpkPv8cpT1EzRuGt8?g_st=aw'
   },
   {
-    name: 'Krishna Nagar Branch',
-    address: 'Krishna Nagar Main Market, Mathura, Uttar Pradesh 281004',
-    phone: '+91 565 242 9012',
+    name: 'Outlet at Mandsaur',
+    address: '01, Narayan Tower, Gandhi Chouraha Mandsaur (M.P)',
+    phone: '+91 9425105945',
     rating: 5,
-    imageUrl: 'https://images.unsplash.com/photo-1549465225-b1ea61973649?q=80&w=2072&auto=format&fit=crop',
-    mapUrl: 'https://www.google.com/maps/search/?api=1&query=Gopi+Misthan+Bhandar+Krishna+Nagar+Mathura'
+    imageUrl: '/shop2.jpeg',
+    mapUrl: 'https://maps.app.goo.gl/KbF23a6WooP91WsaA?g_st=aw'
   }
 ];
 
 const GallerySection: React.FC<GallerySectionProps> = ({ galleryItems, showAll }) => {
+  const [currentSlide, setCurrentSlide] = useState(0);
+
+  // Auto-slide every 4 seconds for mobile
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentSlide((prev) => (prev + 1) % branches.length);
+    }, 4000);
+    return () => clearInterval(timer);
+  }, []);
+
   return (
-    <section className="py-16 md:py-24 w-full bg-white">
+    <section className="py-16 md:py-24 w-full bg-white overflow-hidden">
       <div className="max-w-[1400px] mx-auto px-4 md:px-8">
-        
+
         {/* Premium Heading Style */}
-        <div className="text-center mb-16 md:mb-20">
-          <p className="text-[12px] md:text-[14px] font-flama tracking-[0.3em] uppercase text-[#F88E0C] mb-3">
+        <div className="text-center mb-12 md:mb-20">
+          <p className="text-[12px] md:text-[14px] font-flama tracking-[0.3em] uppercase text-[#FE8E02] mb-3">
             Our Presence
           </p>
           <h2 className="text-3xl md:text-5xl lg:text-6xl font-flama-condensed tracking-[0.1em] uppercase text-[#503223]">
@@ -59,14 +69,93 @@ const GallerySection: React.FC<GallerySectionProps> = ({ galleryItems, showAll }
           </h2>
         </div>
 
-        {/* 3 Branches Side-by-Side */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-10 md:gap-12 lg:gap-16 items-start">
-          {branches.map((branch, index) => (
+        {/* =========================================
+            MOBILE VIEW: AUTO-LOOPING SLIDER 
+        ========================================= */}
+        <div className="block md:hidden w-full relative">
+          <div className="overflow-hidden w-full">
             <div 
-              key={index} 
-              className={`flex flex-col items-center text-center group transition-all duration-700 ${
-                index === 1 ? 'md:translate-y-12' : 'md:-translate-y-6'
-              }`}
+              className="flex transition-transform duration-700 ease-in-out"
+              style={{ transform: `translateX(-${currentSlide * 100}%)` }}
+            >
+              {branches.map((branch, index) => (
+                <div key={index} className="w-full flex-shrink-0 flex flex-col items-center text-center px-1">
+                  {/* Large Image with Rounded Corners */}
+                  <div className="relative w-full aspect-[4/5] rounded-[24px] overflow-hidden shadow-sm border border-white mb-6">
+                    <Image
+                      src={branch.imageUrl}
+                      alt={branch.name}
+                      fill
+                      className="object-cover"
+                    />
+                  </div>
+
+                  {/* Branch Name - Serif */}
+                  <h3 className="text-2xl font-playfair font-bold text-[#503223] mb-3">
+                    {branch.name}
+                  </h3>
+
+                  {/* Address - Sans */}
+                  <p className="text-[13px] text-[#503223]/70 font-dm-sans mb-3 px-4 leading-relaxed max-w-[280px]">
+                    {branch.address}
+                  </p>
+
+                  {/* Stars */}
+                  <div className="flex gap-1 mb-6">
+                    {[...Array(branch.rating)].map((_, i) => (
+                      <span key={i} className="text-[#D4A373] text-xl">★</span>
+                    ))}
+                  </div>
+
+                  {/* Links */}
+                  <div className="flex flex-col items-center gap-3 w-full">
+                    <Link
+                      href={`tel:${branch.phone.replace(/\s+/g, '')}`}
+                      className="inline-flex items-center justify-center gap-2 bg-[#FE8E02] text-white px-6 py-3 text-[11px] font-flama tracking-[0.2em] uppercase rounded-full shadow-md w-[220px]"
+                    >
+                      <FiPhone className="w-3.5 h-3.5" />
+                      Contact Now
+                    </Link>
+
+                    <Link
+                      href={branch.mapUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-2 text-[12px] font-flama tracking-[0.2em] uppercase text-[#503223] border-b border-[#503223]/40 pb-1 mt-2"
+                    >
+                      <FiMapPin className="w-3.5 h-3.5" />
+                      View on Map
+                    </Link>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+          
+          {/* Pagination Dots */}
+          <div className="flex justify-center gap-2 mt-10">
+            {branches.map((_, idx) => (
+              <button
+                key={idx}
+                onClick={() => setCurrentSlide(idx)}
+                className={`h-2 rounded-full transition-all duration-300 ${
+                  currentSlide === idx ? 'w-6 bg-[#FE8E02]' : 'w-2 bg-[#E5DCD3]'
+                }`}
+                aria-label={`Go to slide ${idx + 1}`}
+              />
+            ))}
+          </div>
+        </div>
+
+        {/* =========================================
+            DESKTOP VIEW: 3 BRANCHES SIDE-BY-SIDE 
+        ========================================= */}
+        <div className="hidden md:grid grid-cols-3 gap-10 md:gap-12 lg:gap-16 items-start">
+          {branches.map((branch, index) => (
+            <div
+              key={index}
+              className={`flex flex-col items-center text-center group transition-all duration-700 ${index === 1 ? 'md:translate-y-12' : 'md:-translate-y-6'
+                }`}
             >
               {/* Large Image with Rounded Corners */}
               <div className="relative w-full aspect-[4/5] rounded-[24px] overflow-hidden shadow-lg border border-white mb-8">
@@ -95,23 +184,21 @@ const GallerySection: React.FC<GallerySectionProps> = ({ galleryItems, showAll }
                 ))}
               </div>
 
-              {/* Buttons Container */}
-              <div className="flex flex-col gap-3 w-full max-w-[220px]">
-                {/* Contact Now Button - Orange */}
-                <Link 
+              {/* Links */}
+              <div className="flex flex-col items-center gap-3 mt-2">
+                <Link
                   href={`tel:${branch.phone.replace(/\s+/g, '')}`}
-                  className="inline-flex items-center justify-center gap-2 bg-[#F88E0C] text-white px-6 py-3 text-[11px] font-flama tracking-[0.2em] uppercase rounded-full transition-all duration-300 hover:bg-[#D87A0A] hover:scale-105 shadow-md active:scale-95 w-full"
+                  className="inline-flex items-center justify-center gap-2 bg-[#FE8E02] text-white px-6 py-3 text-[11px] font-flama tracking-[0.2em] uppercase rounded-full transition-all duration-300 hover:bg-[#D87A0A] hover:scale-105 shadow-md active:scale-95 w-full max-w-[220px]"
                 >
                   <FiPhone className="w-3.5 h-3.5" />
                   Contact Now
                 </Link>
 
-                {/* View on Map Button - Outline Orange */}
-                <Link 
+                <Link
                   href={branch.mapUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center justify-center gap-2 border-2 border-[#F88E0C] text-[#F88E0C] px-6 py-2.5 text-[11px] font-flama tracking-[0.2em] uppercase rounded-full transition-all duration-300 hover:bg-[#F88E0C] hover:text-white hover:scale-105 active:scale-95 w-full"
+                  className="inline-flex items-center gap-2 text-[12px] font-flama tracking-[0.2em] uppercase text-[#503223] border-b border-[#503223]/40 pb-1 hover:border-[#FE8E02] hover:text-[#FE8E02] transition-all duration-300"
                 >
                   <FiMapPin className="w-3.5 h-3.5" />
                   View on Map

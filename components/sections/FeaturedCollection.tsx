@@ -63,7 +63,7 @@ const FeaturedProductCard: React.FC<{ product: Product }> = ({ product }) => {
           <h3 className="text-[12px] md:text-[14px] font-flama tracking-[0.1em] uppercase text-[#503223] mb-1 line-clamp-1">
             {product.name}
           </h3>
-          <p className="text-[11px] md:text-[13px] font-flama text-[#F88E0C]">
+          <p className="text-[11px] md:text-[13px] font-flama text-[#FE8E02]">
             Rs. {product.price || '700.00'}
           </p>
         </div>
@@ -189,7 +189,7 @@ const FeaturedCollection: React.FC<FeaturedCollectionProps> = ({ products }) => 
       <div className="max-w-[1600px] mx-auto px-4 md:px-[50px]">
         {/* Header: Centered Titles */}
         <div className="text-center mb-12 md:mb-16">
-          <p className="text-[12px] md:text-[14px] font-flama tracking-[0.3em] uppercase text-[#F88E0C] mb-3">
+          <p className="text-[12px] md:text-[14px] font-flama tracking-[0.3em] uppercase text-[#FE8E02] mb-3">
             Featured Collection
           </p>
           <h2 className="text-3xl md:text-5xl font-flama-condensed tracking-[0.1em] uppercase text-[#503223]">
@@ -210,13 +210,13 @@ const FeaturedCollection: React.FC<FeaturedCollectionProps> = ({ products }) => 
         <div className="text-center mt-12 md:mt-16">
           <Link
             href="/products"
-            className="group relative inline-flex items-center justify-center py-[14px] px-[40px] font-flama tracking-[0.15em] uppercase text-[13px] border-2 border-[#F88E0C] transition-colors duration-500 overflow-hidden"
+            className="group relative inline-flex items-center justify-center py-[14px] px-[40px] font-flama tracking-[0.15em] uppercase text-[13px] border-2 border-[#FE8E02] transition-colors duration-500 overflow-hidden"
           >
             {/* Sliding Background Layer */}
-            <span className="absolute inset-0 bg-[#F88E0C] transition-transform duration-[450ms] [transition-timing-function:cubic-bezier(0.785,0.135,0.15,0.86)] group-hover:translate-x-full"></span>
+            <span className="absolute inset-0 bg-[#FE8E02] transition-transform duration-[450ms] [transition-timing-function:cubic-bezier(0.785,0.135,0.15,0.86)] group-hover:translate-x-full"></span>
 
             {/* Button Text */}
-            <span className="relative z-10 text-white transition-colors duration-[450ms] [transition-timing-function:cubic-bezier(0.785,0.135,0.15,0.86)] group-hover:text-[#F88E0C]">
+            <span className="relative z-10 text-white transition-colors duration-[450ms] [transition-timing-function:cubic-bezier(0.785,0.135,0.15,0.86)] group-hover:text-[#FE8E02]">
               View All
             </span>
           </Link>

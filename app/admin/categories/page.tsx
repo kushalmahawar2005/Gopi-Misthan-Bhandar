@@ -264,7 +264,7 @@ export default function AdminCategories() {
                       </div>
                       <button
                         onClick={() => handleDeleteSubcategory(category._id, subcategory.slug)}
-                        className="text-red-600 hover:text-red-700 transition-colors ml-2"
+                        className="text-primary-red hover:text-primary-red transition-colors ml-2"
                         title="Delete subcategory"
                       >
                         <FiTrash2 size={14} />
@@ -285,7 +285,7 @@ export default function AdminCategories() {
               </Link>
               <button
                 onClick={() => handleDelete(category._id)}
-                className="flex-1 bg-red-600 text-white p-2 rounded hover:bg-red-700 transition-colors text-sm font-medium"
+                className="flex-1 bg-primary-red text-white p-2 rounded hover:bg-primary-red transition-colors text-sm font-medium"
               >
                 <FiTrash2 size={16} className="inline mr-2" />
                 Delete

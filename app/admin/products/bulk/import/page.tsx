@@ -227,7 +227,7 @@ export default function BulkImportPage() {
 
       {message && (
         <div className={`p-4 rounded-lg flex items-center gap-2 ${
-          message.type === 'success' ? 'bg-green-50 text-green-800' : 'bg-red-50 text-red-800'
+          message.type === 'success' ? 'bg-green-50 text-green-800' : 'bg-red-50 text-primary-red'
         }`}>
           <span>{message.text}</span>
         </div>
@@ -280,13 +280,13 @@ export default function BulkImportPage() {
           <div className="mt-6 space-y-2">
             <div className="flex items-center gap-4">
               <div className="text-green-600 font-semibold">Success: {importResults.success}</div>
-              <div className="text-red-600 font-semibold">Failed: {importResults.failed}</div>
+              <div className="text-primary-red font-semibold">Failed: {importResults.failed}</div>
             </div>
             
             {importResults.errors.length > 0 && (
               <div className="bg-red-50 border border-red-200 rounded-lg p-4 max-h-60 overflow-y-auto">
-                <p className="font-semibold text-red-800 mb-2">Errors:</p>
-                <ul className="text-sm text-red-700 space-y-1">
+                <p className="font-semibold text-primary-red mb-2">Errors:</p>
+                <ul className="text-sm text-primary-red space-y-1">
                   {importResults.errors.map((error, index) => (
                     <li key={index}>{error}</li>
                   ))}

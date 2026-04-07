@@ -376,7 +376,7 @@ export default function NewProduct() {
               <button
                 type="button"
                 onClick={() => removeSize(index)}
-                className="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition-colors"
+                className="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-primary-red transition-colors"
               >
                 Remove
               </button>

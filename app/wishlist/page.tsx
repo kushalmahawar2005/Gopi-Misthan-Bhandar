@@ -27,7 +27,7 @@ export default function WishlistPage() {
         <Cart />
         <div className="flex items-center justify-center min-h-[60vh]">
           <div className="text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-red mx-auto mb-4"></div>
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#FE8E02] mx-auto mb-4"></div>
             <p className="text-gray-600">Loading...</p>
           </div>
         </div>
@@ -44,27 +44,30 @@ export default function WishlistPage() {
         <Cart />
 
         {/* Page Header */}
-        <div className="bg-gradient-to-br from-red-700 to-red-800 py-8 md:py-12 px-4">
-          <div className="max-w-7xl text-center mx-auto">
-            <div className="flex items-center justify-between">
-              <div className="text-center">
-                <h1 className="text-3xl md:text-4xl font-[500] font-general-sans text-white">
-                  My Wishlist
-                </h1>
-                <p className="text-lg text-gray-100 mt-2">
-                  {getWishlistCount()} {getWishlistCount() === 1 ? 'item' : 'items'} saved
-                </p>
-              </div>
-              {wishlistItems.length > 0 && (
-                <button
-                  onClick={clearWishlist}
-                  className="px-4 py-2 bg-white/15 text-white rounded-md hover:bg-white/25 transition-colors flex items-center gap-2 backdrop-blur-sm"
-                >
-                  <FiTrash2 className="w-5 h-5" />
-                  Clear All
-                </button>
-              )}
+        <div className="max-w-7xl mx-auto px-4 md:px-6 pt-12 md:pt-16">
+          <div className="flex justify-start mb-6 md:mb-2">
+            <button onClick={() => router.push('/')} className="inline-flex items-center justify-center gap-2 text-[#503223]/60 hover:text-[#FE8E02] transition-colors text-[11px] font-flama tracking-[0.2em] uppercase cursor-pointer">
+              <svg fill="none" strokeWidth="2" stroke="currentColor" viewBox="0 0 24 24" className="w-4 h-4"><path strokeLinecap="round" strokeLinejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg> Back to Home Page
+            </button>
+          </div>
+          <div className="flex flex-col sm:flex-row items-center justify-center mt-2 gap-4">
+            <div className="flex-1 text-center">
+              <h1 className="text-3xl md:text-5xl font-flama-condensed tracking-[0.1em] uppercase text-[#503223]">
+                My Wishlist
+              </h1>
+              <p className="text-[#FE8E02] text-[12px] font-flama tracking-[0.15em] uppercase mt-2 mb-4">
+                {getWishlistCount()} {getWishlistCount() === 1 ? 'item' : 'items'} saved
+              </p>
             </div>
+            {wishlistItems.length > 0 && (
+              <button
+                onClick={clearWishlist}
+                className="inline-flex items-center justify-center gap-2 px-[24px] py-[10px] bg-transparent text-[#503223] border border-gray-200 font-flama tracking-[0.15em] uppercase text-[11px] hover:border-[#FE8E02] hover:text-[#FE8E02] transition-colors duration-300"
+              >
+                <FiTrash2 className="w-3.5 h-3.5" />
+                CLEAR ALL
+              </button>
+            )}
           </div>
         </div>
 
@@ -81,7 +84,7 @@ export default function WishlistPage() {
               </p>
               <Link
                 href="/products"
-                className="inline-flex items.center gap-2 bg-red-700 text-white px-8 py-3 rounded-md font-medium text-lg hover:bg-red-800 transition-colors"
+                className="inline-flex items.center gap-2 bg-[#FE8E02] text-white px-8 py-3 rounded-md font-medium text-lg hover:bg-[#FF9D2E] transition-colors"
               >
                 <FiShoppingBag className="w-5 h-5" />
                 Start Shopping
@@ -109,7 +112,7 @@ export default function WishlistPage() {
               <div className="mt-12 text-center">
                 <Link
                   href="/products"
-                  className="inline-flex items-center gap-2 bg-white border-2 border-red-700 text-red-700 px-8 py-3 rounded-md font-semibold text-lg hover:bg-red-700 hover:text-white transition-colors"
+                  className="inline-flex items-center gap-2 bg-white border-2 border-[#FE8E02] text-[#FE8E02] px-8 py-3 rounded-md font-semibold text-lg hover:bg-[#FE8E02] hover:text-white transition-colors"
                 >
                   <FiShoppingBag className="w-5 h-5" />
                   Continue Shopping

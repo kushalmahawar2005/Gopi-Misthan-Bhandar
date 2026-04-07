@@ -16,7 +16,7 @@ const CategoriesSection: React.FC<CategoriesSectionProps> = ({ categories }) => 
 
   // Define colors for the bento grid cards
   const cardColors = [
-    { bg: '#F88E0C', label: 'Terracotta' }, // Hero
+    { bg: '#FE8E02', label: 'Terracotta' }, // Hero
     { bg: '#2A1A0E', label: 'Dark Brown' },
     { bg: '#2D4B37', label: 'Forest Green' },
     { bg: '#D4A017', label: 'Amber' },
@@ -37,24 +37,58 @@ const CategoriesSection: React.FC<CategoriesSectionProps> = ({ categories }) => 
   };
 
   return (
-    <section className="pt-8 pb-20 md:pt-10 md:pb-28 w-full bg-[#FFFFFF]">
+    <section className="pt-6 pb-6 md:pt-10 md:pb-28 w-full bg-[#FFFFFF]">
       <div className="max-w-[1440px] mx-auto px-6 md:px-[50px]">
         {/* HEADER */}
-        <div className="text-center mb-16 md:mb-20">
-          <p className="text-[12px] md:text-[14px] font-dm-sans tracking-[0.25em] uppercase text-[#F88E0C] font-semibold mb-3">
+        <div className="text-center mb-8 md:mb-20">
+          <p className="text-[12px] md:text-[14px] font-dm-sans tracking-[0.25em] uppercase text-[#FE8E02] font-semibold mb-3">
             Explore Our Collection
           </p>
           <h2 className="text-4xl md:text-6xl font-flama-condensed uppercase tracking-[0.05em] text-[#2A1A0E] mb-4">
             Our Categories
           </h2>
-          <p className="text-sm md:text-base text-[#8B6B52] font-dm-sans max-w-2xl mx-auto">
+          <p className="text-sm md:text-base text-[#8B6B52] font-dm-sans max-w-2xl mx-auto hidden md:block">
             A curated selection of authentic Indian flavors, crafted with tradition and love.
           </p>
-          <div className="w-[40px] h-[1.5px] bg-[#F88E0C] mx-auto mt-6"></div>
+          <p className="text-[12.5px] text-[#8B6B52] font-dm-sans max-w-[280px] mx-auto md:hidden leading-snug">
+            A curated selection of authentic Indian flavors, crafted with tradition and love.
+          </p>
+          <div className="w-[40px] h-[1.5px] bg-[#FE8E02] mx-auto mt-4 md:mt-6"></div>
         </div>
 
-        {/* BENTO GRID */}
-        <div className="grid grid-cols-1 md:grid-cols-[1.4fr_1fr_1fr] md:grid-rows-2 gap-4 md:gap-5 h-auto md:h-[650px]">
+        {/* MOBILE CATEGORIES: 3-Column Grid (No Slider) */}
+        <div className="grid md:hidden w-full grid-cols-3 gap-y-4 gap-x-2 pb-2 pt-0 px-1">
+          {categories.slice(0, 6).map((category) => (
+            <Link
+              key={category.id}
+              href={`/products?category=${category.slug}`}
+              className="flex flex-col items-center gap-3 group"
+            >
+              {/* Circular Card */}
+              <div className="w-[90px] h-[90px] xs:w-[105px] xs:h-[105px] rounded-full overflow-hidden border-[3px] border-white shadow-md ring-2 ring-transparent group-hover:ring-[#FE8E02] transition-all duration-300 relative bg-[#FDF8F3]">
+                {category.image ? (
+                  <Image 
+                    src={category.image} 
+                    alt={category.name} 
+                    fill 
+                    className="object-cover transition-transform duration-500 group-hover:scale-110"
+                  />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center text-3xl">
+                    {getEmoji(category.slug)}
+                  </div>
+                )}
+              </div>
+              {/* Category Name */}
+              <span className="text-[12px] sm:text-[13px] font-dm-sans font-semibold text-[#503223] text-center w-full leading-tight break-words uppercase tracking-[0.05em]">
+                {category.name}
+              </span>
+            </Link>
+          ))}
+        </div>
+
+        {/* BENTO GRID - DESKTOP ONLY */}
+        <div className="hidden md:grid md:grid-cols-[1.4fr_1fr_1fr] md:grid-rows-2 gap-5 h-[650px]">
           {/* Big Hero Card (Left) */}
           <Link 
             href={`/products?category=${categories[0]?.slug}`}
@@ -84,7 +118,7 @@ const CategoriesSection: React.FC<CategoriesSectionProps> = ({ categories }) => 
             <Link 
               key={category.id}
               href={`/products?category=${category.slug}`}
-              className="group relative rounded-[14px] overflow-hidden cursor-pointer h-[250px] md:h-auto transition-transform duration-500 ease-[cubic-bezier(0.25,1,0.5,1)] hover:scale-[1.02]"
+              className="group relative rounded-[14px] overflow-hidden cursor-pointer h-auto transition-transform duration-500 ease-[cubic-bezier(0.25,1,0.5,1)] hover:scale-[1.02]"
             >
               <div 
                 className="absolute inset-0 transition-transform duration-700 ease-[cubic-bezier(0.25,1,0.5,1)] group-hover:scale-[1.06]"
@@ -107,8 +141,8 @@ const CategoriesSection: React.FC<CategoriesSectionProps> = ({ categories }) => 
           ))}
         </div>
 
-        {/* QUICK-NAV STRIP */}
-        <div className="mt-14 grid grid-cols-2 md:grid-cols-4 gap-4">
+        {/* QUICK-NAV STRIP - DESKTOP ONLY */}
+        <div className="hidden md:grid mt-14 grid-cols-4 gap-4">
           {categories.slice(0, 4).map((category) => (
             <Link 
               key={category.id} 
@@ -116,7 +150,7 @@ const CategoriesSection: React.FC<CategoriesSectionProps> = ({ categories }) => 
               className="group relative flex items-center gap-4 bg-white p-4 border-[0.5px] border-[#2A1A0E]/10 rounded-[12px] transition-all duration-300 hover:-translate-y-[2px] hover:shadow-lg overflow-hidden"
             >
               {/* Animated Left Border Accent */}
-              <div className="absolute left-0 top-0 bottom-0 w-[3px] bg-[#F88E0C] origin-top scale-y-0 transition-transform duration-300 group-hover:scale-y-100"></div>
+              <div className="absolute left-0 top-0 bottom-0 w-[3px] bg-[#FE8E02] origin-top scale-y-0 transition-transform duration-300 group-hover:scale-y-100"></div>
               
               {/* Image Box */}
               <div className="flex-shrink-0 w-12 h-12 relative rounded-[10px] overflow-hidden bg-[#FAF0E6] shadow-sm">

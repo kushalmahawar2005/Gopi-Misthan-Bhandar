@@ -236,3 +236,21 @@ section,
     transform: translateX(-33.333%);
   }
 }
+
+/* Purity Marquee Animation */
+@keyframes purityMarquee {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.animate-purity-marquee {
+  animation: purityMarquee 30s linear infinite;
+}
+
+.animate-purity-marquee:hover {
+  animation-play-state: paused;
+}

@@ -25,6 +25,8 @@ const MapSection = dynamic(() => import('@/components/sections/MapSection'));
 const GallerySection = dynamic(() => import('@/components/sections/GallerySection'));
 const GiftBoxSection = dynamic(() => import('@/components/sections/GiftBoxSection'));
 const BlogSection = dynamic(() => import('@/components/sections/BlogSection'));
+const PurityBanner = dynamic(() => import('@/components/sections/PurityBanner'));
+const NewsletterSection = dynamic(() => import('@/components/sections/NewsletterSection'));
 
 export default function Home() {
   const [featuredProducts, setFeaturedProducts] = useState<Product[]>([]);
@@ -164,6 +166,9 @@ export default function Home() {
         </ScrollAnimation>
       )}
 
+      {/* Purity Guarantee Marquee */}
+      <PurityBanner />
+
       <ScrollAnimation delay={150}>
         <div id="about">
           <AboutSection />
@@ -198,6 +203,11 @@ export default function Home() {
           <BlogSection blogs={blogs} />
         </ScrollAnimation>
       )}
+
+      {/* Newsletter - Become A GOPI Insider */}
+      <ScrollAnimation delay={150}>
+        <NewsletterSection />
+      </ScrollAnimation>
 
       <Footer />
     </main>

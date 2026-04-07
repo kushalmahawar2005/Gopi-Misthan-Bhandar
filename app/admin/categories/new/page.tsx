@@ -260,7 +260,7 @@ export default function NewCategory() {
                   <button
                     type="button"
                     onClick={() => removeSubCategory(index)}
-                    className="text-red-600 hover:text-red-700 transition-colors ml-4"
+                    className="text-primary-red hover:text-primary-red transition-colors ml-4"
                   >
                     <FiTrash2 size={18} />
                   </button>

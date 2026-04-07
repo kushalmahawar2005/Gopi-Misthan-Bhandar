@@ -217,7 +217,7 @@ export default function AdminProducts() {
                         </button>
                         <button
                           onClick={() => handleDelete(product._id)}
-                          className="p-2 text-red-600 hover:bg-red-50 rounded transition-colors"
+                          className="p-2 text-primary-red hover:bg-red-50 rounded transition-colors"
                           title="Delete"
                         >
                           <FiTrash2 size={16} />
@@ -288,7 +288,7 @@ export default function AdminProducts() {
                     </button>
                     <button
                       onClick={() => handleDelete(product._id)}
-                      className="p-2 text-red-600 hover:bg-red-50 rounded transition-colors"
+                      className="p-2 text-primary-red hover:bg-red-50 rounded transition-colors"
                       title="Delete"
                     >
                       <FiTrash2 size={16} />

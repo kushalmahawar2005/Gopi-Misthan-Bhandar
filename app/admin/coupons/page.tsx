@@ -194,7 +194,7 @@ export default function CouponsPage() {
                               ? 'bg-green-100 text-green-800'
                               : expired
                               ? 'bg-gray-100 text-gray-800'
-                              : 'bg-red-100 text-red-800'
+                              : 'bg-red-100 text-primary-red'
                           }`}
                         >
                           {activeNow ? 'Active' : expired ? 'Expired' : 'Inactive'}
@@ -213,7 +213,7 @@ export default function CouponsPage() {
                           </Link>
                           <button
                             onClick={() => handleDelete(coupon._id)}
-                            className="text-red-600 hover:text-red-900"
+                            className="text-primary-red hover:text-primary-red"
                           >
                             <FiTrash2 size={18} />
                           </button>
@@ -250,7 +250,7 @@ export default function CouponsPage() {
                   </Link>
                   <button
                     onClick={() => handleDelete(coupon._id)}
-                    className="p-2 text-red-600 hover:bg-red-50 rounded transition-colors"
+                    className="p-2 text-primary-red hover:bg-red-50 rounded transition-colors"
                     title="Delete"
                   >
                     <FiTrash2 size={16} />
@@ -292,7 +292,7 @@ export default function CouponsPage() {
                         ? 'bg-green-100 text-green-800'
                         : expired
                         ? 'bg-gray-100 text-gray-800'
-                        : 'bg-red-100 text-red-800'
+                        : 'bg-red-100 text-primary-red'
                     }`}
                   >
                     {activeNow ? 'Active' : expired ? 'Expired' : 'Inactive'}

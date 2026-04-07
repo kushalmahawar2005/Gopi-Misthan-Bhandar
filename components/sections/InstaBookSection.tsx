@@ -3,7 +3,7 @@
 import React, { useState, useRef } from 'react';
 import { InstagramPost } from '@/types';
 import Link from 'next/link';
-import { FiVolume2, FiVolumeX, FiMaximize2, FiInstagram, FiFacebook } from 'react-icons/fi';
+import { FiVolume2, FiVolumeX, FiMaximize2, FiInstagram, FiFacebook, FiYoutube } from 'react-icons/fi';
 import Image from 'next/image';
 
 interface InstaBookSectionProps {
@@ -14,43 +14,49 @@ const InstaBookSection: React.FC<InstaBookSectionProps> = ({ instaBooks }) => {
   return (
     <section className="py-16 md:py-24 px-4 w-full bg-[#FE8E02]">
       <div className="max-w-[1400px] mx-auto w-full">
-        {/* Header: Title Left, Bird Center, Icons Right */}
-        <div className="flex flex-col md:flex-row items-center justify-between mb-16 md:mb-20 gap-8 px-4">
-
-          {/* Left: Title */}
-          <div className="text-center md:text-left flex-1">
-            <h2 className="text-3xl md:text-4xl lg:text-5xl text-white font-playfair leading-tight">
-              Follow Us For More <br className="hidden md:block" /> Mithai Stories
-            </h2>
-          </div>
-
-          {/* Center: Bird Illustration (Fixed size to match reference) */}
-          <div className="flex-shrink-0 relative w-[120px] h-[120px] md:w-[150px] md:h-[150px]">
-            {/* Using a bird illustration matching the artisanal theme */}
+        {/* Header: Logo Top, Socials Middle, Title Bottom */}
+        <div className="flex flex-col items-center justify-center mb-10 md:mb-16 px-4">
+          
+          {/* Logo */}
+          <div className="flex-shrink-0 relative w-[100px] h-[100px] md:w-[130px] md:h-[130px] mb-4 md:mb-6">
             <Image
               src="/man.png"
               alt="Gopi Man Logo"
               fill
-              className="object-contain h-[120px] w-[120px]"
+              className="object-contain"
             />
           </div>
 
-          {/* Right: Social Icons */}
-          <div className="flex items-center gap-4 flex-1 justify-center md:justify-end">
+          {/* Social Icons */}
+          <div className="flex items-center justify-center gap-3 md:gap-5 mb-6 md:mb-8">
             <Link
               href="https://instagram.com/gopimisthanbhandar"
               target="_blank"
-              className="w-10 h-10 md:w-12 md:h-12 rounded-full border border-white/40 flex items-center justify-center text-white hover:bg-white hover:text-[#F88E0C] transition-all duration-300"
+              className="w-9 h-9 md:w-11 md:h-11 rounded-full border border-white/40 flex items-center justify-center text-white hover:bg-white hover:text-[#FE8E02] transition-all duration-300"
             >
-              <FiInstagram className="w-5 h-5 md:w-6 md:h-6" />
+              <FiInstagram className="w-4 h-4 md:w-5 md:h-5" />
             </Link>
             <Link
               href="https://facebook.com/gopimisthanbhandar"
               target="_blank"
-              className="w-10 h-10 md:w-12 md:h-12 rounded-full border border-white/40 flex items-center justify-center text-white hover:bg-white hover:text-[#F88E0C] transition-all duration-300"
+              className="w-9 h-9 md:w-11 md:h-11 rounded-full border border-white/40 flex items-center justify-center text-white hover:bg-white hover:text-[#FE8E02] transition-all duration-300"
             >
-              <FiFacebook className="w-5 h-5 md:w-6 md:h-6" />
+              <FiFacebook className="w-4 h-4 md:w-5 md:h-5" />
             </Link>
+            <Link
+              href="https://youtube.com/"
+              target="_blank"
+              className="w-9 h-9 md:w-11 md:h-11 rounded-full border border-white/40 flex items-center justify-center text-white hover:bg-white hover:text-[#FE8E02] transition-all duration-300"
+            >
+              <FiYoutube className="w-4 h-4 md:w-5 md:h-5" />
+            </Link>
+          </div>
+
+          {/* Title Section */}
+          <div className="text-center w-full">
+            <h2 className="text-[28px] md:text-4xl lg:text-5xl text-white font-playfair leading-snug">
+              Follow Us For More <br className="hidden md:block" /> Mithai Stories
+            </h2>
           </div>
         </div>
 

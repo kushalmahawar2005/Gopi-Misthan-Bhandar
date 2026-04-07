@@ -31,7 +31,7 @@ const ProductSection: React.FC<ProductSectionProps> = ({
         {title && (
           <div className="text-center mb-12 md:mb-16 px-4 md:px-6">
             {subtitle && (
-              <p className="text-[12px] md:text-[14px] font-flama tracking-[0.3em] uppercase text-[#F88E0C] mb-3">
+              <p className="text-[12px] md:text-[14px] font-flama tracking-[0.3em] uppercase text-[#FE8E02] mb-3">
                 {subtitle}
               </p>
             )}
@@ -70,10 +70,10 @@ const ProductSection: React.FC<ProductSectionProps> = ({
           <div className="text-center mt-12 md:mt-16">
             <Link
               href={viewMoreLink}
-              className="group relative inline-flex items-center justify-center py-[14px] px-[40px] font-flama tracking-[0.15em] uppercase text-[13px] border-2 border-[#F88E0C] transition-colors duration-500 overflow-hidden"
+              className="group relative inline-flex items-center justify-center py-[14px] px-[40px] font-flama tracking-[0.15em] uppercase text-[13px] border-2 border-[#FE8E02] transition-colors duration-500 overflow-hidden"
             >
-              <span className="absolute inset-0 bg-[#F88E0C] transition-transform duration-[450ms] [transition-timing-function:cubic-bezier(0.785,0.135,0.15,0.86)] group-hover:translate-x-full"></span>
-              <span className="relative z-10 text-white transition-colors duration-[450ms] [transition-timing-function:cubic-bezier(0.785,0.135,0.15,0.86)] group-hover:text-[#F88E0C]">
+              <span className="absolute inset-0 bg-[#FE8E02] transition-transform duration-[450ms] [transition-timing-function:cubic-bezier(0.785,0.135,0.15,0.86)] group-hover:translate-x-full"></span>
+              <span className="relative z-10 text-white transition-colors duration-[450ms] [transition-timing-function:cubic-bezier(0.785,0.135,0.15,0.86)] group-hover:text-[#FE8E02]">
                 View All
               </span>
             </Link>

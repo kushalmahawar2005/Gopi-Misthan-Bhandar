@@ -351,7 +351,7 @@ export default function AdminAboutUs() {
                       <button
                         type="button"
                         onClick={() => removeCard(index)}
-                        className="p-2 text-red-600 hover:text-red-700"
+                        className="p-2 text-primary-red hover:text-primary-red"
                         title="Delete card"
                       >
                         <FiTrash2 size={18} />

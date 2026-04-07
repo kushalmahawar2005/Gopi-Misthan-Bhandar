@@ -106,7 +106,7 @@ const HeroSection = () => {
     <section className="relative w-full -mt-0 mb-8 md:mb-4">
       <div className="relative w-full">
         <div
-          className="w-full h-[300px] md:h-[485px] relative overflow-hidden"
+          className="w-full h-[550px] sm:h-[650px] md:h-[485px] lg:h-[550px] relative overflow-hidden bg-[#FDF8F3]"
           onTouchStart={onTouchStart}
           onTouchMove={onTouchMove}
           onTouchEnd={onTouchEnd}
@@ -132,7 +132,7 @@ const HeroSection = () => {
                     src={(slide as any).mobileImage || slide.image}
                     alt={`Hero slide ${index + 1}`}
                     fill
-                    className="object-cover object-center md:hidden"
+                    className="object-contain object-top md:hidden"
                     priority={index === 0}
                     sizes="100vw"
                   />
