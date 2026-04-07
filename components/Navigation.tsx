@@ -100,19 +100,27 @@ const Navigation = () => {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  // Get category by slug from fetched categories
-  const getCategoryBySlug = (slug: string): Category | undefined => {
-    return categories.find(cat => cat.slug === slug);
+  // Get category by slug or name from fetched categories
+  const getCategoryBySlug = (slug: string, label?: string): Category | undefined => {
+    return categories.find(cat => 
+      cat.slug === slug || 
+      (label && (
+        cat.slug === label.toLowerCase().replace(/\s+/g, '-') ||
+        cat.slug === label.toLowerCase().replace(/\s+/g, '-').replace('s$', '') ||
+        cat.slug === label.toLowerCase().replace(/\s+/g, '-') + 's' ||
+        cat.name.toLowerCase() === label.toLowerCase()
+      ))
+    );
   };
 
   const navItems = [
     { label: 'HOME', href: '/' },
     { label: 'SWEETS', href: '/products?category=sweets', slug: 'sweets' },
-    { label: 'DRY FRUIT', href: '/products?category=dry-fruits', slug: 'dry-fruits' },
+    { label: 'DRY FRUIT', href: '/products?category=dry-fruit', slug: 'dry-fruit' },
     { label: 'BAKERY ITEMS', href: '/products?category=bakery-items', slug: 'bakery-items' },
     { label: 'NAMKEEN', href: '/products?category=namkeen', slug: 'namkeen' },
     { label: 'SAVOURY SNACKS', href: '/products?category=savoury-snacks', slug: 'savoury-snacks' },
-    { label: 'GIFTING', href: '/#gifting', slug: 'gifting' },
+    { label: 'GIFTING', href: '/#gifting', slug: 'gifting-' },
   ];
 
   const isActive = (href: string) => {
@@ -362,7 +370,7 @@ const Navigation = () => {
           <div className={`hidden md:flex items-center justify-center gap-6 lg:gap-8 xl:gap-12 px-4 transition-all duration-500 ${isScrolled ? 'max-h-0 py-0 opacity-0 pointer-events-none overflow-hidden' : 'max-h-[100px] py-3 opacity-100 pointer-events-auto overflow-visible'
             }`}>
             {navItems.map((item) => {
-              const category = item.slug ? getCategoryBySlug(item.slug) : null;
+              const category = item.slug ? getCategoryBySlug(item.slug, item.label) : null;
               const hasSubcategories = category?.subCategories && category.subCategories.length > 0;
 
               return (

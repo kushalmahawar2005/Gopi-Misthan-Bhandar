@@ -115,11 +115,11 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, showAddToCart = true
             </span>
           </div>
           
-          {/* Add to Cart Button - Maroon, Full Width, Premium Style */}
+          {/* Add to Cart Button - Solid Orange with no hover */}
           <button
             onClick={handleAddToCart}
             disabled={isAdding}
-            className="mt-auto w-full py-3 md:py-3.5 bg-white text-[#503223] border-2 border-[#503223]/20 text-[11px] md:text-[12px] font-bold tracking-[0.15em] uppercase rounded-lg transition-all duration-500 hover:bg-[#FE8E02] hover:border-[#FE8E02] hover:text-white hover:shadow-lg active:scale-[0.97] disabled:opacity-75 flex items-center justify-center overflow-hidden relative group"
+            className="mt-auto w-full py-3 md:py-3.5 bg-[#FE8E02] text-white text-[11px] md:text-[12px] font-bold tracking-[0.15em] uppercase rounded-lg transition-all duration-300 active:scale-[0.97] disabled:opacity-75 flex items-center justify-center overflow-hidden relative group"
           >
             <span className={`transition-all duration-300 ${isAdding ? 'translate-y-10 opacity-0' : 'translate-y-0 opacity-100'}`}>
               ADD TO CART

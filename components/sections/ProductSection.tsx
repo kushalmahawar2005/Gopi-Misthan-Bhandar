@@ -31,11 +31,11 @@ const ProductSection: React.FC<ProductSectionProps> = ({
         {title && (
           <div className="text-center mb-12 md:mb-16 px-4 md:px-6">
             {subtitle && (
-              <p className="text-[12px] md:text-[14px] font-flama tracking-[0.3em] uppercase text-[#FE8E02] mb-3">
+              <p className="text-[13px] md:text-[16px] font-flama tracking-[0.3em] uppercase text-[#FE8E02] mb-3">
                 {subtitle}
               </p>
             )}
-            <h2 className="text-3xl md:text-5xl font-flama-condensed tracking-[0.1em] uppercase text-[#503223]">
+            <h2 className="text-4xl md:text-5xl lg:text-[64px] font-flama-condensed tracking-[0.05em] xl:tracking-[0.1em] uppercase text-[#503223]">
               {title}
             </h2>
           </div>

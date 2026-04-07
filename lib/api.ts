@@ -10,6 +10,7 @@ const transformProduct = (product: any): Product => {
     image: product.image,
     images: Array.isArray(product.images) ? product.images : [],
     category: product.category,
+    subcategory: product.subcategory,
     featured: product.featured || false,
     isPremium: product.isPremium || false,
     isClassic: product.isClassic || false,
@@ -18,6 +19,8 @@ const transformProduct = (product: any): Product => {
     shelfLife: product.shelfLife,
     deliveryTime: product.deliveryTime,
     stock: product.stock || 0,
+    giftBoxSubCategory: product.giftBoxSubCategory,
+    giftBoxSize: product.giftBoxSize,
   };
 };
 
@@ -225,32 +228,6 @@ export const fetchGallery = async (): Promise<GalleryItem[]> => {
   }
 };
 
-export interface GiftBoxItem {
-  _id: string;
-  category: 'assorted' | 'dry-fruit' | 'souvenir';
-  title: string;
-  description: string;
-  imageUrl: string;
-  size?: 'small' | 'large';
-  price?: number;
-  order: number;
-  isActive: boolean;
-}
-
-export const fetchGiftBoxes = async (): Promise<GiftBoxItem[]> => {
-  try {
-    const response = await fetch('/api/giftbox');
-    const data = await response.json();
-    
-    if (data.success && data.data) {
-      return data.data;
-    }
-    return [];
-  } catch (error) {
-    console.error('Error fetching gift boxes:', error);
-    return [];
-  }
-};
 
 export interface BlogItem {
   _id: string;

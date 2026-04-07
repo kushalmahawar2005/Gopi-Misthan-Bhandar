@@ -14,21 +14,33 @@ const InstaBookSection: React.FC<InstaBookSectionProps> = ({ instaBooks }) => {
   return (
     <section className="py-16 md:py-24 px-4 w-full bg-[#FE8E02]">
       <div className="max-w-[1400px] mx-auto w-full">
-        {/* Header: Logo Top, Socials Middle, Title Bottom */}
-        <div className="flex flex-col items-center justify-center mb-10 md:mb-16 px-4">
+        {/* Header: Responsive Layout 
+            Mobile: Logo -> Socials -> Title 
+            Desktop: Title -> Logo -> Socials 
+        */}
+        <div className="flex flex-col md:flex-row items-center md:justify-between mb-10 md:mb-16 px-4 w-full gap-4 md:gap-0">
           
-          {/* Logo */}
-          <div className="flex-shrink-0 relative w-[100px] h-[100px] md:w-[130px] md:h-[130px] mb-4 md:mb-6">
-            <Image
-              src="/man.png"
-              alt="Gopi Man Logo"
-              fill
-              className="object-contain"
-            />
+          {/* Title Area (Mobile Bottom / Desktop Left) */}
+          <div className="text-center md:text-left flex-1 order-3 md:order-1 mt-6 md:mt-0">
+            <h2 className="text-[28px] md:text-4xl lg:text-5xl text-white font-playfair leading-snug">
+              Follow Us For More <br className="hidden xl:block" /> Mithai Stories
+            </h2>
           </div>
 
-          {/* Social Icons */}
-          <div className="flex items-center justify-center gap-3 md:gap-5 mb-6 md:mb-8">
+          {/* Logo Area (Mobile Top / Desktop Middle) */}
+          <div className="flex-1 order-1 md:order-2 flex justify-center">
+            <div className="relative w-[100px] h-[100px] md:w-[130px] md:h-[130px]">
+              <Image
+                src="/man.png"
+                alt="Gopi Man Logo"
+                fill
+                className="object-contain"
+              />
+            </div>
+          </div>
+
+          {/* Social Icons (Mobile Middle / Desktop Right) */}
+          <div className="flex flex-1 order-2 md:order-3 justify-center md:justify-end items-center gap-3 md:gap-4 mt-2 md:mt-0">
             <Link
               href="https://instagram.com/gopimisthanbhandar"
               target="_blank"
@@ -44,19 +56,12 @@ const InstaBookSection: React.FC<InstaBookSectionProps> = ({ instaBooks }) => {
               <FiFacebook className="w-4 h-4 md:w-5 md:h-5" />
             </Link>
             <Link
-              href="https://youtube.com/"
+              href="https://youtube.com/@gopimisthan1968"
               target="_blank"
               className="w-9 h-9 md:w-11 md:h-11 rounded-full border border-white/40 flex items-center justify-center text-white hover:bg-white hover:text-[#FE8E02] transition-all duration-300"
             >
               <FiYoutube className="w-4 h-4 md:w-5 md:h-5" />
             </Link>
-          </div>
-
-          {/* Title Section */}
-          <div className="text-center w-full">
-            <h2 className="text-[28px] md:text-4xl lg:text-5xl text-white font-playfair leading-snug">
-              Follow Us For More <br className="hidden md:block" /> Mithai Stories
-            </h2>
           </div>
         </div>
 

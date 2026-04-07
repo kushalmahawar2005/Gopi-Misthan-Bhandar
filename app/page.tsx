@@ -8,7 +8,7 @@ import Cart from '@/components/Cart';
 import HeroSection from '@/components/HeroSection';
 import Footer from '@/components/Footer';
 import ScrollAnimation from '@/components/ScrollAnimation';
-import { fetchProducts, fetchCategories, fetchInstaBooks, fetchInstaPosts, fetchGallery, fetchGiftBoxes, fetchBlogs } from '@/lib/api';
+import { fetchProducts, fetchCategories, fetchInstaBooks, fetchInstaPosts, fetchGallery, fetchBlogs } from '@/lib/api';
 import { Product, Category, InstagramPost } from '@/types';
 
 // Dynamic Imports for performance
@@ -35,7 +35,6 @@ export default function Home() {
   const [categories, setCategories] = useState<Category[]>([]);
   const [instaBooks, setInstaBooks] = useState<InstagramPost[]>([]);
   const [galleryItems, setGalleryItems] = useState<any[]>([]);
-  const [giftBoxes, setGiftBoxes] = useState<any[]>([]);
   const [blogs, setBlogs] = useState<any[]>([]);
   // loading state is kept for data fetching logic but not used to block UI
   const [loading, setLoading] = useState(true);
@@ -47,7 +46,7 @@ export default function Home() {
   const loadData = async () => {
     try {
       // Optimized: Fetch only what we need, avoid duplicate calls
-      const [featured, categoriesData, classicFlagged, premiumFlagged, allProducts, instaBooksData, galleryData, giftBoxesData, blogsData] = await Promise.all([
+      const [featured, categoriesData, classicFlagged, premiumFlagged, allProducts, instaBooksData, galleryData, blogsData] = await Promise.all([
         fetchProducts({ featured: true, limit: 8 }),
         fetchCategories(),
         fetchProducts({ isClassic: true, limit: 8 }),
@@ -55,7 +54,6 @@ export default function Home() {
         fetchProducts(), // Fetch all products to count by category
         fetchInstaBooks(),
         fetchGallery(),
-        fetchGiftBoxes(),
         fetchBlogs(),
       ]);
 
@@ -70,7 +68,8 @@ export default function Home() {
 
         // Count products that match any of these slugs
         const count = allProducts.filter((product) =>
-          relevantSlugs.includes(product.category)
+          relevantSlugs.includes(product.category) || 
+          (product.subcategory && relevantSlugs.includes(product.subcategory))
         ).length;
 
         return {
@@ -90,14 +89,24 @@ export default function Home() {
       const isSweetCategory = (slug: string | undefined) => !!slug && /sweet/i.test(slug);
 
       // Filter classic products - prefer sweets but show all if no sweets found
-      let classicFiltered = classicFlagged.filter((p) => sweetsSlugs.includes(p.category) || isSweetCategory(p.category));
+      let classicFiltered = classicFlagged.filter((p) => 
+        sweetsSlugs.includes(p.category) || 
+        (p.subcategory && sweetsSlugs.includes(p.subcategory)) ||
+        isSweetCategory(p.category) ||
+        isSweetCategory(p.subcategory)
+      );
       if (classicFiltered.length === 0) {
         // If no sweets found, show all classic products
         classicFiltered = classicFlagged;
       }
 
       // Filter premium products - prefer sweets but show all if no sweets found
-      let premiumFiltered = premiumFlagged.filter((p) => sweetsSlugs.includes(p.category) || isSweetCategory(p.category));
+      let premiumFiltered = premiumFlagged.filter((p) => 
+        sweetsSlugs.includes(p.category) || 
+        (p.subcategory && sweetsSlugs.includes(p.subcategory)) ||
+        isSweetCategory(p.category) ||
+        isSweetCategory(p.subcategory)
+      );
       if (premiumFiltered.length === 0) {
         // If no sweets found, show all premium products
         premiumFiltered = premiumFlagged;
@@ -108,7 +117,6 @@ export default function Home() {
 
       setInstaBooks(instaBooksData);
       setGalleryItems(galleryData);
-      setGiftBoxes(giftBoxesData);
       setBlogs(blogsData);
     } catch (error) {
       console.error('Error loading data:', error);
@@ -175,12 +183,13 @@ export default function Home() {
         </div>
       </ScrollAnimation>
 
-      {/* Gift Box Section - New Split Panel Design */}
+      {/* Repurposed Gift Box Section - Showing Gifting Subcategories */}
       <ScrollAnimation delay={200}>
         <div id="gifting">
           <GiftBoxSection />
         </div>
       </ScrollAnimation>
+
 
       {instaBooks.length > 0 && (
         <ScrollAnimation delay={150}>

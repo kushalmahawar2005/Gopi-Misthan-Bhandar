@@ -144,7 +144,7 @@ function CategoryContent() {
 
     // Subcategory filter
     if (selectedSubCategory !== 'all') {
-      filtered = filtered.filter(product => product.category === selectedSubCategory);
+      filtered = filtered.filter(product => product.category === selectedSubCategory || product.subcategory === selectedSubCategory);
     }
 
     // Search filter - only search in product name
@@ -291,7 +291,7 @@ function CategoryContent() {
                 // Count products for this subcategory
                 // Since 'products' contains all products for the main category + subcategories,
                 // we can just filter the current 'products' state.
-                const count = products.filter(p => p.category === sub.slug).length;
+                const count = products.filter(p => p.category === sub.slug || p.subcategory === sub.slug).length;
 
                 return (
                   <button

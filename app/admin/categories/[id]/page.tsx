@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { FiSave, FiX, FiPlus, FiTrash2 } from 'react-icons/fi';
 import ImageUpload from '@/components/ImageUpload';
+import Image from 'next/image';
 
 interface SubCategory {
   name: string;
@@ -26,6 +27,7 @@ export default function EditCategory() {
   });
   const [subCategories, setSubCategories] = useState<SubCategory[]>([]);
   const [showSubCategoryForm, setShowSubCategoryForm] = useState(false);
+  const [editingIndex, setEditingIndex] = useState<number | null>(null);
   const [currentSubCategory, setCurrentSubCategory] = useState<SubCategory>({
     name: '',
     slug: '',
@@ -74,21 +76,39 @@ export default function EditCategory() {
     });
   };
 
-  const addSubCategory = () => {
+  const saveSubCategory = () => {
     if (!currentSubCategory.name || !currentSubCategory.slug) {
       alert('Subcategory name and slug are required');
       return;
     }
 
-    // Check for duplicate slugs
-    if (subCategories.some((sub) => sub.slug === currentSubCategory.slug)) {
-      alert('Subcategory with this slug already exists');
-      return;
+    if (editingIndex !== null) {
+      // Check for duplicate slugs excluding the one being edited
+      if (subCategories.some((sub, i) => i !== editingIndex && sub.slug === currentSubCategory.slug)) {
+        alert('Subcategory with this slug already exists');
+        return;
+      }
+      const updated = [...subCategories];
+      updated[editingIndex] = { ...currentSubCategory };
+      setSubCategories(updated);
+    } else {
+      // Check for duplicate slugs
+      if (subCategories.some((sub) => sub.slug === currentSubCategory.slug)) {
+        alert('Subcategory with this slug already exists');
+        return;
+      }
+      setSubCategories([...subCategories, { ...currentSubCategory }]);
     }
 
-    setSubCategories([...subCategories, { ...currentSubCategory }]);
     setCurrentSubCategory({ name: '', slug: '', image: '', description: '' });
     setShowSubCategoryForm(false);
+    setEditingIndex(null);
+  };
+
+  const startEditSubCategory = (index: number) => {
+    setEditingIndex(index);
+    setCurrentSubCategory({ ...subCategories[index] });
+    setShowSubCategoryForm(true);
   };
 
   const removeSubCategory = (index: number) => {
@@ -207,17 +227,24 @@ export default function EditCategory() {
             </div>
             <button
               type="button"
-              onClick={() => setShowSubCategoryForm(!showSubCategoryForm)}
+              onClick={() => {
+                setEditingIndex(null);
+                setCurrentSubCategory({ name: '', slug: '', image: '', description: '' });
+                setShowSubCategoryForm(!showSubCategoryForm);
+              }}
               className="flex items-center gap-2 px-4 py-2 bg-primary-red text-white rounded-lg hover:bg-primary-darkRed transition-colors text-sm font-medium"
             >
               <FiPlus size={18} />
-              Add Subcategory
+              {showSubCategoryForm && editingIndex === null ? 'Cancel' : 'Add Subcategory'}
             </button>
           </div>
 
           {/* Subcategory Form */}
           {showSubCategoryForm && (
-            <div className="bg-gray-50 rounded-lg p-4 mb-4 space-y-4">
+            <div className="bg-orange-50/50 border border-orange-100 rounded-lg p-5 mb-6 shadow-sm space-y-4">
+              <h4 className="text-sm font-bold text-[#503223] uppercase tracking-wider">
+                {editingIndex !== null ? 'Edit Subcategory' : 'Add New Subcategory'}
+              </h4>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">Subcategory Name *</label>
                 <input
@@ -256,15 +283,16 @@ export default function EditCategory() {
               <div className="flex gap-2">
                 <button
                   type="button"
-                  onClick={addSubCategory}
-                  className="px-4 py-2 bg-primary-red text-white rounded-lg hover:bg-primary-darkRed transition-colors text-sm font-medium"
+                  onClick={saveSubCategory}
+                  className="px-6 py-2 bg-primary-red text-white rounded-lg hover:bg-primary-darkRed transition-colors text-sm font-bold uppercase tracking-wide"
                 >
-                  Add
+                  {editingIndex !== null ? 'Update' : 'Add'}
                 </button>
                 <button
                   type="button"
                   onClick={() => {
                     setShowSubCategoryForm(false);
+                    setEditingIndex(null);
                     setCurrentSubCategory({ name: '', slug: '', image: '', description: '' });
                   }}
                   className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors text-sm font-medium"
@@ -287,13 +315,30 @@ export default function EditCategory() {
                       <p className="text-sm text-gray-600 mt-1">{subCategory.description}</p>
                     )}
                   </div>
-                  <button
-                    type="button"
-                    onClick={() => removeSubCategory(index)}
-                    className="text-primary-red hover:text-primary-red transition-colors ml-4"
-                  >
-                    <FiTrash2 size={18} />
-                  </button>
+                    <div className="flex items-center gap-3 ml-4">
+                      {subCategory.image && (
+                        <div className="relative w-10 h-10 rounded border border-gray-200 overflow-hidden bg-gray-50">
+                          <Image src={subCategory.image} alt={subCategory.name} fill className="object-cover" />
+                        </div>
+                      )}
+                      <button
+                        type="button"
+                        onClick={() => startEditSubCategory(index)}
+                        className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                        title="Edit Subcategory"
+                      >
+                        <FiPlus className="rotate-45" size={18} /> {/* Using FiPlus as edit for now or just text */}
+                        <span className="text-xs font-bold ml-1">EDIT</span>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => removeSubCategory(index)}
+                        className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                        title="Remove Subcategory"
+                      >
+                        <FiTrash2 size={18} />
+                      </button>
+                    </div>
                 </div>
               ))}
             </div>
