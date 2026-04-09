@@ -229,6 +229,31 @@ export const fetchGallery = async (): Promise<GalleryItem[]> => {
 };
 
 
+export interface GiftBoxItem {
+  _id: string;
+  category: string;
+  title: string;
+  description: string;
+  imageUrl: string;
+  size?: 'small' | 'large';
+  price?: number;
+}
+
+export const fetchGiftBoxes = async (): Promise<GiftBoxItem[]> => {
+  try {
+    const response = await fetch('/api/giftbox');
+    const data = await response.json();
+    
+    if (data.success && data.data) {
+      return data.data;
+    }
+    return [];
+  } catch (error) {
+    console.error('Error fetching gift boxes:', error);
+    return [];
+  }
+};
+
 export interface BlogItem {
   _id: string;
   title: string;
