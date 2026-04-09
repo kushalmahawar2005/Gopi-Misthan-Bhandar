@@ -23,7 +23,7 @@ const branches = [
     address: '304, Tilak Marg Neemuch (M.P)',
     phone: '+91 9425105945',
     rating: 5,
-    imageUrl: '/shop1.jpeg',
+    imageUrl: '/Shop1.jpeg',
     mapUrl: 'https://maps.app.goo.gl/mPwca1HtWDBKUE3j9?g_st=aw'
   },
   {
@@ -74,7 +74,7 @@ const GallerySection: React.FC<GallerySectionProps> = ({ galleryItems, showAll }
         ========================================= */}
         <div className="block md:hidden w-full relative">
           <div className="overflow-hidden w-full">
-            <div 
+            <div
               className="flex transition-transform duration-700 ease-in-out"
               style={{ transform: `translateX(-${currentSlide * 100}%)` }}
             >
@@ -131,16 +131,15 @@ const GallerySection: React.FC<GallerySectionProps> = ({ galleryItems, showAll }
               ))}
             </div>
           </div>
-          
+
           {/* Pagination Dots */}
           <div className="flex justify-center gap-2 mt-10">
             {branches.map((_, idx) => (
               <button
                 key={idx}
                 onClick={() => setCurrentSlide(idx)}
-                className={`h-2 rounded-full transition-all duration-300 ${
-                  currentSlide === idx ? 'w-6 bg-[#FE8E02]' : 'w-2 bg-[#E5DCD3]'
-                }`}
+                className={`h-2 rounded-full transition-all duration-300 ${currentSlide === idx ? 'w-6 bg-[#FE8E02]' : 'w-2 bg-[#E5DCD3]'
+                  }`}
                 aria-label={`Go to slide ${idx + 1}`}
               />
             ))}
