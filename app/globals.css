@@ -248,7 +248,7 @@ section,
 }
 
 .animate-purity-marquee {
-  animation: purityMarquee 30s linear infinite;
+  animation: purityMarquee 12s linear infinite;
 }
 
 .animate-purity-marquee:hover {

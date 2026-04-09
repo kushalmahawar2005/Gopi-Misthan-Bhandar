@@ -24,7 +24,7 @@ const aboutCards = [
     linkText: 'Discover More',
   },
   {
-    image: '/2.png',
+    image: '/1.png',
     alt: 'Gift of Tradition',
     title: 'The Gift of Tradition',
     description:
@@ -61,7 +61,7 @@ const AboutSection: React.FC = () => {
         ========================================= */}
         <div className="block md:hidden w-full relative">
           <div className="overflow-hidden w-full rounded-sm">
-            <div 
+            <div
               className="flex transition-transform duration-700 ease-in-out"
               style={{ transform: `translateX(-${currentSlide * 100}%)` }}
             >
@@ -96,16 +96,15 @@ const AboutSection: React.FC = () => {
               ))}
             </div>
           </div>
-          
+
           {/* Pagination Dots */}
           <div className="flex justify-center gap-2 mt-8">
             {aboutCards.map((_, idx) => (
               <button
                 key={idx}
                 onClick={() => setCurrentSlide(idx)}
-                className={`h-2 rounded-full transition-all duration-300 ${
-                  currentSlide === idx ? 'w-6 bg-[#FE8E02]' : 'w-2 bg-[#E5DCD3]'
-                }`}
+                className={`h-2 rounded-full transition-all duration-300 ${currentSlide === idx ? 'w-6 bg-[#FE8E02]' : 'w-2 bg-[#E5DCD3]'
+                  }`}
                 aria-label={`Go to slide ${idx + 1}`}
               />
             ))}
@@ -150,7 +149,7 @@ const AboutSection: React.FC = () => {
             </div>
           ))}
         </div>
-        
+
       </div>
     </section>
   );
