@@ -52,7 +52,7 @@ export const authOptions: NextAuthOptions = {
                 // However, since Middleware needs role, we ensure it's here.
                 try {
                     await connectDB();
-                    const dbUser = await User.findOne({ email: token.email });
+                    const dbUser = await User.findOne({ email: token.email }) as any;
                     if (dbUser) {
                         token.id = dbUser._id.toString();
                         token.role = dbUser.role;
@@ -79,8 +79,6 @@ export const authOptions: NextAuthOptions = {
         strategy: 'jwt',
     },
     secret: process.env.NEXTAUTH_SECRET,
-    // Production safety: trust the host when the environment specifies it
-    trustHost: true,
 };
 
 // Start-up safety check

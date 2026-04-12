@@ -5,6 +5,8 @@ import { Product } from '@/types';
 
 export interface CartItem extends Product {
   quantity: number;
+  selectedSize?: string;
+  selectedWeight?: string;
 }
 
 interface CartContextType {

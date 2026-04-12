@@ -63,7 +63,8 @@ const Navigation = () => {
       if (searchQuery.trim().length >= 2) {
         setSearchLoading(true);
         try {
-          const results = await fetchProducts({ search: searchQuery, limit: 8 });
+          const resultsResp = await fetchProducts({ search: searchQuery, limit: 8 });
+          const results = Array.isArray(resultsResp) ? resultsResp : resultsResp.products;
           setSearchResults(results);
           setShowDropdown(true);
         } catch (error) {

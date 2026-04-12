@@ -193,7 +193,8 @@ export default function ProductDetailPage() {
           setSelectedSize(defaultSize);
         }
         // Load related products
-        const related = await fetchProducts({ category: productData.category, limit: 4 });
+        const relatedResp = await fetchProducts({ category: productData.category, limit: 4 });
+        const related = Array.isArray(relatedResp) ? relatedResp : relatedResp.products;
         setRelatedProducts(related.filter(p => p.id !== productData.id).slice(0, 4));
       }
     } catch (error) {
