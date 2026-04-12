@@ -22,11 +22,10 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ success: false, error: 'Invalid credentials' }, { status: 401 });
     }
 
-    // Generate token
     const userId = String(user._id);
     const token = signToken({ userId, email: user.email, role: user.role });
 
-    return NextResponse.json({
+    const response = NextResponse.json({
       success: true,
       data: {
         user: {
@@ -38,6 +37,18 @@ export async function POST(request: NextRequest) {
         token,
       },
     });
+
+    // Set cookie for middleware access
+    response.cookies.set('auth_token', token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      path: '/',
+      maxAge: 7 * 24 * 60 * 60, // 7 days
+    });
+
+    return response;
+
   } catch (error: any) {
     return NextResponse.json({ success: false, error: error.message }, { status: 500 });
   }

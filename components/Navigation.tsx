@@ -102,8 +102,8 @@ const Navigation = () => {
 
   // Get category by slug or name from fetched categories
   const getCategoryBySlug = (slug: string, label?: string): Category | undefined => {
-    return categories.find(cat => 
-      cat.slug === slug || 
+    return categories.find(cat =>
+      cat.slug === slug ||
       (label && (
         cat.slug === label.toLowerCase().replace(/\s+/g, '-') ||
         cat.slug === label.toLowerCase().replace(/\s+/g, '-').replace('s$', '') ||
@@ -176,9 +176,10 @@ const Navigation = () => {
     <>
       <nav
         id="main-nav"
-        className={`bg-white w-full border-b border-[#d6cec6] z-[9999] transition-all duration-500 ease-in-out sticky top-0 left-0 right-0 ${isVisible ? 'translate-y-0' : '-translate-y-full'
+        className={`bg-white w-full border-b border-[#d6cec6] z-50 transition-all duration-500 ease-in-out sticky top-0 left-0 right-0 ${isVisible ? 'translate-y-0' : '-translate-y-full'
           } ${isScrolled ? 'py-0 shadow-md' : 'py-0'}`}
       >
+
         {/* Main Content Area */}
         <div className={`max-w-[1700px] mx-auto transition-all duration-500`}>
           {/* Row 1: Header/Main Row */}
@@ -195,20 +196,21 @@ const Navigation = () => {
                 {isMobileMenuOpen ? <FiX className="w-6 h-6" /> : <FiMenu className="w-6 h-6" />}
               </button>
 
-              {/* Desktop: Bulk Enquiry - slides out on scroll */}
-              <button
-                onClick={() => {
-                  const event = new CustomEvent('open-wedding-enquiry');
-                  window.dispatchEvent(event);
-                }}
-                className={`hidden md:flex items-center justify-center gap-2 bg-transparent text-[#503223] hover:text-[#FE8E02] transition-colors duration-300 text-[14px] md:text-[15px] font-medium px-4 py-2 rounded overflow-hidden whitespace-nowrap group ${isScrolled ? 'max-w-0 opacity-0 px-0 -translate-x-4 pointer-events-none' : 'max-w-[200px] opacity-100 translate-x-0'
-                  }`}
-              >
-                <div className="relative w-[18px] h-[18px] md:w-[20px] md:h-[20px] flex-shrink-0 opacity-80 group-hover:opacity-100 transition-opacity">
-                  <Image src="/market.png" alt="Bulk Enquiry" fill className="object-contain" />
-                </div>
-                Bulk Enquiry
-              </button>
+              {/* Desktop: Bulk Enquiry - hidden instantly on scroll */}
+              {!isScrolled && (
+                <button
+                  onClick={() => {
+                    const event = new CustomEvent('open-wedding-enquiry');
+                    window.dispatchEvent(event);
+                  }}
+                  className="hidden md:flex items-center justify-center gap-2 bg-transparent text-[#503223] hover:text-[#FE8E02] transition-colors duration-300 text-[14px] md:text-[15px] font-medium px-4 py-2 rounded overflow-hidden whitespace-nowrap group"
+                >
+                  <div className="relative w-[18px] h-[18px] md:w-[20px] md:h-[20px] flex-shrink-0 opacity-80 group-hover:opacity-100 transition-opacity">
+                    <Image src="/market.png" alt="Bulk Enquiry" fill className="object-contain" />
+                  </div>
+                  Bulk Enquiry
+                </button>
+              )}
             </div>
 
             {/* Logo: Snaps directly from center to left without transition */}
@@ -315,30 +317,28 @@ const Navigation = () => {
               </div>
 
               {/* Icons */}
-              <div className="flex items-center gap-1">
+              <div className="flex items-center gap-2">
                 {isAuthenticated && user?.role === 'admin' && (
-                  <button
-                    onClick={() => router.push('/admin')}
+                  <Link
+                    href="/admin"
                     className="p-1.5 text-[#FE8E02] hover:opacity-70 transition-opacity"
-                    title="Admin Panel"
+                    title="Go to Admin Dashboard"
                   >
                     <FiSettings className="w-5 h-5" />
-                  </button>
+                  </Link>
                 )}
 
-                <button
-                  onClick={() => {
-                    if (isAuthenticated) router.push('/profile');
-                    else router.push('/login');
-                  }}
+                <Link
+                  href={isAuthenticated ? '/profile' : '/login'}
                   className="p-1.5 text-[#FE8E02] hover:opacity-70 transition-opacity"
-                  title={isAuthenticated ? user?.name : 'Login'}
+                  title={isAuthenticated ? `Profile: ${user?.name}` : 'Login / Register'}
                 >
                   <FiUser className="w-5 h-5 md:w-6 md:h-6" />
-                </button>
+                </Link>
 
-                <button
-                  onClick={() => router.push('/wishlist')}
+
+                <Link
+                  href="/wishlist"
                   className="relative p-1.5 text-[#FE8E02] hover:opacity-70 transition-opacity"
                   title="Wishlist"
                 >
@@ -348,7 +348,8 @@ const Navigation = () => {
                       {wishlistCount > 9 ? '9+' : wishlistCount}
                     </span>
                   )}
-                </button>
+                </Link>
+
 
                 <button
                   onClick={openCart}

@@ -45,19 +45,25 @@ export default function Home() {
 
   const loadData = async () => {
     try {
-      // Optimized: Fetch only what we need, avoid duplicate calls
-      const [featured, categoriesData, classicFlagged, premiumFlagged, allProducts, instaBooksData, galleryData, blogsData] = await Promise.all([
+      // Optimized: Fetch only what we need
+      const [featuredRes, categoriesData, classicRes, premiumRes, allRes, instaBooksData, galleryData, blogsData] = await Promise.all([
         fetchProducts({ featured: true, limit: 8 }),
         fetchCategories(),
         fetchProducts({ isClassic: true, limit: 8 }),
         fetchProducts({ isPremium: true, limit: 8 }),
-        fetchProducts(), // Fetch all products to count by category
+        fetchProducts({ limit: 100 }), // Fetch a reasonable number for category counting
         fetchInstaBooks(),
         fetchGallery(),
         fetchBlogs(),
       ]);
 
-      setFeaturedProducts(featured);
+      const featured = 'products' in featuredRes ? featuredRes.products : featuredRes;
+      const classicFlagged = 'products' in classicRes ? classicRes.products : classicRes;
+      const premiumFlagged = 'products' in premiumRes ? premiumRes.products : premiumRes;
+      const allProducts = 'products' in allRes ? allRes.products : allRes;
+
+      setFeaturedProducts(featured as Product[]);
+
 
       // Calculate product counts for each category (including subcategories)
       const categoriesWithCounts = categoriesData.map((category) => {

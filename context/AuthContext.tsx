@@ -196,9 +196,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const logout = () => {
     removeToken();
+    fetch('/api/auth/logout', { method: 'POST' }).catch(console.error);
     nextAuthSignOut({ redirect: false });
     setUser(null);
   };
+
 
   const updateUser = async (userData: Partial<User>) => {
     if (user && user.id) {

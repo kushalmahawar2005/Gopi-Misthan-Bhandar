@@ -17,6 +17,18 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    await connectDB();
+
+    // Check if this payment ID has already been used (idempotency/double payment check)
+    const existingPayment = await Order.findOne({ paymentId });
+    if (existingPayment) {
+      console.warn(`Payment ID ${paymentId} already exists for order ${existingPayment.orderNumber}. Rejecting verification.`);
+      return NextResponse.json(
+        { success: false, error: 'Payment already verified' },
+        { status: 409 }
+      );
+    }
+
     // Verify payment signature
     const verification = await verifyPayment(razorpayOrderId, paymentId, signature);
 
@@ -27,19 +39,8 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Update order status in database
-    await connectDB();
-    const order = await Order.findOneAndUpdate(
-      { orderNumber: orderId },
-      {
-        $set: {
-          paymentStatus: 'paid',
-          paymentId: paymentId,
-          razorpayOrderId: razorpayOrderId,
-        },
-      },
-      { new: true }
-    );
+    // 3. Find the order (the status update will be handled by the Webhook for absolute reliability)
+    const order = await Order.findOne({ orderNumber: orderId });
 
     if (!order) {
       return NextResponse.json(
@@ -48,43 +49,6 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Send order confirmation email
-    if (order.shipping?.email) {
-      sendOrderConfirmationEmail(order.shipping.email, {
-        orderNumber: order.orderNumber,
-        items: order.items.map((item: any) => ({
-          name: item.name,
-          quantity: item.quantity,
-          price: item.price,
-        })),
-        total: order.total,
-        shipping: {
-          name: order.shipping.name,
-          address: order.shipping.street,
-          city: order.shipping.city,
-          state: order.shipping.state,
-          zipCode: order.shipping.zipCode,
-          phone: order.shipping.phone,
-        },
-        paymentMethod: order.paymentMethod,
-        createdAt: order.createdAt instanceof Date ? order.createdAt.toISOString() : String(order.createdAt),
-      }).catch((error) => {
-        console.error('Error sending order confirmation email:', error);
-        // Don't fail payment verification if email fails
-      });
-    }
-
-    // Send order confirmation SMS
-    if (order.shipping?.phone) {
-      sendOrderConfirmationSMS(
-        order.shipping.phone,
-        order.orderNumber,
-        order.total
-      ).catch((error) => {
-        console.error('Error sending order confirmation SMS:', error);
-        // Don't fail payment verification if SMS fails
-      });
-    }
 
     return NextResponse.json({
       success: true,

@@ -11,7 +11,12 @@ interface JWTPayload {
 }
 
 // Secret key (in production, this should be on the backend)
-const SECRET = 'gopi-misthan-bhandar-secret-key-2024';
+const SECRET = process.env.NEXTAUTH_SECRET;
+
+if (!SECRET && process.env.NODE_ENV === 'production') {
+  throw new Error('NEXTAUTH_SECRET is missing! JWT utility cannot sign tokens securely.');
+}
+
 
 // Base64 URL encode
 function base64UrlEncode(str: string): string {

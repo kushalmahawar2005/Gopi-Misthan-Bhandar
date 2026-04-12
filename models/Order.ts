@@ -41,7 +41,7 @@ export interface IOrder extends Document {
   paymentStatus?: 'pending' | 'paid' | 'failed';
   paymentId?: string;
   razorpayOrderId?: string;
-  status: 'pending' | 'processing' | 'shipped' | 'delivered' | 'cancelled';
+  status: 'pending' | 'confirmed' | 'processing' | 'shipped' | 'delivered' | 'cancelled';
   orderNumber: string;
   createdAt: Date;
   updatedAt: Date;
@@ -95,11 +95,11 @@ const OrderSchema = new Schema<IOrder>(
       enum: ['pending', 'paid', 'failed'],
       default: 'pending',
     },
-    paymentId: { type: String },
+    paymentId: { type: String, unique: true, sparse: true },
     razorpayOrderId: { type: String },
     status: {
       type: String,
-      enum: ['pending', 'processing', 'shipped', 'delivered', 'cancelled'],
+      enum: ['pending', 'confirmed', 'processing', 'shipped', 'delivered', 'cancelled'],
       default: 'pending',
     },
     orderNumber: { type: String, required: true, unique: true },

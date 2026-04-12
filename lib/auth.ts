@@ -42,19 +42,31 @@ export const authOptions: NextAuthOptions = {
             }
             return true;
         },
-        async session({ session, token }: any) {
-            // Add user ID and role to session
-            if (session.user) {
+        async jwt({ token, user }: any) {
+            if (user) {
+                token.id = user.id;
+                token.role = user.role || 'user';
+            } else if (!token.role) {
+                // If token exists but no role (e.g. after initial login), 
+                // we might want a one-time DB check or just rely on initial login.
+                // However, since Middleware needs role, we ensure it's here.
                 try {
                     await connectDB();
-                    const dbUser = await User.findOne({ email: session.user.email });
+                    const dbUser = await User.findOne({ email: token.email });
                     if (dbUser) {
-                        session.user.id = (dbUser as any)._id.toString();
-                        session.user.role = (dbUser as any).role;
+                        token.id = dbUser._id.toString();
+                        token.role = dbUser.role;
                     }
                 } catch (error) {
-                    console.error('Error fetching user for session:', error);
+                    console.error('Error in jwt callback:', error);
                 }
+            }
+            return token;
+        },
+        async session({ session, token }: any) {
+            if (session.user) {
+                session.user.id = token.id;
+                session.user.role = token.role;
             }
             return session;
         },
@@ -66,5 +78,13 @@ export const authOptions: NextAuthOptions = {
     session: {
         strategy: 'jwt',
     },
-    secret: process.env.NEXTAUTH_SECRET || 'gopi-misthan-bhandar-secret-key-2024',
+    secret: process.env.NEXTAUTH_SECRET,
+    // Production safety: trust the host when the environment specifies it
+    trustHost: true,
 };
+
+// Start-up safety check
+if (!process.env.NEXTAUTH_SECRET && process.env.NODE_ENV === 'production') {
+    throw new Error('NEXTAUTH_SECRET is missing! High security risk in production.');
+}
+
