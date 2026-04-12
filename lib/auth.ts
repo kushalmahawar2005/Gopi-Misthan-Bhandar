@@ -81,8 +81,5 @@ export const authOptions: NextAuthOptions = {
     secret: process.env.NEXTAUTH_SECRET,
 };
 
-// Start-up safety check
-if (!process.env.NEXTAUTH_SECRET && process.env.NODE_ENV === 'production') {
-    throw new Error('NEXTAUTH_SECRET is missing! High security risk in production.');
-}
+
 
