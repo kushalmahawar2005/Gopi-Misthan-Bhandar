@@ -125,14 +125,94 @@ export async function POST(req: Request) {
           createdAt: order.createdAt instanceof Date ? order.createdAt.toISOString() : String(order.createdAt)
         };
 
-        // 5. Trigger Email and SMS
-        // We run these concurrently and await them to ensure they complete before Serverless environments freeze execution
-        await Promise.allSettled([
-          sendOrderConfirmationEmail(order.shipping.email, orderDataForEmail),
-          sendOrderConfirmationSMS(order.shipping.phone, order.orderNumber, order.total),
-        ]);
+        // 5. Trigger Shipment Creation (NimbusPost)
+        try {
+          // Get site URL for tracking link
+          const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
+          
+          // Calculate weight
+          let totalWeight = 0;
+          order.items.forEach((item: any) => {
+             const w = item.weight || '0.5kg';
+             const value = parseFloat(w);
+             if (w.toLowerCase().includes('g')) {
+               totalWeight += (value / 1000) * item.quantity;
+             } else {
+               totalWeight += value * item.quantity;
+             }
+          });
+          if (totalWeight === 0) totalWeight = 0.5;
 
-        console.log(`Notifications sent and tasks completed for order ${order.orderNumber}.`);
+          const { createShipment } = await import('@/lib/nimbuspost');
+          const shipmentResult = await createShipment({
+            order_id: order.orderNumber,
+            consignee: {
+              name: order.shipping.name,
+              address: order.shipping.street,
+              city: order.shipping.city,
+              state: order.shipping.state,
+              pincode: order.shipping.zipCode,
+              phone: order.shipping.phone,
+              email: order.shipping.email,
+            },
+            pickup: {
+              name: process.env.SENDER_NAME || 'Gopi Misthan Bhandar',
+              address: process.env.SENDER_ADDRESS || '',
+              city: process.env.SENDER_CITY || '',
+              state: process.env.SENDER_STATE || '',
+              pincode: process.env.SENDER_PINCODE || '',
+              phone: process.env.SENDER_PHONE || '',
+            },
+            order_items: order.items.map((item: any) => ({
+              name: item.name,
+              qty: item.quantity,
+              price: item.price,
+            })),
+            payment_method: 'prepaid',
+            total_amount: order.total,
+            weight: totalWeight,
+            length: 10,
+            breadth: 10,
+            height: 10,
+          });
+
+          if (shipmentResult.status && shipmentResult.data) {
+            const awb = shipmentResult.data.awb_number;
+            const courier = shipmentResult.data.courier_name || order.selectedCourier || 'Courier';
+            const trackingUrl = `${siteUrl}/orders?awb=${awb}`; // Custom track page or Nimbus track
+
+            order.awbNumber = awb;
+            order.courierName = courier;
+            order.status = 'shipped';
+            order.shipmentStatus = 'shipped';
+            order.trackingUrl = trackingUrl;
+            await order.save();
+
+            const { sendShipmentEmail } = await import('@/lib/email');
+            const { sendShipmentSMS } = await import('@/lib/sms');
+
+            await Promise.allSettled([
+              sendShipmentEmail(order.shipping.email, orderDataForEmail as any, awb, courier, trackingUrl),
+              sendShipmentSMS(order.shipping.phone, order.orderNumber, awb, trackingUrl),
+            ]);
+            
+            console.log(`Shipment created and notifications sent for order ${order.orderNumber}. AWB: ${awb}`);
+          } else {
+            console.error('Auto shipment creation failed for order', order.orderNumber, shipmentResult.message);
+            // Even if shipment fails, we still send confirmation email
+            await Promise.allSettled([
+              sendOrderConfirmationEmail(order.shipping.email, orderDataForEmail as any),
+              sendOrderConfirmationSMS(order.shipping.phone, order.orderNumber, order.total),
+            ]);
+          }
+        } catch (shipmentError: any) {
+          console.error('Error in auto shipment flow:', shipmentError);
+          // Fallback to regular confirmation if shipment fails
+          await Promise.allSettled([
+            sendOrderConfirmationEmail(order.shipping.email, orderDataForEmail as any),
+            sendOrderConfirmationSMS(order.shipping.phone, order.orderNumber, order.total),
+          ]);
+        }
       } 
       // Handle failed payment
       else if (event.event === 'payment.failed') {

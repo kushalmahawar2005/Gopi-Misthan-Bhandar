@@ -15,17 +15,74 @@ interface Order {
   paymentMethod: string;
   paymentStatus: string;
   createdAt: string;
+  awbNumber?: string;
+  courierName?: string;
+  shipmentStatus?: string;
+  trackingUrl?: string;
 }
 
+import { FiTruck, FiRefreshCw, FiCopy, FiX } from 'react-icons/fi';
 
 export default function AdminOrders() {
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
   const [statusFilter, setStatusFilter] = useState('all');
+  const [isProcessing, setIsProcessing] = useState<string | null>(null);
+  
+  // Tracking Modal State
+  const [showTrackModal, setShowTrackModal] = useState(false);
+  const [trackingInfo, setTrackingInfo] = useState<any>(null);
+  const [loadingTracking, setLoadingTracking] = useState(false);
 
   const [autoPrintEnabled, setAutoPrintEnabled] = useState(false);
   const [lastCheckTime, setLastCheckTime] = useState(Date.now());
   const audioRef = React.useRef<HTMLAudioElement | null>(null);
+
+  const handleCreateShipment = async (orderId: string) => {
+    if (!confirm('Are you sure you want to create a shipment for this order?')) return;
+    setIsProcessing(orderId);
+    try {
+      const resp = await fetch('/api/delivery/create-shipment', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ orderId })
+      });
+      const data = await resp.json();
+      if (data.success) {
+        alert(`Shipment created! AWB: ${data.awb}`);
+        fetchOrders();
+      } else {
+        alert(`Error: ${data.message}`);
+      }
+    } catch (e) {
+      console.error(e);
+      alert('Failed to connect to shipping API');
+    } finally {
+      setIsProcessing(null);
+    }
+  };
+
+  const handleTrackOrder = async (awb: string) => {
+    setLoadingTracking(true);
+    setShowTrackModal(true);
+    setTrackingInfo(null);
+    try {
+      const resp = await fetch(`/api/delivery/track?awb=${awb}`);
+      const data = await resp.json();
+      if (data.success) {
+        setTrackingInfo(data.data);
+      } else {
+        alert(data.message);
+        setShowTrackModal(false);
+      }
+    } catch (e) {
+      console.error(e);
+      alert('Failed to fetch tracking info');
+      setShowTrackModal(false);
+    } finally {
+      setLoadingTracking(false);
+    }
+  };
 
   useEffect(() => {
     // Initialize audio
@@ -205,8 +262,8 @@ export default function AdminOrders() {
                 <th className="px-4 lg:px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider hidden lg:table-cell">
                   Payment
                 </th>
-                <th className="px-4 lg:px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider hidden lg:table-cell">
-                  Date
+                <th className="px-4 lg:px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                  Shipping Info
                 </th>
                 <th className="px-4 lg:px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
                   Actions
@@ -282,8 +339,31 @@ export default function AdminOrders() {
                       </span>
                     </td>
 
-                    <td className="px-4 lg:px-6 py-4 whitespace-nowrap text-sm text-gray-600 hidden lg:table-cell">
-                      {new Date(order.createdAt).toLocaleDateString()}
+                    <td className="px-4 lg:px-6 py-4 whitespace-nowrap">
+                      {order.awbNumber ? (
+                        <div className="space-y-1">
+                          <div className="flex items-center gap-1">
+                            <span className="text-xs font-bold text-primary-brown">{order.awbNumber}</span>
+                            <button onClick={() => navigator.clipboard.writeText(order.awbNumber!)} className="text-gray-400 hover:text-primary-red"><FiCopy size={12} /></button>
+                          </div>
+                          <div className="text-[10px] text-gray-500 uppercase">{order.courierName}</div>
+                          <button 
+                            onClick={() => handleTrackOrder(order.awbNumber!)} 
+                            className="text-[10px] text-primary-red font-bold hover:underline flex items-center gap-1"
+                          >
+                            <FiTruck size={10} /> Track
+                          </button>
+                        </div>
+                      ) : (
+                        <button 
+                          onClick={() => handleCreateShipment(order._id)}
+                          disabled={isProcessing === order._id || order.paymentStatus !== 'paid'}
+                          className="flex items-center gap-1 px-3 py-1 bg-primary-red text-white text-[10px] font-bold rounded hover:bg-red-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-all"
+                        >
+                          {isProcessing === order._id ? <FiRefreshCw className="animate-spin" /> : <FiTruck />}
+                          Create Shipment
+                        </button>
+                      )}
                     </td>
                     <td className="px-4 lg:px-6 py-4 whitespace-nowrap">
                       <Link
@@ -440,6 +520,65 @@ export default function AdminOrders() {
           </div>
         )
       }
+      {/* Tracking Modal */}
+      {showTrackModal && (
+        <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+          <div className="bg-white rounded-2xl w-full max-w-md overflow-hidden shadow-2xl">
+            <div className="p-6 border-b flex items-center justify-between">
+              <h3 className="text-xl font-bold text-primary-brown">Shipment Tracking</h3>
+              <button onClick={() => setShowTrackModal(false)} className="text-gray-400 hover:text-gray-600"><FiX size={24} /></button>
+            </div>
+            <div className="p-6 max-h-[70vh] overflow-y-auto">
+              {loadingTracking ? (
+                <div className="flex flex-col items-center justify-center py-12">
+                   <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-primary-red mb-4"></div>
+                   <p className="text-gray-500 font-medium">Fetching live status...</p>
+                </div>
+              ) : trackingInfo ? (
+                <div className="space-y-6">
+                  {/* Current Status */}
+                  <div className="flex items-center gap-4 p-4 bg-green-50 rounded-xl border border-green-100">
+                    <div className="w-12 h-12 rounded-full bg-green-500 flex items-center justify-center text-white">
+                      <FiTruck size={24} />
+                    </div>
+                    <div>
+                      <p className="text-xs font-bold text-green-600 uppercase">Current Status</p>
+                      <h4 className="text-lg font-black text-green-900">{trackingInfo.currentStatus}</h4>
+                      {trackingInfo.estimatedDelivery && <p className="text-xs text-green-700">Estimated Delivery: {trackingInfo.estimatedDelivery}</p>}
+                    </div>
+                  </div>
+
+                  {/* Timeline */}
+                  <div className="space-y-4">
+                     <h5 className="text-sm font-bold text-gray-700 uppercase tracking-widest">Tracking Timeline</h5>
+                     <div className="relative pl-6 space-y-6">
+                        {/* Vertical Line */}
+                        <div className="absolute left-[7px] top-2 bottom-2 w-0.5 bg-gray-200"></div>
+                        
+                        {trackingInfo.timeline.map((event: any, i: number) => (
+                           <div key={i} className="relative">
+                              {/* Dot */}
+                              <div className={`absolute -left-[23px] top-1.5 w-3 h-3 rounded-full border-2 bg-white ${i === 0 ? 'border-primary-red' : 'border-gray-300'}`}></div>
+                              <div>
+                                 <p className={`text-sm font-bold ${i === 0 ? 'text-primary-brown' : 'text-gray-600'}`}>{event.status}</p>
+                                 <p className="text-xs text-gray-500">{event.location}</p>
+                                 <p className="text-[10px] text-gray-400 mt-0.5">{event.timestamp}</p>
+                              </div>
+                           </div>
+                        ))}
+                     </div>
+                  </div>
+                </div>
+              ) : (
+                <p className="text-center text-gray-500">Tracking information not available.</p>
+              )}
+            </div>
+            <div className="p-6 bg-gray-50 border-t">
+              <button onClick={() => setShowTrackModal(false)} className="w-full py-3 bg-gray-900 text-white font-bold rounded-xl hover:bg-black transition-all">Close</button>
+            </div>
+          </div>
+        </div>
+      )}
     </div >
   );
 }

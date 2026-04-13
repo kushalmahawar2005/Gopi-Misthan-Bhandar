@@ -60,9 +60,11 @@ export default function CheckoutPage() {
     isServiceable: boolean;
     deliveryCharge: number;
     estimatedDays: number;
-    zone: string;
+    couriers?: any[];
     message?: string;
   } | null>(null);
+  const [availableCouriers, setAvailableCouriers] = useState<any[]>([]);
+  const [selectedCourier, setSelectedCourier] = useState<any>(null);
   const [checkingDelivery, setCheckingDelivery] = useState(false);
 
   useEffect(() => {
@@ -89,14 +91,47 @@ export default function CheckoutPage() {
     if (!formData.pincode || formData.pincode.length !== 6) return;
     setCheckingDelivery(true);
     try {
-      const resp = await fetch(`/api/delivery/check?pincode=${formData.pincode}&amount=${getTotalPrice()}`);
-      const data = await resp.json();
-      if (data.success) {
-        setDeliveryInfo(data.data);
-        if (!data.data.isServiceable) setErrors(p => ({ ...p, pincode: 'Delivery not available' }));
-        else setErrors(p => { const { pincode, ...rest } = p; return rest; });
+      // Calculate total weight for the cart
+      let totalWeight = 0;
+      cartItems.forEach(item => {
+        const w = item.selectedSize || item.defaultWeight || '0.5kg';
+        const value = parseFloat(w);
+        if (w.toLowerCase().includes('g')) {
+          totalWeight += (value / 1000) * item.quantity;
+        } else {
+          totalWeight += value * item.quantity;
+        }
+      });
+      if (totalWeight === 0) totalWeight = 0.5;
+
+      const resp = await fetch('/api/delivery/check-pincode', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          pincode: formData.pincode, 
+          weight: totalWeight, 
+          orderAmount: getTotalPrice() 
+        })
+      });
+      
+      const result = await resp.json();
+      if (result.success) {
+        setDeliveryInfo(result.data);
+        if (result.data.isServiceable) {
+          setAvailableCouriers(result.data.couriers);
+          setSelectedCourier(result.data.cheapestOption);
+          setErrors(p => { const { pincode, ...rest } = p; return rest; });
+        } else {
+          setAvailableCouriers([]);
+          setSelectedCourier(null);
+          setErrors(p => ({ ...p, pincode: 'Delivery not available at this pincode' }));
+        }
       }
-    } catch (e) { console.error(e); } finally { setCheckingDelivery(false); }
+    } catch (e) { 
+      console.error(e); 
+    } finally { 
+      setCheckingDelivery(false); 
+    }
   };
 
   const validateStep = (step: number) => {
@@ -130,18 +165,51 @@ export default function CheckoutPage() {
       const orderItems = cartItems.map(i => ({ productId: i.id, name: i.name, price: i.price, quantity: i.quantity, image: i.image, weight: i.selectedSize || i.defaultWeight || '' }));
       const shippingAddress = { name: `${formData.firstName} ${formData.lastName}`, email: formData.email, phone: formData.phone, street: formData.address, city: formData.city, state: formData.state, zipCode: formData.pincode };
       
-      const orderResp = await fetch('/api/orders', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ items: orderItems, shipping: shippingAddress, billing: sameAsShipping ? shippingAddress : { name: `${billingData.firstName} ${billingData.lastName}`, street: billingData.address, city: billingData.city, state: billingData.state, zipCode: billingData.pincode }, shippingCost: deliveryInfo?.deliveryCharge || 0, subtotal: getTotalPrice(), total: getTotalPrice() + (deliveryInfo?.deliveryCharge || 0), paymentMethod, paymentStatus: 'pending' }) });
+      const orderResp = await fetch('/api/orders', { 
+        method: 'POST', 
+        headers: { 'Content-Type': 'application/json' }, 
+        body: JSON.stringify({ 
+          items: orderItems, 
+          shipping: shippingAddress, 
+          billing: sameAsShipping ? shippingAddress : { name: `${billingData.firstName} ${billingData.lastName}`, street: billingData.address, city: billingData.city, state: billingData.state, zipCode: billingData.pincode }, 
+          shippingCost: selectedCourier?.charge || 0, 
+          subtotal: getTotalPrice(), 
+          total: getTotalPrice() + (selectedCourier?.charge || 0), 
+          paymentMethod, 
+          paymentStatus: 'pending',
+          selectedCourier: selectedCourier?.name,
+          deliveryCharge: selectedCourier?.charge
+        }) 
+      });
       const orderResult = await orderResp.json();
       if (!orderResult.success) throw new Error(orderResult.error);
 
       if (!razorpayLoaded || !window.Razorpay) throw new Error('Gateway loading...');
-      const payResp = await fetch('/api/payment/create-order', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ cartItems: orderItems, deliveryPincode: formData.pincode, orderId: orderResult.data.orderNumber }) });
+      const payResp = await fetch('/api/payment/create-order', { 
+        method: 'POST', 
+        headers: { 'Content-Type': 'application/json' }, 
+        body: JSON.stringify({ 
+          cartItems: orderItems, 
+          deliveryPincode: formData.pincode, 
+          orderId: orderResult.data.orderNumber,
+          courierCharge: selectedCourier?.charge
+        }) 
+      });
       const payData = await payResp.json();
       
-      const rzp = new window.Razorpay({ key: payData.keyId, amount: Math.round((getTotalPrice() + (deliveryInfo?.deliveryCharge || 0)) * 100), currency: 'INR', name: 'Gopi Misthan Bhandar', order_id: payData.orderId, handler: async (r: any) => {
-        const v = await fetch('/api/payment/verify', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ orderId: orderResult.data.orderNumber, paymentId: r.razorpay_payment_id, signature: r.razorpay_signature, razorpayOrderId: r.razorpay_order_id }) });
-        if ((await v.json()).success) { clearCart(); router.push(`/checkout/success?orderId=${orderResult.data.orderNumber}`); }
-      }, prefill: { name: shippingAddress.name, email: shippingAddress.email, contact: shippingAddress.phone }, theme: { color: '#ba0606' } });
+      const rzp = new window.Razorpay({ 
+        key: payData.keyId, 
+        amount: Math.round((getTotalPrice() + (selectedCourier?.charge || 0)) * 100), 
+        currency: 'INR', 
+        name: 'Gopi Misthan Bhandar', 
+        order_id: payData.orderId, 
+        handler: async (r: any) => {
+          const v = await fetch('/api/payment/verify', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ orderId: orderResult.data.orderNumber, paymentId: r.razorpay_payment_id, signature: r.razorpay_signature, razorpayOrderId: r.razorpay_order_id }) });
+          if ((await v.json()).success) { clearCart(); router.push(`/checkout/success?orderId=${orderResult.data.orderNumber}`); }
+        }, 
+        prefill: { name: shippingAddress.name, email: shippingAddress.email, contact: shippingAddress.phone }, 
+        theme: { color: '#ba0606' } 
+      });
       rzp.open();
     } catch (e: any) { alert(e.message); setIsPlacingOrder(false); }
   };
@@ -186,11 +254,62 @@ export default function CheckoutPage() {
                 <input placeholder="Phone" value={formData.phone} onChange={e => setFormData({...formData, phone: e.target.value})} className="col-span-2 p-3 bg-gray-50 rounded-xl border border-gray-100" />
                 <input placeholder="Email" value={formData.email} onChange={e => setFormData({...formData, email: e.target.value})} className="col-span-2 p-3 bg-gray-50 rounded-xl border border-gray-100" />
                 <textarea placeholder="Full Address" value={formData.address} onChange={e => setFormData({...formData, address: e.target.value})} rows={3} className="col-span-2 p-3 bg-gray-50 rounded-xl border border-gray-100" />
-                <input placeholder="Pincode" value={formData.pincode} onChange={e => setFormData({...formData, pincode: e.target.value})} className="col-span-1 p-3 bg-gray-50 rounded-xl border border-gray-100" />
-                <input placeholder="City" value={formData.city} onChange={e => setFormData({...formData, city: e.target.value})} className="col-span-1 p-3 bg-gray-50 rounded-xl border border-gray-100" />
-                <input placeholder="State" value={formData.state} onChange={e => setFormData({...formData, state: e.target.value})} className="col-span-2 p-3 bg-gray-50 rounded-xl border border-gray-100" />
+                <input placeholder="Pincode" value={formData.pincode} onChange={e => setFormData({...formData, pincode: e.target.value})} className="col-span-1 p-3 bg-gray-50 rounded-xl border border-gray-100 placeholder:text-gray-400" />
+                <input placeholder="City" value={formData.city} onChange={e => setFormData({...formData, city: e.target.value})} className="col-span-1 p-3 bg-gray-50 rounded-xl border border-gray-100 placeholder:text-gray-400" />
+                <input placeholder="State" value={formData.state} onChange={e => setFormData({...formData, state: e.target.value})} className="col-span-2 p-3 bg-gray-50 rounded-xl border border-gray-100 placeholder:text-gray-400" />
              </div>
-             {deliveryInfo && <div className={`mt-4 p-4 rounded-xl border ${deliveryInfo.isServiceable ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-700'}`}>{deliveryInfo.message}</div>}
+
+             {checkingDelivery && (
+               <div className="mt-4 flex items-center justify-center p-4 bg-gray-50 rounded-xl border border-dashed border-gray-200">
+                 <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-primary-red mr-3"></div>
+                 <span className="text-sm font-medium text-gray-500">Checking serviceability...</span>
+               </div>
+             )}
+
+             {deliveryInfo && !checkingDelivery && (
+               <div className="mt-6 space-y-4">
+                 {!deliveryInfo.isServiceable ? (
+                   <div className="p-4 rounded-xl bg-red-50 border border-red-100 text-primary-red flex items-center gap-3">
+                     <div className="w-2 h-2 rounded-full bg-primary-red animate-pulse"></div>
+                     <span className="text-sm font-bold">Delivery not available at this pincode</span>
+                   </div>
+                 ) : (
+                   <div className="space-y-3">
+                     <h3 className="text-sm font-bold text-gray-700 flex items-center gap-2">
+                       <FiTruck className="text-primary-red" /> Select Delivery Option:
+                     </h3>
+                     <div className="grid grid-cols-1 gap-3">
+                       {availableCouriers.map((courier: any, idx: number) => (
+                         <div 
+                           key={courier.name + idx}
+                           onClick={() => setSelectedCourier(courier)}
+                           className={`p-4 rounded-xl border-2 transition-all cursor-pointer flex items-center justify-between ${
+                             selectedCourier?.name === courier.name 
+                               ? 'border-primary-red bg-red-50/30' 
+                                : 'border-gray-100 hover:border-gray-200 bg-white'
+                           }`}
+                         >
+                           <div className="flex items-center gap-3">
+                             <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
+                               selectedCourier?.name === courier.name ? 'border-primary-red bg-primary-red' : 'border-gray-300'
+                             }`}>
+                               {selectedCourier?.name === courier.name && <FiCheck className="text-white w-3 h-3" />}
+                             </div>
+                             <div>
+                               <p className="text-sm font-bold text-gray-900">{courier.name}</p>
+                               <p className="text-xs text-gray-500">Estimated delivery: {courier.estimatedDays} days</p>
+                             </div>
+                           </div>
+                           <div className="text-right">
+                             <p className="text-sm font-black text-primary-red">₹{courier.charge}</p>
+                           </div>
+                         </div>
+                       ))}
+                     </div>
+                   </div>
+                 )}
+               </div>
+             )}
           </div>
 
           {/* Billing Form */}
@@ -231,12 +350,12 @@ export default function CheckoutPage() {
              ))}
              <div className="pt-6 border-t border-gray-100 space-y-3">
                <div className="flex justify-between text-sm"><span>Subtotal</span><span className="font-bold">₹{getTotalPrice().toLocaleString()}</span></div>
-               <div className="flex justify-between text-sm"><span>Shipping</span><span className="font-bold">₹{deliveryInfo?.deliveryCharge || 0}</span></div>
-               <div className="flex justify-between text-lg font-bold border-t pt-3"><span>Total</span><span className="text-primary-red">₹{(getTotalPrice()+(deliveryInfo?.deliveryCharge || 0)).toLocaleString()}</span></div>
+               <div className="flex justify-between text-sm"><span>Shipping</span><span className="font-bold">₹{(selectedCourier?.charge || 0).toLocaleString()}</span></div>
+               <div className="flex justify-between text-lg font-bold border-t pt-3"><span>Total</span><span className="text-primary-red">₹{(getTotalPrice() + (selectedCourier?.charge || 0)).toLocaleString()}</span></div>
              </div>
              
              {/* Desktop Action Button */}
-             <button onClick={handlePlaceOrder} disabled={isPlacingOrder} className="hidden lg:block w-full mt-8 bg-gray-900 text-white py-4 rounded-2xl font-bold hover:bg-black transition-all">
+             <button onClick={handlePlaceOrder} disabled={isPlacingOrder || !selectedCourier} className="hidden lg:block w-full mt-8 bg-gray-900 text-white py-4 rounded-2xl font-bold hover:bg-black transition-all disabled:opacity-50 disabled:cursor-not-allowed">
                {isPlacingOrder ? 'Processing...' : 'Place Order & Pay Now'}
              </button>
            </div>
@@ -249,8 +368,8 @@ export default function CheckoutPage() {
             {currentStep < 3 ? (
               <button onClick={() => validateStep(currentStep) && setCurrentStep(currentStep+1)} className="w-full bg-gray-900 text-white py-4 rounded-xl font-bold flex items-center justify-center gap-2">Next <FiChevronRight /></button>
             ) : (
-              <button onClick={handlePlaceOrder} disabled={isPlacingOrder} className="w-full bg-[#FE8E02] text-white py-4 rounded-xl font-bold">
-                {isPlacingOrder ? 'Processing...' : `Pay ₹${(getTotalPrice()+(deliveryInfo?.deliveryCharge||0)).toLocaleString()}`}
+              <button onClick={handlePlaceOrder} disabled={isPlacingOrder || !selectedCourier} className="w-full bg-[#FE8E02] text-white py-4 rounded-xl font-bold disabled:opacity-50 disabled:cursor-not-allowed">
+                {isPlacingOrder ? 'Processing...' : `Pay ₹${(getTotalPrice()+(selectedCourier?.charge||0)).toLocaleString()}`}
               </button>
             )}
          </div>

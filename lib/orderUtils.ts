@@ -24,7 +24,8 @@ export interface CalculationResult {
 export const calculateOrderAmount = async (
   cartItems: CartItem[],
   couponCode?: string,
-  deliveryPincode?: string
+  deliveryPincode?: string,
+  courierCharge?: number
 ): Promise<CalculationResult> => {
   try {
     let subtotal = 0;
@@ -89,12 +90,14 @@ export const calculateOrderAmount = async (
     }
 
     // 3. Calculate delivery charge
-    let deliveryCharge = 0;
-    if (deliveryPincode) {
+    let deliveryCharge = courierCharge || 0;
+    
+    // If no courierCharge but pincode is provided, we can't accurately calculate anymore
+    // using the old method if we want to stick to NimbusPost.
+    // However, some old flows might still use this.
+    if (courierCharge === undefined && deliveryPincode) {
+      const { checkPincodeServiceability } = await import('@/lib/delivery');
       const deliveryInfo = checkPincodeServiceability(deliveryPincode, subtotal);
-      if (!deliveryInfo.isServiceable) {
-        return { success: false, finalAmount: 0, breakdown: { subtotal: 0, discount: 0, deliveryCharge: 0 }, error: `Pincode ${deliveryPincode} is not serviceable` };
-      }
       deliveryCharge = deliveryInfo.deliveryCharge;
     }
 

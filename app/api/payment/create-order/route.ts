@@ -7,7 +7,7 @@ import { calculateOrderAmount } from '@/lib/orderUtils';
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { cartItems, couponCode, deliveryPincode, userId, orderId: existingOrderId } = body;
+    const { cartItems, couponCode, deliveryPincode, courierCharge, userId, orderId: existingOrderId } = body;
 
     if (!cartItems || !Array.isArray(cartItems) || cartItems.length === 0) {
       return NextResponse.json(
@@ -19,7 +19,7 @@ export async function POST(request: NextRequest) {
     await connectDB();
 
     // 1. Calculate and validate order amount on server side
-    const calculation = await calculateOrderAmount(cartItems, couponCode, deliveryPincode);
+    const calculation = await calculateOrderAmount(cartItems, couponCode, deliveryPincode, courierCharge);
 
     if (!calculation.success) {
       return NextResponse.json(
