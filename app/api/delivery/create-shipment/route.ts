@@ -58,6 +58,7 @@ export async function POST(req: NextRequest) {
         state: process.env.SENDER_STATE || '',
         pincode: process.env.SENDER_PINCODE || '',
         phone: process.env.SENDER_PHONE || '',
+        email: process.env.SENDER_EMAIL || '',
       },
       order_items: order.items.map((item: any) => ({
         name: item.name,
@@ -72,37 +73,24 @@ export async function POST(req: NextRequest) {
       height: 10,
     };
 
-    try {
-      const result = await createShipment(shipmentParams);
+    const result = await createShipment(shipmentParams);
 
-      if (result.status && result.data) {
-        const awb = result.data.awb_number;
-        const courier = result.data.courier_name || order.selectedCourier || 'Courier';
-        
-        order.awbNumber = awb;
-        order.courierName = courier;
-        order.status = 'shipped';
-        order.shipmentStatus = 'shipped';
-        order.trackingUrl = `https://nimbuspost.com/track?awb=${awb}`;
-        
-        await order.save();
-
-        return NextResponse.json({ success: true, awb: awb });
-      } else {
-        throw new Error(result.message || 'Shipment creation failed');
-      }
-    } catch (e) {
-      // MOCK SHIPMENT FOR TESTING
-      // REMOVE THIS IN PRODUCTION
-      console.warn('Using mock shipment for testing:', e);
-      const mockAwb = `TEST-AWB-${Date.now()}`;
-      order.awbNumber = mockAwb;
-      order.courierName = order.selectedCourier || 'Standard (Test)';
-      order.status = 'processing';
-      order.shipmentStatus = 'pending'; // Mock value must be in the allowed enum
-      order.trackingUrl = '#';
+    if (result.status && result.data) {
+      const awb = result.data.awb_number;
+      const courier = result.data.courier_name || order.selectedCourier || 'Courier';
+      
+      order.awbNumber = awb;
+      order.courierName = courier;
+      order.status = 'shipped';
+      order.shipmentStatus = 'shipped';
+      order.trackingUrl = `https://nimbuspost.com/track?awb=${awb}`;
+      
       await order.save();
-      return NextResponse.json({ success: true, awb: mockAwb });
+
+      return NextResponse.json({ success: true, awb: awb });
+    } else {
+      console.error('NimbusPost Shipment Creation Failed:', result);
+      return NextResponse.json({ success: false, message: result.message || 'Shipment creation failed' }, { status: 400 });
     }
 
   } catch (error: any) {

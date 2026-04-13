@@ -19,41 +19,44 @@ export async function POST(req: NextRequest) {
       payment_method: 'prepaid', // COD disabled as per request
     });
 
-    // MOCK RESPONSE FOR TESTING OVERRIDE
-    // REMOVE THIS IN PRODUCTION
-    if (result.status === false || !result.data || result.data.length === 0) {
-      return NextResponse.json({
-        success: true,
-        data: {
-          isServiceable: true,
-          isCOD: false,
-          couriers: [
-            { name: 'Standard (Test)', charge: 80, estimatedDays: 5, id: 'test_courier' }
-          ],
-          cheapestOption: { name: 'Standard (Test)', charge: 80, estimatedDays: 5, id: 'test_courier' },
-        }
-      });
-    }
-
     if (result.status && result.data && result.data.length > 0) {
-      const couriers = result.data.map((c: any) => ({
-        name: c.name,
-        charge: c.total_amount,
-        estimatedDays: parseInt(c.expected_delivery_days) || 5,
-        id: c.id
-      }));
+      const couriers = result.data.map((c: any) => {
+        // Calculate estimated days from edd (format: "19-04-2026")
+        let days = 5;
+        if (c.edd) {
+          try {
+            const [d, m, y] = c.edd.split('-').map(Number);
+            const eddDate = new Date(y, m - 1, d);
+            const diffTime = eddDate.getTime() - new Date().getTime();
+            days = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+          } catch (e) {
+            days = 5;
+          }
+        }
+
+        return {
+          name: c.name,
+          charge: c.total_charges || c.freight_charges || 0,
+          estimatedDays: days > 0 ? days : 5,
+          id: c.id
+        };
+      });
 
       // Sort by charge to find cheapest
-      const sorted = [...couriers].sort((a, b) => a.charge - b.charge);
-      const cheapestOption = sorted[0];
+      const sortedByPrice = [...couriers].sort((a, b) => a.charge - b.charge);
+
+      const cheapest = sortedByPrice[0];
+
+      // Only return the absolute cheapest option as requested
+      const topOptions = [cheapest];
 
       return NextResponse.json({
         success: true,
         data: {
           isServiceable: true,
           isCOD: false,
-          couriers: couriers,
-          cheapestOption: cheapestOption,
+          couriers: topOptions,
+          cheapestOption: cheapest,
         }
       });
     }
