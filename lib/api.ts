@@ -39,7 +39,7 @@ const transformCategory = (category: any): Category => {
 const transformInstaBook = (item: any): InstagramPost => {
   return {
     id: item._id ? String(item._id) : item.id,
-    image: item.videoUrl || item.image || '', // Support old 'image' field for migration
+    videoUrl: item.videoUrl || '',
     label: item.label,
     isVideo: true, // InstaBook is always video now
     isInstagramReel: item.isInstagramReel || false,

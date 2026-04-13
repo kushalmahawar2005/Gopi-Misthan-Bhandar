@@ -123,7 +123,7 @@ const VideoCard: React.FC<VideoCardProps> = ({ item }) => {
       >
         {item.isInstagramReel ? (
           <Link
-            href={item.image}
+            href={item.videoUrl}
             target="_blank"
             rel="noopener noreferrer"
             className="w-full h-full bg-gradient-to-br from-purple-500 via-pink-500 to-orange-500 flex items-center justify-center group"
@@ -145,7 +145,7 @@ const VideoCard: React.FC<VideoCardProps> = ({ item }) => {
               playsInline
               className="absolute inset-0 w-full h-full object-cover"
             >
-              <source src={item.image} type="video/mp4" />
+              <source src={item.videoUrl} type="video/mp4" />
             </video>
 
             {/* Hover Controls (desktop) */}

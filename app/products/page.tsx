@@ -162,9 +162,9 @@ function ProductsContent() {
       {/* --- MOBILE ONLY: HORIZONTAL CHIPS --- */}
       <div className="lg:hidden sticky top-[55px] z-40 bg-white border-b border-gray-100 pt-4 pb-2">
         <div className="flex items-center gap-3 overflow-x-auto px-6 no-scrollbar whitespace-nowrap">
-          <button onClick={() => handleFilterChange({ category: 'all' })} className={`px-6 py-2 rounded-full text-[10px] font-bold uppercase transition-all border ${selectedCategory === 'all' ? 'bg-[#FE8E02] text-white' : 'bg-white border-gray-200 text-gray-400'}`}>All Items</button>
+          <button onClick={() => handleFilterChange({ category: 'all' })} className={`px-8 py-3.5 rounded-full text-[13px] font-bold uppercase transition-all border ${selectedCategory === 'all' ? 'bg-[#FE8E02] text-white shadow-sm' : 'bg-white border-gray-200 text-gray-400'}`}>All Items</button>
           {categories.map(c => (
-            <button key={c.id} onClick={() => handleFilterChange({ category: c.slug })} className={`px-6 py-2 rounded-full text-[10px] font-bold uppercase transition-all border ${selectedCategory === c.slug ? 'bg-[#FE8E02] text-white' : 'bg-white border-gray-200 text-gray-400'}`}>{c.name}</button>
+            <button key={c.id} onClick={() => handleFilterChange({ category: c.slug })} className={`px-8 py-3.5 rounded-full text-[13px] font-bold uppercase transition-all border ${selectedCategory === c.slug ? 'bg-[#FE8E02] text-white shadow-sm' : 'bg-white border-gray-200 text-gray-400'}`}>{c.name}</button>
           ))}
         </div>
       </div>
