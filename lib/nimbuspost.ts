@@ -82,8 +82,6 @@ export async function checkServiceability(params: ServiceabilityParams) {
       return { status: false, message: 'Sender pincode missing' };
     }
 
-    console.log(`🔍 Checking Serviceability: From ${origin} to ${params.pincode}, Weight: ${params.weight}kg`);
-
     const response = await nimbusClient.post('/courier/serviceability', {
       origin: origin,
       destination: params.pincode,
@@ -92,15 +90,6 @@ export async function checkServiceability(params: ServiceabilityParams) {
       payment_method: params.payment_method,
       payment_type: params.payment_method, // String like 'prepaid' or 'cod'
     });
-
-    if (response.data.status) {
-      console.log(`✅ Serviceable: Found ${response.data.data?.length || 0} couriers.`);
-      if (response.data.data?.length > 0) {
-        console.log('📦 Sample Courier Data (First Item):', JSON.stringify(response.data.data[0], null, 2));
-      }
-    } else {
-      console.warn(`⚠️ Not Serviceable: ${response.data.message || 'No reason given by NimbusPost'}`);
-    }
 
     return response.data;
   } catch (error: any) {
@@ -135,6 +124,7 @@ export interface ShipmentParams {
     state: string;
     pincode: string;
     phone: string;
+    email?: string;
   };
   order_items: Array<{
     name: string;
