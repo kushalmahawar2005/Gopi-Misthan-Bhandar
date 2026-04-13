@@ -55,10 +55,10 @@ const PromotionalBanner = () => {
     const checkMobile = () => {
       setIsMobile(window.innerWidth < 768);
     };
-    
+
     checkMobile();
     window.addEventListener('resize', checkMobile);
-    
+
     return () => {
       window.removeEventListener('resize', checkMobile);
     };
@@ -101,10 +101,10 @@ const PromotionalBanner = () => {
   const handleTitleAnimationComplete = () => {
     // Skip fadeout on mobile
     if (isMobile) return;
-    
+
     // Only proceed if section has been scrolled into view
     if (!hasAnimated) return;
-    
+
     // Wait a bit before fading out the title
     setTimeout(() => {
       if (titleRef.current) {
@@ -152,87 +152,87 @@ const PromotionalBanner = () => {
           duration={400}
         >
           <div className="py-6 md:py-8 lg:py-10 min-h-[85px] md:min-h-[110px] flex items-center relative px-4 md:px-6 lg:px-8">
-          {/* Title - Mobile: Always show, Desktop: Animation */}
-          {showTitle && (
-            <div
-              ref={titleRef}
-              className="flex items-center justify-center w-full absolute inset-0"
-            >
-              <div className="text-center w-full px-4">
-                {isMobile ? (
-                  // Mobile: Simple text, no animation
-                  <h1 className="text-xl tracking-wider md:text-3xl lg:text-4xl font-general-sans font-[450] text-white">
-                    Gopi Misthan Bhandar, Neemuch
-                  </h1>
-                ) : hasAnimated ? (
-                  // Desktop: Animated text
-                  <SplitText
-                    text="Gopi Misthan Bhandar, Neemuch"
-                    className="text-2xl md:text-3xl lg:text-4xl font-general-sans font-[450] text-white"
-                    delay={80}
-                    duration={0.5}
-                    ease="power3.out"
-                    splitType="chars"
-                    from={{ opacity: 0, y: 30 }}
-                    to={{ opacity: 1, y: 0 }}
-                    scrollTrigger={false}
-                    onLetterAnimationComplete={handleTitleAnimationComplete}
-                    tag="h1"
-                  />
-                ) : (
-                  <h1 className="text-2xl md:text-3xl lg:text-4xl font-general-sans font-[450] text-white opacity-0">
-                    Gopi Misthan Bhandar, Neemuch
-                  </h1>
-                )}
+            {/* Title - Mobile: Always show, Desktop: Animation */}
+            {showTitle && (
+              <div
+                ref={titleRef}
+                className="flex items-center justify-center w-full absolute inset-0"
+              >
+                <div className="text-center w-full px-4">
+                  {isMobile ? (
+                    // Mobile: Simple text, no animation
+                    <h1 className="text-xl tracking-wider md:text-3xl lg:text-4xl font-general-sans font-[450] text-white">
+                      Gopi Misthan Bhandar, Nemuch
+                    </h1>
+                  ) : hasAnimated ? (
+                    // Desktop: Animated text
+                    <SplitText
+                      text="Gopi Misthan Bhandar, Neemuch"
+                      className="text-2xl md:text-3xl lg:text-4xl font-general-sans font-[450] text-white"
+                      delay={80}
+                      duration={0.5}
+                      ease="power3.out"
+                      splitType="chars"
+                      from={{ opacity: 0, y: 30 }}
+                      to={{ opacity: 1, y: 0 }}
+                      scrollTrigger={false}
+                      onLetterAnimationComplete={handleTitleAnimationComplete}
+                      tag="h1"
+                    />
+                  ) : (
+                    <h1 className="text-2xl md:text-3xl lg:text-4xl font-general-sans font-[450] text-white opacity-0">
+                      Gopi Misthan Bhandar, Neemuch
+                    </h1>
+                  )}
+                </div>
               </div>
-            </div>
-          )}
+            )}
 
-          {/* Features - shown after title fades out */}
-          {showFeatures && (
-            <div ref={featuresRef} className="grid grid-cols-2 md:grid-cols-4 items-stretch  gap-6 md:gap-8 w-full relative z-10">
-              {features.map((feature, index) => {
-                const Icon = feature.icon;
-                return (
-                  <div key={index} className="relative flex items-center">
-                    <div className="flex items-start md:items-center gap-4 md:gap-6 w-full">
-                      {/* Icon / image container */}
-                      <div className="flex-shrink-0 flex items-center justify-center w-10 h-10 md:w-12 md:h-12 lg:w-14 lg:h-14">
-                        {feature.useImage && feature.image ? (
-                          <div className="relative w-full h-full">
-                            <Image
-                              src={feature.image}
-                              alt={feature.title}
-                              fill
-                              className="object-contain filter invert brightness-0"
-                              sizes="40px"
-                            />
-                          </div>
-                        ) : (
-                          <Icon className="w-8 h-8 md:w-10 md:h-10 text-white" />
-                        )}
+            {/* Features - shown after title fades out */}
+            {showFeatures && (
+              <div ref={featuresRef} className="grid grid-cols-2 md:grid-cols-4 items-stretch  gap-6 md:gap-8 w-full relative z-10">
+                {features.map((feature, index) => {
+                  const Icon = feature.icon;
+                  return (
+                    <div key={index} className="relative flex items-center">
+                      <div className="flex items-start md:items-center gap-4 md:gap-6 w-full">
+                        {/* Icon / image container */}
+                        <div className="flex-shrink-0 flex items-center justify-center w-10 h-10 md:w-12 md:h-12 lg:w-14 lg:h-14">
+                          {feature.useImage && feature.image ? (
+                            <div className="relative w-full h-full">
+                              <Image
+                                src={feature.image}
+                                alt={feature.title}
+                                fill
+                                className="object-contain filter invert brightness-0"
+                                sizes="40px"
+                              />
+                            </div>
+                          ) : (
+                            <Icon className="w-8 h-8 md:w-10 md:h-10 text-white" />
+                          )}
+                        </div>
+
+                        {/* Text */}
+                        <div className="flex-1">
+                          <h3 className="text-white font-general-sans text-lg md:text-2xl lg:text-2xl leading-tight font-medium">
+                            {feature.title}
+                          </h3>
+                          <p className="text-white/90 text-xs md:text-sm mt-1">{feature.subtitle}</p>
+                        </div>
                       </div>
 
-                      {/* Text */}
-                      <div className="flex-1">
-                        <h3 className="text-white font-general-sans text-lg md:text-2xl lg:text-2xl leading-tight font-medium">
-                          {feature.title}
-                        </h3>
-                        <p className="text-white/90 text-xs md:text-sm mt-1">{feature.subtitle}</p>
-                      </div>
+                      {/* vertical divider: show on md and up except after last item */}
+                      {index < features.length - 1 && (
+                        <div className="hidden md:block absolute right-0 top-1/2 transform -translate-y-1/2 translate-x-3">
+                          <div className="w-px h-16 bg-white/25" />
+                        </div>
+                      )}
                     </div>
-
-                    {/* vertical divider: show on md and up except after last item */}
-                    {index < features.length - 1 && (
-                      <div className="hidden md:block absolute right-0 top-1/2 transform -translate-y-1/2 translate-x-3">
-                        <div className="w-px h-16 bg-white/25" />
-                      </div>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
-          )}
+                  );
+                })}
+              </div>
+            )}
           </div>
         </ClickSpark>
       </div>
