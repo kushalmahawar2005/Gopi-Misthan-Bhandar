@@ -99,7 +99,7 @@ export async function POST(req: NextRequest) {
       order.awbNumber = mockAwb;
       order.courierName = order.selectedCourier || 'Standard (Test)';
       order.status = 'processing';
-      order.shipmentStatus = 'Label Created (Test)';
+      order.shipmentStatus = 'pending'; // Mock value must be in the allowed enum
       order.trackingUrl = '#';
       await order.save();
       return NextResponse.json({ success: true, awb: mockAwb });
