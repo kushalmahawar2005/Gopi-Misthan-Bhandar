@@ -69,3 +69,4 @@ export const config = {
     '/api/admin/:path*',
   ],
 };
+
