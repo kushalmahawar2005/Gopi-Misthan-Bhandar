@@ -75,18 +75,31 @@ export interface ServiceabilityParams {
 
 export async function checkServiceability(params: ServiceabilityParams) {
   try {
+    const origin = process.env.SENDER_PINCODE;
+    
+    if (!origin) {
+      console.error('❌ SENDER_PINCODE is missing in .env');
+      return { status: false, message: 'Sender pincode missing' };
+    }
+
     const response = await nimbusClient.post('/courier/serviceability', {
-      origin: process.env.SENDER_PINCODE,
+      origin: origin,
       destination: params.pincode,
-      weight: params.weight,
+      weight: Math.round(params.weight * 1000), // Convert to grams (integer)
       order_amount: params.order_amount,
       payment_method: params.payment_method,
+      payment_type: params.payment_method, // String like 'prepaid' or 'cod'
     });
 
     return response.data;
   } catch (error: any) {
-    console.error('NimbusPost Serviceability Error:', error.response?.data || error.message);
-    return { status: false, message: error.message };
+    const errorData = error.response?.data;
+    console.error('❌ NimbusPost Serviceability Error:', {
+      message: error.message,
+      data: errorData,
+      status: error.response?.status
+    });
+    return { status: false, message: errorData?.message || error.message };
   }
 }
 
@@ -111,6 +124,7 @@ export interface ShipmentParams {
     state: string;
     pincode: string;
     phone: string;
+    email?: string;
   };
   order_items: Array<{
     name: string;
@@ -178,6 +192,21 @@ export async function trackShipment(awb: string) {
   } catch (error: any) {
     console.error('NimbusPost Tracking Error:', error.response?.data || error.message);
     return { status: false, message: error.message };
+  }
+}
+
+/**
+ * Cancel Shipment
+ */
+export async function cancelShipment(awb: string) {
+  try {
+    const response = await nimbusClient.post('/shipments/cancel', {
+      awb: awb,
+    });
+    return response.data;
+  } catch (error: any) {
+    console.error('NimbusPost Cancel Error:', error.response?.data || error.message);
+    return { status: false, message: error.response?.data?.message || error.message };
   }
 }
 

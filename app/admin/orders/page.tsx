@@ -21,7 +21,7 @@ interface Order {
   trackingUrl?: string;
 }
 
-import { FiTruck, FiRefreshCw, FiCopy, FiX } from 'react-icons/fi';
+import { FiTruck, FiRefreshCw, FiCopy, FiX, FiTrash2 } from 'react-icons/fi';
 
 export default function AdminOrders() {
   const [orders, setOrders] = useState<Order[]>([]);
@@ -81,6 +81,30 @@ export default function AdminOrders() {
       setShowTrackModal(false);
     } finally {
       setLoadingTracking(false);
+    }
+  };
+
+  const handleCancelShipment = async (orderId: string) => {
+    if (!confirm('Are you sure you want to CANCEL this shipment? This cannot be undone.')) return;
+    setIsProcessing(orderId);
+    try {
+      const resp = await fetch('/api/delivery/cancel-shipment', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ orderId })
+      });
+      const data = await resp.json();
+      if (data.success) {
+        alert('Shipment cancelled successfully');
+        fetchOrders();
+      } else {
+        alert(`Error: ${data.message}`);
+      }
+    } catch (e) {
+      console.error(e);
+      alert('Failed to cancel shipment');
+    } finally {
+      setIsProcessing(null);
     }
   };
 
@@ -347,12 +371,21 @@ export default function AdminOrders() {
                             <button onClick={() => navigator.clipboard.writeText(order.awbNumber!)} className="text-gray-400 hover:text-primary-red"><FiCopy size={12} /></button>
                           </div>
                           <div className="text-[10px] text-gray-500 uppercase">{order.courierName}</div>
-                          <button 
-                            onClick={() => handleTrackOrder(order.awbNumber!)} 
-                            className="text-[10px] text-primary-red font-bold hover:underline flex items-center gap-1"
-                          >
-                            <FiTruck size={10} /> Track
-                          </button>
+                          <div className="flex flex-col gap-1.5 pt-1">
+                            <button 
+                              onClick={() => handleTrackOrder(order.awbNumber!)} 
+                              className="text-[10px] text-primary-red font-bold hover:underline flex items-center gap-1"
+                            >
+                              <FiTruck size={10} /> Track
+                            </button>
+                            <button 
+                              onClick={() => handleCancelShipment(order._id)} 
+                              disabled={isProcessing === order._id}
+                              className="text-[10px] text-gray-400 hover:text-red-600 font-medium flex items-center gap-1"
+                            >
+                              <FiTrash2 size={10} /> Cancel
+                            </button>
+                          </div>
                         </div>
                       ) : (
                         <button 
@@ -478,6 +511,19 @@ export default function AdminOrders() {
                       <option value="cancelled">Cancelled</option>
                     </select>
                   </div>
+
+                  {order.awbNumber && (
+                    <div className="pt-2">
+                       <button 
+                        onClick={() => handleCancelShipment(order._id)}
+                        disabled={isProcessing === order._id}
+                        className="w-full py-2 border border-red-200 text-red-600 rounded-lg text-xs font-bold flex items-center justify-center gap-2 hover:bg-red-50"
+                      >
+                        <FiTrash2 size={14} /> {isProcessing === order._id ? 'Processing...' : 'Cancel Shipment'}
+                      </button>
+                    </div>
+                  )}
+
                   <div className="flex items-center justify-between text-sm py-1">
                     <span className="text-gray-600">Payment Status:</span>
                     <span className={`px-2 py-0.5 text-[10px] font-bold rounded uppercase ${

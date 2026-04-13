@@ -58,6 +58,7 @@ export async function POST(req: NextRequest) {
         state: process.env.SENDER_STATE || '',
         pincode: process.env.SENDER_PINCODE || '',
         phone: process.env.SENDER_PHONE || '',
+        email: process.env.SENDER_EMAIL || '',
       },
       order_items: order.items.map((item: any) => ({
         name: item.name,
