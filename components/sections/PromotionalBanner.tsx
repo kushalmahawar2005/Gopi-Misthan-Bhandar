@@ -162,7 +162,7 @@ const PromotionalBanner = () => {
                   {isMobile ? (
                     // Mobile: Simple text, no animation
                     <h1 className="text-xl tracking-wider md:text-3xl lg:text-4xl font-general-sans font-[450] text-white">
-                      Gopi Misthan Bhandar, Nemuch
+                      Gopi Misthan Bhandar, Neemuch
                     </h1>
                   ) : hasAnimated ? (
                     // Desktop: Animated text
