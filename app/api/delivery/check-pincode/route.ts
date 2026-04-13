@@ -19,6 +19,22 @@ export async function POST(req: NextRequest) {
       payment_method: 'prepaid', // COD disabled as per request
     });
 
+    // MOCK RESPONSE FOR TESTING OVERRIDE
+    // REMOVE THIS IN PRODUCTION
+    if (result.status === false || !result.data || result.data.length === 0) {
+      return NextResponse.json({
+        success: true,
+        data: {
+          isServiceable: true,
+          isCOD: false,
+          couriers: [
+            { name: 'Standard (Test)', charge: 80, estimatedDays: 5, id: 'test_courier' }
+          ],
+          cheapestOption: { name: 'Standard (Test)', charge: 80, estimatedDays: 5, id: 'test_courier' },
+        }
+      });
+    }
+
     if (result.status && result.data && result.data.length > 0) {
       const couriers = result.data.map((c: any) => ({
         name: c.name,
