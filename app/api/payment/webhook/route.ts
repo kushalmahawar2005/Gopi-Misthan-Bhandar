@@ -36,13 +36,10 @@ export async function POST(req: Request) {
     }
 
     // Signature matches, proceed
-    const event = JSON.parse(body);
-
     await connectDB();
 
     // 3. Parse Event
     const event = JSON.parse(body);
-    await connectDB();
 
     // 4. Handle Specific Events
     if (event.event === 'payment.captured' || event.event === 'order.paid') {
