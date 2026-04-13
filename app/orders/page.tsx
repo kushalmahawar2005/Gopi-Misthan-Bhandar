@@ -8,7 +8,7 @@ import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
 import Cart from '@/components/Cart';
 import ProtectedRoute from '@/components/ProtectedRoute';
-import { FiPackage, FiShoppingBag, FiCalendar, FiMapPin, FiDollarSign, FiEye } from 'react-icons/fi';
+import { FiPackage, FiShoppingBag, FiCalendar, FiMapPin, FiDollarSign, FiEye, FiTruck } from 'react-icons/fi';
 import Link from 'next/link';
 import Image from 'next/image';
 
@@ -38,6 +38,9 @@ interface Order {
   paymentMethod: string;
   paymentStatus: string;
   createdAt: string;
+  awbNumber?: string;
+  courierName?: string;
+  trackingUrl?: string;
 }
 
 export default function OrdersPage() {
@@ -209,6 +212,41 @@ export default function OrdersPage() {
 
                   {/* Order Items */}
                   <div className="p-6">
+                    {/* Tracking Info (NimbusPost) */}
+                    {order.awbNumber && (
+                      <div className="mb-6 p-4 bg-orange-50 rounded-xl border border-orange-100 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                        <div className="flex items-center gap-4">
+                          <div className="w-10 h-10 rounded-full bg-[#FE8E02] flex items-center justify-center text-white">
+                            <FiTruck className="w-5 h-5" />
+                          </div>
+                          <div>
+                            <p className="text-xs font-bold text-gray-500 uppercase tracking-wider">Tracking Number (AWB)</p>
+                            <div className="flex items-center gap-2">
+                              <p className="text-lg font-black text-primary-brown">{order.awbNumber}</p>
+                              <button 
+                                onClick={() => {
+                                  navigator.clipboard.writeText(order.awbNumber!);
+                                  alert('AWB copied to clipboard!');
+                                }}
+                                className="text-xs text-[#FE8E02] font-bold hover:underline"
+                              >
+                                Copy
+                              </button>
+                            </div>
+                            <p className="text-xs text-gray-600 font-medium">via {order.courierName || 'Courier Partner'}</p>
+                          </div>
+                        </div>
+                        <a 
+                          href={order.trackingUrl || `https://nimbuspost.com/track?awb=${order.awbNumber}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="px-6 py-2 bg-white border-2 border-[#FE8E02] text-[#FE8E02] rounded-lg font-bold text-sm hover:bg-orange-50 transition-all text-center"
+                        >
+                          Track on NimbusPost
+                        </a>
+                      </div>
+                    )}
+
                     <div className="space-y-4">
                       {order.items.map((item, index) => (
                         <div key={index} className="flex items-center gap-4 pb-4 border-b border-gray-100 last:border-0">

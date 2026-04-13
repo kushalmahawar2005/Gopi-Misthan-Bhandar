@@ -3,24 +3,32 @@ import connectDB from '@/lib/mongodb';
 import Product from '@/models/Product';
 import Category from '@/models/Category';
 
-// GET all products
+// GET all products with pagination
 export async function GET(request: NextRequest) {
   try {
     await connectDB();
     
     const searchParams = request.nextUrl.searchParams;
     const category = searchParams.get('category');
+    const subcategory = searchParams.get('subcategory');
+
     const featured = searchParams.get('featured');
     const search = searchParams.get('search');
-    const limit = searchParams.get('limit');
+    const page = parseInt(searchParams.get('page') || '1');
+    const limit = parseInt(searchParams.get('limit') || '10');
     const isClassic = searchParams.get('isClassic');
     const isPremium = searchParams.get('isPremium');
 
     let query: any = {};
 
-    if (category) {
+    if (subcategory && subcategory !== 'all') {
+      // If subcategory is provided, filter by subcategory
+      query.subcategory = subcategory;
+    } else if (category && category !== 'all') {
+      // If only category is provided, filter by category
       query.category = category;
     }
+
 
     if (featured === 'true') {
       query.featured = true;
@@ -38,20 +46,32 @@ export async function GET(request: NextRequest) {
       query.name = { $regex: search, $options: 'i' };
     }
 
-    // Optimize query - select only needed fields and add limit early
-    let productsQuery = Product.find(query)
-      .select('name description price image images category subcategory featured isPremium isClassic sizes defaultWeight shelfLife deliveryTime stock')
-      .sort({ createdAt: -1 });
+    // 2. Implementation: Skip and Limit for pagination
+    const skip = (page - 1) * limit;
 
-    if (limit) {
-      productsQuery = productsQuery.limit(parseInt(limit));
-    }
+    const [products, totalCount] = await Promise.all([
+      Product.find(query)
+        .select('name description price image images category subcategory featured isPremium isClassic sizes defaultWeight shelfLife deliveryTime stock')
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(limit)
+        .lean(),
+      Product.countDocuments(query)
+    ]);
 
-    const products = await productsQuery.lean(); // Use lean() for better performance
+    const totalPages = Math.ceil(totalCount / limit);
 
-    // Add cache headers for better performance
     return NextResponse.json(
-      { success: true, data: products },
+      { 
+        success: true, 
+        data: products,
+        pagination: {
+          totalCount,
+          totalPages,
+          currentPage: page,
+          limit
+        }
+      },
       {
         status: 200,
         headers: {

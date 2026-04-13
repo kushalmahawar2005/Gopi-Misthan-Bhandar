@@ -30,7 +30,7 @@ export default function EditInstaBook() {
       if (data.success) {
         setFormData({
           label: data.data.label || '',
-          videoUrl: data.data.videoUrl || data.data.image || '', // Support old 'image' field for migration
+          videoUrl: data.data.videoUrl || '', 
           isInstagramReel: data.data.isInstagramReel || false,
           overlayText: data.data.overlayText || '',
           order: data.data.order || 0,

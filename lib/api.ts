@@ -39,7 +39,7 @@ const transformCategory = (category: any): Category => {
 const transformInstaBook = (item: any): InstagramPost => {
   return {
     id: item._id ? String(item._id) : item.id,
-    image: item.videoUrl || item.image || '', // Support old 'image' field for migration
+    videoUrl: item.videoUrl || '',
     label: item.label,
     isVideo: true, // InstaBook is always video now
     isInstagramReel: item.isInstagramReel || false,
@@ -48,19 +48,32 @@ const transformInstaBook = (item: any): InstagramPost => {
 };
 
 // API Functions
+export interface PaginatedProductResponse {
+  success: boolean;
+  products: Product[];
+  totalCount: number;
+  totalPages: number;
+  currentPage: number;
+}
+
 export const fetchProducts = async (params?: {
   category?: string;
+  subcategory?: string;
   featured?: boolean;
   search?: string;
+  page?: number;
   limit?: number;
   isClassic?: boolean;
   isPremium?: boolean;
-}): Promise<Product[]> => {
+}): Promise<PaginatedProductResponse | Product[]> => {
   try {
     const queryParams = new URLSearchParams();
     if (params?.category) queryParams.append('category', params.category);
+    if (params?.subcategory) queryParams.append('subcategory', params.subcategory);
+
     if (params?.featured) queryParams.append('featured', 'true');
     if (params?.search) queryParams.append('search', params.search);
+    if (params?.page) queryParams.append('page', params.page.toString());
     if (params?.limit) queryParams.append('limit', params.limit.toString());
     if (params?.isClassic) queryParams.append('isClassic', 'true');
     if (params?.isPremium) queryParams.append('isPremium', 'true');
@@ -69,6 +82,15 @@ export const fetchProducts = async (params?: {
     const data = await response.json();
     
     if (data.success && data.data) {
+      if (data.pagination) {
+        return {
+          success: true,
+          products: data.data.map(transformProduct),
+          totalCount: data.pagination.totalCount,
+          totalPages: data.pagination.totalPages,
+          currentPage: data.pagination.currentPage,
+        };
+      }
       return data.data.map(transformProduct);
     }
     return [];

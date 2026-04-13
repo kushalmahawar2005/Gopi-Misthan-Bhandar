@@ -41,8 +41,14 @@ export interface IOrder extends Document {
   paymentStatus?: 'pending' | 'paid' | 'failed';
   paymentId?: string;
   razorpayOrderId?: string;
-  status: 'pending' | 'processing' | 'shipped' | 'delivered' | 'cancelled';
+  status: 'pending' | 'confirmed' | 'processing' | 'shipped' | 'delivered' | 'cancelled' | 'in_transit' | 'out_for_delivery' | 'failed';
   orderNumber: string;
+  awbNumber?: string;
+  courierName?: string;
+  shipmentStatus?: 'pending' | 'shipped' | 'in_transit' | 'out_for_delivery' | 'delivered' | 'failed';
+  trackingUrl?: string;
+  deliveryCharge?: number;
+  selectedCourier?: string;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -95,14 +101,23 @@ const OrderSchema = new Schema<IOrder>(
       enum: ['pending', 'paid', 'failed'],
       default: 'pending',
     },
-    paymentId: { type: String },
+    paymentId: { type: String, unique: true, sparse: true },
     razorpayOrderId: { type: String },
     status: {
       type: String,
-      enum: ['pending', 'processing', 'shipped', 'delivered', 'cancelled'],
+      enum: ['pending', 'confirmed', 'processing', 'shipped', 'delivered', 'cancelled', 'in_transit', 'out_for_delivery', 'failed'],
       default: 'pending',
     },
     orderNumber: { type: String, required: true, unique: true },
+    awbNumber: { type: String },
+    courierName: { type: String },
+    shipmentStatus: {
+      type: String,
+      enum: ['pending', 'shipped', 'in_transit', 'out_for_delivery', 'delivered', 'failed'],
+    },
+    trackingUrl: { type: String },
+    deliveryCharge: { type: Number },
+    selectedCourier: { type: String },
   },
   {
     timestamps: true,

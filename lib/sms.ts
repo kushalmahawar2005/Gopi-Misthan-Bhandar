@@ -96,3 +96,13 @@ export const sendOTPSMS = async (phone: string, otp: string) => {
   return sendSMS(phone, message);
 };
 
+export const sendShipmentSMS = async (
+  phone: string,
+  orderNumber: string,
+  awb: string,
+  trackingUrl: string
+) => {
+  const message = `Your Gopi Misthan Bhandar order #${orderNumber} has been shipped! AWB: ${awb}. Track live here: ${trackingUrl}`;
+  
+  return sendSMS(phone, message);
+};

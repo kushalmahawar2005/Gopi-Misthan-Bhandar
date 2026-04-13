@@ -170,6 +170,93 @@ export const sendOrderConfirmationEmail = async (
   return sendEmail(email, `Order Confirmation - ${orderData.orderNumber}`, html);
 };
 
+export const sendShipmentEmail = async (
+  email: string,
+  orderData: {
+    orderNumber: string;
+    items: Array<{ name: string; quantity: number; price: number }>;
+    total: number;
+    shipping: { name: string; address: string; city: string; state: string; zipCode: string; phone: string };
+  },
+  awb: string,
+  courierName: string,
+  trackingUrl: string
+) => {
+  const itemsHtml = orderData.items
+    .map(
+      (item) => `
+    <tr>
+      <td style="padding: 10px; border-bottom: 1px solid #eee;">${item.name}</td>
+      <td style="padding: 10px; border-bottom: 1px solid #eee; text-align: center;">${item.quantity}</td>
+      <td style="padding: 10px; border-bottom: 1px solid #eee; text-align: right;">₹${item.price.toLocaleString()}</td>
+    </tr>
+  `
+    )
+    .join('');
+
+  const html = `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <meta charset="utf-8">
+      <style>
+        body { font-family: Arial, sans-general-sans; line-height: 1.6; color: #333; }
+        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+        .header { background: #ba0606; color: white; padding: 20px; text-align: center; }
+        .content { background: #f9f9f9; padding: 20px; }
+        .shipment-details { background: white; padding: 20px; margin: 20px 0; border-radius: 5px; border-left: 5px solid #ba0606; }
+        .button { display: inline-block; padding: 12px 24px; background: #ba0606; color: white; text-decoration: none; border-radius: 5px; margin: 20px 0; font-weight: bold; }
+        .footer { text-align: center; padding: 20px; color: #666; font-size: 12px; }
+        table { width: 100%; border-collapse: collapse; }
+      </style>
+    </head>
+    <body>
+      <div class="container">
+        <div class="header">
+          <h1>Your Order is on its way!</h1>
+          <p>Great news! Your order has been shipped.</p>
+        </div>
+        <div class="content">
+          <p>Dear ${orderData.shipping.name},</p>
+          <p>Your order #${orderData.orderNumber} has been handed over to our courier partner and is now in transit.</p>
+          
+          <div class="shipment-details">
+            <h2>Tracking Information</h2>
+            <p><strong>Tracking Number (AWB):</strong> <span style="font-size: 18px; color: #ba0606;">${awb}</span></p>
+            <p><strong>Courier Partner:</strong> ${courierName}</p>
+            <a href="${trackingUrl}" class="button">Track Your Order</a>
+          </div>
+
+          <div style="background: white; padding: 20px; border-radius: 5px; margin-top: 20px;">
+            <h3>Items in this shipment:</h3>
+            <table>
+              <thead>
+                <tr style="background: #f5f5f5;">
+                  <th style="padding: 10px; text-align: left;">Product</th>
+                  <th style="padding: 10px; text-align: center;">Quantity</th>
+                  <th style="padding: 10px; text-align: right;">Price</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${itemsHtml}
+              </tbody>
+            </table>
+          </div>
+          
+          <p>If you have any questions, please contact us at info@gopimisthanbhandar.com</p>
+        </div>
+        <div class="footer">
+          <p>© ${new Date().getFullYear()} Gopi Misthan Bhandar. All rights reserved.</p>
+        </div>
+      </div>
+    </body>
+    </html>
+  `;
+
+  return sendEmail(email, `Order Shipped - #${orderData.orderNumber}`, html);
+};
+
+
 export const sendPasswordResetEmail = async (email: string, resetToken: string) => {
   const resetUrl = `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/reset-password?token=${resetToken}`;
   

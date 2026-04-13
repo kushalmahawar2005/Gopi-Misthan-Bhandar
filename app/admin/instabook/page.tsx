@@ -8,7 +8,7 @@ import Image from 'next/image';
 interface InstaBook {
   _id: string;
   label: string;
-  image: string;
+  videoUrl: string;
   isVideo: boolean;
   overlayText: string;
   order: number;
@@ -183,7 +183,7 @@ export default function InstaBookPage() {
             <div className="relative w-full h-64 mb-4 rounded-lg overflow-hidden">
               {item.isVideo ? (
                 <video
-                  src={item.image}
+                  src={item.videoUrl}
                   className="w-full h-full object-cover"
                   muted
                   loop
@@ -191,7 +191,7 @@ export default function InstaBookPage() {
                 />
               ) : (
                 <Image
-                  src={item.image}
+                  src={item.videoUrl}
                   alt={item.label}
                   fill
                   className="object-cover"

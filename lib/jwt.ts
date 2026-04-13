@@ -10,9 +10,6 @@ interface JWTPayload {
   exp: number;
 }
 
-// Secret key (in production, this should be on the backend)
-const SECRET = 'gopi-misthan-bhandar-secret-key-2024';
-
 // Base64 URL encode
 function base64UrlEncode(str: string): string {
   return btoa(str)
@@ -32,6 +29,12 @@ function base64UrlDecode(str: string): string {
 
 // Create a simple token (mimics JWT structure)
 export function createToken(payload: Omit<JWTPayload, 'iat' | 'exp'>): string {
+  const secret = process.env.NEXTAUTH_SECRET;
+  
+  if (!secret && process.env.NODE_ENV === 'production') {
+    throw new Error('NEXTAUTH_SECRET is missing! JWT utility cannot sign tokens securely.');
+  }
+
   const now = Math.floor(Date.now() / 1000);
   const tokenPayload: JWTPayload = {
     ...payload,
@@ -48,7 +51,7 @@ export function createToken(payload: Omit<JWTPayload, 'iat' | 'exp'>): string {
   const encodedPayload = base64UrlEncode(JSON.stringify(tokenPayload));
   
   // Simple signature (in production, use HMAC)
-  const signature = base64UrlEncode(JSON.stringify({ ...tokenPayload, secret: SECRET }));
+  const signature = base64UrlEncode(JSON.stringify({ ...tokenPayload, secret: secret || 'dev-secret' }));
 
   return `${encodedHeader}.${encodedPayload}.${signature}`;
 }
@@ -105,4 +108,3 @@ export function getUserFromToken(): JWTPayload | null {
 export function signToken(payload: Omit<JWTPayload, 'iat' | 'exp'>): string {
   return createToken(payload);
 }
-

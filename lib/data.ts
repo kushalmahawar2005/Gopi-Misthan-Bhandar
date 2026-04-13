@@ -296,9 +296,9 @@ export const getPremiumProducts = (): Product[] => {
 };
 
 export const instagramPosts: InstagramPost[] = [
-  { id: '1', image: getPlaceholderImage(20, 200, 360), label: 'Our Store' },
-  { id: '2', image: getPlaceholderImage(21, 200, 360), label: 'Hampers' },
-  { id: '3', image: getPlaceholderImage(22, 200, 360), label: 'Gifting', isVideo: true },
-  { id: '4', image: getPlaceholderImage(23, 200, 360), label: 'Milk Cake' },
-  { id: '5', image: getPlaceholderImage(24, 200, 360), label: 'Dry Fruits' },
+  { id: '1', videoUrl: getPlaceholderImage(20, 200, 360), label: 'Our Store' },
+  { id: '2', videoUrl: getPlaceholderImage(21, 200, 360), label: 'Hampers' },
+  { id: '3', videoUrl: getPlaceholderImage(22, 200, 360), label: 'Gifting', isVideo: true },
+  { id: '4', videoUrl: getPlaceholderImage(23, 200, 360), label: 'Milk Cake' },
+  { id: '5', videoUrl: getPlaceholderImage(24, 200, 360), label: 'Dry Fruits' },
 ];

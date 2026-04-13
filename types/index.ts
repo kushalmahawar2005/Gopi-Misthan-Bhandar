@@ -45,7 +45,7 @@ export interface Category {
 
 export interface InstagramPost {
   id: string;
-  image: string;
+  videoUrl: string;
   label: string;
   isVideo?: boolean;
   isInstagramReel?: boolean;

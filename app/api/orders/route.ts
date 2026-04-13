@@ -1,8 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
 import Order from '@/models/Order';
-import { sendOrderConfirmationEmail } from '@/lib/email';
-import { sendOrderConfirmationSMS } from '@/lib/sms';
 
 // GET all orders
 export async function GET(request: NextRequest) {
@@ -44,55 +42,25 @@ export async function POST(request: NextRequest) {
     
     const body = await request.json();
     
-    // Generate order number if not provided
+    // Generate orderNumber if not provided
     if (!body.orderNumber) {
-      const count = await Order.countDocuments() || 0;
-      body.orderNumber = `ORD-${Date.now()}-${count + 1}`;
+      body.orderNumber = `ORD-${Date.now()}-${Math.floor(1000 + Math.random() * 9000)}`;
     }
+
+    // Force safe initial values to prevent premature confirmation
+    const orderData = {
+      ...body,
+      status: 'pending',
+      paymentStatus: 'pending',
+    };
     
-    const order = await Order.create(body);
+    // Create the order
+    const order = await Order.create(orderData);
 
-    // Send order confirmation email (async, don't wait for it)
-    if (order.shipping?.email) {
-      sendOrderConfirmationEmail(order.shipping.email, {
-        orderNumber: order.orderNumber,
-        items: order.items.map((item: any) => ({
-          name: item.name,
-          quantity: item.quantity,
-          price: item.price,
-        })),
-        total: order.total,
-        shipping: {
-          name: order.shipping.name,
-          address: order.shipping.street,
-          city: order.shipping.city,
-          state: order.shipping.state,
-          zipCode: order.shipping.zipCode,
-          phone: order.shipping.phone,
-        },
-        paymentMethod: order.paymentMethod,
-        createdAt: order.createdAt instanceof Date ? order.createdAt.toISOString() : String(order.createdAt),
-      }).catch((error) => {
-        console.error('Error sending order confirmation email:', error);
-        // Don't fail the order creation if email fails
-      });
-    }
 
-    // Send order confirmation SMS (async, don't wait for it)
-    if (order.shipping?.phone) {
-      sendOrderConfirmationSMS(
-        order.shipping.phone,
-        order.orderNumber,
-        order.total
-      ).catch((error) => {
-        console.error('Error sending order confirmation SMS:', error);
-        // Don't fail the order creation if SMS fails
-      });
-    }
 
     return NextResponse.json({ success: true, data: order }, { status: 201 });
   } catch (error: any) {
     return NextResponse.json({ success: false, error: error.message }, { status: 500 });
   }
 }
-

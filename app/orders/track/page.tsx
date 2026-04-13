@@ -50,6 +50,7 @@ function OrderTrackingContent() {
   const [order, setOrder] = useState<Order | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [nimbusTracking, setNimbusTracking] = useState<any>(null);
 
   const handleTrack = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -60,14 +61,28 @@ function OrderTrackingContent() {
 
     setLoading(true);
     setError('');
+    setNimbusTracking(null);
     try {
       const response = await fetch(`/api/orders`);
       const data = await response.json();
       
       if (data.success && data.data) {
-        const foundOrder = data.data.find((o: Order) => o.orderNumber === orderNumber.toUpperCase());
+        const foundOrder = data.data.find((o: any) => o.orderNumber === orderNumber.toUpperCase());
         if (foundOrder) {
           setOrder(foundOrder);
+          
+          // If AWB exists, fetch nimbus tracking
+          if (foundOrder.awbNumber) {
+            try {
+              const trackResp = await fetch(`/api/delivery/track?awb=${foundOrder.awbNumber}`);
+              const trackData = await trackResp.json();
+              if (trackData.success) {
+                setNimbusTracking(trackData.data);
+              }
+            } catch (trackErr) {
+              console.error('Error fetching nimbus tracking:', trackErr);
+            }
+          }
         } else {
           setError('Order not found. Please check your order number.');
           setOrder(null);
@@ -154,52 +169,85 @@ function OrderTrackingContent() {
           <div className="space-y-6">
             {/* Order Status Timeline */}
             <div className="bg-white rounded-lg border border-gray-200 p-6 md:p-8">
-              <h2 className="text-2xl font-bold font-general-sansal-sansal-sans mb-6">Order Status</h2>
+              <h2 className="text-2xl font-bold font-general-sansal-sansal-sans mb-2">Order Status</h2>
               
-              <div className="relative">
-                {/* Timeline Line */}
-                <div className="absolute left-6 top-0 bottom-0 w-0.5 bg-gray-200" />
-                
-                <div className="space-y-8">
-                  {statusSteps.map((step, index) => {
-                    const currentIndex = getStatusIndex(order.status);
-                    const isCompleted = index <= currentIndex;
-                    const isCurrent = index === currentIndex;
-                    const Icon = step.icon;
-                    
-                    return (
-                      <div key={step.key} className="relative flex items-start gap-4">
-                        <div className={`relative z-10 flex items-center justify-center w-12 h-12 rounded-full border-2 ${
-                          isCompleted
-                            ? 'bg-primary-red border-primary-red text-white'
-                            : 'bg-white border-gray-300 text-gray-400'
-                        }`}>
-                          {isCompleted ? (
-                            <Icon size={20} />
-                          ) : (
-                            <div className="w-3 h-3 rounded-full bg-gray-300" />
-                          )}
+              {nimbusTracking ? (
+                <div className="space-y-8 mt-6">
+                  {/* Nimbus Summary */}
+                  <div className="flex items-center gap-4 p-5 bg-orange-50 rounded-2xl border border-orange-100">
+                    <div className="w-14 h-14 rounded-full bg-[#FE8E02] flex items-center justify-center text-white shadow-lg shadow-orange-200">
+                      <FiTruck size={28} />
+                    </div>
+                    <div>
+                      <p className="text-xs font-bold text-gray-500 uppercase tracking-widest">Live Status</p>
+                      <h4 className="text-xl font-black text-gray-900">{nimbusTracking.currentStatus}</h4>
+                      <p className="text-sm text-gray-600 font-medium">via {(order as any).courierName} (AWB: {(order as any).awbNumber})</p>
+                    </div>
+                  </div>
+
+                  {/* Nimbus Timeline */}
+                  <div className="relative pl-8 space-y-8">
+                    <div className="absolute left-[11px] top-2 bottom-2 w-0.5 bg-gray-100"></div>
+                    {nimbusTracking.timeline.map((event: any, i: number) => (
+                      <div key={i} className="relative">
+                        <div className={`absolute -left-[27px] top-1.5 w-4 h-4 rounded-full border-2 bg-white ${i === 0 ? 'border-[#FE8E02] scale-110' : 'border-gray-200'}`}>
+                          {i === 0 && <div className="absolute inset-0.5 rounded-full bg-[#FE8E02]"></div>}
                         </div>
-                        <div className="flex-1 pt-1">
-                          <h3 className={`font-bold text-lg ${
-                            isCurrent ? getStatusColor(order.status) : isCompleted ? 'text-gray-900' : 'text-gray-400'
-                          }`}>
-                            {step.label}
-                          </h3>
-                          {isCurrent && order.status !== 'cancelled' && (
-                            <p className="text-sm text-gray-600 mt-1">
-                              Your order is currently {order.status}
-                            </p>
-                          )}
-                          {order.status === 'cancelled' && step.key === 'pending' && (
-                            <p className="text-sm text-red-600 mt-1">Order has been cancelled</p>
-                          )}
+                        <div>
+                          <p className={`text-base font-bold ${i === 0 ? 'text-gray-900' : 'text-gray-500'}`}>{event.status}</p>
+                          <p className="text-sm text-gray-500">{event.location}</p>
+                          <p className="text-[11px] text-gray-400 mt-1 uppercase font-bold tracking-tighter">{event.timestamp}</p>
                         </div>
                       </div>
-                    );
-                  })}
+                    ))}
+                  </div>
                 </div>
-              </div>
+              ) : (
+                <div className="relative mt-8">
+                  {/* Basic Timeline Line */}
+                  <div className="absolute left-6 top-0 bottom-0 w-0.5 bg-gray-200" />
+                  
+                  <div className="space-y-8">
+                    {statusSteps.map((step, index) => {
+                      const currentIndex = getStatusIndex(order.status);
+                      const isCompleted = index <= currentIndex;
+                      const isCurrent = index === currentIndex;
+                      const Icon = step.icon;
+                      
+                      return (
+                        <div key={step.key} className="relative flex items-start gap-4">
+                          <div className={`relative z-10 flex items-center justify-center w-12 h-12 rounded-full border-2 ${
+                            isCompleted
+                              ? 'bg-primary-red border-primary-red text-white'
+                              : 'bg-white border-gray-300 text-gray-400'
+                          }`}>
+                            {isCompleted ? (
+                              <Icon size={20} />
+                            ) : (
+                              <div className="w-3 h-3 rounded-full bg-gray-300" />
+                            )}
+                          </div>
+                          <div className="flex-1 pt-1">
+                            <h3 className={`font-bold text-lg ${
+                              isCurrent ? getStatusColor(order.status) : isCompleted ? 'text-gray-900' : 'text-gray-400'
+                            }`}>
+                              {step.label}
+                            </h3>
+                            {isCurrent && order.status !== 'cancelled' && (
+                              <p className="text-sm text-gray-600 mt-1">
+                                Your order is currently {order.status}
+                              </p>
+                            )}
+                            {order.status === 'cancelled' && step.key === 'pending' && (
+                              <p className="text-sm text-red-600 mt-1">Order has been cancelled</p>
+                            )}
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* Order Information */}

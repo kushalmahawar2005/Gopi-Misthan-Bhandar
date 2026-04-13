@@ -31,13 +31,19 @@ async function connectDB(): Promise<typeof mongoose> {
     const opts = {
       bufferCommands: false,
       maxPoolSize: 10, // Maintain up to 10 socket connections
-      serverSelectionTimeoutMS: 5000, // Keep trying to send operations for 5 seconds
+      serverSelectionTimeoutMS: 15000, // Increased to 15s for unstable local networks
       socketTimeoutMS: 45000, // Close sockets after 45 seconds of inactivity
+      family: 4, // Force IPv4 to avoid common DNS resolution issues on Mac
     };
 
     cached.promise = mongoose.connect(MONGODB_URI, opts).then((mongoose) => {
+      console.log('✅ MongoDB Connected Successfully');
       return mongoose;
+    }).catch((err) => {
+      console.error('❌ MongoDB Connection Error:', err.message);
+      throw err;
     });
+
   }
 
   try {

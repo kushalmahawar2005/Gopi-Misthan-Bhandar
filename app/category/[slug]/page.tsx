@@ -49,7 +49,8 @@ function CategoryContent() {
 
       // Fetch main category products
       try {
-        const categoryProducts = await fetchProducts({ category: slug });
+        const resp = await fetchProducts({ category: slug });
+        const categoryProducts = Array.isArray(resp) ? resp : resp.products;
         allProducts = [...categoryProducts];
       } catch (error) {
         console.error('Error fetching category products:', error);
@@ -60,7 +61,8 @@ function CategoryContent() {
         try {
           const subcategoryProductsPromises = categoryData.subCategories.map(async (sub: any) => {
             try {
-              return await fetchProducts({ category: sub.slug });
+              const resp = await fetchProducts({ category: sub.slug });
+              return Array.isArray(resp) ? resp : resp.products;
             } catch (error) {
               console.error(`Error fetching subcategory ${sub.slug} products:`, error);
               return [];
@@ -89,13 +91,15 @@ function CategoryContent() {
       await Promise.all(
         allCategories.map(async (cat) => {
           try {
-            let catProducts = await fetchProducts({ category: cat.slug });
+            const resp = await fetchProducts({ category: cat.slug });
+            let catProducts = Array.isArray(resp) ? resp : resp.products;
 
             // Also include subcategory products in count
             if (cat.subCategories && cat.subCategories.length > 0) {
               const subcategoryProductsPromises = cat.subCategories.map(async (sub: any) => {
                 try {
-                  return await fetchProducts({ category: sub.slug });
+                  const sResp = await fetchProducts({ category: sub.slug });
+                  return Array.isArray(sResp) ? sResp : sResp.products;
                 } catch (error) {
                   return [];
                 }
