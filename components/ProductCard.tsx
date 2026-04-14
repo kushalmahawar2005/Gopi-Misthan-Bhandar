@@ -51,19 +51,20 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, showAddToCart = true
             {/* Main Image */}
             <Image
               src={product.image && product.image.trim() !== '' ? product.image : `https://picsum.photos/seed/product${product.id}/500/500`}
-              alt={product.name}
+              alt={`${product.name} | ${product.category?.replace(/-/g, ' ') || 'Indian Sweets'} - Gopi Misthan Bhandar`}
               fill
               className={`object-cover object-center transition-opacity duration-700 ${
                 isHovered && product.images && product.images.length > 0 ? 'opacity-0' : 'opacity-100'
               }`}
               sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
             />
-            {/* Second Image on Hover (if available) */}
+            {/* Second Image on Hover — lazy loaded since not visible initially */}
             {product.images && product.images.length > 0 && (
               <Image
                 src={product.images[0]}
-                alt={`${product.name} - Alternate View`}
+                alt={`${product.name} - View 2 | Gopi Misthan Bhandar`}
                 fill
+                loading="lazy"
                 className={`object-cover object-center transition-opacity duration-700 ${
                   isHovered ? 'opacity-100' : 'opacity-0'
                 }`}

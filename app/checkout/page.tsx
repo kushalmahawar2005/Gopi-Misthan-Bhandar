@@ -161,10 +161,14 @@ export default function CheckoutPage() {
        return;
     }
     setIsPlacingOrder(true);
+
+    let createdOrderNumber = '';
+
     try {
       const orderItems = cartItems.map(i => ({ productId: i.id, name: i.name, price: i.price, quantity: i.quantity, image: i.image, weight: i.selectedSize || i.defaultWeight || '' }));
       const shippingAddress = { name: `${formData.firstName} ${formData.lastName}`, email: formData.email, phone: formData.phone, street: formData.address, city: formData.city, state: formData.state, zipCode: formData.pincode };
       
+      // Step 1: Create order in database
       const orderResp = await fetch('/api/orders', { 
         method: 'POST', 
         headers: { 'Content-Type': 'application/json' }, 
@@ -182,36 +186,97 @@ export default function CheckoutPage() {
         }) 
       });
       const orderResult = await orderResp.json();
-      if (!orderResult.success) throw new Error(orderResult.error);
+      if (!orderResult.success) throw new Error(orderResult.error || 'Failed to create order');
+      createdOrderNumber = orderResult.data.orderNumber;
 
-      if (!razorpayLoaded || !window.Razorpay) throw new Error('Gateway loading...');
+      // Step 2: Check Razorpay is loaded
+      if (!razorpayLoaded || !window.Razorpay) throw new Error('Payment gateway is still loading. Please try again.');
+
+      // Step 3: Create Razorpay payment order
       const payResp = await fetch('/api/payment/create-order', { 
         method: 'POST', 
         headers: { 'Content-Type': 'application/json' }, 
         body: JSON.stringify({ 
           cartItems: orderItems, 
           deliveryPincode: formData.pincode, 
-          orderId: orderResult.data.orderNumber,
+          orderId: createdOrderNumber,
           courierCharge: selectedCourier?.charge
         }) 
       });
       const payData = await payResp.json();
+      if (!payData.success) throw new Error(payData.error || 'Failed to initiate payment');
       
+      // Step 4: Open Razorpay checkout modal
       const rzp = new window.Razorpay({ 
         key: payData.keyId, 
         amount: Math.round((getTotalPrice() + (selectedCourier?.charge || 0)) * 100), 
         currency: 'INR', 
         name: 'Gopi Misthan Bhandar', 
+        description: `Order #${createdOrderNumber}`,
         order_id: payData.orderId, 
         handler: async (r: any) => {
-          const v = await fetch('/api/payment/verify', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ orderId: orderResult.data.orderNumber, paymentId: r.razorpay_payment_id, signature: r.razorpay_signature, razorpayOrderId: r.razorpay_order_id }) });
-          if ((await v.json()).success) { clearCart(); router.push(`/checkout/success?orderId=${orderResult.data.orderNumber}`); }
-        }, 
+          // Payment completed by user — now verify on server
+          try {
+            const verifyResp = await fetch('/api/payment/verify', { 
+              method: 'POST', 
+              headers: { 'Content-Type': 'application/json' }, 
+              body: JSON.stringify({ 
+                orderId: createdOrderNumber, 
+                paymentId: r.razorpay_payment_id, 
+                signature: r.razorpay_signature, 
+                razorpayOrderId: r.razorpay_order_id 
+              }) 
+            });
+            const verifyResult = await verifyResp.json();
+            
+            if (verifyResult.success) {
+              // Payment verified! Clear cart and redirect to success
+              clearCart();
+              router.push(`/checkout/success?orderId=${createdOrderNumber}&paymentId=${r.razorpay_payment_id}`);
+            } else {
+              // Verification failed — redirect to failed page
+              router.push(`/checkout/failed?orderId=${createdOrderNumber}&reason=${encodeURIComponent(verifyResult.error || 'Payment verification failed')}`);
+            }
+          } catch (verifyError) {
+            // Network error during verification — still redirect to success
+            // The webhook will handle the actual status update
+            clearCart();
+            router.push(`/checkout/success?orderId=${createdOrderNumber}&paymentId=${r.razorpay_payment_id}`);
+          }
+        },
+        modal: {
+          ondismiss: () => {
+            // User closed Razorpay popup without completing payment
+            setIsPlacingOrder(false);
+            router.push(`/checkout/failed?orderId=${createdOrderNumber}&reason=${encodeURIComponent('Payment was cancelled. You can retry from your orders page.')}`);
+          },
+          escape: true,
+          confirm_close: true,
+        },
         prefill: { name: shippingAddress.name, email: shippingAddress.email, contact: shippingAddress.phone }, 
-        theme: { color: '#ba0606' } 
+        theme: { color: '#ba0606' },
+        retry: { enabled: true, max_count: 3 },
       });
+      
+      rzp.on('payment.failed', (response: any) => {
+        // Razorpay payment failed (bank declined, etc.)
+        const reason = response.error?.description || response.error?.reason || 'Payment failed';
+        setIsPlacingOrder(false);
+        router.push(`/checkout/failed?orderId=${createdOrderNumber}&reason=${encodeURIComponent(reason)}&code=${response.error?.code || ''}`);
+      });
+
       rzp.open();
-    } catch (e: any) { alert(e.message); setIsPlacingOrder(false); }
+    } catch (e: any) {
+      setIsPlacingOrder(false);
+      if (createdOrderNumber) {
+        // Order was created but payment failed to start — redirect to failed page
+        router.push(`/checkout/failed?orderId=${createdOrderNumber}&reason=${encodeURIComponent(e.message || 'Something went wrong')}`);
+      } else {
+        // Order creation itself failed — show error on checkout page
+        setErrors(prev => ({ ...prev, general: e.message || 'Something went wrong. Please try again.' }));
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+    }
   };
 
   if (cartItems.length === 0) return null;
@@ -245,6 +310,19 @@ export default function CheckoutPage() {
       <main className="max-w-7xl mx-auto px-4 py-8 lg:py-12 flex flex-col lg:flex-row gap-8">
         {/* Left Section: Form */}
         <div className="flex-1 space-y-8">
+          {/* General Error Banner */}
+          {errors.general && (
+            <div className="bg-red-50 border-2 border-red-200 rounded-2xl p-5 flex items-start gap-4">
+              <div className="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center flex-shrink-0">
+                <svg className="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+              </div>
+              <div>
+                <p className="text-red-800 font-bold text-sm">Order could not be placed</p>
+                <p className="text-red-600 text-sm mt-1">{errors.general}</p>
+              </div>
+              <button onClick={() => setErrors(prev => { const { general, ...rest } = prev; return rest; })} className="ml-auto text-red-400 hover:text-red-600">✕</button>
+            </div>
+          )}
           {/* Shipping Form (Always visible on desktop, step-based on mobile) */}
           <div className={`${currentStep === 1 || true ? '' : 'hidden lg:block'} bg-white rounded-2xl p-6 lg:p-10 shadow-sm border border-gray-100`}>
              <h2 className="text-xl font-bold mb-8 flex items-center gap-3"><FiMapPin className="text-primary-red" /> Shipping Address</h2>

@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
 import Category from '@/models/Category';
+import { requireAdmin } from '@/lib/auth';
+
 
 // GET all categories
 export async function GET(request: NextRequest) {
@@ -30,7 +32,11 @@ export async function GET(request: NextRequest) {
 
 // POST create new category
 export async function POST(request: NextRequest) {
+  const authError = await requireAdmin(request);
+  if (authError) return authError;
+
   try {
+
     await connectDB();
     
     const body = await request.json();

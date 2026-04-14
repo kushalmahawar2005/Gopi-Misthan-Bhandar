@@ -1,9 +1,11 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef, useCallback } from 'react';
 import { FiEdit, FiTrash2, FiPlus, FiSearch, FiCopy } from 'react-icons/fi';
 import Link from 'next/link';
 import Image from 'next/image';
+import Pagination from '@/components/admin/Pagination';
+import TableSkeleton from '@/components/admin/TableSkeleton';
 
 interface Product {
   _id: string;
@@ -16,17 +18,26 @@ interface Product {
   stock: number;
 }
 
+const ITEMS_PER_PAGE = 10;
+
 export default function AdminProducts() {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
+  const [pageLoading, setPageLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'inactive'>('all');
   const [categoryFilter, setCategoryFilter] = useState('all');
 
+  // Pagination State
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalProducts, setTotalProducts] = useState(0);
+
   const [categories, setCategories] = useState<{ name: string; slug: string }[]>([]);
+  const tableRef = useRef<HTMLDivElement>(null);
+  const searchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
-    fetchProducts();
     fetchCategories();
   }, []);
 
@@ -42,16 +53,77 @@ export default function AdminProducts() {
     }
   };
 
-  const fetchProducts = async () => {
+  // Reset page when filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [statusFilter, categoryFilter]);
+
+  // Debounced search - reset page and refetch
+  useEffect(() => {
+    if (searchTimeoutRef.current) {
+      clearTimeout(searchTimeoutRef.current);
+    }
+    searchTimeoutRef.current = setTimeout(() => {
+      setCurrentPage(1);
+    }, 400);
+
+    return () => {
+      if (searchTimeoutRef.current) clearTimeout(searchTimeoutRef.current);
+    };
+  }, [searchTerm]);
+
+  const fetchProducts = useCallback(async () => {
     try {
-      const response = await fetch('/api/products');
+      setPageLoading(true);
+      const params = new URLSearchParams();
+      params.set('page', String(currentPage));
+      params.set('limit', String(ITEMS_PER_PAGE));
+
+      if (searchTerm) {
+        params.set('search', searchTerm);
+      }
+      if (categoryFilter !== 'all') {
+        params.set('category', categoryFilter);
+      }
+      if (statusFilter === 'active') {
+        params.set('featured', 'true');
+      }
+
+      const response = await fetch(`/api/products?${params.toString()}`);
       const data = await response.json();
-      if (data.success) setProducts(data.data);
+      if (data.success) {
+        let filteredData = data.data;
+
+        // Client-side filter for inactive (API doesn't support featured=false)
+        if (statusFilter === 'inactive') {
+          filteredData = data.data.filter((p: Product) => !p.featured);
+        }
+
+        setProducts(filteredData);
+        setTotalProducts(data.pagination?.totalCount || filteredData.length);
+        setTotalPages(data.pagination?.totalPages || 1);
+      }
     } catch (error) {
       console.error('Error fetching products:', error);
     } finally {
       setLoading(false);
+      setPageLoading(false);
     }
+  }, [currentPage, searchTerm, statusFilter, categoryFilter]);
+
+  useEffect(() => {
+    fetchProducts();
+  }, [fetchProducts]);
+
+  // Scroll to top of table on page change
+  useEffect(() => {
+    if (!loading && tableRef.current) {
+      tableRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  }, [currentPage]);
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
   };
 
   const handleDelete = async (id: string) => {
@@ -59,21 +131,13 @@ export default function AdminProducts() {
     try {
       const response = await fetch(`/api/products/${id}`, { method: 'DELETE' });
       const data = await response.json();
-      if (data.success) setProducts(prev => prev.filter(p => p._id !== id));
+      if (data.success) {
+        fetchProducts();
+      }
     } catch (error) {
       console.error('Error deleting product:', error);
     }
   };
-
-  const filteredProducts = products.filter((product) => {
-    const matchesSearch = product.name.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesStatus =
-      statusFilter === 'all' ||
-      (statusFilter === 'active' && product.featured) ||
-      (statusFilter === 'inactive' && !product.featured);
-    const matchesCategory = categoryFilter === 'all' || product.category === categoryFilter;
-    return matchesSearch && matchesStatus && matchesCategory;
-  });
 
   if (loading) {
     return (
@@ -87,7 +151,7 @@ export default function AdminProducts() {
   }
 
   return (
-    <div className="space-y-6 w-full">
+    <div className="space-y-6 w-full" ref={tableRef}>
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
@@ -140,70 +204,146 @@ export default function AdminProducts() {
         </div>
       </div>
 
-      {/* Products Table - Desktop */}
-      <div className="bg-white rounded-lg border border-gray-200 overflow-hidden hidden md:block">
-        <div className="overflow-x-auto">
-          <table className="w-full min-w-[720px]">
-            <thead className="bg-gray-50 border-b border-gray-200">
-              <tr>
-                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                  <input type="checkbox" className="rounded border-gray-300" />
-                </th>
-                <th className="px-4 lg:px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Product</th>
-                <th className="px-4 lg:px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Price</th>
-                <th className="px-4 lg:px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Stock</th>
-                <th className="px-4 lg:px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Status</th>
-                <th className="px-4 lg:px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider hidden lg:table-cell">Updated</th>
-                <th className="px-4 lg:px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Actions</th>
-              </tr>
-            </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
-              {filteredProducts.length === 0 ? (
-                <tr>
-                  <td colSpan={7} className="px-6 py-12 text-center text-gray-500">No products found</td>
-                </tr>
-              ) : (
-                filteredProducts.map((product) => (
-                  <tr key={product._id} className="hover:bg-gray-50 transition-colors">
-                    <td className="px-4 lg:px-6 py-4 whitespace-nowrap">
+      {/* Loading Skeleton for page transitions */}
+      {pageLoading ? (
+        <TableSkeleton columns={7} rows={ITEMS_PER_PAGE} />
+      ) : (
+        <>
+          {/* Products Table - Desktop */}
+          <div className="bg-white rounded-lg border border-gray-200 overflow-hidden hidden md:block">
+            <div className="overflow-x-auto">
+              <table className="w-full min-w-[720px]">
+                <thead className="bg-gray-50 border-b border-gray-200">
+                  <tr>
+                    <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
                       <input type="checkbox" className="rounded border-gray-300" />
-                    </td>
-                    <td className="px-4 lg:px-6 py-4">
-                      <div className="flex items-center gap-3">
-                        <div className="relative w-12 h-12 rounded border border-gray-200 overflow-hidden bg-gray-100">
-                          <Image
-                            src={product.image || '/1.jpg'}
-                            alt={product.name}
-                            fill
-                            className="object-cover"
-                            sizes="48px"
-                          />
-                        </div>
-                        <div>
-                          <div className="text-sm font-medium text-primary-brown">{product.name}</div>
-                          <div className="text-xs text-gray-500 capitalize">
-                            {product.category} {product.featured && '• Featured'}
+                    </th>
+                    <th className="px-4 lg:px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Product</th>
+                    <th className="px-4 lg:px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Price</th>
+                    <th className="px-4 lg:px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Stock</th>
+                    <th className="px-4 lg:px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Status</th>
+                    <th className="px-4 lg:px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider hidden lg:table-cell">Updated</th>
+                    <th className="px-4 lg:px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Actions</th>
+                  </tr>
+                </thead>
+                <tbody className="bg-white divide-y divide-gray-200">
+                  {products.length === 0 ? (
+                    <tr>
+                      <td colSpan={7} className="px-6 py-12 text-center text-gray-500">No products found</td>
+                    </tr>
+                  ) : (
+                    products.map((product) => (
+                      <tr key={product._id} className="hover:bg-gray-50 transition-colors">
+                        <td className="px-4 lg:px-6 py-4 whitespace-nowrap">
+                          <input type="checkbox" className="rounded border-gray-300" />
+                        </td>
+                        <td className="px-4 lg:px-6 py-4">
+                          <div className="flex items-center gap-3">
+                            <div className="relative w-12 h-12 rounded border border-gray-200 overflow-hidden bg-gray-100">
+                              <Image
+                                src={product.image || '/1.jpg'}
+                                alt={product.name}
+                                fill
+                                className="object-cover"
+                                sizes="48px"
+                              />
+                            </div>
+                            <div>
+                              <div className="text-sm font-medium text-primary-brown">{product.name}</div>
+                              <div className="text-xs text-gray-500 capitalize">
+                                {product.category} {product.featured && '• Featured'}
+                              </div>
+                            </div>
                           </div>
+                        </td>
+                        <td className="px-4 lg:px-6 py-4 whitespace-nowrap">
+                          <div className="text-sm font-medium text-primary-brown">₹{product.price}</div>
+                        </td>
+                        <td className="px-4 lg:px-6 py-4 whitespace-nowrap">
+                          <div className="text-sm text-primary-brown">{product.stock || 0}</div>
+                        </td>
+                        <td className="px-4 lg:px-6 py-4 whitespace-nowrap">
+                          <span
+                            className={`px-2 py-1 text-xs font-medium rounded-full ${product.featured ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}`}
+                          >
+                            {product.featured ? 'active' : 'inactive'}
+                          </span>
+                        </td>
+                        <td className="px-4 lg:px-6 py-4 whitespace-nowrap text-sm text-gray-500 hidden lg:table-cell">
+                          {new Date().toLocaleDateString()}
+                        </td>
+                        <td className="px-4 lg:px-6 py-4 whitespace-nowrap">
+                          <div className="flex items-center gap-2">
+                            <Link
+                              href={`/admin/products/${product._id}`}
+                              className="p-2 text-primary-red hover:bg-red-50 rounded transition-colors"
+                              title="Edit"
+                            >
+                              <FiEdit size={16} />
+                            </Link>
+                            <button className="p-2 text-primary-red hover:bg-red-50 rounded transition-colors" title="Copy">
+                              <FiCopy size={16} />
+                            </button>
+                            <button
+                              onClick={() => handleDelete(product._id)}
+                              className="p-2 text-primary-red hover:bg-red-50 rounded transition-colors"
+                              title="Delete"
+                            >
+                              <FiTrash2 size={16} />
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </div> {/* ✅ desktop wrapper properly closed */}
+
+          {/* Products Cards - Mobile */}
+          <div className="block md:hidden w-full min-h-[200px]">
+            {products.length === 0 ? (
+              <div className="text-center py-12 bg-white rounded-lg border border-gray-200 w-full">
+                <p className="text-gray-500 mb-4">No products found</p>
+                <Link
+                  href="/admin/products/new"
+                  className="inline-block px-4 py-2 bg-primary-red text-white rounded-lg hover:bg-primary-darkRed transition-colors font-medium text-sm"
+                >
+                  Add your first product
+                </Link>
+              </div>
+            ) : (
+              <div className="space-y-4 w-full">
+                {products.map((product) => (
+                  <div key={product._id} className="bg-white rounded-lg border border-gray-200 p-4 w-full">
+                    <div className="flex items-start gap-3 mb-3">
+                      <div className="relative w-16 h-16 rounded border border-gray-200 overflow-hidden bg-gray-100 flex-shrink-0">
+                        <Image
+                          src={product.image || '/1.jpg'}
+                          alt={product.name}
+                          fill
+                          className="object-cover"
+                          sizes="64px"
+                        />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <h3 className="text-sm font-medium text-primary-brown truncate">{product.name}</h3>
+                        <p className="text-xs text-gray-500 capitalize mt-1">
+                          {product.category} {product.featured && '• Featured'}
+                        </p>
+                        <div className="flex items-center gap-3 mt-2">
+                          <span className="text-sm font-medium text-primary-brown">₹{product.price}</span>
+                          <span className="text-xs text-gray-500">Stock: {product.stock || 0}</span>
                         </div>
                       </div>
-                    </td>
-                    <td className="px-4 lg:px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm font-medium text-primary-brown">₹{product.price}</div>
-                    </td>
-                    <td className="px-4 lg:px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-primary-brown">{product.stock || 0}</div>
-                    </td>
-                    <td className="px-4 lg:px-6 py-4 whitespace-nowrap">
+                    </div>
+                    <div className="flex items-center justify-between pt-3 border-t border-gray-100">
                       <span
                         className={`px-2 py-1 text-xs font-medium rounded-full ${product.featured ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}`}
                       >
                         {product.featured ? 'active' : 'inactive'}
                       </span>
-                    </td>
-                    <td className="px-4 lg:px-6 py-4 whitespace-nowrap text-sm text-gray-500 hidden lg:table-cell">
-                      {new Date().toLocaleDateString()}
-                    </td>
-                    <td className="px-4 lg:px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center gap-2">
                         <Link
                           href={`/admin/products/${product._id}`}
@@ -223,105 +363,25 @@ export default function AdminProducts() {
                           <FiTrash2 size={16} />
                         </button>
                       </div>
-                    </td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
-        </div>
-      </div> {/* ✅ desktop wrapper properly closed */}
-
-      {/* Products Cards - Mobile */}
-      <div className="block md:hidden w-full min-h-[200px]">
-        {filteredProducts.length === 0 ? (
-          <div className="text-center py-12 bg-white rounded-lg border border-gray-200 w-full">
-            <p className="text-gray-500 mb-4">No products found</p>
-            <Link
-              href="/admin/products/new"
-              className="inline-block px-4 py-2 bg-primary-red text-white rounded-lg hover:bg-primary-darkRed transition-colors font-medium text-sm"
-            >
-              Add your first product
-            </Link>
-          </div>
-        ) : (
-          <div className="space-y-4 w-full">
-            {filteredProducts.map((product) => (
-              <div key={product._id} className="bg-white rounded-lg border border-gray-200 p-4 w-full">
-                <div className="flex items-start gap-3 mb-3">
-                  <div className="relative w-16 h-16 rounded border border-gray-200 overflow-hidden bg-gray-100 flex-shrink-0">
-                    <Image
-                      src={product.image || '/1.jpg'}
-                      alt={product.name}
-                      fill
-                      className="object-cover"
-                      sizes="64px"
-                    />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <h3 className="text-sm font-medium text-primary-brown truncate">{product.name}</h3>
-                    <p className="text-xs text-gray-500 capitalize mt-1">
-                      {product.category} {product.featured && '• Featured'}
-                    </p>
-                    <div className="flex items-center gap-3 mt-2">
-                      <span className="text-sm font-medium text-primary-brown">₹{product.price}</span>
-                      <span className="text-xs text-gray-500">Stock: {product.stock || 0}</span>
                     </div>
                   </div>
-                </div>
-                <div className="flex items-center justify-between pt-3 border-t border-gray-100">
-                  <span
-                    className={`px-2 py-1 text-xs font-medium rounded-full ${product.featured ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}`}
-                  >
-                    {product.featured ? 'active' : 'inactive'}
-                  </span>
-                  <div className="flex items-center gap-2">
-                    <Link
-                      href={`/admin/products/${product._id}`}
-                      className="p-2 text-primary-red hover:bg-red-50 rounded transition-colors"
-                      title="Edit"
-                    >
-                      <FiEdit size={16} />
-                    </Link>
-                    <button className="p-2 text-primary-red hover:bg-red-50 rounded transition-colors" title="Copy">
-                      <FiCopy size={16} />
-                    </button>
-                    <button
-                      onClick={() => handleDelete(product._id)}
-                      className="p-2 text-primary-red hover:bg-red-50 rounded transition-colors"
-                      title="Delete"
-                    >
-                      <FiTrash2 size={16} />
-                    </button>
-                  </div>
-                </div>
+                ))}
               </div>
-            ))}
+            )}
           </div>
-        )}
-      </div>
+        </>
+      )}
 
       {/* Pagination */}
-      {filteredProducts.length > 0 && (
-        <div className="px-4 md:px-6 py-4 border-t border-gray-200 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <div className="text-xs sm:text-sm text-gray-600 text-center sm:text-left">
-            Showing 1 to {filteredProducts.length} of {filteredProducts.length} products
-          </div>
-          <div className="flex gap-2 w-full sm:w-auto justify-center">
-            <button
-              disabled
-              className="px-3 sm:px-4 py-2 text-xs sm:text-sm border border-gray-300 rounded-lg text-gray-400 cursor-not-allowed"
-            >
-              Previous
-            </button>
-            <button
-              disabled={filteredProducts.length <= 10}
-              className="px-3 sm:px-4 py-2 text-xs sm:text-sm border border-gray-300 rounded-lg bg-primary-red text-white hover:bg-primary-darkRed transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              Next
-            </button>
-          </div>
-        </div>
+      {totalProducts > 0 && (
+        <Pagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          totalItems={totalProducts}
+          limit={ITEMS_PER_PAGE}
+          itemLabel="products"
+          onPageChange={handlePageChange}
+        />
       )}
     </div>
   );

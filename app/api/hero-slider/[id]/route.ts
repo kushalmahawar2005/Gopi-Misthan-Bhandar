@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
 import HeroSlider from '@/models/HeroSlider';
+import { requireAdmin } from '@/lib/auth';
+
 
 // GET hero slide by ID
 export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
@@ -21,7 +23,11 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
 
 // PUT update hero slide
 export async function PUT(request: NextRequest, { params }: { params: { id: string } }) {
+  const authError = await requireAdmin(request);
+  if (authError) return authError;
+
   try {
+
     await connectDB();
     
     const body = await request.json();
@@ -42,7 +48,11 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
 
 // DELETE hero slide
 export async function DELETE(request: NextRequest, { params }: { params: { id: string } }) {
+  const authError = await requireAdmin(request);
+  if (authError) return authError;
+
   try {
+
     await connectDB();
     
     const deletedSlide = await HeroSlider.findByIdAndDelete(params.id);

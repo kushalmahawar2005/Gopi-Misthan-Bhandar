@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
 import SiteContent from '@/models/SiteContent';
+import { requireAdmin } from '@/lib/auth';
+
 
 // GET single site content
 export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
@@ -21,7 +23,11 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
 
 // PUT update site content
 export async function PUT(request: NextRequest, { params }: { params: { id: string } }) {
+  const authError = await requireAdmin(request);
+  if (authError) return authError;
+
   try {
+
     await connectDB();
     
     const body = await request.json();
@@ -71,7 +77,11 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
 
 // DELETE site content
 export async function DELETE(request: NextRequest, { params }: { params: { id: string } }) {
+  const authError = await requireAdmin(request);
+  if (authError) return authError;
+
   try {
+
     await connectDB();
     
     const content = await SiteContent.findByIdAndDelete(params.id);

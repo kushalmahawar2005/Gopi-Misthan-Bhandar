@@ -9,9 +9,62 @@ import SmoothScroll from '@/components/SmoothScroll'
 import TrendingBannerModal from '@/components/TrendingBannerModal'
 import NextAuthSessionProvider from '@/components/NextAuthSessionProvider'
 
+const BASE_URL = process.env.NEXTAUTH_URL || 'https://gopimisthanbhandar.com';
+
 export const metadata: Metadata = {
-  title: 'Gopi Misthan Bhandar Neemuch - Traditional Indian Sweets',
-  description: 'Serving Tradition & Sweetness Since 1968. Traditional Indian sweets, snacks, and namkeen from Neemuch.',
+  metadataBase: new URL(BASE_URL),
+  title: {
+    default: 'Gopi Misthan Bhandar Neemuch - Traditional Indian Sweets Since 1968',
+    template: '%s | Gopi Misthan Bhandar',
+  },
+  description: 'Serving Tradition & Sweetness Since 1968. Order authentic traditional Indian sweets, premium dry fruit boxes, namkeen, and gift hampers online from Neemuch, Madhya Pradesh. Pan-India delivery.',
+  keywords: [
+    'Indian sweets', 'mithai', 'sweets online', 'Neemuch sweets', 'traditional sweets',
+    'Gopi Misthan Bhandar', 'namkeen', 'dry fruit boxes', 'gift hampers', 'wedding sweets',
+    'premium sweets', 'Madhya Pradesh sweets', 'buy sweets online India', 'mithai delivery',
+    'Diwali sweets', 'Rakhi gift box', 'corporate gifting sweets',
+  ],
+  authors: [{ name: 'Gopi Misthan Bhandar' }],
+  creator: 'Gopi Misthan Bhandar',
+  publisher: 'Gopi Misthan Bhandar',
+  formatDetection: {
+    email: false,
+    address: false,
+    telephone: false,
+  },
+  openGraph: {
+    type: 'website',
+    locale: 'en_IN',
+    url: BASE_URL,
+    siteName: 'Gopi Misthan Bhandar',
+    title: 'Gopi Misthan Bhandar - Traditional Indian Sweets Since 1968',
+    description: 'Order authentic traditional Indian sweets, premium dry fruit boxes, namkeen & gift hampers online. Pan-India delivery from Neemuch.',
+    images: [
+      {
+        url: '/logo.png',
+        width: 512,
+        height: 512,
+        alt: 'Gopi Misthan Bhandar Logo',
+      },
+    ],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Gopi Misthan Bhandar - Traditional Indian Sweets Since 1968',
+    description: 'Order authentic traditional Indian sweets, premium dry fruit boxes & gift hampers online from Neemuch.',
+    images: ['/logo.png'],
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-video-preview': -1,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+    },
+  },
   icons: {
     icon: [
       { url: '/logo.png', type: 'image/png' },
@@ -23,6 +76,9 @@ export const metadata: Metadata = {
     ],
     shortcut: '/logo.png',
   },
+  alternates: {
+    canonical: BASE_URL,
+  },
 }
 
 export default function RootLayout({
@@ -33,11 +89,17 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
+        {/* Preconnect to font CDN - reduces DNS lookup time */}
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link href="https://fonts.googleapis.com/css2?family=Averia+Serif+Libre:wght@300;400;700&family=Inder&family=Inter:wght@300;400;500;600;700;800;900&family=Roboto+Slab:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
-        <link href="https://fonts.googleapis.com/css2?family=Jost:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet" />
-        <link href="https://fonts.googleapis.com/css2?family=Geom:ital,wght@0,300..900;1,300..900&family=Sora:wght@100..800&display=swap" rel="stylesheet" />
+        {/* DNS prefetch for image CDN (Cloudinary) */}
+        <link rel="dns-prefetch" href="https://res.cloudinary.com" />
+        {/* ALL Google Fonts combined into ONE request (was 3 separate = 3× render-blocking calls) */}
+        <link
+          href="https://fonts.googleapis.com/css2?family=Averia+Serif+Libre:wght@300;400;700&family=Inder&family=Inter:wght@300;400;500;600;700;800;900&family=Jost:ital,wght@0,100..900;1,100..900&family=Roboto+Slab:wght@300;400;500;600;700&family=Sora:wght@100..800&display=swap"
+          rel="stylesheet"
+        />
+        {/* Local font - self-hosted (no external request) */}
         <link href="/fonts/GeneralSans_Complete/Fonts/WEB/css/general-sans.css" rel="stylesheet" />
         <link rel="icon" href="/logo.png" type="image/png" />
         <link rel="shortcut icon" href="/logo.png" type="image/png" />
@@ -47,6 +109,75 @@ export default function RootLayout({
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
         <meta name="apple-mobile-web-app-title" content="Gopi Sweets" />
         <link rel="apple-touch-icon" href="/logo.png" />
+        {/* JSON-LD: LocalBusiness Schema (Google Knowledge Panel) */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              '@context': 'https://schema.org',
+              '@type': ['LocalBusiness', 'FoodEstablishment'],
+              '@id': `${BASE_URL}/#organization`,
+              name: 'Gopi Misthan Bhandar',
+              alternateName: 'Gopi Sweets Neemuch',
+              url: BASE_URL,
+              logo: `${BASE_URL}/logo.png`,
+              image: `${BASE_URL}/logo.png`,
+              description: 'Serving Tradition & Sweetness Since 1968. Traditional Indian sweets, premium mithai, namkeen, dry fruit boxes, and gifting solutions from Neemuch, Madhya Pradesh.',
+              foundingDate: '1968',
+              address: {
+                '@type': 'PostalAddress',
+                streetAddress: 'Main Road',
+                addressLocality: 'Neemuch',
+                addressRegion: 'Madhya Pradesh',
+                postalCode: '458441',
+                addressCountry: 'IN',
+              },
+              geo: {
+                '@type': 'GeoCoordinates',
+                latitude: 24.4619,
+                longitude: 74.8666,
+              },
+              servesCuisine: 'Indian Sweets',
+              priceRange: '₹₹',
+              openingHoursSpecification: [{
+                '@type': 'OpeningHoursSpecification',
+                dayOfWeek: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
+                opens: '08:00',
+                closes: '21:00',
+              }],
+              hasOfferCatalog: {
+                '@type': 'OfferCatalog',
+                name: 'Gopi Misthan Bhandar Products',
+                itemListElement: [
+                  { '@type': 'OfferCatalog', name: 'Traditional Sweets' },
+                  { '@type': 'OfferCatalog', name: 'Premium Sweets' },
+                  { '@type': 'OfferCatalog', name: 'Namkeen & Snacks' },
+                  { '@type': 'OfferCatalog', name: 'Dry Fruit Gift Boxes' },
+                ],
+              },
+            }),
+          }}
+        />
+        {/* JSON-LD: WebSite Schema (Google Sitelinks Search Box) */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              '@context': 'https://schema.org',
+              '@type': 'WebSite',
+              name: 'Gopi Misthan Bhandar',
+              url: BASE_URL,
+              potentialAction: {
+                '@type': 'SearchAction',
+                target: {
+                  '@type': 'EntryPoint',
+                  urlTemplate: `${BASE_URL}/products?search={search_term_string}`,
+                },
+                'query-input': 'required name=search_term_string',
+              },
+            }),
+          }}
+        />
       </head>
       <body className="antialiased overflow-x-hidden w-full relative min-h-screen">
         <SmoothScroll />

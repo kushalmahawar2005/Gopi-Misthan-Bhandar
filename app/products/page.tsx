@@ -9,6 +9,7 @@ import Header from '@/components/Header';
 import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
 import Cart from '@/components/Cart';
+import { ProductGridSkeleton } from '@/components/SkeletonLoaders';
 import Pagination from '@/components/Pagination';
 import { FiGrid, FiList, FiChevronDown, FiX, FiFilter, FiCheck } from 'react-icons/fi';
 import { Product, Category } from '@/types';
@@ -230,9 +231,7 @@ function ProductsContent() {
             </div>
 
             {loading ? (
-              <div className="grid grid-cols-2 lg:grid-cols-4 gap-8">
-                {[...Array(8)].map((_, i) => <div key={i} className="aspect-[4/5] bg-gray-50 animate-pulse rounded-2xl" />)}
-              </div>
+              <ProductGridSkeleton count={12} />
             ) : processedProducts.length === 0 ? (
               <div className="py-20 text-center bg-gray-50 rounded-3xl font-bold text-gray-400 uppercase tracking-widest">No products found</div>
             ) : (

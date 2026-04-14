@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
 import Category from '@/models/Category';
+import { requireAdmin } from '@/lib/auth';
+
 
 // GET single category
 export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
@@ -21,7 +23,11 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
 
 // PUT update category
 export async function PUT(request: NextRequest, { params }: { params: { id: string } }) {
+  const authError = await requireAdmin(request);
+  if (authError) return authError;
+
   try {
+
     await connectDB();
     
     const body = await request.json();
@@ -39,7 +45,11 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
 
 // DELETE category
 export async function DELETE(request: NextRequest, { params }: { params: { id: string } }) {
+  const authError = await requireAdmin(request);
+  if (authError) return authError;
+
   try {
+
     await connectDB();
     
     const category = await Category.findByIdAndDelete(params.id);

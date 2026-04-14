@@ -87,15 +87,11 @@ const HeroSection = () => {
   const goToSlide = (i: number) => i >= 0 && i < slides.length && setCurrentSlide(i);
 
   if (loading) {
+    // Static skeleton — does NOT block LCP (no spinner animation)
     return (
-      <section className="w-full -mt-0">
-        <div className="w-full h-[485px] relative overflow-hidden bg-gray-100">
-          <div className="flex items-center justify-center h-full">
-            <div className="text-center">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-red mx-auto mb-4"></div>
-              <p className="text-gray-600">Loading...</p>
-            </div>
-          </div>
+      <section className="w-full -mt-0 mb-8 md:mb-4">
+        <div className="w-full h-[550px] sm:h-[650px] md:h-[485px] lg:h-[550px] relative overflow-hidden bg-[#FDF8F3]">
+          <div className="w-full h-full bg-gradient-to-r from-[#FDF8F3] via-[#f5ead8] to-[#FDF8F3] animate-pulse" />
         </div>
       </section>
     );
@@ -120,20 +116,24 @@ const HeroSection = () => {
                   }`}
               >
                 <div className="relative w-full h-full">
+                  {/* Desktop image — priority on first slide for LCP */}
                   <Image
                     src={slide.image}
-                    alt={`Hero slide ${index + 1}`}
+                    alt={slide.title ? `${slide.title} - Gopi Misthan Bhandar` : `Gopi Misthan Bhandar Traditional Sweets - Slide ${index + 1}`}
                     fill
                     className="object-cover object-center hidden md:block"
                     priority={index === 0}
+                    fetchPriority={index === 0 ? 'high' : 'auto'}
                     sizes="100vw"
                   />
+                  {/* Mobile image */}
                   <Image
                     src={(slide as any).mobileImage || slide.image}
-                    alt={`Hero slide ${index + 1}`}
+                    alt={slide.title ? `${slide.title} - Gopi Misthan Bhandar` : `Gopi Misthan Bhandar Traditional Sweets - Slide ${index + 1}`}
                     fill
                     className="object-contain object-top md:hidden"
                     priority={index === 0}
+                    fetchPriority={index === 0 ? 'high' : 'auto'}
                     sizes="100vw"
                   />
                 </div>

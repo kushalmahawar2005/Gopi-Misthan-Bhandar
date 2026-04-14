@@ -1,7 +1,8 @@
 'use client';
 
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
 import { Product } from '@/types';
+import { useAuth } from '@/context/AuthContext';
 
 export interface CartItem extends Product {
   quantity: number;
@@ -27,6 +28,10 @@ const CartContext = createContext<CartContextType | undefined>(undefined);
 export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const [isCartOpen, setIsCartOpen] = useState(false);
+  const { user } = useAuth();
+  
+  const [isInitialized, setIsInitialized] = useState(false);
+  const isSyncing = useRef(false);
 
   // Load cart from localStorage on mount
   useEffect(() => {
@@ -38,15 +43,65 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
         console.error('Error loading cart from localStorage:', error);
       }
     }
+    setIsInitialized(true);
   }, []);
 
-  // Save cart to localStorage whenever it changes
+  // Sync cart when user logs in
   useEffect(() => {
+    if (!isInitialized || !user) return;
+    
+    const sourceId = user.id || user.userId;
+    if (!sourceId) return;
+
+    const syncCartWithDB = async () => {
+      isSyncing.current = true;
+      try {
+        const localCartStr = localStorage.getItem('cart');
+        const localItems = localCartStr ? JSON.parse(localCartStr) : [];
+        
+        const res = await fetch('/api/cart', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ userId: sourceId, items: localItems, action: 'sync' })
+        });
+        
+        const data = await res.json();
+        if (data.success && data.data) {
+          setCartItems(data.data);
+          localStorage.setItem('cart', JSON.stringify(data.data));
+        }
+      } catch (err) {
+        console.error('Cart sync error:', err);
+      } finally {
+        isSyncing.current = false;
+      }
+    };
+    
+    syncCartWithDB();
+  }, [user, isInitialized]);
+
+  // Save cart to DB and localStorage whenever it changes
+  useEffect(() => {
+    if (!isInitialized) return;
+    
     localStorage.setItem('cart', JSON.stringify(cartItems));
-  }, [cartItems]);
+
+    // If currently performing sync-merge, do not overwrite DB with incomplete local state
+    if (user && !isSyncing.current) {
+      const sourceId = user.id || user.userId;
+      if (sourceId) {
+        fetch('/api/cart', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ userId: sourceId, items: cartItems }),
+        }).catch(err => console.error('Failed to save cart to DB:', err));
+      }
+    }
+  }, [cartItems, user, isInitialized]);
 
   const addToCart = (product: Product, quantity: number = 1) => {
     setCartItems((prevItems) => {
+      // Find existing item keeping size/weight into account if they exist
       const existingItem = prevItems.find((item) => item.id === product.id);
       
       if (existingItem) {
@@ -121,4 +176,3 @@ export const useCart = () => {
   }
   return context;
 };
-

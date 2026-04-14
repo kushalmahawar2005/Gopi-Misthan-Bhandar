@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
 import Gallery from '@/models/Gallery';
+import { requireAdmin } from '@/lib/auth';
+
 
 export async function GET(
   request: NextRequest,
@@ -67,7 +69,11 @@ export async function DELETE(
   request: NextRequest,
   { params }: { params: { id: string } }
 ) {
+  const authError = await requireAdmin(request);
+  if (authError) return authError;
+
   try {
+
     await connectDB();
     const galleryItem = await Gallery.findByIdAndDelete(params.id);
     if (!galleryItem) {

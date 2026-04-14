@@ -4,7 +4,43 @@ import connectDB from '@/lib/mongodb';
 import User from '@/models/User';
 import { NextAuthOptions } from 'next-auth';
 
+import { getServerSession } from 'next-auth/next';
+import { NextRequest, NextResponse } from 'next/server';
+import { verifyToken } from '@/lib/jwt';
+
+export async function requireAdmin(request: NextRequest) {
+    // 1. Check NextAuth session
+    const session = await getServerSession(authOptions) as any;
+    if (session && session.user?.role === 'admin') {
+        return null; // Admin authorized via NextAuth
+    }
+
+    // 2. Fallback: Check custom auth_token cookie
+    const customToken = request.cookies.get('auth_token')?.value;
+    if (customToken) {
+        const payload = verifyToken(customToken);
+        if (payload && payload.role === 'admin') {
+            return null; // Admin authorized via custom token
+        }
+    }
+
+    // 3. Unauthorized
+    if (!session && !customToken) {
+        return NextResponse.json(
+            { success: false, error: 'Unauthorized. Login required.' },
+            { status: 401 }
+        );
+    }
+
+    // 4. Forbidden
+    return NextResponse.json(
+        { success: false, error: 'Forbidden. Admin access required.' },
+        { status: 403 }
+    );
+}
+
 export const authOptions: NextAuthOptions = {
+
     providers: [
         GoogleProvider({
             clientId: process.env.GOOGLE_CLIENT_ID || '',

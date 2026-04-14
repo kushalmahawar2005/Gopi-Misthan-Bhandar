@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
 import Gallery from '@/models/Gallery';
+import { requireAdmin } from '@/lib/auth';
+
 
 export async function GET() {
   try {
@@ -24,7 +26,11 @@ export async function GET() {
 }
 
 export async function POST(request: NextRequest) {
+  const authError = await requireAdmin(request);
+  if (authError) return authError;
+
   try {
+
     await connectDB();
     const body = await request.json();
     const galleryItem = await Gallery.create(body);
