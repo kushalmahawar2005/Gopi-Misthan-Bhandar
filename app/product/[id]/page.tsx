@@ -14,7 +14,6 @@ import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
 import Cart from '@/components/Cart';
 import { ProductDetailSkeleton } from '@/components/SkeletonLoaders';
-import Cart from '@/components/Cart';
 import {
   FiShoppingCart,
   FiMinus,
