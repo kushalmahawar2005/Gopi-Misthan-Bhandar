@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
 import InstaBook from '@/models/InstaBook';
+import { requireAdmin } from '@/lib/auth';
+
 
 export async function GET(request: NextRequest) {
   try {
@@ -30,7 +32,11 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
+  const authError = await requireAdmin(request);
+  if (authError) return authError;
+
   try {
+
     await connectDB();
     const body = await request.json();
     const instaBook = await InstaBook.create(body);

@@ -13,6 +13,8 @@ import Header from '@/components/Header';
 import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
 import Cart from '@/components/Cart';
+import { ProductDetailSkeleton } from '@/components/SkeletonLoaders';
+import Cart from '@/components/Cart';
 import {
   FiShoppingCart,
   FiMinus,
@@ -212,16 +214,11 @@ export default function ProductDetailPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-white">
+      <div className="min-h-screen bg-white pt-24 pb-12">
         <Header />
         <Navigation />
         <Cart />
-        <div className="flex items-center justify-center min-h-[60vh]">
-          <div className="text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-red mx-auto mb-4"></div>
-            <p className="text-gray-600">Loading product...</p>
-          </div>
-        </div>
+        <ProductDetailSkeleton />
         <Footer />
       </div>
     );

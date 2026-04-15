@@ -1,7 +1,8 @@
 'use client';
 
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
 import { Product } from '@/types';
+import { useAuth } from '@/context/AuthContext';
 
 interface WishlistContextType {
   wishlistItems: Product[];
@@ -16,6 +17,10 @@ const WishlistContext = createContext<WishlistContextType | undefined>(undefined
 
 export const WishlistProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [wishlistItems, setWishlistItems] = useState<Product[]>([]);
+  const { user } = useAuth();
+  
+  const [isInitialized, setIsInitialized] = useState(false);
+  const isSyncing = useRef(false);
 
   // Load wishlist from localStorage on mount
   useEffect(() => {
@@ -27,12 +32,60 @@ export const WishlistProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         console.error('Error loading wishlist from localStorage:', error);
       }
     }
+    setIsInitialized(true);
   }, []);
 
-  // Save wishlist to localStorage whenever it changes
+  // Sync wishlist with DB logic when user logs in
   useEffect(() => {
+    if (!isInitialized || !user) return;
+    
+    const sourceId = user.id || user.userId;
+    if (!sourceId) return;
+
+    const syncWishlistWithDB = async () => {
+      isSyncing.current = true;
+      try {
+        const localWishlistStr = localStorage.getItem('wishlist');
+        const localItems = localWishlistStr ? JSON.parse(localWishlistStr) : [];
+        
+        const res = await fetch('/api/wishlist', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ userId: sourceId, items: localItems, action: 'sync' })
+        });
+        
+        const data = await res.json();
+        if (data.success && data.data) {
+          setWishlistItems(data.data);
+          localStorage.setItem('wishlist', JSON.stringify(data.data));
+        }
+      } catch (err) {
+        console.error('Wishlist sync error:', err);
+      } finally {
+        isSyncing.current = false;
+      }
+    };
+    
+    syncWishlistWithDB();
+  }, [user, isInitialized]);
+
+  // Save wishlist to DB and localStorage whenever it changes
+  useEffect(() => {
+    if (!isInitialized) return;
+    
     localStorage.setItem('wishlist', JSON.stringify(wishlistItems));
-  }, [wishlistItems]);
+
+    if (user && !isSyncing.current) {
+      const sourceId = user.id || user.userId;
+      if (sourceId) {
+        fetch('/api/wishlist', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ userId: sourceId, items: wishlistItems }),
+        }).catch(err => console.error('Failed to save wishlist to DB:', err));
+      }
+    }
+  }, [wishlistItems, user, isInitialized]);
 
   const addToWishlist = (product: Product) => {
     setWishlistItems((prevItems) => {
@@ -82,4 +135,3 @@ export const useWishlist = () => {
   }
   return context;
 };
-

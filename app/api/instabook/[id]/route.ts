@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
 import InstaBook from '@/models/InstaBook';
+import { requireAdmin } from '@/lib/auth';
+
 
 export async function GET(
   request: NextRequest,
@@ -28,7 +30,11 @@ export async function PUT(
   request: NextRequest,
   { params }: { params: { id: string } }
 ) {
+  const authError = await requireAdmin(request);
+  if (authError) return authError;
+
   try {
+
     await connectDB();
     const body = await request.json();
     const instaBook = await InstaBook.findByIdAndUpdate(
@@ -55,7 +61,11 @@ export async function DELETE(
   request: NextRequest,
   { params }: { params: { id: string } }
 ) {
+  const authError = await requireAdmin(request);
+  if (authError) return authError;
+
   try {
+
     await connectDB();
     const instaBook = await InstaBook.findByIdAndDelete(params.id);
     if (!instaBook) {

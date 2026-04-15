@@ -1,5 +1,5 @@
-@import url('https://fonts.googleapis.com/css2?family=Instrument+Sans:ital,wght@0,400..700;1,400..700&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&display=swap');
+/* ⚡ Performance Note: Google Fonts are loaded via <link> in layout.tsx HEAD
+   with preconnect hints — NOT via @import here to avoid render-blocking. */
 
 @font-face {
   font-family: 'Platina';
@@ -253,4 +253,72 @@ section,
 
 .animate-purity-marquee:hover {
   animation-play-state: paused;
+}
+
+/* ══════════════════════════════════════════════
+   ⚡ CORE WEB VITALS — CLS PREVENTION UTILITIES
+   Prevents layout shifts during image/content load
+   ══════════════════════════════════════════════ */
+
+/* Skeleton shimmer animation (replaces spinners that kill LCP) */
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    #f0e8de 25%,
+    #f5ead8 50%,
+    #f0e8de 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s ease-in-out infinite;
+  border-radius: 4px;
+}
+
+/* Prevent CLS: Reserve aspect ratio for images before they load */
+.aspect-square-reserved {
+  aspect-ratio: 1 / 1;
+  width: 100%;
+}
+
+.aspect-hero-reserved {
+  min-height: 485px;
+}
+
+@media (max-width: 768px) {
+  .aspect-hero-reserved {
+    min-height: 550px;
+  }
+}
+
+/* Prevent layout shift from fonts (FOUT/FOIT mitigation) */
+/* Ensures font size doesn't jump when custom fonts load */
+body {
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Smooth image loading — prevents CLS from image size changes */
+img, [data-next-image] {
+  max-width: 100%;
+  height: auto;
+}
+
+/* Fix for Next.js Image fill mode — ensure parent always has defined size */
+[style*="position: relative"] > span[style*="box-sizing: border-box"] {
+  display: block !important;
+}
+
+/* no-scrollbar utility */
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
 }

@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
 import Product from '@/models/Product';
 import Category from '@/models/Category';
+import { requireAdmin } from '@/lib/auth';
+
 
 // GET all products with pagination
 export async function GET(request: NextRequest) {
@@ -86,7 +88,11 @@ export async function GET(request: NextRequest) {
 
 // POST create new product
 export async function POST(request: NextRequest) {
+  const authError = await requireAdmin(request);
+  if (authError) return authError;
+
   try {
+
     await connectDB();
     
     const body = await request.json();

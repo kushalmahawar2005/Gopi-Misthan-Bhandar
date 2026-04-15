@@ -23,7 +23,6 @@ import {
   FiGift,
   FiBox,
   FiEye,
-  FiInstagram,
   FiGrid,
   FiStar,
   FiTruck,
@@ -73,7 +72,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     { href: '/admin/categories', icon: FiFolder, label: 'Categories' },
     { href: '/admin/inventory', icon: FiBox, label: 'Inventory' },
     { href: '/admin/coupons', icon: FiGift, label: 'Coupons' },
-    { href: '/admin/delivery', icon: FiTruck, label: 'Delivery' },
+    { href: '/admin/delivery', icon: FiTruck, label: 'Delivery (NimbusPost)' },
     { href: '/admin/analytics', icon: FiBarChart2, label: 'Analytics' },
     { href: '/admin/settings', icon: FiSettings, label: 'Settings' },
   ];

@@ -2,9 +2,15 @@ import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
 import Order from '@/models/Order';
 import { cancelShipment } from '@/lib/nimbuspost';
+import { requireAdmin } from '@/lib/auth';
+
 
 export async function POST(req: NextRequest) {
+  const authError = await requireAdmin(req);
+  if (authError) return authError;
+
   try {
+
     const { orderId } = await req.json();
 
     if (!orderId) {

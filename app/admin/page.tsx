@@ -14,7 +14,6 @@ import {
   FiEye,
   FiImage,
   FiFile,
-  FiInstagram,
   FiSettings,
   FiEdit,
 } from 'react-icons/fi';
@@ -102,7 +101,6 @@ export default function AdminDashboard() {
     { label: 'Add Blog', icon: FiFile, href: '/admin/blog/new', color: 'bg-pink-50 text-pink-700 hover:bg-pink-100' },
     { label: 'Categories', icon: FiFolder, href: '/admin/categories', color: 'bg-orange-50 text-orange-700 hover:bg-orange-100' },
     { label: 'InstaBook', icon: FiEye, href: '/admin/instabook', color: 'bg-indigo-50 text-indigo-700 hover:bg-indigo-100' },
-    { label: 'InstaPost', icon: FiInstagram, href: '/admin/instapost', color: 'bg-pink-50 text-pink-700 hover:bg-pink-100' },
     { label: 'Add Coupon', icon: FiGift, href: '/admin/coupons/new', color: 'bg-teal-50 text-teal-700 hover:bg-teal-100' },
     { label: 'User Roles', icon: FiUsers, href: '/admin/users', color: 'bg-cyan-50 text-cyan-700 hover:bg-cyan-100' },
   ];
@@ -135,13 +133,6 @@ export default function AdminDashboard() {
       stats: ['Active Items: 5', 'Auto-play: Enabled'],
       action: { label: '+ Add Item', href: '/admin/instabook/new' },
       manage: { href: '/admin/instabook' },
-    },
-    {
-      title: 'InstaPost',
-      icon: FiInstagram,
-      stats: ['Active Posts: 4', 'Grid Display'],
-      action: { label: '+ Add Post', href: '/admin/instapost/new' },
-      manage: { href: '/admin/instapost' },
     },
   ];
 

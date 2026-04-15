@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
 import Blog from '@/models/Blog';
+import { requireAdmin } from '@/lib/auth';
+
 
 export async function GET(
   request: NextRequest,
@@ -69,7 +71,11 @@ export async function DELETE(
   request: NextRequest,
   { params }: { params: { id: string } }
 ) {
+  const authError = await requireAdmin(request);
+  if (authError) return authError;
+
   try {
+
     await connectDB();
     const blog = await Blog.findByIdAndDelete(params.id);
     if (!blog) {

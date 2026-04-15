@@ -11,6 +11,7 @@ import Header from '@/components/Header';
 import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
 import Cart from '@/components/Cart';
+import { CategorySkeleton } from '@/components/SkeletonLoaders';
 import { FiGrid, FiList, FiChevronDown, FiX } from 'react-icons/fi';
 import { Product, Category } from '@/types';
 
@@ -190,12 +191,7 @@ function CategoryContent() {
         <Header />
         <Navigation />
         <Cart />
-        <div className="flex items-center justify-center min-h-[60vh]">
-          <div className="text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-red mx-auto mb-4"></div>
-            <p className="text-gray-600">Loading...</p>
-          </div>
-        </div>
+        <CategorySkeleton />
         <Footer />
       </div>
     );

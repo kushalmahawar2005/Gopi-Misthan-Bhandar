@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
 import HeroSlider from '@/models/HeroSlider';
+import { requireAdmin } from '@/lib/auth';
+
 
 // GET all hero slides
 export async function GET(request: NextRequest) {
@@ -32,7 +34,11 @@ export async function GET(request: NextRequest) {
 
 // POST create new hero slide
 export async function POST(request: NextRequest) {
+  const authError = await requireAdmin(request);
+  if (authError) return authError;
+
   try {
+
     await connectDB();
     
     const body = await request.json();

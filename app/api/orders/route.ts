@@ -11,11 +11,16 @@ export async function GET(request: NextRequest) {
     const userId = searchParams.get('userId');
     const email = searchParams.get('email');
     const status = searchParams.get('status');
+    const orderNumber = searchParams.get('orderNumber');
 
     let query: any = {};
 
+    // If orderNumber is provided, use it directly (for success page lookup)
+    if (orderNumber) {
+      query.orderNumber = orderNumber;
+    }
     // If userId is provided, filter by userId
-    if (userId) {
+    else if (userId) {
       query.userId = userId;
     }
     // If email is provided but no userId, filter by shipping email
@@ -27,6 +32,33 @@ export async function GET(request: NextRequest) {
       query.status = status;
     }
 
+    // Check if pagination is requested
+    const page = searchParams.get('page');
+    const limit = searchParams.get('limit');
+
+    if (page) {
+      // Paginated response for admin dashboard
+      const pageNum = Math.max(1, parseInt(page));
+      const limitNum = Math.max(1, Math.min(100, parseInt(limit || '10')));
+      const skip = (pageNum - 1) * limitNum;
+
+      const [orders, totalOrders] = await Promise.all([
+        Order.find(query).sort({ createdAt: -1 }).skip(skip).limit(limitNum).lean(),
+        Order.countDocuments(query),
+      ]);
+
+      const totalPages = Math.ceil(totalOrders / limitNum);
+
+      return NextResponse.json({
+        success: true,
+        data: orders,
+        totalOrders,
+        totalPages,
+        currentPage: pageNum,
+      }, { status: 200 });
+    }
+
+    // Non-paginated response (for polling, user order history, etc.)
     const orders = await Order.find(query).sort({ createdAt: -1 });
 
     return NextResponse.json({ success: true, data: orders }, { status: 200 });

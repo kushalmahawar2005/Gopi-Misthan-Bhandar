@@ -1,9 +1,10 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { FiFile, FiPlus, FiEdit, FiTrash2, FiSearch, FiArrowUp, FiArrowDown } from 'react-icons/fi';
 import Link from 'next/link';
 import Image from 'next/image';
+import Pagination from '@/components/admin/Pagination';
 
 interface BlogItem {
   _id: string;
@@ -16,27 +17,75 @@ interface BlogItem {
   isActive: boolean;
 }
 
+const ITEMS_PER_PAGE = 9; // 3x3 grid looks best
+
 export default function BlogPage() {
   const [blogs, setBlogs] = useState<BlogItem[]>([]);
   const [loading, setLoading] = useState(true);
+  const [pageLoading, setPageLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
 
-  useEffect(() => {
-    fetchBlogs();
-  }, []);
+  // Pagination State
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalBlogs, setTotalBlogs] = useState(0);
 
-  const fetchBlogs = async () => {
+  const gridRef = useRef<HTMLDivElement>(null);
+  const searchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Debounced search - reset page
+  useEffect(() => {
+    if (searchTimeoutRef.current) {
+      clearTimeout(searchTimeoutRef.current);
+    }
+    searchTimeoutRef.current = setTimeout(() => {
+      setCurrentPage(1);
+    }, 400);
+
+    return () => {
+      if (searchTimeoutRef.current) clearTimeout(searchTimeoutRef.current);
+    };
+  }, [searchTerm]);
+
+  const fetchBlogs = useCallback(async () => {
     try {
-      const response = await fetch('/api/blog/all');
+      setPageLoading(true);
+      const params = new URLSearchParams();
+      params.set('page', String(currentPage));
+      params.set('limit', String(ITEMS_PER_PAGE));
+
+      if (searchTerm) {
+        params.set('search', searchTerm);
+      }
+
+      const response = await fetch(`/api/blog/all?${params.toString()}`);
       const data = await response.json();
       if (data.success) {
         setBlogs(data.data || []);
+        setTotalBlogs(data.totalBlogs || data.data?.length || 0);
+        setTotalPages(data.totalPages || 1);
       }
     } catch (error) {
       console.error('Error fetching Blog items:', error);
     } finally {
       setLoading(false);
+      setPageLoading(false);
     }
+  }, [currentPage, searchTerm]);
+
+  useEffect(() => {
+    fetchBlogs();
+  }, [fetchBlogs]);
+
+  // Scroll to top on page change
+  useEffect(() => {
+    if (!loading && gridRef.current) {
+      gridRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  }, [currentPage]);
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
   };
 
   const handleDelete = async (id: string) => {
@@ -140,15 +189,8 @@ export default function BlogPage() {
     });
   };
 
-  const filteredBlogs = blogs
-    .filter((item) => {
-      if (!searchTerm) return true;
-      const searchLower = searchTerm.toLowerCase();
-      const title = (item.title || '').toLowerCase();
-      const description = (item.description || '').toLowerCase();
-      return title.includes(searchLower) || description.includes(searchLower);
-    })
-    .sort((a, b) => a.order - b.order);
+  // Sort blogs by order for display
+  const sortedBlogs = [...blogs].sort((a, b) => a.order - b.order);
 
   if (loading) {
     return (
@@ -162,7 +204,7 @@ export default function BlogPage() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6" ref={gridRef}>
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
@@ -192,87 +234,122 @@ export default function BlogPage() {
         </div>
       </div>
 
-      {/* Blog Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-        {filteredBlogs.map((item, index) => (
-          <div key={item._id} className="bg-white border border-gray-200 rounded-lg overflow-hidden hover:shadow-md transition-shadow">
-            <div className="relative w-full h-48 overflow-hidden">
-              <Image
-                src={item.imageUrl || `https://picsum.photos/seed/blog${item._id}/400/300`}
-                alt={item.title}
-                fill
-                className="object-cover"
-                sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
-              />
-              {!item.isActive && (
-                <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
-                  <span className="text-white font-bold">Inactive</span>
+      {/* Loading state for page transitions */}
+      {pageLoading ? (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+          {Array.from({ length: ITEMS_PER_PAGE }).map((_, i) => (
+            <div key={i} className="bg-white border border-gray-200 rounded-lg overflow-hidden animate-pulse">
+              <div className="w-full h-48 bg-gray-200" />
+              <div className="p-5 space-y-3">
+                <div className="h-3 bg-gray-200 rounded w-1/3" />
+                <div className="h-5 bg-gray-200 rounded w-3/4" />
+                <div className="h-3 bg-gray-100 rounded w-full" />
+                <div className="h-3 bg-gray-100 rounded w-1/4" />
+                <div className="flex gap-2 pt-2">
+                  <div className="h-8 bg-gray-100 rounded flex-1" />
+                  <div className="h-8 bg-gray-100 rounded w-10" />
+                  <div className="h-8 bg-gray-100 rounded w-10" />
                 </div>
-              )}
-            </div>
-            <div className="p-5">
-              <p className="text-xs text-gray-500 mb-2">{formatDate(item.publishedDate)}</p>
-              <h3 className="text-lg font-bold text-gray-800 mb-2 line-clamp-2">{item.title}</h3>
-              <p className="text-sm text-gray-600 mb-4 line-clamp-2">{item.description}</p>
-              <p className="text-xs text-gray-500 mb-4">Order: {item.order}</p>
-              <div className="flex gap-2 flex-wrap">
-                <button
-                  onClick={() => updateOrder(item._id, 'up')}
-                  disabled={index === 0}
-                  className="p-2 text-primary-red hover:bg-red-50 rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                  title="Move up"
-                >
-                  <FiArrowUp size={14} />
-                </button>
-                <button
-                  onClick={() => updateOrder(item._id, 'down')}
-                  disabled={index === filteredBlogs.length - 1}
-                  className="p-2 text-primary-red hover:bg-red-50 rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                  title="Move down"
-                >
-                  <FiArrowDown size={14} />
-                </button>
-                <Link
-                  href={`/admin/blog/${item._id}`}
-                  className="flex-1 bg-primary-red text-white p-2 rounded text-center hover:bg-primary-darkRed transition-colors text-sm font-medium"
-                >
-                  <FiEdit size={14} className="inline mr-1" />
-                  Edit
-                </Link>
-                <button
-                  onClick={() => toggleActive(item._id, item.isActive)}
-                  className={`p-2 rounded text-xs font-medium ${
-                    item.isActive
-                      ? 'bg-green-100 text-green-800 hover:bg-green-200'
-                      : 'bg-gray-100 text-gray-800 hover:bg-gray-200'
-                  }`}
-                >
-                  {item.isActive ? 'On' : 'Off'}
-                </button>
-                <button
-                  onClick={() => handleDelete(item._id)}
-                  className="p-2 bg-primary-red text-white rounded hover:bg-primary-red transition-colors"
-                >
-                  <FiTrash2 size={14} />
-                </button>
               </div>
             </div>
-          </div>
-        ))}
-      </div>
-
-      {filteredBlogs.length === 0 && (
-        <div className="bg-white rounded-lg border border-gray-200 p-12 text-center">
-          <p className="text-gray-500 mb-4">No Blog posts found</p>
-          <Link
-            href="/admin/blog/new"
-            className="inline-block text-primary-red hover:underline font-medium"
-          >
-            Add your first Blog post
-          </Link>
+          ))}
         </div>
+      ) : (
+        <>
+          {/* Blog Grid */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+            {sortedBlogs.map((item, index) => (
+              <div key={item._id} className="bg-white border border-gray-200 rounded-lg overflow-hidden hover:shadow-md transition-shadow">
+                <div className="relative w-full h-48 overflow-hidden">
+                  <Image
+                    src={item.imageUrl || `https://picsum.photos/seed/blog${item._id}/400/300`}
+                    alt={item.title}
+                    fill
+                    className="object-cover"
+                    sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                  />
+                  {!item.isActive && (
+                    <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
+                      <span className="text-white font-bold">Inactive</span>
+                    </div>
+                  )}
+                </div>
+                <div className="p-5">
+                  <p className="text-xs text-gray-500 mb-2">{formatDate(item.publishedDate)}</p>
+                  <h3 className="text-lg font-bold text-gray-800 mb-2 line-clamp-2">{item.title}</h3>
+                  <p className="text-sm text-gray-600 mb-4 line-clamp-2">{item.description}</p>
+                  <p className="text-xs text-gray-500 mb-4">Order: {item.order}</p>
+                  <div className="flex gap-2 flex-wrap">
+                    <button
+                      onClick={() => updateOrder(item._id, 'up')}
+                      disabled={index === 0}
+                      className="p-2 text-primary-red hover:bg-red-50 rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                      title="Move up"
+                    >
+                      <FiArrowUp size={14} />
+                    </button>
+                    <button
+                      onClick={() => updateOrder(item._id, 'down')}
+                      disabled={index === sortedBlogs.length - 1}
+                      className="p-2 text-primary-red hover:bg-red-50 rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                      title="Move down"
+                    >
+                      <FiArrowDown size={14} />
+                    </button>
+                    <Link
+                      href={`/admin/blog/${item._id}`}
+                      className="flex-1 bg-primary-red text-white p-2 rounded text-center hover:bg-primary-darkRed transition-colors text-sm font-medium"
+                    >
+                      <FiEdit size={14} className="inline mr-1" />
+                      Edit
+                    </Link>
+                    <button
+                      onClick={() => toggleActive(item._id, item.isActive)}
+                      className={`p-2 rounded text-xs font-medium ${
+                        item.isActive
+                          ? 'bg-green-100 text-green-800 hover:bg-green-200'
+                          : 'bg-gray-100 text-gray-800 hover:bg-gray-200'
+                      }`}
+                    >
+                      {item.isActive ? 'On' : 'Off'}
+                    </button>
+                    <button
+                      onClick={() => handleDelete(item._id)}
+                      className="p-2 bg-primary-red text-white rounded hover:bg-primary-red transition-colors"
+                    >
+                      <FiTrash2 size={14} />
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {sortedBlogs.length === 0 && (
+            <div className="bg-white rounded-lg border border-gray-200 p-12 text-center">
+              <p className="text-gray-500 mb-4">No Blog posts found</p>
+              <Link
+                href="/admin/blog/new"
+                className="inline-block text-primary-red hover:underline font-medium"
+              >
+                Add your first Blog post
+              </Link>
+            </div>
+          )}
+        </>
+      )}
+
+      {/* Pagination */}
+      {totalBlogs > 0 && (
+        <Pagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          totalItems={totalBlogs}
+          limit={ITEMS_PER_PAGE}
+          itemLabel="posts"
+          onPageChange={handlePageChange}
+        />
       )}
     </div>
   );
 }
-

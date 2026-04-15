@@ -67,6 +67,17 @@ export const config = {
   matcher: [
     '/admin/:path*',
     '/api/admin/:path*',
+    '/api/products/:path*',
+    '/api/categories/:path*',
+    '/api/upload/:path*',
+    '/api/coupons/:path*',
+    '/api/blog/:path*',
+    '/api/hero-slider/:path*',
+    '/api/gallery/:path*',
+    '/api/instabook/:path*',
+    '/api/users/:path*',
+    '/api/site-content/:path*',
   ],
 };
+
 
