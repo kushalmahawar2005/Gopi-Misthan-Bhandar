@@ -65,7 +65,7 @@ const CategoriesSection: React.FC<CategoriesSectionProps> = ({ categories }) => 
               className="flex flex-col items-center gap-3 group"
             >
               {/* Circular Card */}
-              <div className="w-[90px] h-[90px] xs:w-[105px] xs:h-[105px] rounded-full overflow-hidden border-[3px] border-white shadow-md ring-2 ring-transparent group-hover:ring-[#FE8E02] transition-all duration-300 relative bg-[#FDF8F3]">
+              <div className="w-[96px] h-[96px] xs:w-[112px] xs:h-[112px] rounded-full overflow-hidden relative transition-transform duration-300 group-hover:scale-[1.03]">
                 {category.image ? (
                   <Image 
                     src={category.image} 
