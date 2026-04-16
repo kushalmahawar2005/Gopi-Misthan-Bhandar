@@ -1,0 +1,1285 @@
+MEDIUM SEVERITY HARDENING - COMPLETE FIXED FILE CONTENTS
+
+===== app/api/orders/[id]/route.ts =====
+import { NextRequest, NextResponse } from 'next/server';
+import connectDB from '@/lib/mongodb';
+import Order from '@/models/Order';
+import { sendOrderStatusSMS } from '@/lib/sms';
+import { getRequestAuth, requireAdmin } from '@/lib/auth';
+
+
+// GET single order
+export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
+  try {
+    const auth = await getRequestAuth(request);
+    if (!auth.isAuthenticated || !auth.user?.id) {
+      return NextResponse.json(
+        { success: false, error: 'Unauthorized. Login required.' },
+        { status: 401 }
+      );
+    }
+
+    await connectDB();
+    
+    const order = await Order.findById(params.id) as any;
+
+    if (!order) {
+      return NextResponse.json({ success: false, error: 'Order not found' }, { status: 404 });
+    }
+
+    const isOwner = order.userId && String(order.userId) === auth.user.id;
+    if (!auth.isAdmin && !isOwner) {
+      return NextResponse.json(
+        { success: false, error: 'Forbidden. This order does not belong to you.' },
+        { status: 403 }
+      );
+    }
+
+    return NextResponse.json({ success: true, data: order }, { status: 200 });
+  } catch (error: any) {
+    return NextResponse.json({ success: false, error: error.message }, { status: 500 });
+  }
+}
+
+// PUT update order
+export async function PUT(request: NextRequest, { params }: { params: { id: string } }) {
+  const authError = await requireAdmin(request);
+  if (authError) return authError;
+
+  try {
+
+    await connectDB();
+    
+    const body = await request.json();
+    const oldOrder = await Order.findById(params.id);
+    const order = await Order.findByIdAndUpdate(params.id, body, { new: true, runValidators: true });
+
+    if (!order) {
+      return NextResponse.json({ success: false, error: 'Order not found' }, { status: 404 });
+    }
+
+    // Send SMS if status changed
+    if (oldOrder && body.status && oldOrder.status !== body.status && order.shipping?.phone) {
+      sendOrderStatusSMS(
+        order.shipping.phone,
+        order.orderNumber,
+        body.status
+      ).catch((error) => {
+        console.error('Error sending status update SMS:', error);
+      });
+    }
+
+    return NextResponse.json({ success: true, data: order }, { status: 200 });
+  } catch (error: any) {
+    return NextResponse.json({ success: false, error: error.message }, { status: 500 });
+  }
+}
+
+// DELETE order
+export async function DELETE(request: NextRequest, { params }: { params: { id: string } }) {
+  const authError = await requireAdmin(request);
+  if (authError) return authError;
+
+  try {
+
+    await connectDB();
+    
+    const order = await Order.findByIdAndDelete(params.id);
+
+    if (!order) {
+      return NextResponse.json({ success: false, error: 'Order not found' }, { status: 404 });
+    }
+
+    return NextResponse.json({ success: true, data: {} }, { status: 200 });
+  } catch (error: any) {
+    return NextResponse.json({ success: false, error: error.message }, { status: 500 });
+  }
+}
+
+
+
+===== app/api/users/[id]/route.ts =====
+import { NextRequest, NextResponse } from 'next/server';
+import connectDB from '@/lib/mongodb';
+import User from '@/models/User';
+import { requireAdmin } from '@/lib/auth';
+
+
+// GET single user
+export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
+  const authError = await requireAdmin(request);
+  if (authError) return authError;
+
+  try {
+
+    await connectDB();
+    
+    const user = await User.findById(params.id).select('-password');
+
+    if (!user) {
+      return NextResponse.json({ success: false, error: 'User not found' }, { status: 404 });
+    }
+
+    return NextResponse.json({ success: true, data: user }, { status: 200 });
+  } catch (error: any) {
+    return NextResponse.json({ success: false, error: error.message }, { status: 500 });
+  }
+}
+
+// PUT update user
+export async function PUT(request: NextRequest, { params }: { params: { id: string } }) {
+  const authError = await requireAdmin(request);
+  if (authError) return authError;
+
+  try {
+
+    await connectDB();
+    
+    const body = await request.json();
+    const { password, ...updateData } = body;
+
+    const user = await User.findByIdAndUpdate(params.id, updateData, { new: true, runValidators: true }).select('-password');
+
+    if (!user) {
+      return NextResponse.json({ success: false, error: 'User not found' }, { status: 404 });
+    }
+
+    // Update password if provided
+    if (password) {
+      user.password = password;
+      await user.save();
+    }
+
+    return NextResponse.json({ success: true, data: user }, { status: 200 });
+  } catch (error: any) {
+    return NextResponse.json({ success: false, error: error.message }, { status: 500 });
+  }
+}
+
+// DELETE user
+export async function DELETE(request: NextRequest, { params }: { params: { id: string } }) {
+  const authError = await requireAdmin(request);
+  if (authError) return authError;
+
+  try {
+
+    await connectDB();
+    
+    const user = await User.findByIdAndDelete(params.id);
+
+    if (!user) {
+      return NextResponse.json({ success: false, error: 'User not found' }, { status: 404 });
+    }
+
+    return NextResponse.json({ success: true, data: {} }, { status: 200 });
+  } catch (error: any) {
+    return NextResponse.json({ success: false, error: error.message }, { status: 500 });
+  }
+}
+
+
+
+===== app/api/users/profile/route.ts =====
+import { NextRequest, NextResponse } from 'next/server';
+import connectDB from '@/lib/mongodb';
+import User from '@/models/User';
+import { getRequestAuth } from '@/lib/auth';
+import { verifyToken } from '@/lib/jwt';
+
+interface ProfileAuthResult {
+  id: string;
+  email?: string;
+  role?: string;
+  isAdmin: boolean;
+}
+
+function normalizeAddressType(value: any): 'home' | 'work' | 'other' {
+  if (value === 'work' || value === 'other') {
+    return value;
+  }
+  return 'home';
+}
+
+function normalizeAddresses(addresses: any[]): any[] {
+  return addresses
+    .map((address) => ({
+      type: normalizeAddressType(address?.type),
+      street: String(address?.street || '').trim(),
+      city: String(address?.city || '').trim(),
+      state: String(address?.state || '').trim(),
+    }))
+    .filter((address) => address.street || address.city || address.state)
+    .map((address) => {
+      if (!address.street || !address.city || !address.state) {
+        return null;
+      }
+      return address;
+    })
+    .filter(Boolean) as any[];
+}
+
+async function getProfileAuth(request: NextRequest): Promise<ProfileAuthResult | null> {
+  const auth = await getRequestAuth(request);
+  if (auth.isAuthenticated && auth.user?.id) {
+    return {
+      id: auth.user.id,
+      email: auth.user.email,
+      role: auth.user.role,
+      isAdmin: auth.isAdmin,
+    };
+  }
+
+  const customToken = request.cookies.get('auth_token')?.value;
+  if (!customToken) {
+    return null;
+  }
+
+  const payload = await verifyToken(customToken);
+  if (!payload?.userId) {
+    return null;
+  }
+
+  const role = payload.role || 'user';
+  return {
+    id: payload.userId,
+    email: payload.email,
+    role,
+    isAdmin: role === 'admin',
+  };
+}
+
+export async function GET(request: NextRequest) {
+  try {
+    const auth = await getProfileAuth(request);
+    if (!auth?.id) {
+      return NextResponse.json(
+        { success: false, error: 'Unauthorized. Login required.' },
+        { status: 401 }
+      );
+    }
+
+    await connectDB();
+
+    const user = await User.findById(auth.id).select('-password');
+    if (!user) {
+      return NextResponse.json({ success: false, error: 'User not found' }, { status: 404 });
+    }
+
+    return NextResponse.json({ success: true, data: user }, { status: 200 });
+  } catch (error: any) {
+    return NextResponse.json({ success: false, error: error.message }, { status: 500 });
+  }
+}
+
+export async function PUT(request: NextRequest) {
+  try {
+    const auth = await getProfileAuth(request);
+    if (!auth?.id) {
+      return NextResponse.json(
+        { success: false, error: 'Unauthorized. Login required.' },
+        { status: 401 }
+      );
+    }
+
+    await connectDB();
+
+    const body = await request.json();
+    const updateData: any = {};
+
+    if (auth.isAdmin) {
+      const { _id, password, ...rest } = body;
+      Object.assign(updateData, rest);
+
+      const adminUser = await User.findByIdAndUpdate(auth.id, updateData, {
+        new: true,
+        runValidators: true,
+      }).select('-password');
+
+      if (!adminUser) {
+        return NextResponse.json({ success: false, error: 'User not found' }, { status: 404 });
+      }
+
+      if (password) {
+        adminUser.password = password;
+        await adminUser.save();
+      }
+
+      return NextResponse.json({ success: true, data: adminUser }, { status: 200 });
+    }
+
+    if (body.name !== undefined) {
+      updateData.name = String(body.name || '').trim();
+    }
+
+    if (body.phone !== undefined) {
+      updateData.phone = String(body.phone || '').trim();
+    }
+
+    if (Array.isArray(body.addresses)) {
+      updateData.addresses = normalizeAddresses(body.addresses);
+    } else {
+      const hasLegacyAddressFields =
+        body.address !== undefined ||
+        body.city !== undefined ||
+        body.state !== undefined;
+
+      if (hasLegacyAddressFields) {
+        const street = String(body.address || '').trim();
+        const city = String(body.city || '').trim();
+        const state = String(body.state || '').trim();
+
+        if (street || city || state) {
+          if (!street || !city || !state) {
+            return NextResponse.json(
+              { success: false, error: 'Address, city, and state are required to save address' },
+              { status: 400 }
+            );
+          }
+
+          updateData.addresses = [
+            {
+              type: 'home',
+              street,
+              city,
+              state,
+            },
+          ];
+        } else {
+          updateData.addresses = [];
+        }
+      }
+    }
+
+    const user = await User.findByIdAndUpdate(auth.id, updateData, {
+      new: true,
+      runValidators: true,
+    }).select('-password');
+
+    if (!user) {
+      return NextResponse.json({ success: false, error: 'User not found' }, { status: 404 });
+    }
+
+    return NextResponse.json({ success: true, data: user }, { status: 200 });
+  } catch (error: any) {
+    return NextResponse.json({ success: false, error: error.message }, { status: 500 });
+  }
+}
+
+
+===== app/api/reviews/route.ts =====
+import { NextRequest, NextResponse } from 'next/server';
+import connectDB from '@/lib/mongodb';
+import Review from '@/models/Review';
+import { getRequestAuth } from '@/lib/auth';
+
+// GET all reviews (with filters)
+export async function GET(request: NextRequest) {
+  try {
+    await connectDB();
+
+    const auth = await getRequestAuth(request);
+    const isAdmin = auth.isAuthenticated && auth.isAdmin;
+    
+    const searchParams = request.nextUrl.searchParams;
+    const productId = searchParams.get('productId');
+    const userId = searchParams.get('userId');
+    const approved = searchParams.get('approved');
+    const limit = searchParams.get('limit');
+
+    let query: any = {};
+
+    if (productId) {
+      query.productId = productId;
+    }
+
+    if (userId) {
+      query.userId = userId;
+    }
+
+    if (!isAdmin) {
+      query.isApproved = true;
+    } else if (approved !== null) {
+      query.isApproved = approved === 'true';
+    }
+
+    let reviewsQuery = Review.find(query)
+      .sort({ createdAt: -1 });
+
+    if (!isAdmin) {
+      reviewsQuery = reviewsQuery.select('-userEmail');
+    }
+
+    if (limit) {
+      reviewsQuery = reviewsQuery.limit(parseInt(limit));
+    }
+
+    const reviews = await reviewsQuery.lean();
+
+    // Calculate average rating for product if productId is provided
+    if (productId) {
+      const stats = await Review.aggregate([
+        { $match: { productId, isApproved: true } },
+        {
+          $group: {
+            _id: null,
+            averageRating: { $avg: '$rating' },
+            totalReviews: { $sum: 1 },
+            ratingDistribution: {
+              $push: '$rating'
+            }
+          }
+        }
+      ]);
+
+      const ratingDistribution = {
+        5: 0,
+        4: 0,
+        3: 0,
+        2: 0,
+        1: 0,
+      };
+
+      if (stats.length > 0 && stats[0].ratingDistribution) {
+        stats[0].ratingDistribution.forEach((rating: number) => {
+          ratingDistribution[rating as keyof typeof ratingDistribution]++;
+        });
+      }
+
+      return NextResponse.json({
+        success: true,
+        data: reviews,
+        stats: stats.length > 0 ? {
+          averageRating: Math.round(stats[0].averageRating * 10) / 10,
+          totalReviews: stats[0].totalReviews,
+          ratingDistribution,
+        } : {
+          averageRating: 0,
+          totalReviews: 0,
+          ratingDistribution,
+        },
+      });
+    }
+
+    return NextResponse.json({ success: true, data: reviews });
+  } catch (error: any) {
+    return NextResponse.json({ success: false, error: error.message }, { status: 500 });
+  }
+}
+
+// POST create new review
+export async function POST(request: NextRequest) {
+  try {
+    await connectDB();
+    
+    const body = await request.json();
+    const { productId, userId, userName, userEmail, rating, title, comment } = body;
+
+    // Validate required fields
+    if (!productId || !userId || !userName || !userEmail || !rating || !comment) {
+      return NextResponse.json(
+        { success: false, error: 'Missing required fields' },
+        { status: 400 }
+      );
+    }
+
+    // Check if user already reviewed this product
+    const existingReview = await Review.findOne({ productId, userId });
+    if (existingReview) {
+      return NextResponse.json(
+        { success: false, error: 'You have already reviewed this product' },
+        { status: 400 }
+      );
+    }
+
+    // Validate rating
+    if (rating < 1 || rating > 5) {
+      return NextResponse.json(
+        { success: false, error: 'Rating must be between 1 and 5' },
+        { status: 400 }
+      );
+    }
+
+    const review = await Review.create({
+      productId,
+      userId,
+      userName,
+      userEmail,
+      rating,
+      title,
+      comment,
+      isApproved: false, // Require admin approval
+    });
+
+    return NextResponse.json({ success: true, data: review }, { status: 201 });
+  } catch (error: any) {
+    return NextResponse.json({ success: false, error: error.message }, { status: 500 });
+  }
+}
+
+
+
+===== context/AuthContext.tsx =====
+'use client';
+
+import React, { createContext, useContext, useState, useEffect } from 'react';
+import { verifyToken, getToken, saveToken, removeToken } from '@/lib/jwt';
+import { useSession, signOut as nextAuthSignOut } from 'next-auth/react';
+
+export interface User {
+  id?: string;
+  userId?: string;
+  email: string;
+  name: string;
+  phone?: string;
+  role?: 'user' | 'admin';
+  addresses?: {
+    type?: 'home' | 'work' | 'other';
+    street: string;
+    city: string;
+    state: string;
+  }[];
+  address?: string;
+  city?: string;
+  state?: string;
+  pincode?: string;
+}
+
+interface AuthContextType {
+  user: User | null;
+  isAuthenticated: boolean;
+  isLoading: boolean;
+  login: (email: string, password: string) => Promise<{ success: boolean; error?: string }>;
+  register: (name: string, email: string, password: string, phone?: string) => Promise<{ success: boolean; error?: string }>;
+  logout: () => void;
+  updateUser: (userData: Partial<User>) => Promise<{ success: boolean; error?: string }>;
+}
+
+const AuthContext = createContext<AuthContextType | undefined>(undefined);
+
+// ...
+
+export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const { data: session } = useSession();
+  const [user, setUser] = useState<User | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  // Load user from token or session
+  useEffect(() => {
+    const initAuth = async () => {
+      // 1. Check NextAuth Session (Google Login)
+      if (session?.user) {
+        setUser({
+          id: (session.user as any).id, // Cast because we extended the session type in route.ts but typescript might not know here without types
+          userId: (session.user as any).id,
+          email: session.user.email || '',
+          name: session.user.name || '',
+          role: (session.user as any).role || 'user',
+          // Google login doesn't usually give these, but we could fetch from DB if needed
+        });
+        setIsLoading(false);
+        return;
+      }
+
+      // 2. Check Custom Token (Email/Pass Login)
+      const token = getToken();
+      if (token) {
+        const payload = await verifyToken(token);
+        if (payload) {
+          try {
+            const userData = await fetchUserData();
+            if (userData) {
+              setUser(userData);
+            } else {
+              setUser({
+                id: payload.userId,
+                userId: payload.userId,
+                email: payload.email,
+                name: payload.name || '',
+                role: (payload.role === 'admin' || payload.role === 'user') ? payload.role : 'user',
+              });
+            }
+          } catch (error) {
+            setUser({
+              id: payload.userId,
+              userId: payload.userId,
+              email: payload.email,
+              name: payload.name || '',
+              role: (payload.role === 'admin' || payload.role === 'user') ? payload.role : 'user',
+            });
+          }
+        } else {
+          removeToken();
+        }
+      }
+      setIsLoading(false);
+    };
+
+    initAuth();
+  }, [session]);
+
+  const fetchUserData = async (): Promise<User | null> => {
+    try {
+      const response = await fetch('/api/users/profile');
+      if (response.ok) {
+        const data = await response.json();
+        if (data.success) {
+          const primaryAddress = Array.isArray(data.data.addresses) && data.data.addresses.length > 0
+            ? data.data.addresses[0]
+            : null;
+
+          return {
+            id: data.data._id,
+            userId: data.data._id,
+            email: data.data.email,
+            name: data.data.name,
+            phone: data.data.phone,
+            role: data.data.role,
+            addresses: data.data.addresses || [],
+            address: primaryAddress?.street || '',
+            city: primaryAddress?.city || '',
+            state: primaryAddress?.state || '',
+          };
+        }
+      }
+    } catch (error) {
+      console.error('Error fetching user data:', error);
+    }
+    return null;
+  };
+
+  const login = async (email: string, password: string): Promise<{ success: boolean; error?: string }> => {
+    try {
+      const response = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, password }),
+      });
+
+      const data = await response.json();
+
+      if (!data.success) {
+        return { success: false, error: data.error || 'Invalid email or password' };
+      }
+
+      // Save token
+      saveToken(data.data.token);
+
+      // Set user
+      setUser({
+        id: data.data.user.id,
+        userId: data.data.user.id,
+        email: data.data.user.email,
+        name: data.data.user.name,
+        role: data.data.user.role,
+      });
+
+      return { success: true };
+    } catch (error) {
+      console.error('Login error:', error);
+      return { success: false, error: 'An error occurred during login' };
+    }
+  };
+
+  const register = async (
+    name: string,
+    email: string,
+    password: string,
+    phone?: string
+  ): Promise<{ success: boolean; error?: string }> => {
+    try {
+      // Validate password
+      if (password.length < 6) {
+        return { success: false, error: 'Password must be at least 6 characters' };
+      }
+
+      const response = await fetch('/api/auth/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ name, email, password, phone }),
+      });
+
+      const data = await response.json();
+
+      if (!data.success) {
+        return { success: false, error: data.error || 'Registration failed' };
+      }
+
+      // Save token
+      saveToken(data.data.token);
+
+      // Set user
+      setUser({
+        id: data.data.user.id,
+        userId: data.data.user.id,
+        email: data.data.user.email,
+        name: data.data.user.name,
+        role: data.data.user.role,
+        phone,
+      });
+
+      return { success: true };
+    } catch (error) {
+      console.error('Registration error:', error);
+      return { success: false, error: 'An error occurred during registration' };
+    }
+  };
+
+  const logout = () => {
+    removeToken();
+    fetch('/api/auth/logout', { method: 'POST' }).catch(console.error);
+    nextAuthSignOut({ redirect: false });
+    setUser(null);
+  };
+
+
+  const updateUser = async (userData: Partial<User>): Promise<{ success: boolean; error?: string }> => {
+    if (!user?.id) {
+      return { success: false, error: 'Please login to update profile' };
+    }
+
+    try {
+      const payload: any = {};
+
+      if (userData.name !== undefined) payload.name = userData.name;
+      if (userData.phone !== undefined) payload.phone = userData.phone;
+
+      if (Array.isArray(userData.addresses)) {
+        payload.addresses = userData.addresses;
+      } else if (
+        userData.address !== undefined ||
+        userData.city !== undefined ||
+        userData.state !== undefined
+      ) {
+        payload.address = userData.address || '';
+        payload.city = userData.city || '';
+        payload.state = userData.state || '';
+      }
+
+      const response = await fetch('/api/users/profile', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload),
+      });
+
+      const data = await response.json();
+      if (!response.ok || !data.success) {
+        return { success: false, error: data.error || 'Failed to update profile' };
+      }
+
+      const primaryAddress = Array.isArray(data.data.addresses) && data.data.addresses.length > 0
+        ? data.data.addresses[0]
+        : null;
+
+      setUser((prev) => {
+        if (!prev) return prev;
+        return {
+          ...prev,
+          id: data.data._id,
+          userId: data.data._id,
+          email: data.data.email,
+          name: data.data.name,
+          phone: data.data.phone,
+          role: data.data.role,
+          addresses: data.data.addresses || [],
+          address: primaryAddress?.street || '',
+          city: primaryAddress?.city || '',
+          state: primaryAddress?.state || '',
+        };
+      });
+
+      return { success: true };
+    } catch (error: any) {
+      console.error('Error updating user:', error);
+      return { success: false, error: error.message || 'Failed to update profile' };
+    }
+  };
+
+  return (
+    <AuthContext.Provider
+      value={{
+        user,
+        isAuthenticated: !!user,
+        isLoading,
+        login,
+        register,
+        logout,
+        updateUser,
+      }}
+    >
+      {children}
+    </AuthContext.Provider>
+  );
+};
+
+export const useAuth = () => {
+  const context = useContext(AuthContext);
+  if (context === undefined) {
+    throw new Error('useAuth must be used within an AuthProvider');
+  }
+  return context;
+};
+
+
+
+===== app/profile/page.tsx =====
+'use client';
+
+import React, { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { useAuth } from '@/context/AuthContext';
+import { useWishlist } from '@/context/WishlistContext';
+import Header from '@/components/Header';
+import Navigation from '@/components/Navigation';
+import Footer from '@/components/Footer';
+import Cart from '@/components/Cart';
+import { 
+  FiUser, 
+  FiMail, 
+  FiPhone, 
+  FiMapPin, 
+  FiEdit2, 
+  FiSave, 
+  FiX,
+  FiLogOut,
+  FiShoppingBag,
+  FiPackage,
+  FiHeart
+} from 'react-icons/fi';
+
+export default function ProfilePage() {
+  const router = useRouter();
+  const { user, logout, updateUser, isAuthenticated, isLoading } = useAuth();
+  const { getWishlistCount } = useWishlist();
+  const [isEditing, setIsEditing] = useState(false);
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    phone: '',
+    address: '',
+    city: '',
+    state: '',
+    pincode: '',
+  });
+  const [saveLoading, setSaveLoading] = useState(false);
+  const [saveMessage, setSaveMessage] = useState('');
+  const [ordersCount, setOrdersCount] = useState(0);
+  const [pendingOrdersCount, setPendingOrdersCount] = useState(0);
+
+  // Redirect if not authenticated
+  useEffect(() => {
+    if (!isLoading && !isAuthenticated) {
+      router.push('/login');
+    }
+  }, [isAuthenticated, isLoading, router]);
+
+  // Load user data
+  useEffect(() => {
+    if (user) {
+      setFormData({
+        name: user.name || '',
+        email: user.email || '',
+        phone: user.phone || '',
+        address: user.address || '',
+        city: user.city || '',
+        state: user.state || '',
+        pincode: user.pincode || '',
+      });
+    }
+  }, [user]);
+
+  // Fetch orders count
+  useEffect(() => {
+    if (user) {
+      fetchOrdersCount();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user]);
+
+  const fetchOrdersCount = async () => {
+    try {
+      const userId = user?.id || user?.userId;
+      const userEmail = user?.email;
+
+      // Try to fetch by userId first, then by email
+      let url = '/api/orders';
+      if (userId) {
+        url += `?userId=${userId}`;
+      } else if (userEmail) {
+        url += `?email=${encodeURIComponent(userEmail)}`;
+      } else {
+        return;
+      }
+
+      const response = await fetch(url);
+      const data = await response.json();
+
+      if (data.success && data.data) {
+        const orders = data.data || [];
+        setOrdersCount(orders.length);
+        setPendingOrdersCount(orders.filter((o: any) => 
+          ['pending', 'processing', 'shipped'].includes(o.status?.toLowerCase())
+        ).length);
+      }
+    } catch (error) {
+      console.error('Error fetching orders count:', error);
+    }
+  };
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleSave = async () => {
+    setSaveLoading(true);
+    setSaveMessage('');
+
+    try {
+      const result = await updateUser(formData);
+      if (!result.success) {
+        setSaveMessage(result.error || 'Error updating profile');
+        return;
+      }
+
+      setSaveMessage('Profile updated successfully!');
+      setIsEditing(false);
+      
+      setTimeout(() => setSaveMessage(''), 3000);
+    } catch (error) {
+      setSaveMessage('Error updating profile');
+    } finally {
+      setSaveLoading(false);
+    }
+  };
+
+  const handleCancel = () => {
+    if (user) {
+      setFormData({
+        name: user.name || '',
+        email: user.email || '',
+        phone: user.phone || '',
+        address: user.address || '',
+        city: user.city || '',
+        state: user.state || '',
+        pincode: user.pincode || '',
+      });
+    }
+    setIsEditing(false);
+    setSaveMessage('');
+  };
+
+  const handleLogout = () => {
+    logout();
+    router.push('/');
+  };
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-white">
+        <Header />
+        <Navigation />
+        <Cart />
+        <div className="flex items-center justify-center min-h-[60vh]">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-red mx-auto mb-4"></div>
+            <p className="text-gray-600">Loading...</p>
+          </div>
+        </div>
+        <Footer />
+      </div>
+    );
+  }
+
+  if (!user) {
+    return null;
+  }
+
+  return (
+    <div className="min-h-screen bg-[#FDF8F3] font-sans">
+      <Header />
+      <Navigation />
+      <Cart />
+
+      <div className="max-w-6xl lg:max-w-7xl mx-auto px-4 md:px-6 pt-12 md:pt-20 pb-20">
+        
+        {/* Back Button */}
+        <div className="flex justify-start mb-6 md:mb-2">
+          <button onClick={() => router.push('/')} className="inline-flex items-center justify-center gap-2 text-[#503223]/60 hover:text-[#FE8E02] transition-colors text-[11px] font-flama tracking-[0.2em] uppercase cursor-pointer">
+            <svg fill="none" strokeWidth="2" stroke="currentColor" viewBox="0 0 24 24" className="w-4 h-4"><path strokeLinecap="round" strokeLinejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg> Back to Home Page
+          </button>
+        </div>
+        
+        {/* Page Title */}
+        <div className="text-center mb-12">
+          <p className="text-[12px] md:text-[14px] font-flama tracking-[0.3em] uppercase text-[#FE8E02] mb-3">
+            YOUR ACCOUNT
+          </p>
+          <h2 className="text-3xl md:text-5xl font-flama-condensed tracking-[0.1em] uppercase text-[#503223]">
+            PROFILE SETTINGS
+          </h2>
+        </div>
+
+        <div className="flex flex-col lg:flex-row gap-8 lg:gap-12">
+          
+          {/* Left Sidebar (Profile Info & Nav) */}
+          <div className="w-full lg:w-[320px] shrink-0">
+            <div className="bg-white rounded-none border border-gray-200 p-8 shadow-sm">
+              <div className="flex flex-col items-center text-center pb-8 border-b border-gray-100">
+                <div className="w-24 h-24 mb-6 rounded-full border border-gray-200 bg-[#FDF8F3] flex items-center justify-center relative overflow-hidden">
+                  <FiUser className="w-10 h-10 text-[#FE8E02] opacity-80" />
+                </div>
+                <h1 className="text-2xl font-flama-condensed tracking-[0.1em] uppercase text-[#503223] mb-2">{user?.name || 'User'}</h1>
+                <p className="text-gray-500 text-[13px] font-flama tracking-wide mb-4">{user?.email}</p>
+                <div className="text-[#FE8E02] px-4 py-1.5 text-[10px] font-bold font-flama tracking-[0.2em] uppercase border border-[#FE8E02]">
+                  Premium Member
+                </div>
+              </div>
+
+              <nav className="mt-8 space-y-3">
+                <button
+                  onClick={() => setIsEditing(true)}
+                  className={`w-full flex items-center gap-4 px-4 py-3 border transition-colors duration-300 font-flama tracking-[0.1em] text-[13px] uppercase ${isEditing ? 'border-[#FE8E02] bg-[#FE8E02]/5 text-[#FE8E02]' : 'border-transparent text-[#503223] hover:text-[#FE8E02] hover:bg-gray-50'}`}
+                >
+                  <FiUser className="w-4 h-4 flex-shrink-0" />
+                  <span>Personal Info</span>
+                </button>
+                <button
+                  onClick={() => router.push('/orders')}
+                  className="w-full flex items-center gap-4 px-4 py-3 border border-transparent transition-colors duration-300 font-flama tracking-[0.1em] text-[13px] uppercase text-[#503223] hover:text-[#FE8E02] hover:bg-gray-50 group"
+                >
+                  <FiPackage className="w-4 h-4 flex-shrink-0" />
+                  <span>Order History</span>
+                  {ordersCount > 0 && <span className="ml-auto bg-[#FE8E02] text-white py-0.5 px-2 rounded-full text-[10px] font-bold">{ordersCount}</span>}
+                </button>
+                <button
+                  onClick={() => router.push('/wishlist')}
+                  className="w-full flex items-center gap-4 px-4 py-3 border border-transparent transition-colors duration-300 font-flama tracking-[0.1em] text-[13px] uppercase text-[#503223] hover:text-[#FE8E02] hover:bg-gray-50 group"
+                >
+                  <FiHeart className="w-4 h-4 flex-shrink-0" />
+                  <span>My Wishlist</span>
+                  {getWishlistCount() > 0 && <span className="ml-auto bg-[#FE8E02] text-white py-0.5 px-2 rounded-full text-[10px] font-bold">{getWishlistCount()}</span>}
+                </button>
+                <div className="pt-4 border-t border-gray-100">
+                  <button
+                    onClick={handleLogout}
+                    className="w-full flex items-center gap-4 px-4 py-3 border border-transparent transition-colors duration-300 font-flama tracking-[0.1em] text-[13px] uppercase text-red-600 hover:bg-red-50"
+                  >
+                    <FiLogOut className="w-4 h-4 flex-shrink-0" />
+                    <span>Logout Account</span>
+                  </button>
+                </div>
+              </nav>
+            </div>
+          </div>
+
+          {/* Right Main Content */}
+          <div className="flex-1 space-y-8">
+            
+            {/* Stats Row */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+              {[
+                { label: 'Total Orders', value: ordersCount, icon: FiShoppingBag },
+                { label: 'Wishlist Items', value: getWishlistCount(), icon: FiHeart },
+                { label: 'Pending Orders', value: pendingOrdersCount, icon: FiPackage },
+              ].map((stat, idx) => (
+                <div key={idx} className={`bg-white rounded-none border border-gray-200 p-6 flex flex-col items-center text-center justify-center gap-3 transition-colors duration-300 hover:border-[#FE8E02] group`}>
+                  <div className={`w-12 h-12 rounded-full bg-[#FDF8F3] text-[#FE8E02] flex items-center justify-center text-xl group-hover:scale-110 transition-transform duration-300`}>
+                    <stat.icon />
+                  </div>
+                  <div>
+                    <p className="text-3xl font-flama-condensed text-[#503223] mb-1">{stat.value}</p>
+                    <p className="text-[#503223]/70 text-[11px] font-flama tracking-[0.15em] uppercase">{stat.label}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Form Card */}
+            <div className="bg-white rounded-none shadow-sm border border-gray-200 p-8">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 mb-10 pb-6 border-b border-gray-100">
+                <div>
+                  <h3 className="text-2xl font-flama-condensed tracking-[0.1em] uppercase text-[#503223] mb-2">Personal Information</h3>
+                  <p className="text-[#FE8E02] text-[11px] font-flama tracking-[0.15em] uppercase">Manage your delivery addresses and account details</p>
+                </div>
+                {!isEditing && (
+                  <button
+                    onClick={() => setIsEditing(true)}
+                    className="inline-flex items-center justify-center gap-2 px-[32px] py-[12px] bg-[#FE8E02] text-white border-2 border-[#FE8E02] font-flama tracking-[0.15em] uppercase text-[12px] hover:bg-transparent hover:text-[#FE8E02] transition-colors duration-500"
+                  >
+                    <FiEdit2 className="w-3.5 h-3.5" />
+                    Edit Details
+                  </button>
+                )}
+              </div>
+
+              {saveMessage && (
+                <div className={`mb-8 px-5 py-4 flex items-center gap-3 font-flama tracking-wide text-sm ${
+                  saveMessage.includes('success') 
+                    ? 'bg-emerald-50 border border-emerald-100 text-emerald-800' 
+                    : 'bg-red-50 border border-red-100 text-red-800'
+                }`}>
+                  <p className="font-medium text-sm">{saveMessage}</p>
+                </div>
+              )}
+
+              <form className="space-y-6">
+                <div className="grid sm:grid-cols-2 gap-x-8 gap-y-8">
+                  {/* Name field */}
+                  <div className="space-y-3">
+                    <label className="text-[11px] font-flama font-bold tracking-[0.15em] text-[#503223] uppercase flex items-center gap-2">
+                      <FiUser className="text-[#FE8E02]" /> Full Name
+                    </label>
+                    <input
+                      type="text"
+                      name="name"
+                      value={formData.name}
+                      onChange={handleChange}
+                      disabled={!isEditing}
+                      className={`w-full px-4 py-3.5 border-2 rounded-lg bg-transparent focus:outline-none transition-all font-sans text-sm ${
+                        isEditing ? 'border-gray-200 focus:border-[#FE8E02] text-gray-800' : 'border-gray-100 bg-gray-50 text-gray-500'
+                      }`}
+                    />
+                  </div>
+
+                  {/* Email field */}
+                  <div className="space-y-3">
+                    <label className="text-[11px] font-flama font-bold tracking-[0.15em] text-[#503223] uppercase flex items-center gap-2">
+                      <FiMail className="text-[#FE8E02]" /> Email Address
+                    </label>
+                    <input
+                      type="email"
+                      name="email"
+                      value={formData.email}
+                      disabled
+                      className="w-full px-4 py-3.5 border-2 border-gray-100 rounded-lg bg-gray-50 text-gray-400 cursor-not-allowed font-sans text-sm"
+                    />
+                  </div>
+
+                  {/* Phone field */}
+                  <div className="space-y-3">
+                    <label className="text-[11px] font-flama font-bold tracking-[0.15em] text-[#503223] uppercase flex items-center gap-2">
+                      <FiPhone className="text-[#FE8E02]" /> Phone Number
+                    </label>
+                    <input
+                      type="tel"
+                      name="phone"
+                      value={formData.phone}
+                      onChange={handleChange}
+                      disabled={!isEditing}
+                      className={`w-full px-4 py-3.5 border-2 rounded-lg bg-transparent focus:outline-none transition-all font-sans text-sm ${
+                        isEditing ? 'border-gray-200 focus:border-[#FE8E02] text-gray-800' : 'border-gray-100 bg-gray-50 text-gray-500'
+                      }`}
+                      placeholder="+91"
+                    />
+                  </div>
+
+                  {/* City field */}
+                  <div className="space-y-3">
+                    <label className="text-[11px] font-flama font-bold tracking-[0.15em] text-[#503223] uppercase flex items-center gap-2">
+                      <FiMapPin className="text-[#FE8E02]" /> City
+                    </label>
+                    <input
+                      type="text"
+                      name="city"
+                      value={formData.city}
+                      onChange={handleChange}
+                      disabled={!isEditing}
+                      className={`w-full px-4 py-3.5 border-2 rounded-lg bg-transparent focus:outline-none transition-all font-sans text-sm ${
+                        isEditing ? 'border-gray-200 focus:border-[#FE8E02] text-gray-800' : 'border-gray-100 bg-gray-50 text-gray-500'
+                      }`}
+                    />
+                  </div>
+
+                  {/* State field */}
+                  <div className="space-y-3">
+                    <label className="text-[11px] font-flama font-bold tracking-[0.15em] text-[#503223] uppercase flex items-center gap-2">
+                      <FiMapPin className="text-[#FE8E02]" /> State
+                    </label>
+                    <input
+                      type="text"
+                      name="state"
+                      value={formData.state}
+                      onChange={handleChange}
+                      disabled={!isEditing}
+                      className={`w-full px-4 py-3.5 border-2 rounded-lg bg-transparent focus:outline-none transition-all font-sans text-sm ${
+                        isEditing ? 'border-gray-200 focus:border-[#FE8E02] text-gray-800' : 'border-gray-100 bg-gray-50 text-gray-500'
+                      }`}
+                    />
+                  </div>
+
+                  {/* Pincode field */}
+                  <div className="space-y-3">
+                    <label className="text-[11px] font-flama font-bold tracking-[0.15em] text-[#503223] uppercase flex items-center gap-2">
+                      <FiMapPin className="text-[#FE8E02]" /> Pincode
+                    </label>
+                    <input
+                      type="text"
+                      name="pincode"
+                      value={formData.pincode}
+                      onChange={handleChange}
+                      disabled={!isEditing}
+                      maxLength={6}
+                      className={`w-full px-4 py-3.5 border-2 rounded-lg bg-transparent focus:outline-none transition-all font-sans text-sm tracking-wide ${
+                        isEditing ? 'border-gray-200 focus:border-[#FE8E02] text-gray-800' : 'border-gray-100 bg-gray-50 text-gray-500'
+                      }`}
+                    />
+                  </div>
+                </div>
+
+                {/* Full Address */}
+                <div className="space-y-3 pt-4">
+                  <label className="text-[11px] font-flama font-bold tracking-[0.15em] text-[#503223] uppercase flex items-center gap-2">
+                    <FiMapPin className="text-[#FE8E02]" /> Full Address
+                  </label>
+                  <textarea
+                    name="address"
+                    value={formData.address}
+                    onChange={handleChange}
+                    disabled={!isEditing}
+                    rows={3}
+                    className={`w-full px-4 py-3.5 border-2 rounded-lg bg-transparent focus:outline-none transition-all resize-none font-sans text-sm leading-relaxed ${
+                      isEditing ? 'border-gray-200 focus:border-[#FE8E02] text-gray-800' : 'border-gray-100 bg-gray-50 text-gray-500'
+                    }`}
+                    placeholder="Enter your complete delivery address"
+                  />
+                </div>
+
+                {isEditing && (
+                  <div className="flex flex-col sm:flex-row gap-4 pt-10 mt-6 border-t border-gray-100">
+                    <button
+                      type="button"
+                      onClick={handleSave}
+                      disabled={saveLoading}
+                      className="inline-flex items-center justify-center gap-2 px-[40px] py-[14px] bg-[#FE8E02] text-white border-2 border-[#FE8E02] font-flama tracking-[0.15em] uppercase text-[12px] hover:bg-transparent hover:text-[#FE8E02] transition-colors duration-500 disabled:opacity-75"
+                    >
+                      <FiSave className="w-4 h-4 flex-shrink-0" />
+                      {saveLoading ? 'SAVING...' : 'SAVE CHANGES'}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={handleCancel}
+                      className="inline-flex items-center justify-center gap-2 px-[40px] py-[14px] bg-transparent text-[#503223] border-2 border-gray-200 font-flama tracking-[0.15em] uppercase text-[12px] hover:border-[#503223] transition-colors duration-500"
+                    >
+                      <FiX className="w-4 h-4 flex-shrink-0" />
+                      CANCEL
+                    </button>
+                  </div>
+                )}
+              </form>
+            </div>
+            
+          </div>
+        </div>
+      </div>
+
+      <Footer />
+    </div>
+  );
+}
+
+

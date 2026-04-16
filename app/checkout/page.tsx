@@ -46,6 +46,8 @@ export default function CheckoutPage() {
   const [billingData, setBillingData] = useState({
     firstName: '',
     lastName: '',
+    email: '',
+    phone: '',
     address: '',
     city: '',
     state: '',
@@ -148,7 +150,12 @@ export default function CheckoutPage() {
     }
     if ((step === 2 || step === 0) && !sameAsShipping) {
       if (!billingData.firstName.trim()) newErrors.billing_firstName = 'Required';
+      if (!billingData.email.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(billingData.email)) newErrors.billing_email = 'Invalid email';
+      if (!billingData.phone.trim() || !/^[0-9]{10}$/.test(billingData.phone)) newErrors.billing_phone = '10 digits';
       if (!billingData.address.trim()) newErrors.billing_address = 'Required';
+      if (!billingData.city.trim()) newErrors.billing_city = 'Required';
+      if (!billingData.state.trim()) newErrors.billing_state = 'Required';
+      if (!billingData.pincode.trim() || !/^[0-9]{6}$/.test(billingData.pincode)) newErrors.billing_pincode = '6 digits';
     }
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -175,7 +182,15 @@ export default function CheckoutPage() {
         body: JSON.stringify({ 
           items: orderItems, 
           shipping: shippingAddress, 
-          billing: sameAsShipping ? shippingAddress : { name: `${billingData.firstName} ${billingData.lastName}`, street: billingData.address, city: billingData.city, state: billingData.state, zipCode: billingData.pincode }, 
+          billing: sameAsShipping ? shippingAddress : {
+            name: `${billingData.firstName} ${billingData.lastName}`,
+            email: billingData.email,
+            phone: billingData.phone,
+            street: billingData.address,
+            city: billingData.city,
+            state: billingData.state,
+            zipCode: billingData.pincode,
+          }, 
           shippingCost: selectedCourier?.charge || 0, 
           subtotal: getTotalPrice(), 
           total: getTotalPrice() + (selectedCourier?.charge || 0), 
@@ -198,9 +213,7 @@ export default function CheckoutPage() {
         headers: { 'Content-Type': 'application/json' }, 
         body: JSON.stringify({ 
           cartItems: orderItems, 
-          deliveryPincode: formData.pincode, 
-          orderId: createdOrderNumber,
-          courierCharge: selectedCourier?.charge
+          deliveryPincode: formData.pincode
         }) 
       });
       const payData = await payResp.json();
@@ -209,7 +222,7 @@ export default function CheckoutPage() {
       // Step 4: Open Razorpay checkout modal
       const rzp = new window.Razorpay({ 
         key: payData.keyId, 
-        amount: Math.round((getTotalPrice() + (selectedCourier?.charge || 0)) * 100), 
+        amount: Math.round((payData.finalAmount || 0) * 100), 
         currency: 'INR', 
         name: 'Gopi Misthan Bhandar', 
         description: `Order #${createdOrderNumber}`,
@@ -223,8 +236,7 @@ export default function CheckoutPage() {
               body: JSON.stringify({ 
                 orderId: createdOrderNumber, 
                 paymentId: r.razorpay_payment_id, 
-                signature: r.razorpay_signature, 
-                razorpayOrderId: r.razorpay_order_id 
+                signature: r.razorpay_signature
               }) 
             });
             const verifyResult = await verifyResp.json();
@@ -398,10 +410,13 @@ export default function CheckoutPage() {
              </div>
              {!sameAsShipping && (
                <div className="grid grid-cols-2 gap-5">
-                  <input placeholder="Full Name" value={billingData.firstName} onChange={e => setBillingData({...billingData, firstName: e.target.value})} className="col-span-2 p-3 bg-gray-50 rounded-xl border border-gray-100" />
-                  <textarea placeholder="Billing Address" value={billingData.address} onChange={e => setBillingData({...billingData, address: e.target.value})} rows={2} className="col-span-2 p-3 bg-gray-50 rounded-xl border border-gray-100" />
-                  <input placeholder="City" value={billingData.city} onChange={e => setBillingData({...billingData, city: e.target.value})} className="col-span-1 p-3 bg-gray-50 rounded-xl border border-gray-100" />
-                  <input placeholder="State" value={billingData.state} onChange={e => setBillingData({...billingData, state: e.target.value})} className="col-span-1 p-3 bg-gray-50 rounded-xl border border-gray-100" />
+                  <input placeholder="Full Name" value={billingData.firstName} onChange={e => setBillingData({...billingData, firstName: e.target.value})} className={`col-span-2 p-3 bg-gray-50 rounded-xl border ${errors.billing_firstName ? 'border-red-500' : 'border-gray-100'}`} />
+                  <input placeholder="Billing Email" value={billingData.email} onChange={e => setBillingData({...billingData, email: e.target.value})} className={`col-span-2 p-3 bg-gray-50 rounded-xl border ${errors.billing_email ? 'border-red-500' : 'border-gray-100'}`} />
+                  <input placeholder="Billing Phone" value={billingData.phone} onChange={e => setBillingData({...billingData, phone: e.target.value})} className={`col-span-2 p-3 bg-gray-50 rounded-xl border ${errors.billing_phone ? 'border-red-500' : 'border-gray-100'}`} />
+                  <textarea placeholder="Billing Address" value={billingData.address} onChange={e => setBillingData({...billingData, address: e.target.value})} rows={2} className={`col-span-2 p-3 bg-gray-50 rounded-xl border ${errors.billing_address ? 'border-red-500' : 'border-gray-100'}`} />
+                  <input placeholder="City" value={billingData.city} onChange={e => setBillingData({...billingData, city: e.target.value})} className={`col-span-1 p-3 bg-gray-50 rounded-xl border ${errors.billing_city ? 'border-red-500' : 'border-gray-100'}`} />
+                  <input placeholder="State" value={billingData.state} onChange={e => setBillingData({...billingData, state: e.target.value})} className={`col-span-1 p-3 bg-gray-50 rounded-xl border ${errors.billing_state ? 'border-red-500' : 'border-gray-100'}`} />
+                  <input placeholder="Pincode" value={billingData.pincode} onChange={e => setBillingData({...billingData, pincode: e.target.value})} className={`col-span-2 p-3 bg-gray-50 rounded-xl border ${errors.billing_pincode ? 'border-red-500' : 'border-gray-100'}`} />
                </div>
              )}
           </div>

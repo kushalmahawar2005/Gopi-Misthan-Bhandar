@@ -6,7 +6,6 @@ let twilioClient: any = null;
 
 export const initializeSMS = (accountSid: string, authToken: string, fromNumber: string) => {
   if (!accountSid || !authToken) {
-    console.warn('Twilio credentials not provided');
     return;
   }
   

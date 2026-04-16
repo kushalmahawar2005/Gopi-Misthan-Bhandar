@@ -36,24 +36,25 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const router = useRouter();
   const pathname = usePathname();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const isAdmin = String(user?.role || '').toLowerCase() === 'admin';
 
   // Redirect if not admin
   React.useEffect(() => {
     if (isLoading) return;
 
-    if (user && user.role !== 'admin') {
+    if (user && !isAdmin) {
       router.push('/');
     }
     if (!user) {
       router.push('/login');
     }
-  }, [user, isLoading, router]);
+  }, [user, isAdmin, isLoading, router]);
 
   if (isLoading) {
     return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
   }
 
-  if (!user || user.role !== 'admin') {
+  if (!user || !isAdmin) {
     return null;
   }
 

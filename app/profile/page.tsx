@@ -110,16 +110,21 @@ export default function ProfilePage() {
     setSaveMessage('');
 
     try {
-      updateUser(formData);
+      const result = await updateUser(formData);
+      if (!result.success) {
+        setSaveMessage(result.error || 'Error updating profile');
+        return;
+      }
+
       setSaveMessage('Profile updated successfully!');
       setIsEditing(false);
       
       setTimeout(() => setSaveMessage(''), 3000);
     } catch (error) {
       setSaveMessage('Error updating profile');
+    } finally {
+      setSaveLoading(false);
     }
-
-    setSaveLoading(false);
   };
 
   const handleCancel = () => {

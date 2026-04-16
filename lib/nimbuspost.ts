@@ -4,11 +4,6 @@ const BASE_URL = process.env.NIMBUSPOST_BASE_URL || 'https://api.nimbuspost.com/
 const API_KEY = process.env.NIMBUSPOST_API_KEY; // Usually the password
 const CLIENT_ID = process.env.NIMBUSPOST_CLIENT_ID; // Usually the email
 
-// Warning if variables are missing
-if (!API_KEY || !CLIENT_ID || !BASE_URL) {
-  console.warn('NimbusPost environment variables (API_KEY, CLIENT_ID, BASE_URL) are missing. Delivery features will be disabled.');
-}
-
 let cachedToken: string | null = null;
 let tokenExpiry: number | null = null;
 

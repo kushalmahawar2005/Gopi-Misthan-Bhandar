@@ -42,12 +42,9 @@ export default function AdminAboutUs() {
         cache: 'no-store', // Always fetch fresh data
       });
       const data = await response.json();
-      console.log('Fetch response:', data);
       
       if (data.success && data.data) {
         const aboutData = data.data;
-        console.log('Fetched about data:', aboutData);
-        console.log('About cards:', aboutData.aboutCards);
         
         setContent(aboutData);
         
@@ -55,16 +52,13 @@ export default function AdminAboutUs() {
         if (aboutData.aboutCards && Array.isArray(aboutData.aboutCards) && aboutData.aboutCards.length > 0) {
           const sortedCards = [...aboutData.aboutCards].sort((a: AboutCard, b: AboutCard) => (a.order || 0) - (b.order || 0));
           setCards(sortedCards);
-          console.log('Cards set:', sortedCards);
         } else {
           setCards([]);
-          console.log('No cards found in response');
         }
       } else if (data.error === 'Content not found') {
         // No content exists yet, that's okay
         setContent(null);
         setCards([]);
-        console.log('No content found');
       } else {
         console.error('Unexpected response:', data);
         setContent(null);
@@ -108,8 +102,6 @@ export default function AdminAboutUs() {
         isActive: content?.isActive !== undefined ? content.isActive : true,
       };
 
-      console.log('Saving data:', cleanedData);
-
       let response;
       if (content?._id) {
         // Update existing
@@ -132,7 +124,6 @@ export default function AdminAboutUs() {
       }
 
       const data = await response.json();
-      console.log('Save response:', data);
       
       if (data.success && data.data) {
         // Update content state with the response data
@@ -143,7 +134,6 @@ export default function AdminAboutUs() {
         if (savedContent.aboutCards && Array.isArray(savedContent.aboutCards)) {
           const sortedCards = [...savedContent.aboutCards].sort((a: AboutCard, b: AboutCard) => (a.order || 0) - (b.order || 0));
           setCards(sortedCards);
-          console.log('Cards updated from response:', sortedCards);
         } else {
           // Fallback: use the cards we just saved
           setCards(validCards.map((card, index) => ({ ...card, order: index })));

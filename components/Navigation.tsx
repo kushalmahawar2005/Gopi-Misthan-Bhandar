@@ -35,6 +35,7 @@ const Navigation = () => {
   const { getWishlistCount } = useWishlist();
   const cartItemsCount = getTotalItems();
   const wishlistCount = getWishlistCount();
+  const isAdmin = isAuthenticated && String(user?.role || '').toLowerCase() === 'admin';
 
   // Search results
   const [searchResults, setSearchResults] = useState<any[]>([]);
@@ -319,7 +320,7 @@ const Navigation = () => {
 
               {/* Icons */}
               <div className="flex items-center gap-2">
-                {isAuthenticated && user?.role === 'admin' && (
+                {isAdmin && (
                   <Link
                     href="/admin"
                     className="p-1.5 text-[#FE8E02] hover:opacity-70 transition-opacity"
@@ -576,7 +577,7 @@ const Navigation = () => {
                 </button>
               ))}
 
-              {isAuthenticated && user?.role === 'admin' && (
+              {isAdmin && (
                 <button
                   onClick={() => {
                     router.push('/admin');

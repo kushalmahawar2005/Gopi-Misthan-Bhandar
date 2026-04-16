@@ -123,7 +123,7 @@ export default function AdminOrders() {
         if (newOrders.length > 0) {
           // Play sound
           if (audioRef.current) {
-            audioRef.current.play().catch(e => console.log('Audio play failed:', e));
+            audioRef.current.play().catch(() => {});
           }
 
           // Update list

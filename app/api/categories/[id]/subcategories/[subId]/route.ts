@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
 import Category from '@/models/Category';
+import { requireAdmin } from '@/lib/auth';
 
 // GET single subcategory
 export async function GET(
@@ -35,6 +36,9 @@ export async function PUT(
   request: NextRequest,
   { params }: { params: { id: string; subId: string } }
 ) {
+  const authError = await requireAdmin(request);
+  if (authError) return authError;
+
   try {
     await connectDB();
     
@@ -85,6 +89,9 @@ export async function DELETE(
   request: NextRequest,
   { params }: { params: { id: string; subId: string } }
 ) {
+  const authError = await requireAdmin(request);
+  if (authError) return authError;
+
   try {
     await connectDB();
     

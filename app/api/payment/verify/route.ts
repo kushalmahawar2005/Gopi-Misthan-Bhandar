@@ -4,13 +4,22 @@ import connectDB from '@/lib/mongodb';
 import Order from '@/models/Order';
 import { sendOrderConfirmationEmail } from '@/lib/email';
 import { sendOrderConfirmationSMS } from '@/lib/sms';
+import { getRequestAuth } from '@/lib/auth';
 
 export async function POST(request: NextRequest) {
   try {
-    const body = await request.json();
-    const { orderId, paymentId, signature, razorpayOrderId } = body;
+    const auth = await getRequestAuth(request);
+    if (!auth.isAuthenticated || !auth.user?.id) {
+      return NextResponse.json(
+        { success: false, error: 'Unauthorized. Please login to verify payment.' },
+        { status: 401 }
+      );
+    }
 
-    if (!orderId || !paymentId || !signature || !razorpayOrderId) {
+    const body = await request.json();
+    const { orderId, paymentId, signature } = body;
+
+    if (!orderId || !paymentId || !signature) {
       return NextResponse.json(
         { success: false, error: 'Missing required payment details' },
         { status: 400 }
@@ -19,36 +28,6 @@ export async function POST(request: NextRequest) {
 
     await connectDB();
 
-    // Check if this payment ID has already been used (idempotency/double payment check)
-    const existingPayment = await Order.findOne({ paymentId });
-    if (existingPayment) {
-      console.warn(`Payment ID ${paymentId} already exists for order ${existingPayment.orderNumber}. Returning success for idempotency.`);
-      // Return success with order data so the frontend can redirect properly
-      return NextResponse.json({
-        success: true,
-        message: 'Payment already verified',
-        order: existingPayment,
-      });
-    }
-
-    // Verify payment signature
-    const verification = await verifyPayment(razorpayOrderId, paymentId, signature);
-
-    if (!verification.success) {
-      // Mark order as payment failed
-      await Order.findOneAndUpdate(
-        { orderNumber: orderId },
-        { paymentStatus: 'failed' }
-      );
-      return NextResponse.json(
-        { success: false, error: verification.error || 'Payment verification failed' },
-        { status: 400 }
-      );
-    }
-
-    // Find the order and update its status
-    // This acts as a fast-path update. The webhook is the ultimate source of truth,
-    // but we update here so the success page shows correct data immediately.
     const order = await Order.findOne({ orderNumber: orderId });
 
     if (!order) {
@@ -58,12 +37,64 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    const isOwner = order.userId && String(order.userId) === auth.user.id;
+    if (!auth.isAdmin && !isOwner) {
+      return NextResponse.json(
+        { success: false, error: 'Forbidden. This order does not belong to you.' },
+        { status: 403 }
+      );
+    }
+
+    if (!order.razorpayOrderId) {
+      return NextResponse.json(
+        { success: false, error: 'Missing payment order reference on server.' },
+        { status: 400 }
+      );
+    }
+
+    // Check if this payment ID has already been used (idempotency/double payment check)
+    const existingPayment = await Order.findOne({ paymentId });
+    if (existingPayment) {
+      if (existingPayment.orderNumber !== order.orderNumber) {
+        return NextResponse.json(
+          { success: false, error: 'Payment already linked to a different order.' },
+          { status: 409 }
+        );
+      }
+      // Return success with order data so the frontend can redirect properly
+      return NextResponse.json({
+        success: true,
+        message: 'Payment already verified',
+        order: existingPayment,
+      });
+    }
+
+    // Verify signature against server-side Razorpay order reference (never trust client order id).
+    const verification = await verifyPayment(order.razorpayOrderId, paymentId, signature);
+
+    if (!verification.success) {
+      // Mark order as payment failed
+      order.paymentStatus = 'failed';
+      await order.save();
+      return NextResponse.json(
+        { success: false, error: verification.error || 'Payment verification failed' },
+        { status: 400 }
+      );
+    }
+
+    const verifiedOrderId = verification.payment?.order_id;
+    if (!verifiedOrderId || verifiedOrderId !== order.razorpayOrderId) {
+      return NextResponse.json(
+        { success: false, error: 'Payment/order mismatch detected.' },
+        { status: 400 }
+      );
+    }
+
     // Only update if not already paid (webhook might have beaten us)
     if (order.paymentStatus !== 'paid') {
       order.paymentStatus = 'paid';
       order.status = 'confirmed';
       order.paymentId = paymentId;
-      order.razorpayOrderId = razorpayOrderId;
       await order.save();
     }
 

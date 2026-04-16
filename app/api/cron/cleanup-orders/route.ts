@@ -29,8 +29,8 @@ export async function GET(request: NextRequest) {
     const results = await Promise.allSettled(expiredOrders.map(async (order) => {
       // a. Restore stock for each item
       await Promise.allSettled(order.items.map(async (item: any) => {
-        if (item.product || item._id) {
-          await Product.findByIdAndUpdate(item.product || item._id, {
+        if (item.productId) {
+          await Product.findByIdAndUpdate(item.productId, {
             $inc: { stock: item.quantity }
           });
         }

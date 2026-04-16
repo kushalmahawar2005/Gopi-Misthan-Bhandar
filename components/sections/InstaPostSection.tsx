@@ -34,8 +34,6 @@ const InstaPostSection: React.FC<InstaPostSectionProps> = ({ instaPosts }) => {
     }
   }, [instaPosts]);
 
-  if (!instaPosts || instaPosts.length === 0) return null;
-
   // Handle user interaction to pause auto-scroll
   const handleUserInteractionStart = () => {
     isUserInteractingRef.current = true;
@@ -92,6 +90,8 @@ const InstaPostSection: React.FC<InstaPostSectionProps> = ({ instaPosts }) => {
       }
     };
   }, [instaPosts]);
+
+  if (!instaPosts || instaPosts.length === 0) return null;
 
   return (
     <section className="py-16 md:py-24 px-4 w-full">

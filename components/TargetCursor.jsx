@@ -25,7 +25,7 @@ const TargetCursor = ({
   useEffect(() => {
     const hasTouchScreen = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
     const isSmallScreen = window.innerWidth <= 768;
-    const userAgent = navigator.userAgent || navigator.vendor || (window as any).opera;
+    const userAgent = navigator.userAgent || navigator.vendor || window.opera || '';
     const mobileRegex = /android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini/i;
     const isMobileUserAgent = mobileRegex.test(userAgent.toLowerCase());
     setIsMobile((hasTouchScreen && isSmallScreen) || isMobileUserAgent);

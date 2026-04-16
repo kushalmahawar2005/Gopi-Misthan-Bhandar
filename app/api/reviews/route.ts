@@ -1,11 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
 import Review from '@/models/Review';
+import { getRequestAuth } from '@/lib/auth';
 
 // GET all reviews (with filters)
 export async function GET(request: NextRequest) {
   try {
     await connectDB();
+
+    const auth = await getRequestAuth(request);
+    const isAdmin = auth.isAuthenticated && auth.isAdmin;
     
     const searchParams = request.nextUrl.searchParams;
     const productId = searchParams.get('productId');
@@ -23,12 +27,18 @@ export async function GET(request: NextRequest) {
       query.userId = userId;
     }
 
-    if (approved !== null) {
+    if (!isAdmin) {
+      query.isApproved = true;
+    } else if (approved !== null) {
       query.isApproved = approved === 'true';
     }
 
     let reviewsQuery = Review.find(query)
       .sort({ createdAt: -1 });
+
+    if (!isAdmin) {
+      reviewsQuery = reviewsQuery.select('-userEmail');
+    }
 
     if (limit) {
       reviewsQuery = reviewsQuery.limit(parseInt(limit));

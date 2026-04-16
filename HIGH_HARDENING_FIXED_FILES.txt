@@ -1,0 +1,1941 @@
+HIGH SEVERITY HARDENING - COMPLETE FIXED FILE CONTENTS
+
+===== app/api/cart/route.ts =====
+import { NextRequest, NextResponse } from 'next/server';
+import connectDB from '@/lib/mongodb';
+import Cart from '@/models/Cart';
+import { getRequestAuth } from '@/lib/auth';
+
+async function getAuthenticatedUserId(request: NextRequest): Promise<string | null> {
+  const auth = await getRequestAuth(request);
+  if (!auth.isAuthenticated || !auth.user?.id) {
+    return null;
+  }
+  return auth.user.id;
+}
+
+export async function GET(request: NextRequest) {
+  try {
+    const userId = await getAuthenticatedUserId(request);
+    if (!userId) {
+      return NextResponse.json(
+        { success: false, error: 'Unauthorized. Login required.' },
+        { status: 401 }
+      );
+    }
+
+    await connectDB();
+
+    const cart = await Cart.findOne({ userId });
+    return NextResponse.json({ success: true, data: cart ? cart.items : [] }, { status: 200 });
+  } catch (error: any) {
+    return NextResponse.json({ success: false, error: error.message }, { status: 500 });
+  }
+}
+
+export async function POST(request: NextRequest) {
+  try {
+    const userId = await getAuthenticatedUserId(request);
+    if (!userId) {
+      return NextResponse.json(
+        { success: false, error: 'Unauthorized. Login required.' },
+        { status: 401 }
+      );
+    }
+
+    await connectDB();
+    const body = await request.json();
+    const { items, action } = body;
+
+    if (action === 'sync') {
+      // Sync operation: merge local items with DB items
+      const dbCart = await Cart.findOne({ userId });
+      const dbItems = dbCart ? dbCart.items : [];
+      let merged = [...dbItems];
+      
+      const localItems = items || [];
+      
+      localItems.forEach((localItem: any) => {
+        // Find if local item exists in DB cart (by ID and weight/size)
+        const existsIndex = merged.findIndex((i: any) => 
+          i.id === localItem.id && 
+          i.selectedWeight === localItem.selectedWeight && 
+          i.selectedSize === localItem.selectedSize
+        );
+        
+        if (existsIndex === -1) {
+          merged.push(localItem);
+        } else {
+          // Keep the larger quantity or overwrite
+          if (localItem.quantity > merged[existsIndex].quantity) {
+             merged[existsIndex].quantity = localItem.quantity;
+          }
+        }
+      });
+
+      // Avoid writing if nothing has changed.
+      const finalItems = (localItems.length === 0 && dbItems.length > 0) ? dbItems : merged;
+      
+      const newCart = await Cart.findOneAndUpdate(
+        { userId },
+        { items: finalItems },
+        { new: true, upsert: true }
+      );
+      
+      return NextResponse.json({ success: true, data: newCart.items }, { status: 200 });
+    } else {
+      // Normal overwrite operation (called on every cart update)
+      const cart = await Cart.findOneAndUpdate(
+        { userId },
+        { items: items || [] },
+        { new: true, upsert: true }
+      );
+
+      return NextResponse.json({ success: true, data: cart.items }, { status: 200 });
+    }
+  } catch (error: any) {
+    return NextResponse.json({ success: false, error: error.message }, { status: 500 });
+  }
+}
+
+export async function DELETE(request: NextRequest) {
+  try {
+    const userId = await getAuthenticatedUserId(request);
+    if (!userId) {
+      return NextResponse.json(
+        { success: false, error: 'Unauthorized. Login required.' },
+        { status: 401 }
+      );
+    }
+
+    await connectDB();
+
+    await Cart.findOneAndDelete({ userId });
+    return NextResponse.json({ success: true, data: [] }, { status: 200 });
+  } catch (error: any) {
+    return NextResponse.json({ success: false, error: error.message }, { status: 500 });
+  }
+}
+
+
+===== app/api/wishlist/route.ts =====
+import { NextRequest, NextResponse } from 'next/server';
+import connectDB from '@/lib/mongodb';
+import Wishlist from '@/models/Wishlist';
+import { getRequestAuth } from '@/lib/auth';
+
+async function getAuthenticatedUserId(request: NextRequest): Promise<string | null> {
+  const auth = await getRequestAuth(request);
+  if (!auth.isAuthenticated || !auth.user?.id) {
+    return null;
+  }
+  return auth.user.id;
+}
+
+export async function GET(request: NextRequest) {
+  try {
+    const userId = await getAuthenticatedUserId(request);
+    if (!userId) {
+      return NextResponse.json(
+        { success: false, error: 'Unauthorized. Login required.' },
+        { status: 401 }
+      );
+    }
+
+    await connectDB();
+
+    const wishlist = await Wishlist.findOne({ userId });
+    return NextResponse.json({ success: true, data: wishlist ? wishlist.items : [] }, { status: 200 });
+  } catch (error: any) {
+    return NextResponse.json({ success: false, error: error.message }, { status: 500 });
+  }
+}
+
+export async function POST(request: NextRequest) {
+  try {
+    const userId = await getAuthenticatedUserId(request);
+    if (!userId) {
+      return NextResponse.json(
+        { success: false, error: 'Unauthorized. Login required.' },
+        { status: 401 }
+      );
+    }
+
+    await connectDB();
+    const body = await request.json();
+    const { items, action } = body;
+
+    if (action === 'sync') {
+      // Sync operation: merge local items with DB items avoiding duplicates
+      const dbWishlist = await Wishlist.findOne({ userId });
+      const dbItems = dbWishlist ? dbWishlist.items : [];
+      let merged = [...dbItems];
+      
+      const localItems = items || [];
+      
+      localItems.forEach((localItem: any) => {
+        const exists = merged.find((i: any) => i.id === localItem.id);
+        if (!exists) {
+          merged.push(localItem);
+        }
+      });
+
+      const finalItems = (localItems.length === 0 && dbItems.length > 0) ? dbItems : merged;
+      
+      const newWishlist = await Wishlist.findOneAndUpdate(
+        { userId },
+        { items: finalItems },
+        { new: true, upsert: true }
+      );
+      
+      return NextResponse.json({ success: true, data: newWishlist.items }, { status: 200 });
+    } else {
+      // Normal overwrite operation (called on every update)
+      const wishlist = await Wishlist.findOneAndUpdate(
+        { userId },
+        { items: items || [] },
+        { new: true, upsert: true }
+      );
+
+      return NextResponse.json({ success: true, data: wishlist.items }, { status: 200 });
+    }
+  } catch (error: any) {
+    return NextResponse.json({ success: false, error: error.message }, { status: 500 });
+  }
+}
+
+export async function DELETE(request: NextRequest) {
+  try {
+    const userId = await getAuthenticatedUserId(request);
+    if (!userId) {
+      return NextResponse.json(
+        { success: false, error: 'Unauthorized. Login required.' },
+        { status: 401 }
+      );
+    }
+
+    await connectDB();
+
+    await Wishlist.findOneAndDelete({ userId });
+    return NextResponse.json({ success: true, data: [] }, { status: 200 });
+  } catch (error: any) {
+    return NextResponse.json({ success: false, error: error.message }, { status: 500 });
+  }
+}
+
+
+===== app/api/giftbox/[id]/route.ts =====
+import { NextRequest, NextResponse } from 'next/server';
+import connectDB from '@/lib/mongodb';
+import GiftBox from '@/models/GiftBox';
+import { requireAdmin } from '@/lib/auth';
+
+export async function GET(
+  request: NextRequest,
+  { params }: { params: { id: string } }
+) {
+  try {
+    await connectDB();
+    const giftBox = await GiftBox.findById(params.id)
+      .select('category title description imageUrl size price order isActive')
+      .lean();
+    if (!giftBox) {
+      return NextResponse.json(
+        { success: false, error: 'GiftBox not found' },
+        { status: 404 }
+      );
+    }
+    return NextResponse.json({ success: true, data: giftBox });
+  } catch (error: any) {
+    return NextResponse.json(
+      { success: false, error: error.message },
+      { status: 500 }
+    );
+  }
+}
+
+export async function PUT(
+  request: NextRequest,
+  { params }: { params: { id: string } }
+) {
+  const authError = await requireAdmin(request);
+  if (authError) return authError;
+
+  try {
+    await connectDB();
+    const body = await request.json();
+    
+    const updateData: any = {};
+    if (body.category !== undefined && body.category !== null) updateData.category = body.category;
+    if (body.title !== undefined && body.title !== null) updateData.title = body.title;
+    if (body.description !== undefined && body.description !== null) updateData.description = body.description;
+    if (body.imageUrl !== undefined && body.imageUrl !== null) updateData.imageUrl = body.imageUrl;
+    if (body.size !== undefined && body.size !== null) updateData.size = body.size;
+    if (body.price !== undefined && body.price !== null) updateData.price = Number(body.price);
+    if (body.order !== undefined && body.order !== null) updateData.order = Number(body.order);
+    if (body.isActive !== undefined && body.isActive !== null) updateData.isActive = Boolean(body.isActive);
+    
+    const giftBox = await GiftBox.findByIdAndUpdate(
+      params.id,
+      updateData,
+      { new: true, runValidators: true }
+    ).select('category title description imageUrl size price order isActive');
+    
+    if (!giftBox) {
+      return NextResponse.json(
+        { success: false, error: 'GiftBox not found' },
+        { status: 404 }
+      );
+    }
+    return NextResponse.json({ success: true, data: giftBox });
+  } catch (error: any) {
+    return NextResponse.json(
+      { success: false, error: error.message },
+      { status: 400 }
+    );
+  }
+}
+
+export async function DELETE(
+  request: NextRequest,
+  { params }: { params: { id: string } }
+) {
+  const authError = await requireAdmin(request);
+  if (authError) return authError;
+
+  try {
+    await connectDB();
+    const giftBox = await GiftBox.findByIdAndDelete(params.id);
+    if (!giftBox) {
+      return NextResponse.json(
+        { success: false, error: 'GiftBox not found' },
+        { status: 404 }
+      );
+    }
+    return NextResponse.json({ success: true, data: giftBox });
+  } catch (error: any) {
+    return NextResponse.json(
+      { success: false, error: error.message },
+      { status: 500 }
+    );
+  }
+}
+
+
+
+===== app/api/categories/[id]/subcategories/route.ts =====
+import { NextRequest, NextResponse } from 'next/server';
+import connectDB from '@/lib/mongodb';
+import Category from '@/models/Category';
+import { requireAdmin } from '@/lib/auth';
+
+// GET all subcategories of a category
+export async function GET(
+  request: NextRequest,
+  { params }: { params: { id: string } }
+) {
+  try {
+    await connectDB();
+    
+    const category = await Category.findById(params.id).select('subCategories');
+    
+    if (!category) {
+      return NextResponse.json({ success: false, error: 'Category not found' }, { status: 404 });
+    }
+
+    return NextResponse.json({ success: true, data: category.subCategories || [] }, { status: 200 });
+  } catch (error: any) {
+    return NextResponse.json({ success: false, error: error.message }, { status: 500 });
+  }
+}
+
+// POST create new subcategory
+export async function POST(
+  request: NextRequest,
+  { params }: { params: { id: string } }
+) {
+  const authError = await requireAdmin(request);
+  if (authError) return authError;
+
+  try {
+    await connectDB();
+    
+    const body = await request.json();
+    const { name, slug, image, description } = body;
+
+    if (!name || !slug) {
+      return NextResponse.json({ success: false, error: 'Name and slug are required' }, { status: 400 });
+    }
+
+    const category = await Category.findById(params.id);
+    
+    if (!category) {
+      return NextResponse.json({ success: false, error: 'Category not found' }, { status: 404 });
+    }
+
+    // Check if subcategory with same slug already exists
+    if (category.subCategories?.some((sub: any) => sub.slug === slug)) {
+      return NextResponse.json({ success: false, error: 'Subcategory with this slug already exists' }, { status: 400 });
+    }
+
+    // Add subcategory
+    if (!category.subCategories) {
+      category.subCategories = [];
+    }
+
+    category.subCategories.push({
+      name,
+      slug,
+      image: image || undefined,
+      description: description || undefined,
+    });
+
+    await category.save();
+
+    return NextResponse.json({ success: true, data: category.subCategories[category.subCategories.length - 1] }, { status: 201 });
+  } catch (error: any) {
+    return NextResponse.json({ success: false, error: error.message }, { status: 500 });
+  }
+}
+
+
+
+===== app/api/categories/[id]/subcategories/[subId]/route.ts =====
+import { NextRequest, NextResponse } from 'next/server';
+import connectDB from '@/lib/mongodb';
+import Category from '@/models/Category';
+import { requireAdmin } from '@/lib/auth';
+
+// GET single subcategory
+export async function GET(
+  request: NextRequest,
+  { params }: { params: { id: string; subId: string } }
+) {
+  try {
+    await connectDB();
+    
+    const category = await Category.findById(params.id);
+    
+    if (!category) {
+      return NextResponse.json({ success: false, error: 'Category not found' }, { status: 404 });
+    }
+
+    const subcategory = category.subCategories?.find(
+      (sub: any) => sub.slug === params.subId
+    );
+
+    if (!subcategory) {
+      return NextResponse.json({ success: false, error: 'Subcategory not found' }, { status: 404 });
+    }
+
+    return NextResponse.json({ success: true, data: subcategory }, { status: 200 });
+  } catch (error: any) {
+    return NextResponse.json({ success: false, error: error.message }, { status: 500 });
+  }
+}
+
+// PUT update subcategory
+export async function PUT(
+  request: NextRequest,
+  { params }: { params: { id: string; subId: string } }
+) {
+  const authError = await requireAdmin(request);
+  if (authError) return authError;
+
+  try {
+    await connectDB();
+    
+    const body = await request.json();
+    const { name, slug, image, description } = body;
+
+    const category = await Category.findById(params.id);
+    
+    if (!category) {
+      return NextResponse.json({ success: false, error: 'Category not found' }, { status: 404 });
+    }
+
+    if (!category.subCategories || category.subCategories.length === 0) {
+      return NextResponse.json({ success: false, error: 'Subcategory not found' }, { status: 404 });
+    }
+
+    const subcategoryIndex = category.subCategories.findIndex(
+      (sub: any) => sub.slug === params.subId
+    );
+
+    if (subcategoryIndex === -1) {
+      return NextResponse.json({ success: false, error: 'Subcategory not found' }, { status: 404 });
+    }
+
+    // Check if new slug conflicts with another subcategory
+    if (slug && slug !== category.subCategories[subcategoryIndex].slug) {
+      if (category.subCategories.some((sub: any, idx: number) => idx !== subcategoryIndex && sub.slug === slug)) {
+        return NextResponse.json({ success: false, error: 'Subcategory with this slug already exists' }, { status: 400 });
+      }
+    }
+
+    // Update subcategory
+    if (name) category.subCategories[subcategoryIndex].name = name;
+    if (slug) category.subCategories[subcategoryIndex].slug = slug;
+    if (image !== undefined) category.subCategories[subcategoryIndex].image = image;
+    if (description !== undefined) category.subCategories[subcategoryIndex].description = description;
+
+    await category.save();
+
+    return NextResponse.json({ success: true, data: category.subCategories[subcategoryIndex] }, { status: 200 });
+  } catch (error: any) {
+    return NextResponse.json({ success: false, error: error.message }, { status: 500 });
+  }
+}
+
+// DELETE subcategory
+export async function DELETE(
+  request: NextRequest,
+  { params }: { params: { id: string; subId: string } }
+) {
+  const authError = await requireAdmin(request);
+  if (authError) return authError;
+
+  try {
+    await connectDB();
+    
+    const category = await Category.findById(params.id);
+    
+    if (!category) {
+      return NextResponse.json({ success: false, error: 'Category not found' }, { status: 404 });
+    }
+
+    if (!category.subCategories || category.subCategories.length === 0) {
+      return NextResponse.json({ success: false, error: 'Subcategory not found' }, { status: 404 });
+    }
+
+    const subcategoryIndex = category.subCategories.findIndex(
+      (sub: any) => sub.slug === params.subId
+    );
+
+    if (subcategoryIndex === -1) {
+      return NextResponse.json({ success: false, error: 'Subcategory not found' }, { status: 404 });
+    }
+
+    category.subCategories.splice(subcategoryIndex, 1);
+    await category.save();
+
+    return NextResponse.json({ success: true, data: {} }, { status: 200 });
+  } catch (error: any) {
+    return NextResponse.json({ success: false, error: error.message }, { status: 500 });
+  }
+}
+
+
+
+===== app/api/reviews/[id]/route.ts =====
+import { NextRequest, NextResponse } from 'next/server';
+import connectDB from '@/lib/mongodb';
+import Review from '@/models/Review';
+import { requireAdmin } from '@/lib/auth';
+
+// GET single review
+export async function GET(
+  request: NextRequest,
+  { params }: { params: { id: string } }
+) {
+  try {
+    await connectDB();
+    const review = await Review.findById(params.id).lean();
+    
+    if (!review) {
+      return NextResponse.json(
+        { success: false, error: 'Review not found' },
+        { status: 404 }
+      );
+    }
+
+    return NextResponse.json({ success: true, data: review });
+  } catch (error: any) {
+    return NextResponse.json({ success: false, error: error.message }, { status: 500 });
+  }
+}
+
+// PUT update review
+export async function PUT(
+  request: NextRequest,
+  { params }: { params: { id: string } }
+) {
+  const authError = await requireAdmin(request);
+  if (authError) return authError;
+
+  try {
+    await connectDB();
+    const body = await request.json();
+    
+    const review = await Review.findByIdAndUpdate(
+      params.id,
+      body,
+      { new: true, runValidators: true }
+    ).lean();
+
+    if (!review) {
+      return NextResponse.json(
+        { success: false, error: 'Review not found' },
+        { status: 404 }
+      );
+    }
+
+    return NextResponse.json({ success: true, data: review });
+  } catch (error: any) {
+    return NextResponse.json({ success: false, error: error.message }, { status: 500 });
+  }
+}
+
+// DELETE review
+export async function DELETE(
+  request: NextRequest,
+  { params }: { params: { id: string } }
+) {
+  const authError = await requireAdmin(request);
+  if (authError) return authError;
+
+  try {
+    await connectDB();
+    const review = await Review.findByIdAndDelete(params.id);
+
+    if (!review) {
+      return NextResponse.json(
+        { success: false, error: 'Review not found' },
+        { status: 404 }
+      );
+    }
+
+    return NextResponse.json({ success: true, message: 'Review deleted successfully' });
+  } catch (error: any) {
+    return NextResponse.json({ success: false, error: error.message }, { status: 500 });
+  }
+}
+
+
+
+===== models/Order.ts =====
+import mongoose, { Schema, Document, Model } from 'mongoose';
+
+export interface IOrderItem {
+  productId: string;
+  name: string;
+  price: number;
+  quantity: number;
+  image: string;
+  weight?: string;
+}
+
+export interface IShippingAddress {
+  name: string;
+  email: string;
+  phone: string;
+  street: string;
+  city: string;
+  state: string;
+  zipCode: string;
+}
+
+export interface IBillingAddress {
+  name: string;
+  email: string;
+  phone: string;
+  street: string;
+  city: string;
+  state: string;
+  zipCode: string;
+}
+
+export interface IOrder extends Document {
+  userId?: string;
+  items: IOrderItem[];
+  shipping: IShippingAddress;
+  billing: IBillingAddress;
+  appliedCouponCode?: string;
+  couponDiscount?: number;
+  shippingCost: number;
+  subtotal: number;
+  total: number;
+  paymentMethod: 'cod' | 'card' | 'upi';
+  paymentStatus?: 'pending' | 'paid' | 'failed';
+  paymentId?: string;
+  razorpayOrderId?: string;
+  status: 'pending' | 'confirmed' | 'processing' | 'shipped' | 'delivered' | 'cancelled' | 'in_transit' | 'out_for_delivery' | 'failed' | 'expired';
+  orderNumber: string;
+  awbNumber?: string;
+  courierName?: string;
+  shipmentStatus?: 'pending' | 'shipped' | 'in_transit' | 'out_for_delivery' | 'delivered' | 'failed';
+  trackingUrl?: string;
+  deliveryCharge?: number;
+  selectedCourier?: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+const OrderItemSchema = new Schema<IOrderItem>({
+  productId: { type: String, required: true },
+  name: { type: String, required: true },
+  price: { type: Number, required: true },
+  quantity: { type: Number, required: true },
+  image: { type: String, required: true },
+  weight: { type: String },
+});
+
+const ShippingAddressSchema = new Schema<IShippingAddress>({
+  name: { type: String, required: true },
+  email: { type: String, required: true },
+  phone: { type: String, required: true },
+  street: { type: String, required: true },
+  city: { type: String, required: true },
+  state: { type: String, required: true },
+  zipCode: { type: String, required: true },
+});
+
+const BillingAddressSchema = new Schema<IBillingAddress>({
+  name: { type: String, required: true, trim: true },
+  email: { type: String, required: [true, 'Billing email is required'], trim: true },
+  phone: { type: String, required: [true, 'Billing phone is required'], trim: true },
+  street: { type: String, required: true, trim: true },
+  city: { type: String, required: true, trim: true },
+  state: { type: String, required: true, trim: true },
+  zipCode: { type: String, required: true, trim: true },
+});
+
+const OrderSchema = new Schema<IOrder>(
+  {
+    userId: { type: String },
+    items: [OrderItemSchema],
+    shipping: { type: ShippingAddressSchema, required: true },
+    billing: { type: BillingAddressSchema, required: true },
+    appliedCouponCode: { type: String, trim: true, uppercase: true },
+    couponDiscount: { type: Number, default: 0 },
+    shippingCost: { type: Number, default: 0 },
+    subtotal: { type: Number, required: true },
+    total: { type: Number, required: true },
+    paymentMethod: {
+      type: String,
+      enum: ['cod', 'card', 'upi'],
+      default: 'cod',
+    },
+    paymentStatus: {
+      type: String,
+      enum: ['pending', 'paid', 'failed'],
+      default: 'pending',
+    },
+    paymentId: { type: String, unique: true, sparse: true },
+    razorpayOrderId: { type: String },
+    status: {
+      type: String,
+      enum: ['pending', 'confirmed', 'processing', 'shipped', 'delivered', 'cancelled', 'in_transit', 'out_for_delivery', 'failed', 'expired'],
+      default: 'pending',
+    },
+    orderNumber: { type: String, required: true, unique: true },
+    awbNumber: { type: String },
+    courierName: { type: String },
+    shipmentStatus: {
+      type: String,
+      enum: ['pending', 'shipped', 'in_transit', 'out_for_delivery', 'delivered', 'failed'],
+    },
+    trackingUrl: { type: String },
+    deliveryCharge: { type: Number },
+    selectedCourier: { type: String },
+  },
+  {
+    timestamps: true,
+  }
+);
+
+// Generate order number before saving (if not already set)
+OrderSchema.pre('save', async function (next) {
+  if (!this.orderNumber || this.orderNumber.trim() === '') {
+    try {
+      const count = await mongoose.models.Order?.countDocuments() || 0;
+      this.orderNumber = `ORD-${Date.now()}-${count + 1}`;
+    } catch (error) {
+      // Fallback if count fails
+      this.orderNumber = `ORD-${Date.now()}-${Math.floor(Math.random() * 10000)}`;
+    }
+  }
+  next();
+});
+
+const Order: Model<IOrder> = mongoose.models.Order || mongoose.model<IOrder>('Order', OrderSchema);
+
+export default Order;
+
+
+
+===== app/checkout/page.tsx =====
+'use client';
+
+import React, { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { useCart } from '@/context/CartContext';
+import { useAuth } from '@/context/AuthContext';
+import Image from 'next/image';
+import Link from 'next/link';
+import { FiArrowLeft, FiCreditCard, FiSmartphone, FiTruck, FiChevronRight, FiMapPin, FiShoppingCart, FiCheck } from 'react-icons/fi';
+import Header from '@/components/Header';
+import Navigation from '@/components/Navigation';
+import Footer from '@/components/Footer';
+import Cart from '@/components/Cart';
+
+type PaymentMethod = 'upi' | 'card';
+
+declare global {
+  interface Window {
+    Razorpay: any;
+  }
+}
+
+export default function CheckoutPage() {
+  const router = useRouter();
+  const { user } = useAuth();
+  const {
+    cartItems,
+    getTotalPrice,
+    clearCart,
+  } = useCart();
+
+  const [currentStep, setCurrentStep] = useState(1); // 1: Address, 2: Billing, 3: Payment
+  const [formData, setFormData] = useState({
+    firstName: '',
+    lastName: '',
+    email: '',
+    phone: '',
+    address: '',
+    city: '',
+    state: '',
+    pincode: '',
+    landmark: '',
+  });
+
+  const [sameAsShipping, setSameAsShipping] = useState(true);
+  const [billingData, setBillingData] = useState({
+    firstName: '',
+    lastName: '',
+    email: '',
+    phone: '',
+    address: '',
+    city: '',
+    state: '',
+    pincode: '',
+  });
+
+  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('upi');
+  const [isPlacingOrder, setIsPlacingOrder] = useState(false);
+  const [errors, setErrors] = useState<{ [key: string]: string }>({});
+  const [razorpayLoaded, setRazorpayLoaded] = useState(false);
+  const [deliveryInfo, setDeliveryInfo] = useState<{
+    isServiceable: boolean;
+    deliveryCharge: number;
+    estimatedDays: number;
+    couriers?: any[];
+    message?: string;
+  } | null>(null);
+  const [availableCouriers, setAvailableCouriers] = useState<any[]>([]);
+  const [selectedCourier, setSelectedCourier] = useState<any>(null);
+  const [checkingDelivery, setCheckingDelivery] = useState(false);
+
+  useEffect(() => {
+    if (cartItems.length === 0) router.push('/products');
+  }, [cartItems.length, router]);
+
+  useEffect(() => {
+    const script = document.createElement('script');
+    script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+    script.async = true;
+    script.onload = () => setRazorpayLoaded(true);
+    document.body.appendChild(script);
+    return () => { if (document.body.contains(script)) document.body.removeChild(script); };
+  }, []);
+
+  useEffect(() => {
+    if (formData.pincode && formData.pincode.length === 6) {
+      const timer = setTimeout(() => checkDelivery(), 500);
+      return () => clearTimeout(timer);
+    }
+  }, [formData.pincode]);
+
+  const checkDelivery = async () => {
+    if (!formData.pincode || formData.pincode.length !== 6) return;
+    setCheckingDelivery(true);
+    try {
+      // Calculate total weight for the cart
+      let totalWeight = 0;
+      cartItems.forEach(item => {
+        const w = item.selectedSize || item.defaultWeight || '0.5kg';
+        const value = parseFloat(w);
+        if (w.toLowerCase().includes('g')) {
+          totalWeight += (value / 1000) * item.quantity;
+        } else {
+          totalWeight += value * item.quantity;
+        }
+      });
+      if (totalWeight === 0) totalWeight = 0.5;
+
+      const resp = await fetch('/api/delivery/check-pincode', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          pincode: formData.pincode, 
+          weight: totalWeight, 
+          orderAmount: getTotalPrice() 
+        })
+      });
+      
+      const result = await resp.json();
+      if (result.success) {
+        setDeliveryInfo(result.data);
+        if (result.data.isServiceable) {
+          setAvailableCouriers(result.data.couriers);
+          setSelectedCourier(result.data.cheapestOption);
+          setErrors(p => { const { pincode, ...rest } = p; return rest; });
+        } else {
+          setAvailableCouriers([]);
+          setSelectedCourier(null);
+          setErrors(p => ({ ...p, pincode: 'Delivery not available at this pincode' }));
+        }
+      }
+    } catch (e) { 
+      console.error(e); 
+    } finally { 
+      setCheckingDelivery(false); 
+    }
+  };
+
+  const validateStep = (step: number) => {
+    const newErrors: { [key: string]: string } = {};
+    if (step <= 1) {
+      if (!formData.firstName.trim()) newErrors.firstName = 'Required';
+      if (!formData.lastName.trim()) newErrors.lastName = 'Required';
+      if (!formData.email.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) newErrors.email = 'Invalid email';
+      if (!formData.phone.trim() || !/^[0-9]{10}$/.test(formData.phone)) newErrors.phone = '10 digits';
+      if (!formData.address.trim()) newErrors.address = 'Required';
+      if (!formData.city.trim()) newErrors.city = 'Required';
+      if (!formData.state.trim()) newErrors.state = 'Required';
+      if (!formData.pincode.trim() || !/^[0-9]{6}$/.test(formData.pincode)) newErrors.pincode = '6 digits';
+    }
+    if ((step === 2 || step === 0) && !sameAsShipping) {
+      if (!billingData.firstName.trim()) newErrors.billing_firstName = 'Required';
+      if (!billingData.email.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(billingData.email)) newErrors.billing_email = 'Invalid email';
+      if (!billingData.phone.trim() || !/^[0-9]{10}$/.test(billingData.phone)) newErrors.billing_phone = '10 digits';
+      if (!billingData.address.trim()) newErrors.billing_address = 'Required';
+      if (!billingData.city.trim()) newErrors.billing_city = 'Required';
+      if (!billingData.state.trim()) newErrors.billing_state = 'Required';
+      if (!billingData.pincode.trim() || !/^[0-9]{6}$/.test(billingData.pincode)) newErrors.billing_pincode = '6 digits';
+    }
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handlePlaceOrder = async () => {
+    // For desktop we validate all steps at once (step 0)
+    if (!validateStep(0)) {
+       window.scrollTo({ top: 0, behavior: 'smooth' });
+       return;
+    }
+    setIsPlacingOrder(true);
+
+    let createdOrderNumber = '';
+
+    try {
+      const orderItems = cartItems.map(i => ({ productId: i.id, name: i.name, price: i.price, quantity: i.quantity, image: i.image, weight: i.selectedSize || i.defaultWeight || '' }));
+      const shippingAddress = { name: `${formData.firstName} ${formData.lastName}`, email: formData.email, phone: formData.phone, street: formData.address, city: formData.city, state: formData.state, zipCode: formData.pincode };
+      
+      // Step 1: Create order in database
+      const orderResp = await fetch('/api/orders', { 
+        method: 'POST', 
+        headers: { 'Content-Type': 'application/json' }, 
+        body: JSON.stringify({ 
+          items: orderItems, 
+          shipping: shippingAddress, 
+          billing: sameAsShipping ? shippingAddress : {
+            name: `${billingData.firstName} ${billingData.lastName}`,
+            email: billingData.email,
+            phone: billingData.phone,
+            street: billingData.address,
+            city: billingData.city,
+            state: billingData.state,
+            zipCode: billingData.pincode,
+          }, 
+          shippingCost: selectedCourier?.charge || 0, 
+          subtotal: getTotalPrice(), 
+          total: getTotalPrice() + (selectedCourier?.charge || 0), 
+          paymentMethod, 
+          paymentStatus: 'pending',
+          selectedCourier: selectedCourier?.name,
+          deliveryCharge: selectedCourier?.charge
+        }) 
+      });
+      const orderResult = await orderResp.json();
+      if (!orderResult.success) throw new Error(orderResult.error || 'Failed to create order');
+      createdOrderNumber = orderResult.data.orderNumber;
+
+      // Step 2: Check Razorpay is loaded
+      if (!razorpayLoaded || !window.Razorpay) throw new Error('Payment gateway is still loading. Please try again.');
+
+      // Step 3: Create Razorpay payment order
+      const payResp = await fetch('/api/payment/create-order', { 
+        method: 'POST', 
+        headers: { 'Content-Type': 'application/json' }, 
+        body: JSON.stringify({ 
+          cartItems: orderItems, 
+          deliveryPincode: formData.pincode
+        }) 
+      });
+      const payData = await payResp.json();
+      if (!payData.success) throw new Error(payData.error || 'Failed to initiate payment');
+      
+      // Step 4: Open Razorpay checkout modal
+      const rzp = new window.Razorpay({ 
+        key: payData.keyId, 
+        amount: Math.round((payData.finalAmount || 0) * 100), 
+        currency: 'INR', 
+        name: 'Gopi Misthan Bhandar', 
+        description: `Order #${createdOrderNumber}`,
+        order_id: payData.orderId, 
+        handler: async (r: any) => {
+          // Payment completed by user — now verify on server
+          try {
+            const verifyResp = await fetch('/api/payment/verify', { 
+              method: 'POST', 
+              headers: { 'Content-Type': 'application/json' }, 
+              body: JSON.stringify({ 
+                orderId: createdOrderNumber, 
+                paymentId: r.razorpay_payment_id, 
+                signature: r.razorpay_signature
+              }) 
+            });
+            const verifyResult = await verifyResp.json();
+            
+            if (verifyResult.success) {
+              // Payment verified! Clear cart and redirect to success
+              clearCart();
+              router.push(`/checkout/success?orderId=${createdOrderNumber}&paymentId=${r.razorpay_payment_id}`);
+            } else {
+              // Verification failed — redirect to failed page
+              router.push(`/checkout/failed?orderId=${createdOrderNumber}&reason=${encodeURIComponent(verifyResult.error || 'Payment verification failed')}`);
+            }
+          } catch (verifyError) {
+            // Network error during verification — still redirect to success
+            // The webhook will handle the actual status update
+            clearCart();
+            router.push(`/checkout/success?orderId=${createdOrderNumber}&paymentId=${r.razorpay_payment_id}`);
+          }
+        },
+        modal: {
+          ondismiss: () => {
+            // User closed Razorpay popup without completing payment
+            setIsPlacingOrder(false);
+            router.push(`/checkout/failed?orderId=${createdOrderNumber}&reason=${encodeURIComponent('Payment was cancelled. You can retry from your orders page.')}`);
+          },
+          escape: true,
+          confirm_close: true,
+        },
+        prefill: { name: shippingAddress.name, email: shippingAddress.email, contact: shippingAddress.phone }, 
+        theme: { color: '#ba0606' },
+        retry: { enabled: true, max_count: 3 },
+      });
+      
+      rzp.on('payment.failed', (response: any) => {
+        // Razorpay payment failed (bank declined, etc.)
+        const reason = response.error?.description || response.error?.reason || 'Payment failed';
+        setIsPlacingOrder(false);
+        router.push(`/checkout/failed?orderId=${createdOrderNumber}&reason=${encodeURIComponent(reason)}&code=${response.error?.code || ''}`);
+      });
+
+      rzp.open();
+    } catch (e: any) {
+      setIsPlacingOrder(false);
+      if (createdOrderNumber) {
+        // Order was created but payment failed to start — redirect to failed page
+        router.push(`/checkout/failed?orderId=${createdOrderNumber}&reason=${encodeURIComponent(e.message || 'Something went wrong')}`);
+      } else {
+        // Order creation itself failed — show error on checkout page
+        setErrors(prev => ({ ...prev, general: e.message || 'Something went wrong. Please try again.' }));
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+    }
+  };
+
+  if (cartItems.length === 0) return null;
+
+  return (
+    <div className="min-h-screen bg-gray-50 overflow-x-hidden">
+      {/* --- DESKTOP VIEW: STANDARD HEADER/NAV --- */}
+      <div className="hidden lg:block"><Header /><Navigation /><Cart /></div>
+
+      {/* --- MOBILE VIEW: MINI HEADER --- */}
+      <header className="lg:hidden sticky top-0 z-[100] bg-white border-b border-gray-200 px-4 py-4">
+        <div className="max-w-3xl mx-auto flex items-center justify-between">
+          <button onClick={() => currentStep > 1 ? setCurrentStep(currentStep - 1) : router.back()} className="p-2 -ml-2"><FiArrowLeft className="w-6 h-6" /></button>
+          <h1 className="text-xl font-bold">Checkout</h1>
+          <div className="w-10"></div>
+        </div>
+      </header>
+
+      {/* --- MOBILE VIEW: STEPPER --- */}
+      <div className="lg:hidden bg-white border-b border-gray-200 sticky top-[61px] z-[90] px-6 py-4">
+        <div className="flex items-center justify-between relative max-w-sm mx-auto">
+          {[1, 2, 3].map(s => (
+            <div key={s} className="z-10 flex flex-col items-center">
+              <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm ${currentStep >= s ? 'bg-primary-red text-white' : 'bg-gray-100 text-gray-400'}`}>{s < currentStep ? '✓' : s}</div>
+              <span className={`text-[10px] mt-1 font-bold ${currentStep >= s ? 'text-primary-red' : 'text-gray-400'}`}>{s === 1 ? 'Address' : s === 2 ? 'Billing' : 'Payment'}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <main className="max-w-7xl mx-auto px-4 py-8 lg:py-12 flex flex-col lg:flex-row gap-8">
+        {/* Left Section: Form */}
+        <div className="flex-1 space-y-8">
+          {/* General Error Banner */}
+          {errors.general && (
+            <div className="bg-red-50 border-2 border-red-200 rounded-2xl p-5 flex items-start gap-4">
+              <div className="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center flex-shrink-0">
+                <svg className="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+              </div>
+              <div>
+                <p className="text-red-800 font-bold text-sm">Order could not be placed</p>
+                <p className="text-red-600 text-sm mt-1">{errors.general}</p>
+              </div>
+              <button onClick={() => setErrors(prev => { const { general, ...rest } = prev; return rest; })} className="ml-auto text-red-400 hover:text-red-600">✕</button>
+            </div>
+          )}
+          {/* Shipping Form (Always visible on desktop, step-based on mobile) */}
+          <div className={`${currentStep === 1 || true ? '' : 'hidden lg:block'} bg-white rounded-2xl p-6 lg:p-10 shadow-sm border border-gray-100`}>
+             <h2 className="text-xl font-bold mb-8 flex items-center gap-3"><FiMapPin className="text-primary-red" /> Shipping Address</h2>
+             <div className="grid grid-cols-2 gap-5">
+                <input placeholder="First Name" value={formData.firstName} onChange={e => setFormData({...formData, firstName: e.target.value})} className={`col-span-1 p-3 bg-gray-50 rounded-xl border ${errors.firstName ? 'border-red-500' : 'border-gray-100'}`} />
+                <input placeholder="Last Name" value={formData.lastName} onChange={e => setFormData({...formData, lastName: e.target.value})} className="col-span-1 p-3 bg-gray-50 rounded-xl border border-gray-100" />
+                <input placeholder="Phone" value={formData.phone} onChange={e => setFormData({...formData, phone: e.target.value})} className="col-span-2 p-3 bg-gray-50 rounded-xl border border-gray-100" />
+                <input placeholder="Email" value={formData.email} onChange={e => setFormData({...formData, email: e.target.value})} className="col-span-2 p-3 bg-gray-50 rounded-xl border border-gray-100" />
+                <textarea placeholder="Full Address" value={formData.address} onChange={e => setFormData({...formData, address: e.target.value})} rows={3} className="col-span-2 p-3 bg-gray-50 rounded-xl border border-gray-100" />
+                <input placeholder="Pincode" value={formData.pincode} onChange={e => setFormData({...formData, pincode: e.target.value})} className="col-span-1 p-3 bg-gray-50 rounded-xl border border-gray-100 placeholder:text-gray-400" />
+                <input placeholder="City" value={formData.city} onChange={e => setFormData({...formData, city: e.target.value})} className="col-span-1 p-3 bg-gray-50 rounded-xl border border-gray-100 placeholder:text-gray-400" />
+                <input placeholder="State" value={formData.state} onChange={e => setFormData({...formData, state: e.target.value})} className="col-span-2 p-3 bg-gray-50 rounded-xl border border-gray-100 placeholder:text-gray-400" />
+             </div>
+
+             {checkingDelivery && (
+               <div className="mt-4 flex items-center justify-center p-4 bg-gray-50 rounded-xl border border-dashed border-gray-200">
+                 <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-primary-red mr-3"></div>
+                 <span className="text-sm font-medium text-gray-500">Checking serviceability...</span>
+               </div>
+             )}
+
+             {deliveryInfo && !checkingDelivery && (
+               <div className="mt-6 space-y-4">
+                 {!deliveryInfo.isServiceable ? (
+                   <div className="p-4 rounded-xl bg-red-50 border border-red-100 text-primary-red flex items-center gap-3">
+                     <div className="w-2 h-2 rounded-full bg-primary-red animate-pulse"></div>
+                     <span className="text-sm font-bold">Delivery not available at this pincode</span>
+                   </div>
+                 ) : (
+                   <div className="space-y-3">
+                     <h3 className="text-sm font-bold text-gray-700 flex items-center gap-2">
+                       <FiTruck className="text-primary-red" /> Select Delivery Option:
+                     </h3>
+                     <div className="grid grid-cols-1 gap-3">
+                       {availableCouriers.map((courier: any, idx: number) => (
+                         <div 
+                           key={courier.name + idx}
+                           onClick={() => setSelectedCourier(courier)}
+                           className={`p-4 rounded-xl border-2 transition-all cursor-pointer flex items-center justify-between ${
+                             selectedCourier?.name === courier.name 
+                               ? 'border-primary-red bg-red-50/30' 
+                                : 'border-gray-100 hover:border-gray-200 bg-white'
+                           }`}
+                         >
+                           <div className="flex items-center gap-3">
+                             <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
+                               selectedCourier?.name === courier.name ? 'border-primary-red bg-primary-red' : 'border-gray-300'
+                             }`}>
+                               {selectedCourier?.name === courier.name && <FiCheck className="text-white w-3 h-3" />}
+                             </div>
+                             <div>
+                               <p className="text-sm font-bold text-gray-900">{courier.name}</p>
+                               <p className="text-xs text-gray-500">Estimated delivery: {courier.estimatedDays} days</p>
+                             </div>
+                           </div>
+                           <div className="text-right">
+                             <p className="text-sm font-black text-primary-red">₹{courier.charge}</p>
+                           </div>
+                         </div>
+                       ))}
+                     </div>
+                   </div>
+                 )}
+               </div>
+             )}
+          </div>
+
+          {/* Billing Form */}
+          <div className={`${(currentStep === 2 || !true) ? '' : 'hidden lg:block'} bg-white rounded-2xl p-6 lg:p-10 shadow-sm border border-gray-100`}>
+             <div className="flex items-center justify-between mb-8">
+               <h2 className="text-xl font-bold">Billing Details</h2>
+               <div className="flex items-center gap-2"><input type="checkbox" checked={sameAsShipping} onChange={e => setSameAsShipping(e.target.checked)} /><label className="text-sm font-bold">Same as shipping</label></div>
+             </div>
+             {!sameAsShipping && (
+               <div className="grid grid-cols-2 gap-5">
+                  <input placeholder="Full Name" value={billingData.firstName} onChange={e => setBillingData({...billingData, firstName: e.target.value})} className={`col-span-2 p-3 bg-gray-50 rounded-xl border ${errors.billing_firstName ? 'border-red-500' : 'border-gray-100'}`} />
+                  <input placeholder="Billing Email" value={billingData.email} onChange={e => setBillingData({...billingData, email: e.target.value})} className={`col-span-2 p-3 bg-gray-50 rounded-xl border ${errors.billing_email ? 'border-red-500' : 'border-gray-100'}`} />
+                  <input placeholder="Billing Phone" value={billingData.phone} onChange={e => setBillingData({...billingData, phone: e.target.value})} className={`col-span-2 p-3 bg-gray-50 rounded-xl border ${errors.billing_phone ? 'border-red-500' : 'border-gray-100'}`} />
+                  <textarea placeholder="Billing Address" value={billingData.address} onChange={e => setBillingData({...billingData, address: e.target.value})} rows={2} className={`col-span-2 p-3 bg-gray-50 rounded-xl border ${errors.billing_address ? 'border-red-500' : 'border-gray-100'}`} />
+                  <input placeholder="City" value={billingData.city} onChange={e => setBillingData({...billingData, city: e.target.value})} className={`col-span-1 p-3 bg-gray-50 rounded-xl border ${errors.billing_city ? 'border-red-500' : 'border-gray-100'}`} />
+                  <input placeholder="State" value={billingData.state} onChange={e => setBillingData({...billingData, state: e.target.value})} className={`col-span-1 p-3 bg-gray-50 rounded-xl border ${errors.billing_state ? 'border-red-500' : 'border-gray-100'}`} />
+                  <input placeholder="Pincode" value={billingData.pincode} onChange={e => setBillingData({...billingData, pincode: e.target.value})} className={`col-span-2 p-3 bg-gray-50 rounded-xl border ${errors.billing_pincode ? 'border-red-500' : 'border-gray-100'}`} />
+               </div>
+             )}
+          </div>
+
+          {/* Payment (Step 3 or Always on desktop) */}
+          <div className={`${(currentStep === 3 || !true) ? '' : 'hidden lg:block'} bg-white rounded-2xl p-6 lg:p-10 shadow-sm border border-gray-100`}>
+             <h2 className="text-xl font-bold mb-8">Payment Method</h2>
+             <div className="flex flex-col gap-3">
+                <label onClick={() => setPaymentMethod('upi')} className={`p-4 rounded-xl border-2 flex items-center gap-4 cursor-pointer ${paymentMethod === 'upi' ? 'border-[#FE8E02] bg-orange-50' : 'border-gray-50'}`}><FiSmartphone className="text-xl" /> <span className="font-bold">UPI / GPay / PhonePe</span></label>
+                <label onClick={() => setPaymentMethod('card')} className={`p-4 rounded-xl border-2 flex items-center gap-4 cursor-pointer ${paymentMethod === 'card' ? 'border-[#FE8E02] bg-orange-50' : 'border-gray-50'}`}><FiCreditCard className="text-xl" /> <span className="font-bold">Debit / Credit Card</span></label>
+             </div>
+          </div>
+        </div>
+
+        {/* Right Section: Summary */}
+        <aside className="w-full lg:w-96 space-y-6">
+           <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 sticky top-24">
+             <h2 className="text-xl font-bold mb-6">Order Summary</h2>
+             {cartItems.map(i => (
+               <div key={i.id} className="flex gap-4 mb-4">
+                 <div className="relative w-14 h-14 rounded-lg overflow-hidden border border-gray-100"><Image src={i.image} alt={i.name} fill className="object-cover" /></div>
+                 <div><p className="text-sm font-bold line-clamp-1">{i.name}</p><p className="text-xs text-gray-400">Qty: {i.quantity} | {i.selectedSize || i.defaultWeight}</p></div>
+               </div>
+             ))}
+             <div className="pt-6 border-t border-gray-100 space-y-3">
+               <div className="flex justify-between text-sm"><span>Subtotal</span><span className="font-bold">₹{getTotalPrice().toLocaleString()}</span></div>
+               <div className="flex justify-between text-sm"><span>Shipping</span><span className="font-bold">₹{(selectedCourier?.charge || 0).toLocaleString()}</span></div>
+               <div className="flex justify-between text-lg font-bold border-t pt-3"><span>Total</span><span className="text-primary-red">₹{(getTotalPrice() + (selectedCourier?.charge || 0)).toLocaleString()}</span></div>
+             </div>
+             
+             {/* Desktop Action Button */}
+             <button onClick={handlePlaceOrder} disabled={isPlacingOrder || !selectedCourier} className="hidden lg:block w-full mt-8 bg-gray-900 text-white py-4 rounded-2xl font-bold hover:bg-black transition-all disabled:opacity-50 disabled:cursor-not-allowed">
+               {isPlacingOrder ? 'Processing...' : 'Place Order & Pay Now'}
+             </button>
+           </div>
+        </aside>
+      </main>
+
+      {/* --- MOBILE VIEW: STICKY ACTIONS --- */}
+      <footer className="lg:hidden fixed bottom-0 left-0 right-0 bg-white border-t p-4 z-[100] shadow-lg">
+         <div className="flex items-center justify-between gap-4 max-w-md mx-auto">
+            {currentStep < 3 ? (
+              <button onClick={() => validateStep(currentStep) && setCurrentStep(currentStep+1)} className="w-full bg-gray-900 text-white py-4 rounded-xl font-bold flex items-center justify-center gap-2">Next <FiChevronRight /></button>
+            ) : (
+              <button onClick={handlePlaceOrder} disabled={isPlacingOrder || !selectedCourier} className="w-full bg-[#FE8E02] text-white py-4 rounded-xl font-bold disabled:opacity-50 disabled:cursor-not-allowed">
+                {isPlacingOrder ? 'Processing...' : `Pay ₹${(getTotalPrice()+(selectedCourier?.charge||0)).toLocaleString()}`}
+              </button>
+            )}
+         </div>
+      </footer>
+
+      {/* --- DESKTOP VIEW: FOOTER --- */}
+      <div className="hidden lg:block"><Footer /></div>
+    </div>
+  );
+}
+
+
+===== app/api/payment/create-order/route.ts =====
+import { NextRequest, NextResponse } from 'next/server';
+import { createRazorpayOrder } from '@/lib/razorpay';
+import connectDB from '@/lib/mongodb';
+import Order from '@/models/Order';
+import { calculateOrderAmount } from '@/lib/orderUtils';
+import { getRequestAuth } from '@/lib/auth';
+import { checkServiceability } from '@/lib/nimbuspost';
+
+const FALLBACK_COURIER_CHARGE = 60;
+
+function parseWeightToKg(weight: string): number {
+  const raw = String(weight || '').trim().toLowerCase();
+  if (!raw) return 0;
+
+  const match = raw.match(/^(\d+(?:\.\d+)?)\s*(kg|g|gm|gram|grams)?$/i);
+  if (!match) {
+    const numeric = Number(raw);
+    return Number.isFinite(numeric) && numeric > 0 ? numeric : 0;
+  }
+
+  const value = Number(match[1]);
+  const unit = (match[2] || 'kg').toLowerCase();
+
+  if (!Number.isFinite(value) || value <= 0) return 0;
+  if (unit === 'kg') return value;
+  return value / 1000;
+}
+
+function buildItemsSignature(items: any[]): string {
+  return items
+    .map((item) => ({
+      productId: String(item?.productId || '').trim(),
+      quantity: Number(item?.quantity || 0),
+      weight: String(item?.weight || '').trim().toLowerCase(),
+    }))
+    .filter((item) => item.productId && item.quantity > 0)
+    .sort((a, b) => {
+      const keyA = `${a.productId}:${a.weight}`;
+      const keyB = `${b.productId}:${b.weight}`;
+      if (keyA < keyB) return -1;
+      if (keyA > keyB) return 1;
+      return a.quantity - b.quantity;
+    })
+    .map((item) => `${item.productId}:${item.quantity}:${item.weight}`)
+    .join('|');
+}
+
+export async function POST(request: NextRequest) {
+  try {
+    const auth = await getRequestAuth(request);
+    if (!auth.isAuthenticated || !auth.user?.id) {
+      return NextResponse.json(
+        { success: false, error: 'Unauthorized. Please login to continue.' },
+        { status: 401 }
+      );
+    }
+
+    const body = await request.json();
+    const { cartItems, couponCode, deliveryPincode } = body;
+
+    if (!cartItems || !Array.isArray(cartItems) || cartItems.length === 0) {
+      return NextResponse.json(
+        { success: false, error: 'Cart is empty or invalid' },
+        { status: 400 }
+      );
+    }
+
+    await connectDB();
+
+    const cartSignature = buildItemsSignature(cartItems);
+    if (!cartSignature) {
+      return NextResponse.json(
+        { success: false, error: 'Cart items are invalid' },
+        { status: 400 }
+      );
+    }
+
+    // Server-side pending order lookup by authenticated user and cart content.
+    const pendingOrders = await Order.find({
+      userId: auth.user.id,
+      paymentStatus: 'pending',
+      status: 'pending',
+    })
+      .select('orderNumber items paymentStatus shipping')
+      .sort({ createdAt: -1 })
+      .limit(25);
+
+    const orderToUpdate = pendingOrders.find((order: any) => {
+      const existingSignature = buildItemsSignature(order.items || []);
+      return existingSignature === cartSignature;
+    }) as any;
+
+    if (!orderToUpdate) {
+      return NextResponse.json(
+        { success: false, error: 'No matching pending order found for this user.' },
+        { status: 404 }
+      );
+    }
+
+    // Compute courier charge server-side using authoritative order pincode and cart weight.
+    const orderDeliveryPincode = String(orderToUpdate.shipping?.zipCode || deliveryPincode || '').trim();
+    const totalWeightKg = cartItems.reduce((total: number, item: any) => {
+      const quantity = Math.max(0, Number(item?.quantity || 0));
+      const itemWeightKg = parseWeightToKg(String(item?.weight || ''));
+      return total + itemWeightKg * quantity;
+    }, 0);
+
+    let serverCourierCharge = FALLBACK_COURIER_CHARGE;
+    if (/^\d{6}$/.test(orderDeliveryPincode)) {
+      const serviceability = await checkServiceability({
+        pincode: orderDeliveryPincode,
+        weight: totalWeightKg > 0 ? totalWeightKg : 0.5,
+        order_amount: 0,
+        payment_method: 'prepaid',
+      });
+
+      if (serviceability?.status && Array.isArray(serviceability?.data) && serviceability.data.length > 0) {
+        const cheapest = serviceability.data.reduce((min: any, current: any) => {
+          const currentCharge = Number(current?.total_charges ?? current?.freight_charges ?? Number.MAX_SAFE_INTEGER);
+          const minCharge = Number(min?.total_charges ?? min?.freight_charges ?? Number.MAX_SAFE_INTEGER);
+          return currentCharge < minCharge ? current : min;
+        }, serviceability.data[0]);
+
+        const computedCharge = Number(cheapest?.total_charges ?? cheapest?.freight_charges);
+        if (Number.isFinite(computedCharge) && computedCharge >= 0) {
+          serverCourierCharge = computedCharge;
+        }
+      }
+    }
+
+    // Calculate and validate order amount on server side using authoritative courier charge.
+    const calculation = await calculateOrderAmount(
+      cartItems,
+      couponCode,
+      orderDeliveryPincode,
+      serverCourierCharge
+    );
+
+    if (!calculation.success) {
+      return NextResponse.json(
+        { success: false, error: calculation.error },
+        { status: 400 }
+      );
+    }
+
+    if (orderToUpdate.paymentStatus === 'paid') {
+      return NextResponse.json(
+        { success: false, error: 'Order already paid' },
+        { status: 400 }
+      );
+    }
+
+    // Convert total to paise for Razorpay
+    const amountInPaise = Math.round(calculation.finalAmount * 100);
+
+    const result = await createRazorpayOrder({
+      amount: amountInPaise,
+      currency: 'INR',
+      receipt: orderToUpdate.orderNumber,
+      notes: {
+        userId: auth.user.id,
+        couponCode: couponCode || 'none',
+        orderNumber: orderToUpdate.orderNumber,
+      },
+    });
+
+    if (!result.success) {
+      return NextResponse.json(
+        { success: false, error: result.error },
+        { status: 500 }
+      );
+    }
+
+    // Update the matched user-owned pending order with authoritative payment metadata.
+    orderToUpdate.razorpayOrderId = result.orderId;
+    orderToUpdate.subtotal = calculation.breakdown.subtotal;
+    orderToUpdate.shippingCost = calculation.breakdown.deliveryCharge;
+    orderToUpdate.couponDiscount = calculation.breakdown.discount || 0;
+    orderToUpdate.appliedCouponCode = calculation.appliedCouponCode || undefined;
+    orderToUpdate.total = calculation.finalAmount;
+    await orderToUpdate.save();
+
+    return NextResponse.json({
+      success: true,
+      orderId: result.orderId,
+      orderNumber: orderToUpdate.orderNumber,
+      finalAmount: calculation.finalAmount,
+      breakdown: calculation.breakdown,
+      keyId: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
+    });
+  } catch (error: any) {
+    console.error('Error creating payment order:', error);
+    return NextResponse.json(
+      { success: false, error: error.message || 'Error creating payment order' },
+      { status: 500 }
+    );
+  }
+}
+
+
+
+
+===== lib/orderUtils.ts =====
+import Product from '@/models/Product';
+import Coupon from '@/models/Coupon';
+
+export interface CartItem {
+  productId: string;
+  quantity: number;
+  weight?: string; // Add weight to match frontend selection
+}
+
+
+export interface CalculationResult {
+  success: boolean;
+  finalAmount: number;
+  breakdown: {
+    subtotal: number;
+    discount: number;
+    deliveryCharge: number;
+  };
+  appliedCouponCode?: string;
+  error?: string;
+  products?: any[]; // For further use if needed
+}
+
+function isCouponApplicableToCart(coupon: any, products: any[]): boolean {
+  const applicableTo = coupon.applicableTo || 'all';
+
+  if (applicableTo === 'all') {
+    return true;
+  }
+
+  if (applicableTo === 'category') {
+    const allowed = (coupon.categories || []).map((value: any) => String(value));
+    if (allowed.length === 0) {
+      return false;
+    }
+
+    return products.some((product) => {
+      const category = String(product.category || '');
+      const subcategory = String(product.subcategory || '');
+      return allowed.includes(category) || (subcategory ? allowed.includes(subcategory) : false);
+    });
+  }
+
+  if (applicableTo === 'product') {
+    const allowedProductIds = (coupon.products || []).map((value: any) => String(value));
+    if (allowedProductIds.length === 0) {
+      return false;
+    }
+
+    return products.some((product) => allowedProductIds.includes(String(product._id)));
+  }
+
+  return false;
+}
+
+export const calculateOrderAmount = async (
+  cartItems: CartItem[],
+  couponCode?: string,
+  deliveryPincode?: string,
+  courierCharge?: number
+): Promise<CalculationResult> => {
+  try {
+    let subtotal = 0;
+    const validatedProducts = [];
+
+    // 1. Fetch products and check stock
+    for (const item of cartItems) {
+      const product = await Product.findById(item.productId);
+      
+      if (!product) {
+        return { success: false, finalAmount: 0, breakdown: { subtotal: 0, discount: 0, deliveryCharge: 0 }, error: `Product with ID ${item.productId} not found` };
+      }
+
+      if (product.stock !== undefined && product.stock < item.quantity) {
+        return { success: false, finalAmount: 0, breakdown: { subtotal: 0, discount: 0, deliveryCharge: 0 }, error: `Insufficient stock for ${product.name}. Available: ${product.stock}` };
+      }
+
+      // Find the correct price based on weight if sizes exist
+      let itemPrice = product.price; // Default to base price
+      
+      if (item.weight && product.sizes && product.sizes.length > 0) {
+        const matchingSize = product.sizes.find(s => s.weight === item.weight);
+        if (matchingSize) {
+          itemPrice = matchingSize.price;
+        }
+      }
+
+      const itemTotal = itemPrice * item.quantity;
+      subtotal += itemTotal;
+      validatedProducts.push({
+        _id: product._id,
+        name: product.name,
+        category: product.category,
+        subcategory: product.subcategory,
+        price: itemPrice,
+        quantity: item.quantity,
+        image: product.image,
+        weight: item.weight || product.defaultWeight
+      });
+    }
+
+
+    let discount = 0;
+    let appliedCouponCode: string | undefined;
+
+    // 2. Validate and apply coupon
+    if (couponCode) {
+      const normalizedCouponCode = couponCode.trim().toUpperCase();
+      const coupon = await Coupon.findOne({ code: normalizedCouponCode, isActive: true });
+
+      if (!coupon) {
+        return {
+          success: false,
+          finalAmount: 0,
+          breakdown: { subtotal: 0, discount: 0, deliveryCharge: 0 },
+          error: 'Invalid or inactive coupon code',
+        };
+      }
+
+      const now = new Date();
+      if (now < coupon.startDate || now > coupon.endDate) {
+        return {
+          success: false,
+          finalAmount: 0,
+          breakdown: { subtotal: 0, discount: 0, deliveryCharge: 0 },
+          error: 'Coupon is not valid at this time',
+        };
+      }
+
+      if (coupon.usageLimit !== null && coupon.usedCount >= coupon.usageLimit) {
+        return {
+          success: false,
+          finalAmount: 0,
+          breakdown: { subtotal: 0, discount: 0, deliveryCharge: 0 },
+          error: 'Coupon usage limit has been reached',
+        };
+      }
+
+      if (subtotal < coupon.minimumPurchase) {
+        return {
+          success: false,
+          finalAmount: 0,
+          breakdown: { subtotal: 0, discount: 0, deliveryCharge: 0 },
+          error: `Minimum purchase of ${coupon.minimumPurchase} required for this coupon`,
+        };
+      }
+
+      if (!isCouponApplicableToCart(coupon, validatedProducts)) {
+        return {
+          success: false,
+          finalAmount: 0,
+          breakdown: { subtotal: 0, discount: 0, deliveryCharge: 0 },
+          error: 'Coupon is not applicable to selected cart items',
+        };
+      }
+
+      if (coupon.discountType === 'percentage') {
+        discount = (subtotal * coupon.discountValue) / 100;
+        if (coupon.maximumDiscount && discount > coupon.maximumDiscount) {
+          discount = coupon.maximumDiscount;
+        }
+      } else if (coupon.discountType === 'fixed') {
+        discount = coupon.discountValue;
+      }
+
+      if (discount > 0) {
+        appliedCouponCode = normalizedCouponCode;
+      }
+    }
+
+    // 3. Calculate delivery charge
+    let deliveryCharge = courierCharge || 0;
+    
+    // If no courierCharge but pincode is provided, we can't accurately calculate anymore
+    // using the old method if we want to stick to NimbusPost.
+    // However, some old flows might still use this.
+    if (courierCharge === undefined && deliveryPincode) {
+      const { checkPincodeServiceability } = await import('@/lib/delivery');
+      const deliveryInfo = checkPincodeServiceability(deliveryPincode, subtotal);
+      deliveryCharge = deliveryInfo.deliveryCharge;
+    }
+
+    const finalAmount = Math.max(0, subtotal - discount + deliveryCharge);
+
+    return {
+      success: true,
+      finalAmount,
+      breakdown: {
+        subtotal,
+        discount,
+        deliveryCharge
+      },
+      appliedCouponCode,
+      products: validatedProducts
+    };
+  } catch (error: any) {
+    console.error('Error in calculateOrderAmount:', error);
+    return { success: false, finalAmount: 0, breakdown: { subtotal: 0, discount: 0, deliveryCharge: 0 }, error: error.message };
+  }
+};
+
+
+
+===== app/api/coupons/route.ts =====
+import { NextRequest, NextResponse } from 'next/server';
+import connectDB from '@/lib/mongodb';
+import Coupon from '@/models/Coupon';
+import { requireAdmin } from '@/lib/auth';
+
+
+export async function GET() {
+  try {
+    await connectDB();
+    const coupons = await Coupon.find().sort({ createdAt: -1 });
+    return NextResponse.json({ success: true, data: coupons });
+  } catch (error: any) {
+    return NextResponse.json(
+      { success: false, error: error.message },
+      { status: 500 }
+    );
+  }
+}
+
+export async function POST(request: NextRequest) {
+  const authError = await requireAdmin(request);
+  if (authError) return authError;
+
+  try {
+    await connectDB();
+    const body = await request.json();
+
+    const applicableTo = body?.applicableTo || 'all';
+    const categories = Array.isArray(body?.categories) ? body.categories.filter(Boolean) : [];
+    const products = Array.isArray(body?.products) ? body.products.filter(Boolean) : [];
+
+    if (body?.usageLimit !== null && body?.usageLimit !== undefined) {
+      const usageLimit = Number(body.usageLimit);
+      if (!Number.isInteger(usageLimit) || usageLimit < 1) {
+        return NextResponse.json(
+          { success: false, error: 'usageLimit must be a positive integer or null' },
+          { status: 400 }
+        );
+      }
+      body.usageLimit = usageLimit;
+    }
+
+    if (applicableTo === 'all') {
+      body.categories = [];
+      body.products = [];
+    }
+
+    if (applicableTo === 'category') {
+      if (categories.length === 0) {
+        return NextResponse.json(
+          { success: false, error: 'categories are required when applicableTo is category' },
+          { status: 400 }
+        );
+      }
+      body.categories = categories;
+      body.products = [];
+    }
+
+    if (applicableTo === 'product') {
+      if (products.length === 0) {
+        return NextResponse.json(
+          { success: false, error: 'products are required when applicableTo is product' },
+          { status: 400 }
+        );
+      }
+      body.products = products;
+      body.categories = [];
+    }
+
+    const coupon = await Coupon.create(body);
+    return NextResponse.json({ success: true, data: coupon }, { status: 201 });
+  } catch (error: any) {
+    return NextResponse.json(
+      { success: false, error: error.message },
+      { status: 400 }
+    );
+  }
+}
+
+
+
+===== app/api/payment/webhook/route.ts =====
+import { NextResponse } from 'next/server';
+import crypto from 'crypto';
+import connectDB from '@/lib/mongodb';
+import Order from '@/models/Order';
+import Product from '@/models/Product';
+import Coupon from '@/models/Coupon';
+import { sendOrderConfirmationEmail } from '@/lib/email';
+import { sendOrderConfirmationSMS } from '@/lib/sms';
+
+export async function POST(req: Request) {
+  try {
+    const body = await req.text(); // Raw text for signature verification
+    const signature = req.headers.get('x-razorpay-signature');
+
+    const webhookSecret = process.env.RAZORPAY_WEBHOOK_SECRET;
+
+    if (!webhookSecret) {
+      console.error('Webhook secret not configured');
+      return NextResponse.json({ success: false, message: 'Server configured incorrectly' }, { status: 500 });
+    }
+
+    if (!signature) {
+      console.error('No signature found in headers');
+      return NextResponse.json({ success: false, message: 'No signature found' }, { status: 400 });
+    }
+
+    // 1. Verifies Razorpay webhook signature
+    const expectedSignature = crypto
+      .createHmac('sha256', webhookSecret)
+      .update(body)
+      .digest('hex');
+
+    if (expectedSignature !== signature) {
+      console.error('Invalid signature detected for webhook event.', { expectedSignature, signature });
+      return NextResponse.json({ success: false, message: 'Invalid signature' }, { status: 400 });
+    }
+
+    // Signature matches, proceed
+    await connectDB();
+
+    // 3. Parse Event
+    const event = JSON.parse(body);
+
+    // 4. Handle Specific Events
+    if (event.event === 'payment.captured' || event.event === 'order.paid') {
+      const payload = event.payload.payment?.entity || event.payload.order?.entity;
+      const razorpayOrderId = payload.order_id || payload.id;
+      const paymentId = payload.id;
+
+      const order = await Order.findOne({ razorpayOrderId });
+
+      if (!order) return NextResponse.json({ success: true });
+
+      if (order.paymentStatus === 'paid') return NextResponse.json({ success: true });
+
+      order.paymentStatus = 'paid';
+      order.status = 'confirmed';
+      order.paymentId = paymentId;
+      await order.save();
+
+      // Post-payment Inventory update
+      const appliedCouponCode = String(order.appliedCouponCode || '').trim().toUpperCase();
+      const hasCouponApplied = Boolean(appliedCouponCode && Number(order.couponDiscount || 0) > 0);
+      const stockUpdateTasks = order.items.map((item: any) => 
+        Product.findByIdAndUpdate(item.productId, { $inc: { stock: -item.quantity } })
+      );
+      
+      if (hasCouponApplied) {
+        stockUpdateTasks.push(
+          Coupon.findOneAndUpdate(
+            {
+              code: appliedCouponCode,
+              isActive: true,
+              $or: [
+                { usageLimit: null },
+                { $expr: { $lt: ['$usedCount', '$usageLimit'] } },
+              ],
+            },
+            { $inc: { usedCount: 1 } }
+          )
+        );
+      }
+      await Promise.allSettled(stockUpdateTasks);
+
+      // Automated Shipment
+      try {
+        let totalWeight = 0;
+        order.items.forEach((item: any) => {
+           const w = item.weight || '0.5kg';
+           const value = parseFloat(w);
+           totalWeight += (w.toLowerCase().includes('g') ? value / 1000 : value) * item.quantity;
+        });
+        if (totalWeight === 0) totalWeight = 0.5;
+
+        const { createShipment } = await import('@/lib/nimbuspost');
+        const shipmentResult = await createShipment({
+          order_id: order.orderNumber,
+          consignee: {
+            name: order.shipping.name,
+            address: order.shipping.street,
+            city: order.shipping.city,
+            state: order.shipping.state,
+            pincode: order.shipping.zipCode,
+            phone: order.shipping.phone,
+            email: order.shipping.email,
+          },
+          pickup: {
+            name: process.env.SENDER_NAME || 'Gopi Misthan Bhandar',
+            address: process.env.SENDER_ADDRESS || '',
+            city: process.env.SENDER_CITY || '',
+            state: process.env.SENDER_STATE || '',
+            pincode: process.env.SENDER_PINCODE || '',
+            phone: process.env.SENDER_PHONE || '',
+            email: process.env.SENDER_EMAIL || '',
+          },
+          order_items: order.items.map((item: any) => ({
+            name: item.name,
+            qty: item.quantity,
+            price: item.price,
+          })),
+          payment_method: 'prepaid',
+          total_amount: order.total,
+          weight: totalWeight,
+          length: 10, breadth: 10, height: 10,
+        });
+
+        if (shipmentResult.status && shipmentResult.data) {
+          order.awbNumber = shipmentResult.data.awb_number;
+          order.status = 'shipped';
+          order.shipmentStatus = 'shipped';
+          await order.save();
+        }
+      } catch (e) {
+        console.error('Auto shipment creation failed:', e);
+      }
+    }
+
+    return NextResponse.json({ success: true }, { status: 200 });
+
+  } catch (error: any) {
+    console.error('Webhook processing error:', error);
+    return NextResponse.json({ success: false }, { status: 500 });
+  }
+}
+
+
+===== app/api/cron/cleanup-orders/route.ts =====
+import { NextRequest, NextResponse } from 'next/server';
+import connectDB from '@/lib/mongodb';
+import Order from '@/models/Order';
+import Product from '@/models/Product';
+
+export async function GET(request: NextRequest) {
+  try {
+    // 1. Verify CRON_SECRET
+    const authHeader = request.headers.get('x-cron-secret');
+    if (authHeader !== process.env.CRON_SECRET) {
+      return NextResponse.json({ success: false, message: 'Unauthorized' }, { status: 401 });
+    }
+
+    await connectDB();
+
+    // 2. Find pending orders older than 30 minutes
+    const thirtyMinutesAgo = new Date(Date.now() - 30 * 60 * 1000);
+    
+    const expiredOrders = await Order.find({
+      status: 'pending',
+      createdAt: { $lt: thirtyMinutesAgo }
+    });
+
+    if (expiredOrders.length === 0) {
+      return NextResponse.json({ success: true, message: 'No expired orders found', count: 0 });
+    }
+
+    // 3. Process each expired order
+    const results = await Promise.allSettled(expiredOrders.map(async (order) => {
+      // a. Restore stock for each item
+      await Promise.allSettled(order.items.map(async (item: any) => {
+        if (item.productId) {
+          await Product.findByIdAndUpdate(item.productId, {
+            $inc: { stock: item.quantity }
+          });
+        }
+      }));
+
+      // b. Mark order as expired
+      order.status = 'expired';
+      await order.save();
+      
+      return order._id;
+    }));
+
+    const successfulCleanups = results.filter(r => r.status === 'fulfilled').length;
+
+    return NextResponse.json({
+      success: true,
+      message: `Cleaned up ${successfulCleanups} orders`,
+      count: successfulCleanups
+    });
+
+  } catch (error: any) {
+    console.error('Cron Cleanup Error:', error);
+    return NextResponse.json({ success: false, error: error.message }, { status: 500 });
+  }
+}
+
+

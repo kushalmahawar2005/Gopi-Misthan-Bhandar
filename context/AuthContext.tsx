@@ -1,7 +1,7 @@
 'use client';
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { createToken, verifyToken, getToken, saveToken, removeToken, getUserFromToken } from '@/lib/jwt';
+import { getToken, saveToken, removeToken } from '@/lib/jwt';
 import { useSession, signOut as nextAuthSignOut } from 'next-auth/react';
 
 export interface User {
@@ -11,6 +11,12 @@ export interface User {
   name: string;
   phone?: string;
   role?: 'user' | 'admin';
+  addresses?: {
+    type?: 'home' | 'work' | 'other';
+    street: string;
+    city: string;
+    state: string;
+  }[];
   address?: string;
   city?: string;
   state?: string;
@@ -24,7 +30,7 @@ interface AuthContextType {
   login: (email: string, password: string) => Promise<{ success: boolean; error?: string }>;
   register: (name: string, email: string, password: string, phone?: string) => Promise<{ success: boolean; error?: string }>;
   logout: () => void;
-  updateUser: (userData: Partial<User>) => void;
+  updateUser: (userData: Partial<User>) => Promise<{ success: boolean; error?: string }>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -56,32 +62,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       // 2. Check Custom Token (Email/Pass Login)
       const token = getToken();
       if (token) {
-        const payload = verifyToken(token);
-        if (payload) {
-          try {
-            const userData = await fetchUserData(payload.userId || payload.email);
-            if (userData) {
-              setUser(userData);
-            } else {
-              setUser({
-                id: payload.userId,
-                userId: payload.userId,
-                email: payload.email,
-                name: payload.name || '',
-                role: (payload.role === 'admin' || payload.role === 'user') ? payload.role : 'user',
-              });
-            }
-          } catch (error) {
-            setUser({
-              id: payload.userId,
-              userId: payload.userId,
-              email: payload.email,
-              name: payload.name || '',
-              role: (payload.role === 'admin' || payload.role === 'user') ? payload.role : 'user',
-            });
+        try {
+          const userData = await fetchUserData();
+          if (userData) {
+            setUser(userData);
+          } else {
+            removeToken();
+            await fetch('/api/auth/logout', { method: 'POST' }).catch(() => undefined);
+            setUser(null);
           }
-        } else {
+        } catch (error) {
           removeToken();
+          await fetch('/api/auth/logout', { method: 'POST' }).catch(() => undefined);
+          setUser(null);
         }
       }
       setIsLoading(false);
@@ -90,13 +83,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     initAuth();
   }, [session]);
 
-  const fetchUserData = async (userIdOrEmail: string): Promise<User | null> => {
+  const fetchUserData = async (): Promise<User | null> => {
     try {
-      // Try to fetch user by ID first, then by email
-      const response = await fetch(`/api/users/${userIdOrEmail}`);
+      const response = await fetch('/api/users/profile');
       if (response.ok) {
         const data = await response.json();
         if (data.success) {
+          const primaryAddress = Array.isArray(data.data.addresses) && data.data.addresses.length > 0
+            ? data.data.addresses[0]
+            : null;
+
           return {
             id: data.data._id,
             userId: data.data._id,
@@ -104,6 +100,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             name: data.data.name,
             phone: data.data.phone,
             role: data.data.role,
+            addresses: data.data.addresses || [],
+            address: primaryAddress?.street || '',
+            city: primaryAddress?.city || '',
+            state: primaryAddress?.state || '',
           };
         }
       }
@@ -202,26 +202,67 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
 
-  const updateUser = async (userData: Partial<User>) => {
-    if (user && user.id) {
-      try {
-        const response = await fetch(`/api/users/${user.id}`, {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(userData),
-        });
+  const updateUser = async (userData: Partial<User>): Promise<{ success: boolean; error?: string }> => {
+    if (!user?.id) {
+      return { success: false, error: 'Please login to update profile' };
+    }
 
-        const data = await response.json();
-        if (data.success) {
-          setUser({ ...user, ...userData });
-        }
-      } catch (error) {
-        console.error('Error updating user:', error);
-        // Still update locally on error
-        setUser({ ...user, ...userData });
+    try {
+      const payload: any = {};
+
+      if (userData.name !== undefined) payload.name = userData.name;
+      if (userData.phone !== undefined) payload.phone = userData.phone;
+
+      if (Array.isArray(userData.addresses)) {
+        payload.addresses = userData.addresses;
+      } else if (
+        userData.address !== undefined ||
+        userData.city !== undefined ||
+        userData.state !== undefined
+      ) {
+        payload.address = userData.address || '';
+        payload.city = userData.city || '';
+        payload.state = userData.state || '';
       }
+
+      const response = await fetch('/api/users/profile', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload),
+      });
+
+      const data = await response.json();
+      if (!response.ok || !data.success) {
+        return { success: false, error: data.error || 'Failed to update profile' };
+      }
+
+      const primaryAddress = Array.isArray(data.data.addresses) && data.data.addresses.length > 0
+        ? data.data.addresses[0]
+        : null;
+
+      setUser((prev) => {
+        if (!prev) return prev;
+        return {
+          ...prev,
+          id: data.data._id,
+          userId: data.data._id,
+          email: data.data.email,
+          name: data.data.name,
+          phone: data.data.phone,
+          role: data.data.role,
+          addresses: data.data.addresses || [],
+          address: primaryAddress?.street || '',
+          city: primaryAddress?.city || '',
+          state: primaryAddress?.state || '',
+        };
+      });
+
+      return { success: true };
+    } catch (error: any) {
+      console.error('Error updating user:', error);
+      return { success: false, error: error.message || 'Failed to update profile' };
     }
   };
 

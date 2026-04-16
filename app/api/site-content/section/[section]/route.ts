@@ -23,9 +23,6 @@ export async function GET(request: NextRequest, { params }: { params: { section:
 
     // Convert to plain object to ensure all fields are included
     const responseData = JSON.parse(JSON.stringify(content));
-    console.log('GET Fetched content for section:', params.section);
-    console.log('GET aboutCards:', responseData.aboutCards);
-    console.log('GET Full response data keys:', Object.keys(responseData));
 
     return NextResponse.json({ success: true, data: responseData }, { status: 200 });
   } catch (error: any) {

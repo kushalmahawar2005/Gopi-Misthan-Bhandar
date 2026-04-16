@@ -92,10 +92,14 @@ const CategoriesSection: React.FC<CategoriesSectionProps> = ({ categories }) => 
           {/* Big Hero Card (Left) */}
           <Link 
             href={`/products?category=${categories[0]?.slug}`}
-            className="md:row-span-2 group relative rounded-[14px] overflow-hidden cursor-pointer transition-transform duration-500 ease-[cubic-bezier(0.25,1,0.5,1)] hover:scale-[1.02]"
+            className="md:row-span-2 group relative rounded-[14px] overflow-hidden cursor-pointer transition-transform duration-500 hover:scale-[1.02]"
+            style={{ transitionTimingFunction: 'cubic-bezier(0.25,1,0.5,1)' }}
           >
              {/* Image Zoom Effect */}
-            <div className="absolute inset-0 transition-transform duration-700 ease-[cubic-bezier(0.25,1,0.5,1)] group-hover:scale-[1.06]">
+            <div
+              className="absolute inset-0 transition-transform duration-700 group-hover:scale-[1.06]"
+              style={{ transitionTimingFunction: 'cubic-bezier(0.25,1,0.5,1)' }}
+            >
               {/* Image */}
               {categories[0]?.image && (
                  <Image 
@@ -118,10 +122,12 @@ const CategoriesSection: React.FC<CategoriesSectionProps> = ({ categories }) => 
             <Link 
               key={category.id}
               href={`/products?category=${category.slug}`}
-              className="group relative rounded-[14px] overflow-hidden cursor-pointer h-auto transition-transform duration-500 ease-[cubic-bezier(0.25,1,0.5,1)] hover:scale-[1.02]"
+              className="group relative rounded-[14px] overflow-hidden cursor-pointer h-auto transition-transform duration-500 hover:scale-[1.02]"
+              style={{ transitionTimingFunction: 'cubic-bezier(0.25,1,0.5,1)' }}
             >
               <div 
-                className="absolute inset-0 transition-transform duration-700 ease-[cubic-bezier(0.25,1,0.5,1)] group-hover:scale-[1.06]"
+                className="absolute inset-0 transition-transform duration-700 group-hover:scale-[1.06]"
+                style={{ transitionTimingFunction: 'cubic-bezier(0.25,1,0.5,1)' }}
               >
                  {category.image && (
                    <Image 

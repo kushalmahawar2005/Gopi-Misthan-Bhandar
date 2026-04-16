@@ -1,6 +1,5 @@
 import Product from '@/models/Product';
 import Coupon from '@/models/Coupon';
-import { checkPincodeServiceability } from '@/lib/delivery';
 
 export interface CartItem {
   productId: string;
@@ -17,8 +16,41 @@ export interface CalculationResult {
     discount: number;
     deliveryCharge: number;
   };
+  appliedCouponCode?: string;
   error?: string;
   products?: any[]; // For further use if needed
+}
+
+function isCouponApplicableToCart(coupon: any, products: any[]): boolean {
+  const applicableTo = coupon.applicableTo || 'all';
+
+  if (applicableTo === 'all') {
+    return true;
+  }
+
+  if (applicableTo === 'category') {
+    const allowed = (coupon.categories || []).map((value: any) => String(value));
+    if (allowed.length === 0) {
+      return false;
+    }
+
+    return products.some((product) => {
+      const category = String(product.category || '');
+      const subcategory = String(product.subcategory || '');
+      return allowed.includes(category) || (subcategory ? allowed.includes(subcategory) : false);
+    });
+  }
+
+  if (applicableTo === 'product') {
+    const allowedProductIds = (coupon.products || []).map((value: any) => String(value));
+    if (allowedProductIds.length === 0) {
+      return false;
+    }
+
+    return products.some((product) => allowedProductIds.includes(String(product._id)));
+  }
+
+  return false;
 }
 
 export const calculateOrderAmount = async (
@@ -58,6 +90,8 @@ export const calculateOrderAmount = async (
       validatedProducts.push({
         _id: product._id,
         name: product.name,
+        category: product.category,
+        subcategory: product.subcategory,
         price: itemPrice,
         quantity: item.quantity,
         image: product.image,
@@ -67,25 +101,70 @@ export const calculateOrderAmount = async (
 
 
     let discount = 0;
+    let appliedCouponCode: string | undefined;
 
     // 2. Validate and apply coupon
     if (couponCode) {
-      const coupon = await Coupon.findOne({ code: couponCode.toUpperCase(), isActive: true });
-      
-      if (coupon) {
-        const now = new Date();
-        if (now >= coupon.startDate && now <= coupon.endDate) {
-          if (subtotal >= coupon.minimumPurchase) {
-            if (coupon.discountType === 'percentage') {
-              discount = (subtotal * coupon.discountValue) / 100;
-              if (coupon.maximumDiscount && discount > coupon.maximumDiscount) {
-                discount = coupon.maximumDiscount;
-              }
-            } else if (coupon.discountType === 'fixed') {
-              discount = coupon.discountValue;
-            }
-          }
+      const normalizedCouponCode = couponCode.trim().toUpperCase();
+      const coupon = await Coupon.findOne({ code: normalizedCouponCode, isActive: true });
+
+      if (!coupon) {
+        return {
+          success: false,
+          finalAmount: 0,
+          breakdown: { subtotal: 0, discount: 0, deliveryCharge: 0 },
+          error: 'Invalid or inactive coupon code',
+        };
+      }
+
+      const now = new Date();
+      if (now < coupon.startDate || now > coupon.endDate) {
+        return {
+          success: false,
+          finalAmount: 0,
+          breakdown: { subtotal: 0, discount: 0, deliveryCharge: 0 },
+          error: 'Coupon is not valid at this time',
+        };
+      }
+
+      if (coupon.usageLimit !== null && coupon.usedCount >= coupon.usageLimit) {
+        return {
+          success: false,
+          finalAmount: 0,
+          breakdown: { subtotal: 0, discount: 0, deliveryCharge: 0 },
+          error: 'Coupon usage limit has been reached',
+        };
+      }
+
+      if (subtotal < coupon.minimumPurchase) {
+        return {
+          success: false,
+          finalAmount: 0,
+          breakdown: { subtotal: 0, discount: 0, deliveryCharge: 0 },
+          error: `Minimum purchase of ${coupon.minimumPurchase} required for this coupon`,
+        };
+      }
+
+      if (!isCouponApplicableToCart(coupon, validatedProducts)) {
+        return {
+          success: false,
+          finalAmount: 0,
+          breakdown: { subtotal: 0, discount: 0, deliveryCharge: 0 },
+          error: 'Coupon is not applicable to selected cart items',
+        };
+      }
+
+      if (coupon.discountType === 'percentage') {
+        discount = (subtotal * coupon.discountValue) / 100;
+        if (coupon.maximumDiscount && discount > coupon.maximumDiscount) {
+          discount = coupon.maximumDiscount;
         }
+      } else if (coupon.discountType === 'fixed') {
+        discount = coupon.discountValue;
+      }
+
+      if (discount > 0) {
+        appliedCouponCode = normalizedCouponCode;
       }
     }
 
@@ -111,6 +190,7 @@ export const calculateOrderAmount = async (
         discount,
         deliveryCharge
       },
+      appliedCouponCode,
       products: validatedProducts
     };
   } catch (error: any) {

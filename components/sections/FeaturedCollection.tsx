@@ -213,10 +213,16 @@ const FeaturedCollection: React.FC<FeaturedCollectionProps> = ({ products }) => 
             className="group relative inline-flex items-center justify-center py-[14px] px-[40px] font-flama tracking-[0.15em] uppercase text-[13px] border-2 border-[#FE8E02] transition-colors duration-500 overflow-hidden"
           >
             {/* Sliding Background Layer */}
-            <span className="absolute inset-0 bg-[#FE8E02] transition-transform duration-[450ms] [transition-timing-function:cubic-bezier(0.785,0.135,0.15,0.86)] group-hover:translate-x-full"></span>
+            <span
+              className="absolute inset-0 bg-[#FE8E02] transition-transform duration-500 group-hover:translate-x-full"
+              style={{ transitionTimingFunction: 'cubic-bezier(0.785,0.135,0.15,0.86)' }}
+            ></span>
 
             {/* Button Text */}
-            <span className="relative z-10 text-white transition-colors duration-[450ms] [transition-timing-function:cubic-bezier(0.785,0.135,0.15,0.86)] group-hover:text-[#FE8E02]">
+            <span
+              className="relative z-10 text-white transition-colors duration-500 group-hover:text-[#FE8E02]"
+              style={{ transitionTimingFunction: 'cubic-bezier(0.785,0.135,0.15,0.86)' }}
+            >
               View All
             </span>
           </Link>
