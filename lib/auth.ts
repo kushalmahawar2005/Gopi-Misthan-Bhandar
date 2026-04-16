@@ -4,35 +4,90 @@ import connectDB from '@/lib/mongodb';
 import User from '@/models/User';
 import { NextAuthOptions } from 'next-auth';
 
-import { getServerSession } from 'next-auth/next';
 import { NextRequest, NextResponse } from 'next/server';
+import { getToken } from 'next-auth/jwt';
 import { verifyToken } from '@/lib/jwt';
 
-export async function requireAdmin(request: NextRequest) {
-    // 1. Check NextAuth session
-    const session = await getServerSession(authOptions) as any;
-    if (session && session.user?.role === 'admin') {
-        return null; // Admin authorized via NextAuth
+export interface RequestAuthResult {
+    isAuthenticated: boolean;
+    isAdmin: boolean;
+    user: {
+        id: string;
+        email?: string;
+        role?: string;
+    } | null;
+}
+
+function normalizeRole(role?: string): 'user' | 'admin' {
+    return typeof role === 'string' && role.toLowerCase() === 'admin' ? 'admin' : 'user';
+}
+
+export async function getRequestAuth(request: NextRequest): Promise<RequestAuthResult> {
+    const token = await getToken({
+        req: request,
+        secret: process.env.NEXTAUTH_SECRET,
+    }) as any;
+
+    if (token) {
+        const userId = typeof token.id === 'string'
+            ? token.id
+            : (typeof token.sub === 'string' ? token.sub : '');
+
+        const role = normalizeRole(typeof token.role === 'string' ? token.role : undefined);
+
+        return {
+            isAuthenticated: Boolean(userId),
+            isAdmin: role === 'admin',
+            user: userId
+                ? {
+                    id: userId,
+                    email: typeof token.email === 'string' ? token.email : undefined,
+                    role,
+                }
+                : null,
+        };
     }
 
-    // 2. Fallback: Check custom auth_token cookie
+    // Fallback for custom email/password auth cookie.
     const customToken = request.cookies.get('auth_token')?.value;
     if (customToken) {
-        const payload = verifyToken(customToken);
-        if (payload && payload.role === 'admin') {
-            return null; // Admin authorized via custom token
+        const payload = await verifyToken(customToken);
+        if (payload?.userId) {
+            const role = normalizeRole(payload.role);
+
+            return {
+                isAuthenticated: true,
+                isAdmin: role === 'admin',
+                user: {
+                    id: payload.userId,
+                    email: payload.email,
+                    role,
+                },
+            };
         }
     }
 
-    // 3. Unauthorized
-    if (!session && !customToken) {
+    return {
+        isAuthenticated: false,
+        isAdmin: false,
+        user: null,
+    };
+}
+
+export async function requireAdmin(request: NextRequest) {
+    const auth = await getRequestAuth(request);
+
+    if (!auth.isAuthenticated) {
         return NextResponse.json(
             { success: false, error: 'Unauthorized. Login required.' },
             { status: 401 }
         );
     }
 
-    // 4. Forbidden
+    if (auth.isAdmin) {
+        return null;
+    }
+
     return NextResponse.json(
         { success: false, error: 'Forbidden. Admin access required.' },
         { status: 403 }
@@ -81,7 +136,7 @@ export const authOptions: NextAuthOptions = {
         async jwt({ token, user }: any) {
             if (user) {
                 token.id = user.id;
-                token.role = user.role || 'user';
+                token.role = normalizeRole(user.role);
             } else if (!token.role) {
                 // If token exists but no role (e.g. after initial login), 
                 // we might want a one-time DB check or just rely on initial login.
@@ -91,7 +146,7 @@ export const authOptions: NextAuthOptions = {
                     const dbUser = await User.findOne({ email: token.email }) as any;
                     if (dbUser) {
                         token.id = dbUser._id.toString();
-                        token.role = dbUser.role;
+                        token.role = normalizeRole(dbUser.role);
                     }
                 } catch (error) {
                     console.error('Error in jwt callback:', error);

@@ -59,14 +59,25 @@ export async function POST(req: Request) {
       await order.save();
 
       // Post-payment Inventory update
-      const couponCode = payload.notes?.couponCode;
+      const appliedCouponCode = String(order.appliedCouponCode || '').trim().toUpperCase();
+      const hasCouponApplied = Boolean(appliedCouponCode && Number(order.couponDiscount || 0) > 0);
       const stockUpdateTasks = order.items.map((item: any) => 
         Product.findByIdAndUpdate(item.productId, { $inc: { stock: -item.quantity } })
       );
       
-      if (couponCode && couponCode !== 'none') {
+      if (hasCouponApplied) {
         stockUpdateTasks.push(
-          Coupon.findOneAndUpdate({ code: couponCode.toUpperCase() }, { $inc: { usedCount: 1 } })
+          Coupon.findOneAndUpdate(
+            {
+              code: appliedCouponCode,
+              isActive: true,
+              $or: [
+                { usageLimit: null },
+                { $expr: { $lt: ['$usedCount', '$usageLimit'] } },
+              ],
+            },
+            { $inc: { usedCount: 1 } }
+          )
         );
       }
       await Promise.allSettled(stockUpdateTasks);

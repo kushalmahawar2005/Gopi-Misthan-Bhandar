@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
 import GiftBox from '@/models/GiftBox';
+import { requireAdmin } from '@/lib/auth';
 
 export async function GET(
   request: NextRequest,
@@ -30,6 +31,9 @@ export async function PUT(
   request: NextRequest,
   { params }: { params: { id: string } }
 ) {
+  const authError = await requireAdmin(request);
+  if (authError) return authError;
+
   try {
     await connectDB();
     const body = await request.json();
@@ -69,6 +73,9 @@ export async function DELETE(
   request: NextRequest,
   { params }: { params: { id: string } }
 ) {
+  const authError = await requireAdmin(request);
+  if (authError) return authError;
+
   try {
     await connectDB();
     const giftBox = await GiftBox.findByIdAndDelete(params.id);

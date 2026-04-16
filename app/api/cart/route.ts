@@ -1,15 +1,27 @@
 import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
 import Cart from '@/models/Cart';
+import { getRequestAuth } from '@/lib/auth';
+
+async function getAuthenticatedUserId(request: NextRequest): Promise<string | null> {
+  const auth = await getRequestAuth(request);
+  if (!auth.isAuthenticated || !auth.user?.id) {
+    return null;
+  }
+  return auth.user.id;
+}
 
 export async function GET(request: NextRequest) {
   try {
-    await connectDB();
-    const userId = request.nextUrl.searchParams.get('userId');
-    
+    const userId = await getAuthenticatedUserId(request);
     if (!userId) {
-      return NextResponse.json({ success: false, error: 'User ID is required' }, { status: 400 });
+      return NextResponse.json(
+        { success: false, error: 'Unauthorized. Login required.' },
+        { status: 401 }
+      );
     }
+
+    await connectDB();
 
     const cart = await Cart.findOne({ userId });
     return NextResponse.json({ success: true, data: cart ? cart.items : [] }, { status: 200 });
@@ -20,20 +32,23 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
+    const userId = await getAuthenticatedUserId(request);
+    if (!userId) {
+      return NextResponse.json(
+        { success: false, error: 'Unauthorized. Login required.' },
+        { status: 401 }
+      );
+    }
+
     await connectDB();
     const body = await request.json();
-    const { userId, items, action } = body;
-
-    if (!userId) {
-      return NextResponse.json({ success: false, error: 'User ID is required' }, { status: 400 });
-    }
+    const { items, action } = body;
 
     if (action === 'sync') {
       // Sync operation: merge local items with DB items
       const dbCart = await Cart.findOne({ userId });
       const dbItems = dbCart ? dbCart.items : [];
       let merged = [...dbItems];
-      let hasChanges = false;
       
       const localItems = items || [];
       
@@ -47,12 +62,10 @@ export async function POST(request: NextRequest) {
         
         if (existsIndex === -1) {
           merged.push(localItem);
-          hasChanges = true;
         } else {
           // Keep the larger quantity or overwrite
           if (localItem.quantity > merged[existsIndex].quantity) {
              merged[existsIndex].quantity = localItem.quantity;
-             hasChanges = true;
           }
         }
       });
@@ -84,12 +97,15 @@ export async function POST(request: NextRequest) {
 
 export async function DELETE(request: NextRequest) {
   try {
-    await connectDB();
-    const userId = request.nextUrl.searchParams.get('userId');
-    
+    const userId = await getAuthenticatedUserId(request);
     if (!userId) {
-      return NextResponse.json({ success: false, error: 'User ID is required' }, { status: 400 });
+      return NextResponse.json(
+        { success: false, error: 'Unauthorized. Login required.' },
+        { status: 401 }
+      );
     }
+
+    await connectDB();
 
     await Cart.findOneAndDelete({ userId });
     return NextResponse.json({ success: true, data: [] }, { status: 200 });

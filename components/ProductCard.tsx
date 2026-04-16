@@ -18,25 +18,29 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, showAddToCart = true
   const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
   const [isHovered, setIsHovered] = useState(false);
   const [isAdding, setIsAdding] = useState(false);
+  const [quantity, setQuantity] = useState(1);
   const isFavorite = isInWishlist(product.id);
+  const maxQuantity = typeof product.stock === 'number' && product.stock > 0 ? product.stock : 99;
 
-  const handleAddToCart = async (e: React.MouseEvent) => {
+  const increaseQuantity = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setQuantity((prev) => Math.min(maxQuantity, prev + 1));
+  };
+
+  const decreaseQuantity = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setQuantity((prev) => Math.max(1, prev - 1));
+  };
+
+  const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
     setIsAdding(true);
-    addToCart(product, 1);
+    addToCart(product, quantity);
     setTimeout(() => setIsAdding(false), 800);
   };
-
-  // Mock data for visual consistency with reference image
-  // Using product.id to keep it consistent for the same product
-  const seed = parseInt(product.id.substring(0, 8), 16) || 0;
-  const rating = (4.5 + (seed % 5) * 0.1).toFixed(1);
-  
-  // Random badges for variety like in the image
-  const badges = ["Best Seller", "Mumbai only", "Seasonal", "Trending"];
-  const badge = badges[seed % badges.length];
-  const badgeColor = badge === "Mumbai only" ? "bg-[#503223]" : (badge === "Seasonal" ? "bg-[#D4A373]" : "bg-[#503223]");
 
   return (
     <div className="group block h-full">
@@ -46,7 +50,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, showAddToCart = true
         onMouseLeave={() => setIsHovered(false)}
       >
         {/* Image Container - Square with Rounded Corners */}
-        <div className="relative w-full aspect-square mb-4 rounded-[20px] overflow-hidden bg-[#F9F6F3] border border-gray-100/50">
+        <div className="relative w-full aspect-square mb-4 rounded-[20px] overflow-hidden bg-[#F9F6F3]">
           <Link href={`/product/${product.id}`} className="block relative w-full h-full">
             {/* Main Image */}
             <Image
@@ -73,17 +77,6 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, showAddToCart = true
             )}
           </Link>
           
-          {/* Badge Top Left (e.g., Mumbai Only) */}
-          <div className={`absolute top-3 left-3 px-2.5 py-1 ${badgeColor} text-white text-[10px] md:text-[11px] font-bold tracking-wider uppercase rounded-sm z-10`}>
-            {badge}
-          </div>
-
-          {/* Rating Badge Bottom Right */}
-          <div className="absolute bottom-3 right-3 bg-[#0A2647] bg-opacity-[0.85] text-white px-2 py-1 rounded-md flex items-center gap-1 z-10 backdrop-blur-sm">
-            <span className="text-[10px] md:text-[11px] font-bold">{rating}</span>
-            <span className="text-[10px] text-yellow-400">★</span>
-          </div>
-          
           {/* Heart Icon Top Right - Subtly visible */}
           <button
             onClick={(e) => {
@@ -104,7 +97,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, showAddToCart = true
         {/* Product Info Section - Left Aligned */}
         <div className="w-full flex-grow flex flex-col items-start text-left px-1">
           <Link href={`/product/${product.id}`} className="block mb-2 group-hover:opacity-80 transition-opacity">
-            <h3 className="text-[#2D2D2D] text-[14px] md:text-[15px] font-medium font-geom leading-relaxed line-clamp-2">
+            <h3 className="text-[#1A1A1A] text-[16px] md:text-[17px] font-medium font-flama leading-relaxed line-clamp-2">
               {product.name}
             </h3>
           </Link>
@@ -116,21 +109,46 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, showAddToCart = true
             </span>
           </div>
           
-          {/* Add to Cart Button - Solid Orange with no hover */}
-          <button
-            onClick={handleAddToCart}
-            disabled={isAdding}
-            className="mt-auto w-full py-3 md:py-3.5 bg-[#FE8E02] text-white text-[11px] md:text-[12px] font-bold tracking-[0.15em] uppercase rounded-lg transition-all duration-300 active:scale-[0.97] disabled:opacity-75 flex items-center justify-center overflow-hidden relative group"
-          >
-            <span className={`transition-all duration-300 ${isAdding ? 'translate-y-10 opacity-0' : 'translate-y-0 opacity-100'}`}>
-              ADD TO CART
-            </span>
-            {isAdding && (
-              <span className="absolute inset-0 flex items-center justify-center text-white bg-green-600 animate-in fade-in zoom-in duration-300">
-                ADDED!
-              </span>
-            )}
-          </button>
+          {showAddToCart && (
+            <div className="mt-auto w-full flex items-center gap-2 md:gap-3">
+              <div className="flex items-center justify-between h-[46px] md:h-[50px] min-w-[108px] md:min-w-[120px] px-2.5 md:px-3 border border-[#d6cec6]  bg-white">
+                <button
+                  onClick={decreaseQuantity}
+                  disabled={quantity <= 1}
+                  className="w-7 h-7 flex items-center justify-center text-[18px] leading-none text-[#503223] disabled:opacity-40"
+                  aria-label="Decrease quantity"
+                >
+                  -
+                </button>
+                <span className="min-w-[16px] text-center text-[16px] md:text-[18px] leading-none text-[#2D2D2D] font-inter font-semibold">
+                  {quantity}
+                </span>
+                <button
+                  onClick={increaseQuantity}
+                  disabled={quantity >= maxQuantity}
+                  className="w-7 h-7 flex items-center justify-center text-[18px] leading-none text-[#503223] disabled:opacity-40"
+                  aria-label="Increase quantity"
+                >
+                  +
+                </button>
+              </div>
+
+              <button
+                onClick={handleAddToCart}
+                disabled={isAdding}
+                className="flex-1 h-[46px] md:h-[50px] bg-[#FE8E02] text-white text-[11px] md:text-[12px] font-bold tracking-[0.15em] uppercase transition-all duration-300 active:scale-[0.97] disabled:opacity-75 flex items-center justify-center overflow-hidden relative"
+              >
+                <span className={`transition-all duration-300 ${isAdding ? 'translate-y-10 opacity-0' : 'translate-y-0 opacity-100'}`}>
+                  ADD TO CART
+                </span>
+                {isAdding && (
+                  <span className="absolute inset-0 flex items-center justify-center text-white bg-green-600 animate-in fade-in zoom-in duration-300">
+                    ADDED!
+                  </span>
+                )}
+              </button>
+            </div>
+          )}
         </div>
       </div>
     </div>

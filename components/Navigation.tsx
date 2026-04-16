@@ -35,6 +35,7 @@ const Navigation = () => {
   const { getWishlistCount } = useWishlist();
   const cartItemsCount = getTotalItems();
   const wishlistCount = getWishlistCount();
+  const isAdmin = isAuthenticated && String(user?.role || '').toLowerCase() === 'admin';
 
   // Search results
   const [searchResults, setSearchResults] = useState<any[]>([]);
@@ -115,13 +116,13 @@ const Navigation = () => {
   };
 
   const navItems = [
-    { label: 'HOME', href: '/' },
-    { label: 'SWEETS', href: '/products?category=sweets', slug: 'sweets' },
-    { label: 'DRY FRUIT', href: '/products?category=dry-fruit', slug: 'dry-fruit' },
-    { label: 'BAKERY ITEMS', href: '/products?category=bakery-items', slug: 'bakery-items' },
-    { label: 'NAMKEEN', href: '/products?category=namkeen', slug: 'namkeen' },
-    { label: 'SAVOURY SNACKS', href: '/products?category=savoury-snacks', slug: 'savoury-snacks' },
-    { label: 'GIFTING', href: '/#gifting', slug: 'gifting-' },
+    { label: 'Home', href: '/' },
+    { label: 'Sweets', href: '/products?category=sweets', slug: 'sweets' },
+    { label: 'Dry Fruits', href: '/products?category=dry-fruit', slug: 'dry-fruit' },
+    { label: 'Bakery Items', href: '/products?category=bakery-items', slug: 'bakery-items' },
+    { label: 'Namkeen', href: '/products?category=namkeen', slug: 'namkeen' },
+    { label: 'Savoury Snacks', href: '/products?category=savoury-snacks', slug: 'savoury-snacks' },
+    { label: 'Gifting', href: '/#gifting', slug: 'gifting-' },
   ];
 
   const isActive = (href: string) => {
@@ -155,36 +156,57 @@ const Navigation = () => {
     setIsMobileMenuOpen(false);
   };
 
-  const [isVisible, setIsVisible] = useState(true);
   const [isScrolled, setIsScrolled] = useState(false);
-  const lastScrollY = useRef(0);
+  const scrollRafRef = useRef<number | null>(null);
 
   useEffect(() => {
-    const handleScroll = () => {
-      if (typeof window !== 'undefined') {
-        const currentScrollY = window.scrollY;
-        // Smooth transition trigger around 60px
-        setIsScrolled(currentScrollY > 60);
-        setIsVisible(true);
-      }
+    // Strong hysteresis prevents oscillation when sticky nav height changes during slow scroll.
+    const ENTER_COMPACT_SCROLL = 120;
+    const EXIT_COMPACT_SCROLL = 0;
+
+    const updateScrolledState = () => {
+      const currentScrollY = window.scrollY || window.pageYOffset;
+
+      setIsScrolled((prev) => {
+        if (!prev && currentScrollY >= ENTER_COMPACT_SCROLL) return true;
+        if (prev && currentScrollY <= EXIT_COMPACT_SCROLL) return false;
+        return prev;
+      });
+
+      scrollRafRef.current = null;
     };
 
+    const handleScroll = () => {
+      if (scrollRafRef.current !== null) return;
+      scrollRafRef.current = window.requestAnimationFrame(updateScrolledState);
+    };
+
+    handleScroll();
     window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
+    window.addEventListener('resize', handleScroll);
+
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      window.removeEventListener('resize', handleScroll);
+
+      if (scrollRafRef.current !== null) {
+        window.cancelAnimationFrame(scrollRafRef.current);
+        scrollRafRef.current = null;
+      }
+    };
   }, []);
 
   return (
     <>
       <nav
         id="main-nav"
-        className={`bg-white w-full border-b border-[#d6cec6] z-50 transition-all duration-500 ease-in-out sticky top-0 left-0 right-0 ${isVisible ? 'translate-y-0' : '-translate-y-full'
-          } ${isScrolled ? 'py-0 shadow-md' : 'py-0'}`}
+        className={`bg-white w-full border-b border-[#d6cec6] z-50 transition-shadow duration-300 ease-out sticky top-0 left-0 right-0 ${isScrolled ? 'py-0 shadow-md' : 'py-0'}`}
       >
 
         {/* Main Content Area */}
-        <div className={`max-w-[1700px] mx-auto transition-all duration-500`}>
+        <div className="max-w-[1700px] mx-auto">
           {/* Row 1: Header/Main Row */}
-          <div className={`flex items-center justify-between px-4 md:px-8 lg:px-12 relative transition-all duration-500 ${isScrolled ? 'h-[55px] md:h-[65px]' : 'h-[90px] md:h-[115px]'}`}>
+          <div className={`flex items-center justify-between px-4 md:px-8 lg:px-12 relative ${isScrolled ? 'h-[55px] md:h-[65px]' : 'h-[90px] md:h-[115px]'}`}>
 
             {/* Left Section: Bulk Enquiry (hides on scroll) / Space for Logo (on scroll) */}
             <div className="flex items-center gap-4 flex-1 md:flex-initial">
@@ -217,12 +239,12 @@ const Navigation = () => {
             {/* Logo: Snaps directly from center to left without transition */}
             <Link
               href="/"
-              className={`absolute top-1/2 z-20 ${isScrolled
+              className={`absolute top-1/2 z-20 transition-[left,transform] duration-500 ease-in-out transform-gpu will-change-transform ${isScrolled
                 ? 'left-1/2 md:left-8 lg:left-12 -translate-y-1/2 -translate-x-1/2 md:translate-x-0'
                 : 'left-1/2 -translate-x-1/2 -translate-y-1/2'
                 }`}
             >
-              <div className={`relative ${isScrolled
+              <div className={`relative transition-[width,height] duration-500 ease-in-out ${isScrolled
                 ? 'w-[70px] h-[42px] md:w-[85px] md:h-[52px]'
                 : 'w-[106px] h-[66px] md:w-[138px] md:h-[74px] lg:w-[160px] lg:h-[85px]'
                 }`}>
@@ -238,7 +260,7 @@ const Navigation = () => {
             </Link>
 
             {/* Scrolled Navigation Items: Only visible on scroll in the center */}
-            <div className={`hidden lg:flex items-center justify-center gap-6 lg:gap-8 xl:gap-10 transition-all duration-500 absolute left-[150px] lg:left-[160px] right-[320px] xl:right-[380px] ${isScrolled ? 'opacity-100 translate-y-0 pointer-events-auto' : 'opacity-0 translate-y-4 pointer-events-none'
+            <div className={`hidden lg:flex items-center justify-center gap-6 lg:gap-8 xl:gap-10 transition-all duration-500 transform-gpu will-change-transform absolute left-[150px] lg:left-[160px] right-[320px] xl:right-[380px] ${isScrolled ? 'opacity-100 translate-y-0 pointer-events-auto' : 'opacity-0 translate-y-4 pointer-events-none'
               }`}>
               {navItems.map((item) => (
                 <button
@@ -319,7 +341,7 @@ const Navigation = () => {
 
               {/* Icons */}
               <div className="flex items-center gap-2">
-                {isAuthenticated && user?.role === 'admin' && (
+                {isAdmin && (
                   <Link
                     href="/admin"
                     className="p-1.5 text-[#FE8E02] hover:opacity-70 transition-opacity"
@@ -369,8 +391,8 @@ const Navigation = () => {
           </div>
 
           {/* Row 2: Navigation Links (hides on scroll) */}
-          <div className={`hidden md:flex items-center justify-center gap-6 lg:gap-8 xl:gap-12 px-4 transition-all duration-500 ${isScrolled ? 'max-h-0 py-0 opacity-0 pointer-events-none overflow-hidden' : 'max-h-[100px] py-3 opacity-100 pointer-events-auto overflow-visible'
-            }`}>
+          {!isScrolled && (
+            <div className="hidden md:flex items-center justify-center gap-6 lg:gap-7 xl:gap-8 px-4 py-2">
             {navItems.map((item) => {
               const category = item.slug ? getCategoryBySlug(item.slug, item.label) : null;
               const hasSubcategories = category?.subCategories && category.subCategories.length > 0;
@@ -384,18 +406,18 @@ const Navigation = () => {
                 >
                   <button
                     onClick={() => handleNavClick(item.href)}
-                    className={`text-[11px] md:text-[19px] font-flama-condensed tracking-[0.18em] uppercase transition-colors font-semibold flex items-center gap-1.5 py-2 relative ${isActive(item.href) ? 'text-[#FE8E02]' : 'text-[#503223] hover:text-[#FE8E02]'
+                    className={`text-[16px] lg:text-[17px] font-flama tracking-[0.01em] transition-colors font-medium flex items-center gap-1.5 py-2 relative group ${isActive(item.href) ? 'text-[#2d2d2d]' : 'text-[#2d2d2d] hover:text-[#2d2d2d]'
                       }`}
                   >
                     {item.label}
                     {hasSubcategories && (
-                      <FiChevronDown className={`w-4 h-4 transition-transform duration-200 ${hoveredCategory === item.slug ? 'rotate-180' : ''}`} />
+                      <FiChevronDown className={`w-3.5 h-3.5 transition-transform duration-200 ${hoveredCategory === item.slug ? 'rotate-180' : ''}`} />
                     )}
                     {/* Underline on hover */}
                     <span
-                      className={`absolute bottom-0 left-0 h-0.5 bg-[#FE8E02] transition-all duration-300 ${hoveredCategory === item.slug || isActive(item.href)
+                      className={`absolute -bottom-2 left-0 h-[2px] bg-[#2d2d2d] transition-all duration-300 ${hoveredCategory === item.slug || isActive(item.href)
                         ? 'w-full opacity-100'
-                        : 'w-0 opacity-0'
+                        : 'w-0 opacity-0 group-hover:w-full group-hover:opacity-100'
                         }`}
                     />
                   </button>
@@ -404,16 +426,16 @@ const Navigation = () => {
                   {hasSubcategories && hoveredCategory === item.slug && (
                     <div
                       ref={categoryDropdownRef}
-                      className="absolute top-full left-1/2 transform -translate-x-1/2 pt-2 bg-transparent z-50"
+                      className="absolute top-full left-0 pt-1 bg-transparent z-50"
                       onMouseEnter={() => setHoveredCategory(item.slug || null)}
                       onMouseLeave={() => setHoveredCategory(null)}
                     >
-                      <div className="bg-white border border-gray-200 rounded-md shadow-lg min-w-[180px] py-2">
+                      <div className="bg-white border border-[#e6e6e6] shadow-[0_10px_24px_rgba(0,0,0,0.08)] min-w-[190px] py-2">
                         {/* All Category Link */}
                         <Link
                           href={item.href}
                           onClick={() => setHoveredCategory(null)}
-                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-red-600 transition-colors font-medium"
+                          className="block px-5 py-2 text-[15px] text-[#2d2d2d] hover:bg-[#efefef] transition-colors font-medium"
                         >
                           All {item.label}
                         </Link>
@@ -429,7 +451,7 @@ const Navigation = () => {
                             key={subcategory.slug}
                             href={`/products?category=${item.slug}&subcategory=${subcategory.slug}`}
                             onClick={() => setHoveredCategory(null)}
-                            className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-red-600 transition-colors"
+                            className="block px-5 py-2 text-[15px] text-[#2d2d2d] hover:bg-[#efefef] transition-colors"
                           >
                             {subcategory.name}
                           </Link>
@@ -440,7 +462,8 @@ const Navigation = () => {
                 </div>
               );
             })}
-          </div>
+            </div>
+          )}
         </div>
       </nav>
 
@@ -576,7 +599,7 @@ const Navigation = () => {
                 </button>
               ))}
 
-              {isAuthenticated && user?.role === 'admin' && (
+              {isAdmin && (
                 <button
                   onClick={() => {
                     router.push('/admin');

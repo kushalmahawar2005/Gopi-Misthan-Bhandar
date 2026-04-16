@@ -2,18 +2,34 @@ import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
 import Order from '@/models/Order';
 import { sendOrderStatusSMS } from '@/lib/sms';
-import { requireAdmin } from '@/lib/auth';
+import { getRequestAuth, requireAdmin } from '@/lib/auth';
 
 
 // GET single order
 export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
   try {
+    const auth = await getRequestAuth(request);
+    if (!auth.isAuthenticated || !auth.user?.id) {
+      return NextResponse.json(
+        { success: false, error: 'Unauthorized. Login required.' },
+        { status: 401 }
+      );
+    }
+
     await connectDB();
     
-    const order = await Order.findById(params.id);
+    const order = await Order.findById(params.id) as any;
 
     if (!order) {
       return NextResponse.json({ success: false, error: 'Order not found' }, { status: 404 });
+    }
+
+    const isOwner = order.userId && String(order.userId) === auth.user.id;
+    if (!auth.isAdmin && !isOwner) {
+      return NextResponse.json(
+        { success: false, error: 'Forbidden. This order does not belong to you.' },
+        { status: 403 }
+      );
     }
 
     return NextResponse.json({ success: true, data: order }, { status: 200 });

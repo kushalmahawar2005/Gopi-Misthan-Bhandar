@@ -26,7 +26,6 @@ const GallerySection = dynamic(() => import('@/components/sections/GallerySectio
 const GiftBoxSection = dynamic(() => import('@/components/sections/GiftBoxSection'));
 const BlogSection = dynamic(() => import('@/components/sections/BlogSection'));
 const PurityBanner = dynamic(() => import('@/components/sections/PurityBanner'));
-const NewsletterSection = dynamic(() => import('@/components/sections/NewsletterSection'));
 
 export default function Home() {
   const [featuredProducts, setFeaturedProducts] = useState<Product[]>([]);
@@ -141,7 +140,7 @@ export default function Home() {
       {/* Promotional Banner removed as requested */}
       {/* <PromotionalBanner /> */}
       {featuredProducts.length > 0 && (
-        <ScrollAnimation delay={100}>
+        <ScrollAnimation>
           <div id="featured">
             <FeaturedCollection products={featuredProducts.slice(0, 8)} />
           </div>
@@ -149,7 +148,7 @@ export default function Home() {
       )}
 
       {categories.length > 0 && (
-        <ScrollAnimation delay={150}>
+        <ScrollAnimation>
           <div id="categories">
             <CategoriesSection categories={categories} />
           </div>
@@ -157,7 +156,7 @@ export default function Home() {
       )}
 
       {classicProducts.length > 0 && (
-        <ScrollAnimation delay={200}>
+        <ScrollAnimation>
           <div id="sweets">
             <ProductSection
               title="Classic Sweets"
@@ -170,7 +169,7 @@ export default function Home() {
       )}
 
       {premiumProducts.length > 0 && (
-        <ScrollAnimation delay={200}>
+        <ScrollAnimation>
           <ProductSection
             title="Premium Sweets"
             subtitle="The Luxury Signature Collection"
@@ -183,14 +182,14 @@ export default function Home() {
       {/* Purity Guarantee Marquee */}
       <PurityBanner />
 
-      <ScrollAnimation delay={150}>
+      <ScrollAnimation>
         <div id="about">
           <AboutSection />
         </div>
       </ScrollAnimation>
 
       {/* Repurposed Gift Box Section - Showing Gifting Subcategories */}
-      <ScrollAnimation delay={200}>
+      <ScrollAnimation>
         <div id="gifting">
           <GiftBoxSection />
         </div>
@@ -198,13 +197,13 @@ export default function Home() {
 
 
       {instaBooks.length > 0 && (
-        <ScrollAnimation delay={150}>
+        <ScrollAnimation>
           <InstaBookSection instaBooks={instaBooks} />
         </ScrollAnimation>
       )}
 
       {galleryItems.length > 0 && (
-        <ScrollAnimation delay={200}>
+        <ScrollAnimation className={blogs.length === 0 ? 'mb-10 md:mb-16' : ''}>
           <GallerySection galleryItems={galleryItems} />
         </ScrollAnimation>
       )}
@@ -214,15 +213,10 @@ export default function Home() {
       {/* MapSection removed as per request, moved to Footer */}
 
       {blogs.length > 0 && (
-        <ScrollAnimation delay={200}>
+        <ScrollAnimation>
           <BlogSection blogs={blogs} />
         </ScrollAnimation>
       )}
-
-      {/* Newsletter - Become A GOPI Insider */}
-      <ScrollAnimation delay={150}>
-        <NewsletterSection />
-      </ScrollAnimation>
 
       <Footer />
     </main>

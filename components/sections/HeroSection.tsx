@@ -1,0 +1,182 @@
+'use client';
+
+import React, { useState, useEffect } from 'react';
+import Image from 'next/image';
+import Link from 'next/link';
+import { FiChevronLeft, FiChevronRight } from 'react-icons/fi';
+import { fetchHeroSlides, HeroSlide } from '@/lib/api';
+
+const HeroSection = () => {
+  const [slides, setSlides] = useState<HeroSlide[]>([]);
+  const [currentSlide, setCurrentSlide] = useState(0);
+  const [loading, setLoading] = useState(true);
+  const [enquiryOpen, setEnquiryOpen] = useState(false);
+  const touchStart = React.useRef<number | null>(null);
+  const touchEnd = React.useRef<number | null>(null);
+
+  // Touch Handlers for Swipe
+  const onTouchStart = (e: React.TouchEvent) => {
+    touchEnd.current = null;
+    touchStart.current = e.targetTouches[0].clientX;
+  };
+
+  const onTouchMove = (e: React.TouchEvent) => {
+    touchEnd.current = e.targetTouches[0].clientX;
+  };
+
+  const onTouchEnd = () => {
+    if (!touchStart.current || !touchEnd.current) return;
+    const distance = touchStart.current - touchEnd.current;
+    const isLeftSwipe = distance > 50;
+    const isRightSwipe = distance < -50;
+
+    if (isLeftSwipe) nextSlide();
+    if (isRightSwipe) prevSlide();
+  };
+
+  useEffect(() => {
+    loadSlides();
+  }, []);
+
+  // Hide controls when enquiry modal is open
+  useEffect(() => {
+    const openHandler = () => setEnquiryOpen(true);
+    const closeHandler = () => setEnquiryOpen(false);
+    if (typeof window !== 'undefined') {
+      window.addEventListener('open-wedding-enquiry', openHandler as EventListener);
+      window.addEventListener('close-wedding-enquiry', closeHandler as EventListener);
+    }
+    return () => {
+      if (typeof window !== 'undefined') {
+        window.removeEventListener('open-wedding-enquiry', openHandler as EventListener);
+        window.removeEventListener('close-wedding-enquiry', closeHandler as EventListener);
+      }
+    };
+  }, []);
+
+  const loadSlides = async () => {
+    try {
+      const slidesData = await fetchHeroSlides();
+      setSlides(slidesData.length > 0 ? slidesData : getDefaultSlides());
+    } catch (error) {
+      console.error('Error loading hero slides:', error);
+      setSlides(getDefaultSlides());
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Default slides
+  const getDefaultSlides = (): HeroSlide[] => [
+    { id: '1', image: '/1.jpg', order: 0, isActive: true },
+    { id: '2', image: '/banner-2.png', order: 1, isActive: true },
+    { id: '3', image: '/banner-3.png', order: 2, isActive: true },
+  ];
+
+  // Auto-slide
+  useEffect(() => {
+    if (slides.length === 0) return;
+    const interval = setInterval(() => {
+      setCurrentSlide((prev) => (prev + 1) % slides.length);
+    }, 5000);
+    return () => clearInterval(interval);
+  }, [slides.length]);
+
+  const nextSlide = () => slides.length && setCurrentSlide((p) => (p + 1) % slides.length);
+  const prevSlide = () => slides.length && setCurrentSlide((p) => (p - 1 + slides.length) % slides.length);
+  const goToSlide = (i: number) => i >= 0 && i < slides.length && setCurrentSlide(i);
+
+  if (loading) {
+    // Static skeleton — does NOT block LCP (no spinner animation)
+    return (
+      <section className="w-full -mt-0 mb-8 md:mb-4">
+        <div className="w-full h-[550px] sm:h-[650px] md:h-[485px] lg:h-[550px] relative overflow-hidden bg-[#FDF8F3]">
+          <div className="w-full h-full bg-gradient-to-r from-[#FDF8F3] via-[#f5ead8] to-[#FDF8F3] animate-pulse" />
+        </div>
+      </section>
+    );
+  }
+  if (slides.length === 0) return null;
+
+  return (
+    <section className="relative w-full -mt-0 mb-8 md:mb-4">
+      <div className="relative w-full">
+        <div
+          className="w-full h-[550px] sm:h-[650px] md:h-[485px] lg:h-[550px] relative overflow-hidden bg-[#FDF8F3]"
+          onTouchStart={onTouchStart}
+          onTouchMove={onTouchMove}
+          onTouchEnd={onTouchEnd}
+        >
+          <div className="relative w-full h-full">
+            {slides.map((slide, index) => (
+              <Link
+                key={slide.id}
+                href="/products"
+                className={`absolute inset-0 transition-opacity duration-700 block ${index === currentSlide ? 'opacity-100 z-10' : 'opacity-0 z-0'
+                  }`}
+              >
+                <div className="relative w-full h-full">
+                  {/* Desktop image — priority on first slide for LCP */}
+                  <Image
+                    src={slide.image}
+                    alt={slide.title ? `${slide.title} - Gopi Misthan Bhandar` : `Gopi Misthan Bhandar Traditional Sweets - Slide ${index + 1}`}
+                    fill
+                    className="object-cover object-center hidden md:block"
+                    priority={index === 0}
+                    fetchPriority={index === 0 ? 'high' : 'auto'}
+                    sizes="100vw"
+                  />
+                  {/* Mobile image */}
+                  <Image
+                    src={(slide as any).mobileImage || slide.image}
+                    alt={slide.title ? `${slide.title} - Gopi Misthan Bhandar` : `Gopi Misthan Bhandar Traditional Sweets - Slide ${index + 1}`}
+                    fill
+                    className="object-contain object-top md:hidden"
+                    priority={index === 0}
+                    fetchPriority={index === 0 ? 'high' : 'auto'}
+                    sizes="100vw"
+                  />
+                </div>
+              </Link>
+            ))}
+          </div>
+
+          {slides.length > 1 && !enquiryOpen && (
+            <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-20 flex gap-2">
+              {slides.map((_, index) => (
+                <button
+                  key={index}
+                  onClick={() => goToSlide(index)}
+                  className={`w-2 h-2 rounded-full transition-all ${index === currentSlide ? 'bg-white w-8' : 'bg-white/50 hover:bg-white/75'
+                    }`}
+                  aria-label={`Go to slide ${index + 1}`}
+                />
+              ))}
+            </div>
+          )}
+        </div>
+
+        {slides.length > 1 && !enquiryOpen && (
+          <>
+            <button
+              onClick={prevSlide}
+              className="hidden md:inline-flex absolute left-0 top-1/2 -translate-y-1/2 -translate-x-1/2 bg-transparent text-black p-2 rounded-full border border-transparent shadow-none hover:bg-white/90 hover:border-gray-300 hover:shadow-md transition-all z-30"
+              aria-label="Previous slide"
+            >
+              <FiChevronLeft className="w-5 h-5 md:w-6 md:h-6" />
+            </button>
+            <button
+              onClick={nextSlide}
+              className="hidden md:inline-flex absolute right-0 top-1/2 -translate-y-1/2 translate-x-1/2 bg-transparent text-black p-2 rounded-full border border-transparent shadow-none hover:bg-white/90 hover:border-gray-300 hover:shadow-md transition-all z-30"
+              aria-label="Next slide"
+            >
+              <FiChevronRight className="w-5 h-5 md:w-6 md:h-6" />
+            </button>
+          </>
+        )}
+      </div>
+    </section>
+  );
+};
+
+export default HeroSection;

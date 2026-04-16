@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
 import Review from '@/models/Review';
+import { requireAdmin } from '@/lib/auth';
 
 // GET single review
 export async function GET(
@@ -29,6 +30,9 @@ export async function PUT(
   request: NextRequest,
   { params }: { params: { id: string } }
 ) {
+  const authError = await requireAdmin(request);
+  if (authError) return authError;
+
   try {
     await connectDB();
     const body = await request.json();
@@ -57,6 +61,9 @@ export async function DELETE(
   request: NextRequest,
   { params }: { params: { id: string } }
 ) {
+  const authError = await requireAdmin(request);
+  if (authError) return authError;
+
   try {
     await connectDB();
     const review = await Review.findByIdAndDelete(params.id);

@@ -51,8 +51,8 @@ const PurityBanner: React.FC = () => {
   const repeatedItems = [...purityItems, ...purityItems, ...purityItems, ...purityItems, ...purityItems, ...purityItems];
 
   return (
-    <div className="w-full overflow-hidden mb-2 md:mb-4 bg-[#FE8E02]">
-      <div className="relative py-7 md:py-9">
+    <div className="w-full overflow-hidden mb-0 bg-[#FE8E02]">
+      <div className="relative py-5 md:py-6">
         {/* Marquee Track */}
         <div className="flex items-center animate-purity-marquee whitespace-nowrap">
           {repeatedItems.map((item, index) => (

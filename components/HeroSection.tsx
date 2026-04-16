@@ -89,7 +89,7 @@ const HeroSection = () => {
   if (loading) {
     // Static skeleton — does NOT block LCP (no spinner animation)
     return (
-      <section className="w-full -mt-0 mb-8 md:mb-4">
+      <section className="w-full -mt-4 mb-4">
         <div className="w-full h-[550px] sm:h-[650px] md:h-[485px] lg:h-[550px] relative overflow-hidden bg-[#FDF8F3]">
           <div className="w-full h-full bg-gradient-to-r from-[#FDF8F3] via-[#f5ead8] to-[#FDF8F3] animate-pulse" />
         </div>
@@ -99,7 +99,7 @@ const HeroSection = () => {
   if (slides.length === 0) return null;
 
   return (
-    <section className="relative w-full -mt-0 mb-8 md:mb-4">
+    <section className="relative w-full -mt-0 mb-0">
       <div className="relative w-full">
         <div
           className="w-full h-[550px] sm:h-[650px] md:h-[485px] lg:h-[550px] relative overflow-hidden bg-[#FDF8F3]"
@@ -167,7 +167,7 @@ const HeroSection = () => {
             </button>
             <button
               onClick={nextSlide}
-              className="hidden md:inline-flex absolute right-0 top-1/2 -translate-y-1/2 translate-x-1/2 bg-transparent text-black p-2 rounded-full border border-transparent shadow-none hover:bg.white/90 hover:border-gray-300 hover:shadow-md transition-all z-30"
+              className="hidden md:inline-flex absolute right-0 top-1/2 -translate-y-1/2 translate-x-1/2 bg-transparent text-black p-2 rounded-full border border-transparent shadow-none hover:bg-white/90 hover:border-gray-300 hover:shadow-md transition-all z-30"
               aria-label="Next slide"
             >
               <FiChevronRight className="w-5 h-5 md:w-6 md:h-6" />

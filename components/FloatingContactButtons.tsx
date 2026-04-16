@@ -136,7 +136,7 @@ export default function FloatingContactButtons() {
             <FiGift className="h-5 w-5" />
           </div>
           <div className="pointer-events-none absolute right-[110%] hidden min-w-[200px] translate-y-1 flex-col rounded-xl bg-primary-red px-4 py-3 gap-2 text-left text-white shadow-lg transition group-hover:flex">
-            <span className="text-sm font-semibold uppercase tracking-wide">Bulk Enquiry</span>
+            <span className="text-sm font-flama font-semibold uppercase tracking-wide">Bulk Enquiry</span>
             <span className="text-xs text-white/80">Plan your custom gift hampers</span>
           </div>
         </button>

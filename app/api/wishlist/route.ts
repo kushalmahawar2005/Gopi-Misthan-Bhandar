@@ -1,15 +1,27 @@
 import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
 import Wishlist from '@/models/Wishlist';
+import { getRequestAuth } from '@/lib/auth';
+
+async function getAuthenticatedUserId(request: NextRequest): Promise<string | null> {
+  const auth = await getRequestAuth(request);
+  if (!auth.isAuthenticated || !auth.user?.id) {
+    return null;
+  }
+  return auth.user.id;
+}
 
 export async function GET(request: NextRequest) {
   try {
-    await connectDB();
-    const userId = request.nextUrl.searchParams.get('userId');
-    
+    const userId = await getAuthenticatedUserId(request);
     if (!userId) {
-      return NextResponse.json({ success: false, error: 'User ID is required' }, { status: 400 });
+      return NextResponse.json(
+        { success: false, error: 'Unauthorized. Login required.' },
+        { status: 401 }
+      );
     }
+
+    await connectDB();
 
     const wishlist = await Wishlist.findOne({ userId });
     return NextResponse.json({ success: true, data: wishlist ? wishlist.items : [] }, { status: 200 });
@@ -20,20 +32,23 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
+    const userId = await getAuthenticatedUserId(request);
+    if (!userId) {
+      return NextResponse.json(
+        { success: false, error: 'Unauthorized. Login required.' },
+        { status: 401 }
+      );
+    }
+
     await connectDB();
     const body = await request.json();
-    const { userId, items, action } = body;
-
-    if (!userId) {
-      return NextResponse.json({ success: false, error: 'User ID is required' }, { status: 400 });
-    }
+    const { items, action } = body;
 
     if (action === 'sync') {
       // Sync operation: merge local items with DB items avoiding duplicates
       const dbWishlist = await Wishlist.findOne({ userId });
       const dbItems = dbWishlist ? dbWishlist.items : [];
       let merged = [...dbItems];
-      let hasChanges = false;
       
       const localItems = items || [];
       
@@ -41,7 +56,6 @@ export async function POST(request: NextRequest) {
         const exists = merged.find((i: any) => i.id === localItem.id);
         if (!exists) {
           merged.push(localItem);
-          hasChanges = true;
         }
       });
 
@@ -71,12 +85,15 @@ export async function POST(request: NextRequest) {
 
 export async function DELETE(request: NextRequest) {
   try {
-    await connectDB();
-    const userId = request.nextUrl.searchParams.get('userId');
-    
+    const userId = await getAuthenticatedUserId(request);
     if (!userId) {
-      return NextResponse.json({ success: false, error: 'User ID is required' }, { status: 400 });
+      return NextResponse.json(
+        { success: false, error: 'Unauthorized. Login required.' },
+        { status: 401 }
+      );
     }
+
+    await connectDB();
 
     await Wishlist.findOneAndDelete({ userId });
     return NextResponse.json({ success: true, data: [] }, { status: 200 });

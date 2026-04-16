@@ -34,6 +34,8 @@ export interface IOrder extends Document {
   items: IOrderItem[];
   shipping: IShippingAddress;
   billing: IBillingAddress;
+  appliedCouponCode?: string;
+  couponDiscount?: number;
   shippingCost: number;
   subtotal: number;
   total: number;
@@ -73,13 +75,13 @@ const ShippingAddressSchema = new Schema<IShippingAddress>({
 });
 
 const BillingAddressSchema = new Schema<IBillingAddress>({
-  name: { type: String, required: true },
-  email: { type: String, required: true },
-  phone: { type: String, required: true },
-  street: { type: String, required: true },
-  city: { type: String, required: true },
-  state: { type: String, required: true },
-  zipCode: { type: String, required: true },
+  name: { type: String, required: true, trim: true },
+  email: { type: String, required: [true, 'Billing email is required'], trim: true },
+  phone: { type: String, required: [true, 'Billing phone is required'], trim: true },
+  street: { type: String, required: true, trim: true },
+  city: { type: String, required: true, trim: true },
+  state: { type: String, required: true, trim: true },
+  zipCode: { type: String, required: true, trim: true },
 });
 
 const OrderSchema = new Schema<IOrder>(
@@ -88,6 +90,8 @@ const OrderSchema = new Schema<IOrder>(
     items: [OrderItemSchema],
     shipping: { type: ShippingAddressSchema, required: true },
     billing: { type: BillingAddressSchema, required: true },
+    appliedCouponCode: { type: String, trim: true, uppercase: true },
+    couponDiscount: { type: Number, default: 0 },
     shippingCost: { type: Number, default: 0 },
     subtotal: { type: Number, required: true },
     total: { type: Number, required: true },

@@ -14,7 +14,6 @@ import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
 import Cart from '@/components/Cart';
 import { ProductDetailSkeleton } from '@/components/SkeletonLoaders';
-import Cart from '@/components/Cart';
 import {
   FiShoppingCart,
   FiMinus,
@@ -125,9 +124,7 @@ export default function ProductDetailPage() {
     if (navigator.share) {
       try {
         await navigator.share(shareData);
-      } catch (err) {
-        console.log('Error sharing:', err);
-      }
+      } catch (err) {}
     } else {
       navigator.clipboard.writeText(window.location.href);
       alert('Link copied to clipboard!'); 

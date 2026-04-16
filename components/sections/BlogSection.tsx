@@ -30,9 +30,9 @@ const BlogSection: React.FC<BlogSectionProps> = ({ blogs }) => {
   };
 
   return (
-    <section className="py-12 md:py-20 px-4 w-full">
+    <section className="py-8 md:py-10 px-4 w-full">
       <div className="w-full max-w-7xl mx-auto">
-        <h2 className="text-center text-2xl md:text-3xl font-general-sans text-black mb-12 md:mb-16 font-medium">
+        <h2 className="text-center text-2xl md:text-3xl font-general-sans text-black mb-8 md:mb-10 font-medium">
           Latest Blogs
         </h2>
 

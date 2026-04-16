@@ -41,9 +41,6 @@ const CategorySchema = new Schema<ICategory>(
     timestamps: true,
   }
 );
-
-// Add index for slug lookups
-CategorySchema.index({ slug: 1 });
 // Add index for ordering
 CategorySchema.index({ order: 1 });
 

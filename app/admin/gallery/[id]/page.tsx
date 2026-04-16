@@ -63,8 +63,6 @@ export default function EditGallery() {
         isActive: Boolean(formData.isActive),
       };
       
-      console.log('Updating Gallery item with:', updatePayload);
-      
       const response = await fetch(`/api/gallery/${params.id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
@@ -72,7 +70,6 @@ export default function EditGallery() {
       });
 
       const data = await response.json();
-      console.log('Update response:', data);
       
       if (data.success) {
         alert('Gallery item updated successfully!');

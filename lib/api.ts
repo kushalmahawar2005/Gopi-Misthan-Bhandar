@@ -201,6 +201,7 @@ export interface HeroSlide {
   id: string;
   image: string;
   mobileImage?: string;
+  title?: string;
   order: number;
   isActive: boolean;
 }
@@ -215,6 +216,7 @@ export const fetchHeroSlides = async (): Promise<HeroSlide[]> => {
         id: slide._id ? String(slide._id) : slide.id,
         image: slide.image,
         mobileImage: slide.mobileImage,
+        title: slide.title,
         order: slide.order || 0,
         isActive: slide.isActive !== false,
       }));

@@ -1,10 +1,9 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import ProductCard from '../ProductCard';
 import { Product } from '@/types';
 import Link from 'next/link';
-import { FiArrowRight } from 'react-icons/fi';
 
 interface ProductSectionProps {
   title: string;
@@ -21,15 +20,37 @@ const ProductSection: React.FC<ProductSectionProps> = ({
   showViewMore = true,
   viewMoreLink = '/products',
 }) => {
+  const [isGridVisible, setIsGridVisible] = useState(false);
+  const gridRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    if (!gridRef.current) return;
+
+    const observer = new IntersectionObserver(
+      (entries, obs) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            setIsGridVisible(true);
+            obs.unobserve(entry.target);
+          }
+        });
+      },
+      { rootMargin: '0px 0px -50px 0px' }
+    );
+
+    observer.observe(gridRef.current);
+    return () => observer.disconnect();
+  }, []);
+
   return (
-    <section className="w-full pt-8 pb-8 md:pt-12 md:pb-12">
+    <section className="w-full py-8 md:py-10">
       <div className="section-container max-w-6xl lg:max-w-7xl mx-auto px-0 md:px-0 w-full">
 
         {/* ----------------------
             HEADING + SUBTITLE
         ---------------------- */}
         {title && (
-          <div className="text-center mb-12 md:mb-16 px-4 md:px-6">
+          <div className="text-center mb-10 md:mb-12 px-4 md:px-6">
             {subtitle && (
               <p className="text-[13px] md:text-[16px] font-flama tracking-[0.3em] uppercase text-[#FE8E02] mb-3">
                 {subtitle}
@@ -45,6 +66,7 @@ const ProductSection: React.FC<ProductSectionProps> = ({
             PRODUCT GRID — FINAL PERFECT VERSION
         ---------------------- */}
         <div
+          ref={gridRef}
           className="
             grid
             grid-cols-2
@@ -53,11 +75,16 @@ const ProductSection: React.FC<ProductSectionProps> = ({
             lg:grid-cols-4
             gap-6
             md:gap-[50px]
-            mb-8
+            mb-6
           "
         >
-          {products.map((product) => (
-            <div key={product.id}>
+          {products.map((product, index) => (
+            <div
+              key={product.id}
+              data-cascade
+              className={`m-scroll-trigger animate--fade-in-up ${isGridVisible ? '' : 'm-scroll-trigger--offscreen'}`}
+              style={{ '--animation-order': index } as React.CSSProperties}
+            >
               <ProductCard product={product} />
             </div>
           ))}
@@ -67,13 +94,19 @@ const ProductSection: React.FC<ProductSectionProps> = ({
             VIEW MORE BUTTON
         ---------------------- */}
         {showViewMore && products.length > 0 && (
-          <div className="text-center mt-12 md:mt-16">
+          <div className="text-center mt-8 md:mt-10">
             <Link
               href={viewMoreLink}
               className="group relative inline-flex items-center justify-center py-[14px] px-[40px] font-flama tracking-[0.15em] uppercase text-[13px] border-2 border-[#FE8E02] transition-colors duration-500 overflow-hidden"
             >
-              <span className="absolute inset-0 bg-[#FE8E02] transition-transform duration-[450ms] [transition-timing-function:cubic-bezier(0.785,0.135,0.15,0.86)] group-hover:translate-x-full"></span>
-              <span className="relative z-10 text-white transition-colors duration-[450ms] [transition-timing-function:cubic-bezier(0.785,0.135,0.15,0.86)] group-hover:text-[#FE8E02]">
+              <span
+                className="absolute inset-0 bg-[#FE8E02] transition-transform duration-500 group-hover:translate-x-full"
+                style={{ transitionTimingFunction: 'cubic-bezier(0.785,0.135,0.15,0.86)' }}
+              ></span>
+              <span
+                className="relative z-10 text-white transition-colors duration-500 group-hover:text-[#FE8E02]"
+                style={{ transitionTimingFunction: 'cubic-bezier(0.785,0.135,0.15,0.86)' }}
+              >
                 View All
               </span>
             </Link>

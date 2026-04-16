@@ -12,13 +12,13 @@ interface InstaBookSectionProps {
 
 const InstaBookSection: React.FC<InstaBookSectionProps> = ({ instaBooks }) => {
   return (
-    <section className="py-16 md:py-24 px-4 w-full bg-[#FE8E02]">
+    <section className="py-8 md:py-10 px-4 w-full bg-[#FE8E02]">
       <div className="max-w-[1400px] mx-auto w-full">
         {/* Header: Responsive Layout 
             Mobile: Logo -> Socials -> Title 
             Desktop: Title -> Logo -> Socials 
         */}
-        <div className="flex flex-col md:flex-row items-center md:justify-between mb-10 md:mb-16 px-4 w-full gap-4 md:gap-0">
+        <div className="flex flex-col md:flex-row items-center md:justify-between mb-8 md:mb-10 px-4 w-full gap-4 md:gap-0">
           
           {/* Title Area (Mobile Bottom / Desktop Left) */}
           <div className="text-center md:text-left flex-1 order-3 md:order-1 mt-6 md:mt-0">

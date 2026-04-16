@@ -38,8 +38,5 @@ const blogSchema = new mongoose.Schema({
   timestamps: true,
 });
 
-// Index for slug
-blogSchema.index({ slug: 1 });
-
 export default mongoose.models.Blog || mongoose.model('Blog', blogSchema);
 

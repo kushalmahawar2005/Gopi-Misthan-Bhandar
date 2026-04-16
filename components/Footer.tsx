@@ -1,74 +1,74 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
+import Image from 'next/image';
 import Link from 'next/link';
-import { FiPhone, FiMail, FiMapPin, FiFacebook, FiInstagram, FiTwitter, FiYoutube } from 'react-icons/fi';
+import { FiFacebook, FiInstagram, FiYoutube } from 'react-icons/fi';
 
 const Footer = () => {
+  const [email, setEmail] = useState('');
+  const [isSubscribed, setIsSubscribed] = useState(false);
+
+  const handleSubscribe = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (!email.trim()) return;
+
+    setIsSubscribed(true);
+    setEmail('');
+    setTimeout(() => setIsSubscribed(false), 2500);
+  };
+
   const socialLinks = [
-    { icon: FiFacebook, href: '#', label: 'Facebook' },
-    { icon: FiInstagram, href: '#', label: 'Instagram' },
-    { icon: FiTwitter, href: '#', label: 'Twitter' },
-    { icon: FiYoutube, href: '#', label: 'YouTube' },
+    { icon: FiFacebook, href: 'https://facebook.com', label: 'Facebook' },
+    { icon: FiInstagram, href: 'https://instagram.com', label: 'Instagram' },
+    { icon: FiYoutube, href: 'https://youtube.com', label: 'YouTube' },
   ];
 
-  const quickLinks = [
-    { label: 'Home', href: '/' },
-    { label: 'About Us', href: '/#about' },
-    { label: 'Products', href: '/products' },
-    { label: 'Categories', href: '/#categories' },
-    { label: 'Contact', href: '/#contact' },
+  const paymentStripSrc = '/visa.svg';
+
+  const rangeLinks = [
+    { label: 'Sweets', href: '/products?category=sweets' },
+    { label: 'Dry Fruits', href: '/products?category=dry-fruit' },
+    { label: 'Gifting', href: '/#gifting' },
+    { label: 'Indian Bakery', href: '/products?category=bakery-items' },
+    { label: 'Namkeen', href: '/products?category=namkeen' },
+    { label: 'Savoury Snacks', href: '/products?category=savoury-snacks' },
+  ];
+
+  const aboutLinks = [
+    { label: 'Company', href: '/#about' },
+    { label: 'Our Story', href: '/#about' },
+    { label: 'Contact Us', href: '/#contact' },
+    { label: 'Login', href: '/login' },
+    { label: 'Track Your Order', href: '/orders' },
+  ];
+
+  const legalLinks = [
+    { label: 'Terms & Conditions', href: '/terms' },
+    { label: 'Privacy Policy', href: '/privacy' },
+    { label: 'Refund & Cancellation', href: '/refund-cancellation' },
   ];
 
   return (
-    <footer id="contact" className="bg-[#FE8E02] w-full text-white">
-      {/* Content */}
-      <div className="w-full px-4 md:px-12 py-16 md:py-24 max-w-[1400px] mx-auto">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 lg:gap-16 mb-12">
+    <footer id="contact" className="w-full bg-[#FFF8F1] text-[#503223]">
+      <div className="w-full px-4 md:px-8 lg:px-12 pt-3 md:pt-4 pb-8 max-w-[1400px] mx-auto">
+        <div className="flex items-center justify-between border-b border-[#e8d7c3] pb-6 md:pb-7">
+          <Link href="/" className="relative w-[210px] h-[60px] md:w-[250px] md:h-[72px]">
+            <Image src="/logo.png" alt="Gopi Misthan Bhandar" fill className="object-contain object-left" />
+          </Link>
 
-          {/* Company Info */}
-          <div className="space-y-6">
-            <h3 className="text-white text-2xl font-playfair font-bold tracking-[0.05em]">
-              Gopi Misthan Bhandar
-            </h3>
-            <p className="text-[14px] text-white leading-relaxed font-dm-sans max-w-[280px]">
-              Distilling generations of tradition into premium sweets since 1968. A legacy of taste and purity.
-            </p>
-            <p className="text-[14px] flex items-center gap-2 font-dm-sans text-white">
-              <FiMapPin className="w-4 h-4 text-white" />
-              Neemuch, Madhya Pradesh
-            </p>
-
-            {/* Social Media Links */}
-            <div className="flex gap-4 mt-8">
-              {socialLinks.map((social) => (
-                <a
-                  key={social.label}
-                  href={social.href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="w-11 h-11 border border-white hover:border-white rounded-full flex items-center justify-center text-white hover:text-white transition-all duration-300 hover:scale-110"
-                  aria-label={social.label}
-                >
-                  <social.icon className="w-5 h-5" />
-                </a>
-              ))}
-            </div>
+          <div className="hidden md:block relative w-[110px] h-[76px] opacity-80">
+            <Image src="/bird.avif" alt="Decorative bird" fill className="object-contain" />
           </div>
+        </div>
 
-          {/* Quick Links */}
-          <div className="space-y-6">
-            <h4 className="text-white text-lg font-playfair font-bold tracking-[0.1em] uppercase">
-              Quick Links
-            </h4>
-            <ul className="space-y-4 text-[14px] font-dm-sans">
-              {quickLinks.map((link) => (
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-[1fr_1fr_1fr_1.7fr] gap-8 md:gap-10 xl:gap-12 pt-8 md:pt-10">
+          <div>
+            <h4 className="text-[30px] md:text-[32px] font-roboto leading-none mb-4 text-[#503223]">Our Range</h4>
+            <ul className="space-y-2.5 text-[15px] font-flama text-[#503223]">
+              {rangeLinks.map((link) => (
                 <li key={link.label}>
-                  <Link
-                    href={link.href}
-                    className="text-white hover:text-white transition-opacity flex items-center gap-2 group"
-                  >
-                    <span className="w-0 h-[1px] bg-white transition-all duration-300 group-hover:w-4" />
+                  <Link href={link.href} className="hover:text-[#FE8E02] transition-colors">
                     {link.label}
                   </Link>
                 </li>
@@ -76,70 +76,120 @@ const Footer = () => {
             </ul>
           </div>
 
-          {/* Contact Info */}
-          <div className="space-y-6">
-            <h4 className="text-white text-lg font-playfair font-bold tracking-[0.1em] uppercase">
-              Connect With Us
-            </h4>
-            <ul className="space-y-5 text-[14px] font-dm-sans">
-              <li className="flex items-center gap-3">
-                <FiPhone className="w-4 h-4 text-white" />
-                <a href="tel:+919425922445" className="text-white hover:text-white transition-opacity">
-                  +91 9425922445
-                </a>
-              </li>
-              <li className="flex items-center gap-3">
-                <FiMail className="w-4 h-4 text-white" />
-                <a href="mailto:gopimisthan1968@gmail.com" className="text-white hover:text-white transition-opacity">
-                  gopimisthan1968@gmail.com
-                </a>
-              </li>
-              <li className="flex items-start gap-3">
-                <FiMapPin className="w-4 h-4 text-white mt-1" />
-                <span className="text-white leading-relaxed">Shop No. 123, Main Street,<br />Neemuch, MP 458441</span>
-              </li>
+          <div>
+            <h4 className="text-[30px] md:text-[32px] font-roboto leading-none mb-4 text-[#503223]">About Us</h4>
+            <ul className="space-y-2.5 text-[15px] font-flama text-[#503223]">
+              {aboutLinks.map((link) => (
+                <li key={link.label}>
+                  <Link href={link.href} className="hover:text-[#FE8E02] transition-colors">
+                    {link.label}
+                  </Link>
+                </li>
+              ))}
             </ul>
           </div>
 
-          {/* Find Us - Map Integration */}
-          <div className="space-y-6">
-            <h4 className="text-white text-lg font-playfair font-bold tracking-[0.1em] uppercase">
-              Locate Us
+          <div>
+            <h4 className="text-[30px] md:text-[32px] font-roboto leading-none mb-4 text-[#503223]">Legal</h4>
+            <ul className="space-y-2.5 text-[15px] font-flama text-[#503223]">
+              {legalLinks.map((link) => (
+                <li key={link.label}>
+                  <Link href={link.href} className="hover:text-[#FE8E02] transition-colors">
+                    {link.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          <div>
+            <h4 className="text-[34px] md:text-[38px] font-roboto leading-tight text-[#b37b20] mb-4 md:mb-5">
+              We'd Be Happy To Assist You!
             </h4>
-            <div className="relative w-full h-[200px] rounded-2xl overflow-hidden shadow-2xl border border-white/5 group ring-1 ring-white/10">
-              <iframe
-                width="100%"
-                height="100%"
-                src="https://maps.google.com/maps?q=Gopi%20Misthan%20Bhandar%20Neemuch%20Madhya%20Pradesh&t=&z=14&ie=UTF8&iwloc=&output=embed"
-                frameBorder="0"
-                scrolling="no"
-                marginHeight={0}
-                marginWidth={0}
-                title="Gopi Misthan Bhandar Location"
-                className="w-full h-full grayscale hover:grayscale-0 transition-all duration-1000 opacity-60 group-hover:opacity-100"
+
+            <form onSubmit={handleSubscribe} className="flex items-center bg-white border border-[#e1cfba] overflow-hidden rounded-md">
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="Enter email address"
+                required
+                className="w-full h-12 px-4 text-[15px] font-flama outline-none text-[#503223] placeholder:text-[#9d8f83]"
               />
-              <a
-                href="https://maps.google.com/?q=Gopi%20Misthan%20Bhandar%20Neemuch%20Madhya%20Pradesh"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="absolute inset-0 bg-transparent cursor-pointer z-10"
-              />
+              <button
+                type="submit"
+                className="h-12 px-5 md:px-7 bg-[#FE8E02] text-white text-[14px] font-flama whitespace-nowrap hover:bg-[#D87A0A] transition-colors"
+              >
+                {isSubscribed ? 'Subscribed' : 'Subscribe'}
+              </button>
+            </form>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-4 mt-5 text-[14px] font-flama text-[#503223]">
+              <div>
+                <p className="font-semibold mb-1">Timing :</p>
+                <p>Monday To Saturday</p>
+                <p>10:00 AM to 9:PM PM IST</p>
+              </div>
+              <div>
+                <p className="font-semibold mb-1">Email :</p>
+                <a href="mailto:gopimisthan1968@gmail.com" className="hover:text-[#FE8E02] transition-colors block">
+                  gopimisthan1968@gmail.com
+                </a>
+              </div>
+              <div>
+                <p className="font-semibold mb-1">Phone :</p>
+                <a href="tel:+919425922445" className="hover:text-[#FE8E02] transition-colors">
+                  +91 9425922445
+                </a>
+              </div>
+              <div>
+                <p className="font-semibold mb-1">Address :</p>
+                <p>Shop No. 123, Main Street, Neemuch, MP 458441</p>
+              </div>
             </div>
-            <p className="text-[12px] text-white italic mt-4 font-dm-sans">
-              Experience the sweetness at our flagship store.
-            </p>
           </div>
         </div>
+      </div>
 
-        {/* Bottom Bar */}
-        <div className="border-t border-white/20 pt-10 mt-16">
-          <div className="flex flex-col md:flex-row justify-between items-center gap-6 text-[13px] text-white font-dm-sans">
-            <p>© {new Date().getFullYear()} Gopi Misthan Bhandar. All rights reserved.</p>
-            <div className="flex gap-8">
-              <Link href="/privacy" className="hover:text-gray-200 transition-colors">Privacy Policy</Link>
-              <Link href="/terms" className="hover:text-gray-200 transition-colors">Terms & Conditions</Link>
-              <Link href="/refund-cancellation" className="hover:text-gray-200 transition-colors">Refund & Cancellation</Link>
+      <div className="border-t border-[#ead9c6] bg-white/70">
+        <div className="max-w-[1400px] mx-auto px-4 md:px-8 lg:px-12 py-5 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+          <div>
+            <p className="text-[20px] md:text-[22px] font-roboto text-[#503223] mb-2">Payment Methods</p>
+            <div className="relative h-[20px] w-[240px] md:h-[24px] md:w-[320px]">
+              <Image src={paymentStripSrc} alt="Accepted payment methods" fill className="object-contain object-left" />
             </div>
+          </div>
+
+          <div className="md:text-right">
+            <p className="text-[20px] md:text-[22px] font-roboto text-[#503223] mb-2">Follow Us On</p>
+            <div className="flex md:justify-end gap-3">
+              {socialLinks.map((social) => (
+                <a
+                  key={social.label}
+                  href={social.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-9 h-9 rounded-full border border-[#d9c4a8] bg-white text-[#b37b20] hover:text-[#FE8E02] hover:border-[#FE8E02] transition-colors flex items-center justify-center"
+                  aria-label={social.label}
+                >
+                  <social.icon className="w-4 h-4" />
+                </a>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="border-t border-[#ead9c6] bg-[#fff9f2]">
+        <div className="max-w-[1400px] mx-auto px-4 md:px-8 lg:px-12 py-4 flex flex-col md:flex-row justify-between items-center gap-3 text-[14px] text-[#503223] font-flama">
+          <p className="text-center md:text-left">© {new Date().getFullYear()} Gopi Misthan Bhandar. All Rights Reserved</p>
+
+          <div className="flex flex-wrap items-center justify-center gap-3 md:gap-4">
+            <Link href="/privacy" className="hover:text-[#FE8E02] transition-colors">Privacy Policy</Link>
+            <span className="text-[#d9c4a8]">|</span>
+            <Link href="/terms" className="hover:text-[#FE8E02] transition-colors">Terms & Conditions</Link>
+            <span className="text-[#d9c4a8]">|</span>
+            <Link href="/refund-cancellation" className="hover:text-[#FE8E02] transition-colors">Refund & Cancellation</Link>
           </div>
         </div>
       </div>

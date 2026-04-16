@@ -32,10 +32,10 @@ const GiftBoxSection: React.FC = () => {
   const subCategories = giftingCategory?.subCategories || [];
 
   return (
-    <section className="w-full bg-white py-16 md:py-24">
+    <section className="w-full bg-white py-8 md:py-10">
       <div className="max-w-7xl mx-auto px-4 md:px-8">
         {/* Section Heading */}
-        <div className="text-center mb-14 md:mb-20">
+        <div className="text-center mb-8 md:mb-10">
           <h2 className="text-3xl md:text-4xl font-flama-condensed tracking-[0.15em] uppercase text-[#503223] mb-4">
             Exclusive Gifting
           </h2>
@@ -100,7 +100,7 @@ const GiftBoxSection: React.FC = () => {
 
         {/* View All */}
         {!loading && giftingCategory && (
-          <div className="text-center mt-12 md:mt-16">
+          <div className="text-center mt-8 md:mt-10">
             <Link
               href={`/products?category=${giftingCategory.slug}`}
               className="inline-flex items-center gap-2 text-[12px] md:text-[13px] font-flama tracking-[0.2em] uppercase text-[#503223] group transition-all duration-300"
