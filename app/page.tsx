@@ -180,7 +180,9 @@ export default function Home() {
       )}
 
       {/* Purity Guarantee Marquee */}
-      <PurityBanner />
+      <div className="my-3 md:my-0">
+        <PurityBanner />
+      </div>
 
       <ScrollAnimation>
         <div id="about">

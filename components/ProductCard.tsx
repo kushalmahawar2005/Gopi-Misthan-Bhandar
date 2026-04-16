@@ -110,8 +110,8 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, showAddToCart = true
           </div>
           
           {showAddToCart && (
-            <div className="mt-auto w-full flex items-center gap-2 md:gap-3">
-              <div className="flex items-center justify-between h-[46px] md:h-[50px] min-w-[108px] md:min-w-[120px] px-2.5 md:px-3 border border-[#d6cec6]  bg-white">
+            <div className="mt-auto w-full flex flex-col gap-2 md:flex-row md:items-center md:gap-3">
+              <div className="w-full md:w-auto flex items-center justify-between h-[42px] md:h-[50px] md:min-w-[120px] px-2.5 md:px-3 border border-[#d6cec6] bg-white">
                 <button
                   onClick={decreaseQuantity}
                   disabled={quantity <= 1}
@@ -136,7 +136,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, showAddToCart = true
               <button
                 onClick={handleAddToCart}
                 disabled={isAdding}
-                className="flex-1 h-[46px] md:h-[50px] bg-[#FE8E02] text-white text-[11px] md:text-[12px] font-bold tracking-[0.15em] uppercase transition-all duration-300 active:scale-[0.97] disabled:opacity-75 flex items-center justify-center overflow-hidden relative"
+                className="w-full md:flex-1 h-[42px] md:h-[50px] bg-[#FE8E02] text-white text-[11px] md:text-[12px] font-bold tracking-[0.15em] uppercase transition-all duration-300 active:scale-[0.97] disabled:opacity-75 flex items-center justify-center overflow-hidden relative"
               >
                 <span className={`transition-all duration-300 ${isAdding ? 'translate-y-10 opacity-0' : 'translate-y-0 opacity-100'}`}>
                   ADD TO CART

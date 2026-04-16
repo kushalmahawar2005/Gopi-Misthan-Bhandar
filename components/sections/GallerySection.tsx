@@ -46,6 +46,16 @@ const branches = [
 
 const GallerySection: React.FC<GallerySectionProps> = ({ galleryItems, showAll }) => {
   const [currentSlide, setCurrentSlide] = useState(0);
+  const touchStartX = React.useRef<number | null>(null);
+  const touchEndX = React.useRef<number | null>(null);
+
+  const goToNextSlide = () => {
+    setCurrentSlide((prev) => (prev + 1) % branches.length);
+  };
+
+  const goToPrevSlide = () => {
+    setCurrentSlide((prev) => (prev - 1 + branches.length) % branches.length);
+  };
 
   // Auto-slide every 4 seconds for mobile
   useEffect(() => {
@@ -54,6 +64,25 @@ const GallerySection: React.FC<GallerySectionProps> = ({ galleryItems, showAll }
     }, 4000);
     return () => clearInterval(timer);
   }, []);
+
+  const handleTouchStart = (e: React.TouchEvent<HTMLDivElement>) => {
+    touchEndX.current = null;
+    touchStartX.current = e.targetTouches[0].clientX;
+  };
+
+  const handleTouchMove = (e: React.TouchEvent<HTMLDivElement>) => {
+    touchEndX.current = e.targetTouches[0].clientX;
+  };
+
+  const handleTouchEnd = () => {
+    if (touchStartX.current === null || touchEndX.current === null) return;
+
+    const swipeDistance = touchStartX.current - touchEndX.current;
+    const minSwipeDistance = 50;
+
+    if (swipeDistance > minSwipeDistance) goToNextSlide();
+    if (swipeDistance < -minSwipeDistance) goToPrevSlide();
+  };
 
   return (
     <section className="pt-8 pb-12 md:pt-10 md:pb-24 w-full bg-white overflow-hidden">
@@ -73,7 +102,12 @@ const GallerySection: React.FC<GallerySectionProps> = ({ galleryItems, showAll }
             MOBILE VIEW: AUTO-LOOPING SLIDER 
         ========================================= */}
         <div className="block md:hidden w-full relative">
-          <div className="overflow-hidden w-full">
+          <div
+            className="overflow-hidden w-full"
+            onTouchStart={handleTouchStart}
+            onTouchMove={handleTouchMove}
+            onTouchEnd={handleTouchEnd}
+          >
             <div
               className="flex transition-transform duration-700 ease-in-out"
               style={{ transform: `translateX(-${currentSlide * 100}%)` }}
