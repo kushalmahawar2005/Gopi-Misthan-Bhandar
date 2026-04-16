@@ -156,36 +156,57 @@ const Navigation = () => {
     setIsMobileMenuOpen(false);
   };
 
-  const [isVisible, setIsVisible] = useState(true);
   const [isScrolled, setIsScrolled] = useState(false);
-  const lastScrollY = useRef(0);
+  const scrollRafRef = useRef<number | null>(null);
 
   useEffect(() => {
-    const handleScroll = () => {
-      if (typeof window !== 'undefined') {
-        const currentScrollY = window.scrollY;
-        // Smooth transition trigger around 60px
-        setIsScrolled(currentScrollY > 60);
-        setIsVisible(true);
-      }
+    // Strong hysteresis prevents oscillation when sticky nav height changes during slow scroll.
+    const ENTER_COMPACT_SCROLL = 120;
+    const EXIT_COMPACT_SCROLL = 0;
+
+    const updateScrolledState = () => {
+      const currentScrollY = window.scrollY || window.pageYOffset;
+
+      setIsScrolled((prev) => {
+        if (!prev && currentScrollY >= ENTER_COMPACT_SCROLL) return true;
+        if (prev && currentScrollY <= EXIT_COMPACT_SCROLL) return false;
+        return prev;
+      });
+
+      scrollRafRef.current = null;
     };
 
+    const handleScroll = () => {
+      if (scrollRafRef.current !== null) return;
+      scrollRafRef.current = window.requestAnimationFrame(updateScrolledState);
+    };
+
+    handleScroll();
     window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
+    window.addEventListener('resize', handleScroll);
+
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      window.removeEventListener('resize', handleScroll);
+
+      if (scrollRafRef.current !== null) {
+        window.cancelAnimationFrame(scrollRafRef.current);
+        scrollRafRef.current = null;
+      }
+    };
   }, []);
 
   return (
     <>
       <nav
         id="main-nav"
-        className={`bg-white w-full border-b border-[#d6cec6] z-50 transition-all duration-500 ease-in-out sticky top-0 left-0 right-0 ${isVisible ? 'translate-y-0' : '-translate-y-full'
-          } ${isScrolled ? 'py-0 shadow-md' : 'py-0'}`}
+        className={`bg-white w-full border-b border-[#d6cec6] z-50 transition-shadow duration-300 ease-out sticky top-0 left-0 right-0 ${isScrolled ? 'py-0 shadow-md' : 'py-0'}`}
       >
 
         {/* Main Content Area */}
-        <div className={`max-w-[1700px] mx-auto transition-all duration-500`}>
+        <div className="max-w-[1700px] mx-auto">
           {/* Row 1: Header/Main Row */}
-          <div className={`flex items-center justify-between px-4 md:px-8 lg:px-12 relative transition-all duration-500 ${isScrolled ? 'h-[55px] md:h-[65px]' : 'h-[90px] md:h-[115px]'}`}>
+          <div className={`flex items-center justify-between px-4 md:px-8 lg:px-12 relative ${isScrolled ? 'h-[55px] md:h-[65px]' : 'h-[90px] md:h-[115px]'}`}>
 
             {/* Left Section: Bulk Enquiry (hides on scroll) / Space for Logo (on scroll) */}
             <div className="flex items-center gap-4 flex-1 md:flex-initial">
@@ -218,12 +239,12 @@ const Navigation = () => {
             {/* Logo: Snaps directly from center to left without transition */}
             <Link
               href="/"
-              className={`absolute top-1/2 z-20 ${isScrolled
+              className={`absolute top-1/2 z-20 transition-[left,transform] duration-500 ease-in-out transform-gpu will-change-transform ${isScrolled
                 ? 'left-1/2 md:left-8 lg:left-12 -translate-y-1/2 -translate-x-1/2 md:translate-x-0'
                 : 'left-1/2 -translate-x-1/2 -translate-y-1/2'
                 }`}
             >
-              <div className={`relative ${isScrolled
+              <div className={`relative transition-[width,height] duration-500 ease-in-out ${isScrolled
                 ? 'w-[70px] h-[42px] md:w-[85px] md:h-[52px]'
                 : 'w-[106px] h-[66px] md:w-[138px] md:h-[74px] lg:w-[160px] lg:h-[85px]'
                 }`}>
@@ -239,7 +260,7 @@ const Navigation = () => {
             </Link>
 
             {/* Scrolled Navigation Items: Only visible on scroll in the center */}
-            <div className={`hidden lg:flex items-center justify-center gap-6 lg:gap-8 xl:gap-10 transition-all duration-500 absolute left-[150px] lg:left-[160px] right-[320px] xl:right-[380px] ${isScrolled ? 'opacity-100 translate-y-0 pointer-events-auto' : 'opacity-0 translate-y-4 pointer-events-none'
+            <div className={`hidden lg:flex items-center justify-center gap-6 lg:gap-8 xl:gap-10 transition-all duration-500 transform-gpu will-change-transform absolute left-[150px] lg:left-[160px] right-[320px] xl:right-[380px] ${isScrolled ? 'opacity-100 translate-y-0 pointer-events-auto' : 'opacity-0 translate-y-4 pointer-events-none'
               }`}>
               {navItems.map((item) => (
                 <button
@@ -370,8 +391,8 @@ const Navigation = () => {
           </div>
 
           {/* Row 2: Navigation Links (hides on scroll) */}
-          <div className={`hidden md:flex items-center justify-center gap-6 lg:gap-8 xl:gap-12 px-4 transition-all duration-500 ${isScrolled ? 'max-h-0 py-0 opacity-0 pointer-events-none overflow-hidden' : 'max-h-[100px] py-3 opacity-100 pointer-events-auto overflow-visible'
-            }`}>
+          {!isScrolled && (
+            <div className="hidden md:flex items-center justify-center gap-6 lg:gap-8 xl:gap-12 px-4 py-3">
             {navItems.map((item) => {
               const category = item.slug ? getCategoryBySlug(item.slug, item.label) : null;
               const hasSubcategories = category?.subCategories && category.subCategories.length > 0;
@@ -441,7 +462,8 @@ const Navigation = () => {
                 </div>
               );
             })}
-          </div>
+            </div>
+          )}
         </div>
       </nav>
 

@@ -106,7 +106,7 @@ const Footer = () => {
             <h4 className="text-white text-lg font-playfair font-bold tracking-[0.1em] uppercase">
               Locate Us
             </h4>
-            <div className="relative w-full h-[200px] rounded-2xl overflow-hidden shadow-2xl border border-white/5 group ring-1 ring-white/10">
+            <div className="relative w-full h-[200px] rounded-2xl overflow-hidden shadow-2xl border border-white/5 ring-1 ring-white/10">
               <iframe
                 width="100%"
                 height="100%"
@@ -116,13 +116,7 @@ const Footer = () => {
                 marginHeight={0}
                 marginWidth={0}
                 title="Gopi Misthan Bhandar Location"
-                className="w-full h-full grayscale hover:grayscale-0 transition-all duration-1000 opacity-60 group-hover:opacity-100"
-              />
-              <a
-                href="https://maps.google.com/?q=Gopi%20Misthan%20Bhandar%20Neemuch%20Madhya%20Pradesh"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="absolute inset-0 bg-transparent cursor-pointer z-10"
+                className="w-full h-full"
               />
             </div>
             <p className="text-[12px] text-white italic mt-4 font-dm-sans">
