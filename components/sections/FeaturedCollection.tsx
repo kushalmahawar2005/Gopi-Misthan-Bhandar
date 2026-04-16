@@ -1,10 +1,9 @@
 'use client';
 
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Product } from '@/types';
 import Image from 'next/image';
 import Link from 'next/link';
-import { FiChevronLeft, FiChevronRight } from 'react-icons/fi';
 
 interface FeaturedCollectionProps {
   products: Product[];
@@ -73,122 +72,35 @@ const FeaturedProductCard: React.FC<{ product: Product }> = ({ product }) => {
 };
 
 const FeaturedCollection: React.FC<FeaturedCollectionProps> = ({ products }) => {
-  const scrollContainerRef = useRef<HTMLDivElement>(null);
-  const [canScrollLeft, setCanScrollLeft] = useState(false);
-  const [canScrollRight, setCanScrollRight] = useState(true);
-  const autoScrollIntervalRef = useRef<NodeJS.Timeout | null>(null);
-  const isUserInteractingRef = useRef(false);
-
-  // Check scroll position
-  const checkScroll = () => {
-    if (scrollContainerRef.current) {
-      const { scrollLeft, scrollWidth, clientWidth } = scrollContainerRef.current;
-      setCanScrollLeft(scrollLeft > 0);
-      setCanScrollRight(scrollLeft < scrollWidth - clientWidth - 10);
-    }
-  };
-
-  // Auto scroll function
-  const autoScroll = () => {
-    if (scrollContainerRef.current && !isUserInteractingRef.current) {
-      const { scrollLeft, scrollWidth, clientWidth } = scrollContainerRef.current;
-
-      // Check if we've reached the end
-      if (scrollLeft >= scrollWidth - clientWidth - 10) {
-        // Reset to beginning
-        scrollContainerRef.current.scrollTo({
-          left: 0,
-          behavior: 'smooth',
-        });
-      } else {
-        // Scroll to next
-        const scrollAmount = scrollContainerRef.current.clientWidth * 0.8;
-        scrollContainerRef.current.scrollBy({
-          left: scrollAmount,
-          behavior: 'smooth',
-        });
-      }
-    }
-  };
+  const [isGridVisible, setIsGridVisible] = useState(false);
+  const gridRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
-    checkScroll();
-    const container = scrollContainerRef.current;
-    if (container) {
-      container.addEventListener('scroll', checkScroll);
+    if (!gridRef.current) return;
 
-      // Handle user interaction
-      const handleMouseEnter = () => {
-        isUserInteractingRef.current = true;
-      };
-      const handleMouseLeave = () => {
-        isUserInteractingRef.current = false;
-      };
-      const handleTouchStart = () => {
-        isUserInteractingRef.current = true;
-      };
-      const handleTouchEnd = () => {
-        // Resume auto-scroll after 3 seconds of no interaction
-        setTimeout(() => {
-          isUserInteractingRef.current = false;
-        }, 3000);
-      };
+    const observer = new IntersectionObserver(
+      (entries, obs) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            setIsGridVisible(true);
+            obs.unobserve(entry.target);
+          }
+        });
+      },
+      { rootMargin: '0px 0px -50px 0px' }
+    );
 
-      container.addEventListener('mouseenter', handleMouseEnter);
-      container.addEventListener('mouseleave', handleMouseLeave);
-      container.addEventListener('touchstart', handleTouchStart);
-      container.addEventListener('touchend', handleTouchEnd);
-
-      return () => {
-        container.removeEventListener('scroll', checkScroll);
-        container.removeEventListener('mouseenter', handleMouseEnter);
-        container.removeEventListener('mouseleave', handleMouseLeave);
-        container.removeEventListener('touchstart', handleTouchStart);
-        container.removeEventListener('touchend', handleTouchEnd);
-      };
-    }
-  }, [products]);
-
-  // Auto-scroll every 2 seconds
-  useEffect(() => {
-    if (products.length > 4) {
-      autoScrollIntervalRef.current = setInterval(() => {
-        autoScroll();
-      }, 2000);
-
-      return () => {
-        if (autoScrollIntervalRef.current) {
-          clearInterval(autoScrollIntervalRef.current);
-        }
-      };
-    }
-  }, [products]);
-
-  const scroll = (direction: 'left' | 'right') => {
-    if (scrollContainerRef.current) {
-      // Pause auto-scroll when user manually scrolls
-      isUserInteractingRef.current = true;
-
-      const scrollAmount = scrollContainerRef.current.clientWidth * 0.8;
-      scrollContainerRef.current.scrollBy({
-        left: direction === 'left' ? -scrollAmount : scrollAmount,
-        behavior: 'smooth',
-      });
-
-      // Resume auto-scroll after 3 seconds
-      setTimeout(() => {
-        isUserInteractingRef.current = false;
-      }, 3000);
-    }
-  };
+    observer.observe(gridRef.current);
+    return () => observer.disconnect();
+  }, []);
 
   if (products.length === 0) return null;
 
   return (
-    <section className="pt-16 pb-16 md:pt-20 md:pb-20 w-full">
+    <section className="py-8 md:py-10 w-full">
       <div className="max-w-[1600px] mx-auto px-4 md:px-[50px]">
         {/* Header: Centered Titles */}
-        <div className="text-center mb-12 md:mb-16">
+        <div className="text-center mb-8 md:mb-10">
           <p className="text-[12px] md:text-[14px] font-flama tracking-[0.3em] uppercase text-[#FE8E02] mb-3">
             Featured Collection
           </p>
@@ -198,16 +110,21 @@ const FeaturedCollection: React.FC<FeaturedCollectionProps> = ({ products }) => 
         </div>
 
         {/* Product Grid - 4 Columns on Desktop */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-[50px]">
-          {products.slice(0, 4).map((product) => (
-            <div key={product.id}>
+        <div ref={gridRef} className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-[50px]">
+          {products.slice(0, 4).map((product, index) => (
+            <div
+              key={product.id}
+              data-cascade
+              className={`m-scroll-trigger animate--fade-in-up ${isGridVisible ? '' : 'm-scroll-trigger--offscreen'}`}
+              style={{ '--animation-order': index } as React.CSSProperties}
+            >
               <FeaturedProductCard product={product} />
             </div>
           ))}
         </div>
 
         {/* View All Button - Bottom Center with Khoya Sliding Effect */}
-        <div className="text-center mt-12 md:mt-16">
+        <div className="text-center mt-8 md:mt-10">
           <Link
             href="/products"
             className="group relative inline-flex items-center justify-center py-[14px] px-[40px] font-flama tracking-[0.15em] uppercase text-[13px] border-2 border-[#FE8E02] transition-colors duration-500 overflow-hidden"

@@ -116,13 +116,13 @@ const Navigation = () => {
   };
 
   const navItems = [
-    { label: 'HOME', href: '/' },
-    { label: 'SWEETS', href: '/products?category=sweets', slug: 'sweets' },
-    { label: 'DRY FRUIT', href: '/products?category=dry-fruit', slug: 'dry-fruit' },
-    { label: 'BAKERY ITEMS', href: '/products?category=bakery-items', slug: 'bakery-items' },
-    { label: 'NAMKEEN', href: '/products?category=namkeen', slug: 'namkeen' },
-    { label: 'SAVOURY SNACKS', href: '/products?category=savoury-snacks', slug: 'savoury-snacks' },
-    { label: 'GIFTING', href: '/#gifting', slug: 'gifting-' },
+    { label: 'Home', href: '/' },
+    { label: 'Sweets', href: '/products?category=sweets', slug: 'sweets' },
+    { label: 'Dry Fruits', href: '/products?category=dry-fruit', slug: 'dry-fruit' },
+    { label: 'Bakery Items', href: '/products?category=bakery-items', slug: 'bakery-items' },
+    { label: 'Namkeen', href: '/products?category=namkeen', slug: 'namkeen' },
+    { label: 'Savoury Snacks', href: '/products?category=savoury-snacks', slug: 'savoury-snacks' },
+    { label: 'Gifting', href: '/#gifting', slug: 'gifting-' },
   ];
 
   const isActive = (href: string) => {
@@ -392,7 +392,7 @@ const Navigation = () => {
 
           {/* Row 2: Navigation Links (hides on scroll) */}
           {!isScrolled && (
-            <div className="hidden md:flex items-center justify-center gap-6 lg:gap-8 xl:gap-12 px-4 py-3">
+            <div className="hidden md:flex items-center justify-center gap-6 lg:gap-7 xl:gap-8 px-4 py-2">
             {navItems.map((item) => {
               const category = item.slug ? getCategoryBySlug(item.slug, item.label) : null;
               const hasSubcategories = category?.subCategories && category.subCategories.length > 0;
@@ -406,18 +406,18 @@ const Navigation = () => {
                 >
                   <button
                     onClick={() => handleNavClick(item.href)}
-                    className={`text-[11px] md:text-[19px] font-flama-condensed tracking-[0.18em] uppercase transition-colors font-semibold flex items-center gap-1.5 py-2 relative ${isActive(item.href) ? 'text-[#FE8E02]' : 'text-[#503223] hover:text-[#FE8E02]'
+                    className={`text-[16px] lg:text-[17px] font-flama tracking-[0.01em] transition-colors font-medium flex items-center gap-1.5 py-2 relative group ${isActive(item.href) ? 'text-[#2d2d2d]' : 'text-[#2d2d2d] hover:text-[#2d2d2d]'
                       }`}
                   >
                     {item.label}
                     {hasSubcategories && (
-                      <FiChevronDown className={`w-4 h-4 transition-transform duration-200 ${hoveredCategory === item.slug ? 'rotate-180' : ''}`} />
+                      <FiChevronDown className={`w-3.5 h-3.5 transition-transform duration-200 ${hoveredCategory === item.slug ? 'rotate-180' : ''}`} />
                     )}
                     {/* Underline on hover */}
                     <span
-                      className={`absolute bottom-0 left-0 h-0.5 bg-[#FE8E02] transition-all duration-300 ${hoveredCategory === item.slug || isActive(item.href)
+                      className={`absolute -bottom-2 left-0 h-[2px] bg-[#2d2d2d] transition-all duration-300 ${hoveredCategory === item.slug || isActive(item.href)
                         ? 'w-full opacity-100'
-                        : 'w-0 opacity-0'
+                        : 'w-0 opacity-0 group-hover:w-full group-hover:opacity-100'
                         }`}
                     />
                   </button>
@@ -426,16 +426,16 @@ const Navigation = () => {
                   {hasSubcategories && hoveredCategory === item.slug && (
                     <div
                       ref={categoryDropdownRef}
-                      className="absolute top-full left-1/2 transform -translate-x-1/2 pt-2 bg-transparent z-50"
+                      className="absolute top-full left-0 pt-1 bg-transparent z-50"
                       onMouseEnter={() => setHoveredCategory(item.slug || null)}
                       onMouseLeave={() => setHoveredCategory(null)}
                     >
-                      <div className="bg-white border border-gray-200 rounded-md shadow-lg min-w-[180px] py-2">
+                      <div className="bg-white border border-[#e6e6e6] shadow-[0_10px_24px_rgba(0,0,0,0.08)] min-w-[190px] py-2">
                         {/* All Category Link */}
                         <Link
                           href={item.href}
                           onClick={() => setHoveredCategory(null)}
-                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-red-600 transition-colors font-medium"
+                          className="block px-5 py-2 text-[15px] text-[#2d2d2d] hover:bg-[#efefef] transition-colors font-medium"
                         >
                           All {item.label}
                         </Link>
@@ -451,7 +451,7 @@ const Navigation = () => {
                             key={subcategory.slug}
                             href={`/products?category=${item.slug}&subcategory=${subcategory.slug}`}
                             onClick={() => setHoveredCategory(null)}
-                            className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-red-600 transition-colors"
+                            className="block px-5 py-2 text-[15px] text-[#2d2d2d] hover:bg-[#efefef] transition-colors"
                           >
                             {subcategory.name}
                           </Link>

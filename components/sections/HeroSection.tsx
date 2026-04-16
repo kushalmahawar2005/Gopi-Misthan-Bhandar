@@ -89,7 +89,7 @@ const HeroSection = () => {
   if (loading) {
     // Static skeleton — does NOT block LCP (no spinner animation)
     return (
-      <section className="w-full -mt-4 mb-4">
+      <section className="w-full -mt-0 mb-8 md:mb-4">
         <div className="w-full h-[550px] sm:h-[650px] md:h-[485px] lg:h-[550px] relative overflow-hidden bg-[#FDF8F3]">
           <div className="w-full h-full bg-gradient-to-r from-[#FDF8F3] via-[#f5ead8] to-[#FDF8F3] animate-pulse" />
         </div>
@@ -99,7 +99,7 @@ const HeroSection = () => {
   if (slides.length === 0) return null;
 
   return (
-    <section className="relative w-full -mt-0 mb-0">
+    <section className="relative w-full -mt-0 mb-8 md:mb-4">
       <div className="relative w-full">
         <div
           className="w-full h-[550px] sm:h-[650px] md:h-[485px] lg:h-[550px] relative overflow-hidden bg-[#FDF8F3]"

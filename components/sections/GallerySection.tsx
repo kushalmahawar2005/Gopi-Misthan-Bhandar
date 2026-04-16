@@ -56,11 +56,11 @@ const GallerySection: React.FC<GallerySectionProps> = ({ galleryItems, showAll }
   }, []);
 
   return (
-    <section className="py-16 md:py-24 w-full bg-white overflow-hidden">
+    <section className="pt-8 pb-12 md:pt-10 md:pb-24 w-full bg-white overflow-hidden">
       <div className="max-w-[1400px] mx-auto px-4 md:px-8">
 
         {/* Premium Heading Style */}
-        <div className="text-center mb-12 md:mb-20">
+        <div className="text-center mb-8 md:mb-10">
           <p className="text-[12px] md:text-[14px] font-flama tracking-[0.3em] uppercase text-[#FE8E02] mb-3">
             Our Presence
           </p>
@@ -153,7 +153,7 @@ const GallerySection: React.FC<GallerySectionProps> = ({ galleryItems, showAll }
           {branches.map((branch, index) => (
             <div
               key={index}
-              className={`flex flex-col items-center text-center group transition-all duration-700 ${index === 1 ? 'md:translate-y-12' : 'md:-translate-y-6'
+              className={`flex flex-col items-center text-center group transition-all duration-700 ${index === 1 ? 'md:translate-y-6' : 'md:translate-y-0'
                 }`}
             >
               {/* Large Image with Rounded Corners */}

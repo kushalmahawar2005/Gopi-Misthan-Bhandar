@@ -15,22 +15,22 @@ const aboutCards = [
     linkText: 'Read More',
   },
   {
-    image: '/1.png',
+    image: '/c2.png',
     alt: 'Traditional Craftsmanship',
-    title: 'Crafting Joy Since 1995',
+    title: 'Award-Winning Excellence',
     description:
-      'For nearly three decades, we have been custodians of India’s rich culinary heritage. Each sweet is handcrafted using centuries-old techniques, preserving authentic flavors.',
+      'Recognized with the Best Services Award 2024 by Dainik Bhaskar, Gopi Misthan Bhandar stands for trust, quality, and exceptional customer experience. This achievement reflects our dedication to serving sweetness with perfection.',
     link: '/collections',
     linkText: 'Discover More',
   },
   {
-    image: '/1.png',
+    image: '/c3.png',
     alt: 'Gift of Tradition',
-    title: 'The Gift of Tradition',
+    title: 'Nationally Recognized Taste',
     description:
-      'From festive celebrations to heartfelt gestures, our handcrafted sweets make every occasion memorable. Beautifully packed gift boxes created with love and tradition.',
+      'Our signature Milk Cake has been selected among India’s Top 111 Mithai & Namkeen Products (2025) by Mithai & Namkeen Times. A proud recognition of our authentic flavors and unmatched quality.',
     link: '/giftbox',
-    linkText: 'Explore Gifts',
+    linkText: 'Read More',
   },
 ];
 
@@ -46,10 +46,10 @@ const AboutSection: React.FC = () => {
   }, []);
 
   return (
-    <section className="w-full bg-white py-16 md:py-24 overflow-hidden">
+    <section className="w-full bg-white py-8 md:py-10 overflow-hidden">
       <div className="max-w-7xl mx-auto px-4 md:px-8">
         {/* Section Header */}
-        <div className="text-center mb-10 md:mb-20">
+        <div className="text-center mb-8 md:mb-10">
           <h2 className="text-3xl md:text-4xl font-flama-condensed tracking-[0.15em] uppercase text-[#503223] mb-4">
             Our Story
           </h2>

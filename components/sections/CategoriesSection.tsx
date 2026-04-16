@@ -37,10 +37,10 @@ const CategoriesSection: React.FC<CategoriesSectionProps> = ({ categories }) => 
   };
 
   return (
-    <section className="pt-6 pb-6 md:pt-10 md:pb-28 w-full bg-[#FFFFFF]">
+    <section className="py-8 md:py-10 w-full bg-[#FFFFFF]">
       <div className="max-w-[1440px] mx-auto px-6 md:px-[50px]">
         {/* HEADER */}
-        <div className="text-center mb-8 md:mb-20">
+        <div className="text-center mb-6 md:mb-10">
           <p className="text-[12px] md:text-[14px] font-dm-sans tracking-[0.25em] uppercase text-[#FE8E02] font-semibold mb-3">
             Explore Our Collection
           </p>
@@ -148,7 +148,7 @@ const CategoriesSection: React.FC<CategoriesSectionProps> = ({ categories }) => 
         </div>
 
         {/* QUICK-NAV STRIP - DESKTOP ONLY */}
-        <div className="hidden md:grid mt-14 grid-cols-4 gap-4">
+        <div className="hidden md:grid mt-8 grid-cols-4 gap-4">
           {categories.slice(0, 4).map((category) => (
             <Link 
               key={category.id} 

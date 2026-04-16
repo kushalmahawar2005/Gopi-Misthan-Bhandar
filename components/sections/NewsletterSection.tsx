@@ -17,13 +17,13 @@ const NewsletterSection: React.FC = () => {
   };
 
   return (
-    <section className="w-full bg-[#503223] py-16 md:py-20">
+    <section className="w-full bg-[#503223] py-8 md:py-10">
       <div className="max-w-3xl mx-auto px-6 text-center">
         <h2 className="text-2xl md:text-3xl font-flama-condensed tracking-[0.2em] uppercase text-white mb-4 leading-tight">
           Become A Gopi Insider
         </h2>
 
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-6 mb-8 mt-8">
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-6 my-6">
           <div className="flex items-center gap-3">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="1.5">
               <path d="M20 7L12 15L4 7" strokeLinecap="round" strokeLinejoin="round" />

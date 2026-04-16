@@ -146,6 +146,100 @@
   animation: fadeIn 0.8s ease-out forwards;
 }
 
+/* Anand-style staggered reveal utility classes */
+@media (prefers-reduced-motion: no-preference) {
+  .m-scroll-trigger.animate--fade-in,
+  .m-scroll-trigger.animate--fade-in-up,
+  .m-scroll-trigger.animate--fade-in-left,
+  .m-scroll-trigger.animate--fade-in-right {
+    opacity: 0.01;
+    transition-property: opacity, transform;
+  }
+
+  .m-scroll-trigger.animate--fade-in-up {
+    transform: translateY(20px);
+  }
+
+  .m-scroll-trigger.animate--fade-in-left {
+    transform: translateX(-20px);
+  }
+
+  .m-scroll-trigger.animate--fade-in-right {
+    transform: translateX(20px);
+  }
+
+  .m-scroll-trigger:not(.m-scroll-trigger--offscreen).animate--fade-in {
+    animation: gopi-fade-in 0.55s ease-out forwards;
+    animation-delay: calc(var(--animation-order, 0) * 75ms);
+  }
+
+  .m-scroll-trigger:not(.m-scroll-trigger--offscreen).animate--fade-in-up {
+    animation: gopi-fade-in-up 0.55s ease-out forwards;
+    animation-delay: calc(var(--animation-order, 0) * 75ms);
+  }
+
+  .m-scroll-trigger:not(.m-scroll-trigger--offscreen).animate--fade-in-left {
+    animation: gopi-fade-in-left 0.55s ease-out forwards;
+    animation-delay: calc(var(--animation-order, 0) * 75ms);
+  }
+
+  .m-scroll-trigger:not(.m-scroll-trigger--offscreen).animate--fade-in-right {
+    animation: gopi-fade-in-right 0.55s ease-out forwards;
+    animation-delay: calc(var(--animation-order, 0) * 75ms);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .m-scroll-trigger {
+    opacity: 1 !important;
+    transform: none !important;
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
+@keyframes gopi-fade-in-up {
+  0% {
+    transform: translateY(20px);
+    opacity: 0.01;
+  }
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes gopi-fade-in-left {
+  0% {
+    transform: translateX(-20px);
+    opacity: 0.01;
+  }
+  100% {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes gopi-fade-in-right {
+  0% {
+    transform: translateX(20px);
+    opacity: 0.01;
+  }
+  100% {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes gopi-fade-in {
+  0% {
+    opacity: 0.01;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
 /* Exclude headings from scroll animation */
 .scroll-animate h1,
 .scroll-animate h2,
