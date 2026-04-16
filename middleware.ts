@@ -12,7 +12,7 @@ function normalizeRole(role: unknown): 'user' | 'admin' {
   return 'user';
 }
 
-function base64UrlToBytes(value: string): Uint8Array {
+function base64UrlToBuffer(value: string): ArrayBuffer {
   const base64 = value.replace(/-/g, '+').replace(/_/g, '/');
   const padded = base64 + '='.repeat((4 - (base64.length % 4)) % 4);
   const binary = atob(padded);
@@ -22,12 +22,12 @@ function base64UrlToBytes(value: string): Uint8Array {
     bytes[i] = binary.charCodeAt(i);
   }
 
-  return bytes;
+  return bytes.buffer;
 }
 
 function decodeBase64UrlJson(value: string): Record<string, any> | null {
   try {
-    const json = new TextDecoder().decode(base64UrlToBytes(value));
+    const json = new TextDecoder().decode(base64UrlToBuffer(value));
     return JSON.parse(json);
   } catch {
     return null;
@@ -72,8 +72,8 @@ async function isValidCustomAdminToken(token: string): Promise<boolean> {
       ['verify']
     );
 
-    const data = new TextEncoder().encode(`${headerPart}.${payloadPart}`);
-    const signature = base64UrlToBytes(signaturePart);
+    const data = new TextEncoder().encode(`${headerPart}.${payloadPart}`).buffer;
+    const signature = base64UrlToBuffer(signaturePart);
     const isSignatureValid = await crypto.subtle.verify('HMAC', key, signature, data);
 
     if (!isSignatureValid) {
