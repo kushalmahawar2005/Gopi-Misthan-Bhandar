@@ -15,6 +15,7 @@ import {
   FiImage,
   FiFile,
   FiSettings,
+  FiEdit,
 } from 'react-icons/fi';
 import Link from 'next/link';
 
