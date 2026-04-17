@@ -90,7 +90,7 @@ const TrendingBannerModal: React.FC = () => {
 
   return (
     <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/50 px-4">
-      <div className="relative bg-white rounded-2xl overflow-hidden shadow-2xl max-w-xl w-full">
+      <div className="relative rounded-2xl overflow-hidden shadow-2xl max-w-xl w-full bg-transparent">
         <button
           type="button"
           onClick={handleClose}
@@ -103,9 +103,9 @@ const TrendingBannerModal: React.FC = () => {
         <button
           type="button"
           onClick={handleClick}
-          className="w-full text-left focus:outline-none"
+          className="block w-full cursor-pointer border-0 bg-transparent p-0 m-0 text-left align-top leading-none appearance-none focus:outline-none"
         >
-          <div className="relative w-full h-60 sm:h-72">
+          <div className="relative w-full h-60 sm:h-72 overflow-hidden">
             <Image
               src={banner.imageUrl}
               alt={banner.title || 'Trending product'}

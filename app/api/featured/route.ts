@@ -1,13 +1,27 @@
 import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
 import TrendingBanner from '@/models/TrendingBanner';
+import { getRequestAuth } from '@/lib/auth';
 
 // Get active trending banner (What's Trending)
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
     await connectDB();
 
-    const banner = await TrendingBanner.findOne({ isActive: true }).sort({
+    const includeInactiveRequested =
+      request.nextUrl.searchParams.get('includeInactive') === 'true';
+    let includeInactive = false;
+
+    if (includeInactiveRequested) {
+      try {
+        const auth = await getRequestAuth(request);
+        includeInactive = auth.isAuthenticated && auth.isAdmin;
+      } catch {
+        includeInactive = false;
+      }
+    }
+
+    const banner = await TrendingBanner.findOne(includeInactive ? {} : { isActive: true }).sort({
       updatedAt: -1,
     });
 
@@ -39,38 +53,70 @@ export async function POST(request: NextRequest) {
       isActive = true,
     } = body;
 
-    if (!imageUrl || !productId) {
-      return NextResponse.json(
-        { success: false, error: 'Image and product are required' },
-        { status: 400 }
-      );
-    }
+    const requestedActiveState = isActive !== false;
 
     const safeDelay =
       typeof delaySeconds === 'number' && !Number.isNaN(delaySeconds) && delaySeconds > 0
         ? delaySeconds
         : 12;
 
-    const updateData = {
-      title,
-      subtitle,
-      imageUrl,
-      buttonText: buttonText || 'View Product',
-      categorySlug,
-      productId,
-      delaySeconds: safeDelay,
-      isActive,
-    };
-
     let banner;
 
     if (id) {
-      banner = await TrendingBanner.findByIdAndUpdate(id, updateData, {
+      const existingBanner = await TrendingBanner.findById(id);
+
+      if (!existingBanner) {
+        return NextResponse.json(
+          { success: false, error: 'Banner not found' },
+          { status: 404 }
+        );
+      }
+
+      const resolvedImageUrl = imageUrl || existingBanner.imageUrl;
+      const resolvedProductId = productId || existingBanner.productId;
+
+      if (!resolvedImageUrl || !resolvedProductId) {
+        return NextResponse.json(
+          { success: false, error: 'Image and product are required' },
+          { status: 400 }
+        );
+      }
+
+      banner = await TrendingBanner.findByIdAndUpdate(
+        id,
+        {
+          title,
+          subtitle,
+          imageUrl: resolvedImageUrl,
+          buttonText: buttonText || existingBanner.buttonText || 'View Product',
+          categorySlug: categorySlug ?? existingBanner.categorySlug,
+          productId: resolvedProductId,
+          delaySeconds: safeDelay,
+          isActive: requestedActiveState,
+        },
+        {
         new: true,
         runValidators: true,
-      });
+        }
+      );
     } else {
-      banner = await TrendingBanner.create(updateData);
+      if (!imageUrl || !productId) {
+        return NextResponse.json(
+          { success: false, error: 'Image and product are required' },
+          { status: 400 }
+        );
+      }
+
+      banner = await TrendingBanner.create({
+        title,
+        subtitle,
+        imageUrl,
+        buttonText: buttonText || 'View Product',
+        categorySlug,
+        productId,
+        delaySeconds: safeDelay,
+        isActive: requestedActiveState,
+      });
     }
 
     if (!banner) {

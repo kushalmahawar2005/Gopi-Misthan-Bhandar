@@ -15,7 +15,6 @@ import {
   FiImage,
   FiFile,
   FiSettings,
-  FiEdit,
 } from 'react-icons/fi';
 import Link from 'next/link';
 
@@ -96,7 +95,6 @@ export default function AdminDashboard() {
   const quickActions = [
     { label: 'Add Product', icon: FiPackage, href: '/admin/products/new', color: 'bg-blue-50 text-blue-700 hover:bg-blue-100' },
     { label: 'Hero Slider', icon: FiImage, href: '/admin/hero-slider', color: 'bg-purple-50 text-purple-700 hover:bg-purple-100' },
-    { label: 'About Us', icon: FiEdit, href: '/admin/about-us', color: 'bg-amber-50 text-amber-700 hover:bg-amber-100' },
     { label: 'Shop Now', icon: FiShoppingBag, href: '/admin/products', color: 'bg-green-50 text-green-700 hover:bg-green-100' },
     { label: 'Add Blog', icon: FiFile, href: '/admin/blog/new', color: 'bg-pink-50 text-pink-700 hover:bg-pink-100' },
     { label: 'Categories', icon: FiFolder, href: '/admin/categories', color: 'bg-orange-50 text-orange-700 hover:bg-orange-100' },

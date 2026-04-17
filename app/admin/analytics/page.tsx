@@ -37,6 +37,20 @@ interface PieLabelProps {
   value?: number;
 }
 
+const TIME_RANGE_LABELS: Record<string, string> = {
+  '7': 'Last 7 days',
+  '30': 'Last 30 days',
+  '90': 'Last 90 days',
+  '365': 'Last year',
+};
+
+const toDateKey = (date: Date) => {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+};
+
 export default function AnalyticsPage() {
   const [stats, setStats] = useState({
     totalRevenue: 0,
@@ -63,6 +77,8 @@ export default function AnalyticsPage() {
   }, [timeRange]);
 
   const fetchAnalytics = async () => {
+    setLoading(true);
+
     try {
       const [ordersRes, usersRes, productsRes] = await Promise.all([
         fetch('/api/orders'),
@@ -78,23 +94,34 @@ export default function AnalyticsPage() {
       const users: any[] = usersData.data || [];
       const products: any[] = productsData.data || [];
 
-      const totalRevenue = orders.reduce((sum, order) => sum + (order.total || 0), 0);
+      const parsedDays = Number.parseInt(timeRange, 10);
+      const days = Number.isNaN(parsedDays) ? 30 : Math.max(parsedDays, 1);
+
+      const rangeStart = new Date();
+      rangeStart.setHours(0, 0, 0, 0);
+      rangeStart.setDate(rangeStart.getDate() - (days - 1));
+
+      const filteredOrders = orders.filter((order) => {
+        const createdAt = new Date(order.createdAt);
+        return !Number.isNaN(createdAt.getTime()) && createdAt >= rangeStart;
+      });
+
+      const totalRevenue = filteredOrders.reduce((sum, order) => sum + (Number(order.total) || 0), 0);
       const today = new Date().toISOString().split('T')[0];
       const todayOrders = orders.filter((o) => o.createdAt?.startsWith(today));
-      const todayRevenue = todayOrders.reduce((sum, order) => sum + (order.total || 0), 0);
+      const todayRevenue = todayOrders.reduce((sum, order) => sum + (Number(order.total) || 0), 0);
 
       const thisMonth = new Date();
       thisMonth.setDate(1);
       const thisMonthOrders = orders.filter((o) => new Date(o.createdAt) >= thisMonth);
-      const thisMonthRevenue = thisMonthOrders.reduce((sum, order) => sum + (order.total || 0), 0);
+      const thisMonthRevenue = thisMonthOrders.reduce((sum, order) => sum + (Number(order.total) || 0), 0);
 
       // Chart data init
-      const days = parseInt(timeRange);
       const chartData: Record<string, { date: string; revenue: number; orders: number }> = {};
-      for (let i = days - 1; i >= 0; i--) {
-        const date = new Date();
-        date.setDate(date.getDate() - i);
-        const key = date.toISOString().split('T')[0];
+      for (let i = 0; i < days; i++) {
+        const date = new Date(rangeStart);
+        date.setDate(rangeStart.getDate() + i);
+        const key = toDateKey(date);
         chartData[key] = {
           date: date.toLocaleDateString('en-IN', { month: 'short', day: 'numeric' }),
           revenue: 0,
@@ -102,10 +129,13 @@ export default function AnalyticsPage() {
         };
       }
 
-      orders.forEach((order) => {
-        const key = new Date(order.createdAt).toISOString().split('T')[0];
+      filteredOrders.forEach((order) => {
+        const createdAt = new Date(order.createdAt);
+        if (Number.isNaN(createdAt.getTime())) return;
+
+        const key = toDateKey(createdAt);
         if (chartData[key]) {
-          chartData[key].revenue += order.total || 0;
+          chartData[key].revenue += Number(order.total) || 0;
           chartData[key].orders += 1;
         }
       });
@@ -115,7 +145,7 @@ export default function AnalyticsPage() {
 
       // Category revenue
       const categoryRevenue: Record<string, number> = {};
-      orders.forEach((order) =>
+      filteredOrders.forEach((order) =>
         order.items?.forEach((item: any) => {
           const cat = item.category || 'Unknown';
             // Ensure price & quantity numbers
@@ -131,7 +161,7 @@ export default function AnalyticsPage() {
 
       // Payment methods
       const paymentMethods: Record<string, number> = {};
-      orders.forEach((order) => {
+      filteredOrders.forEach((order) => {
         const method = (order.paymentMethod || 'COD').toUpperCase();
         paymentMethods[method] = (paymentMethods[method] || 0) + 1;
       });
@@ -142,7 +172,7 @@ export default function AnalyticsPage() {
         string,
         { name: string; quantity: number; revenue: number }
       > = {};
-      orders.forEach((order) =>
+      filteredOrders.forEach((order) =>
         order.items?.forEach((item: any) => {
           const id = item.productId || item._id || item.name;
           if (!productSales[id]) {
@@ -165,10 +195,10 @@ export default function AnalyticsPage() {
       setTopProducts(topProductsData);
       setStats({
         totalRevenue,
-        totalOrders: orders.length,
+        totalOrders: filteredOrders.length,
         totalUsers: users.length,
         totalProducts: products.length,
-        avgOrderValue: orders.length ? totalRevenue / orders.length : 0,
+        avgOrderValue: filteredOrders.length ? totalRevenue / filteredOrders.length : 0,
         todayRevenue,
         todayOrders: todayOrders.length,
         thisMonthRevenue,
@@ -192,16 +222,18 @@ export default function AnalyticsPage() {
     );
   }
 
+  const selectedRangeLabel = TIME_RANGE_LABELS[timeRange] || `Last ${timeRange} days`;
+
   const statCards = [
     {
-      label: 'Total Revenue',
+      label: `${selectedRangeLabel} Revenue`,
       value: `₹${stats.totalRevenue.toLocaleString()}`,
       icon: FiDollarSign,
       color: 'text-green-600',
       bgColor: 'bg-green-50',
     },
     {
-      label: 'Total Orders',
+      label: `${selectedRangeLabel} Orders`,
       value: stats.totalOrders.toLocaleString(),
       icon: FiShoppingBag,
       color: 'text-blue-600',
@@ -222,7 +254,7 @@ export default function AnalyticsPage() {
       bgColor: 'bg-orange-50',
     },
     {
-      label: 'Avg Order Value',
+      label: `${selectedRangeLabel} Avg Order Value`,
       value: `₹${Math.round(stats.avgOrderValue).toLocaleString()}`,
       icon: FiTrendingUp,
       color: 'text-indigo-600',

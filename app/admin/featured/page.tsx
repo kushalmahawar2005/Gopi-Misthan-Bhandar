@@ -41,7 +41,7 @@ export default function FeaturedPage() {
       try {
         const [catRes, bannerRes] = await Promise.all([
           fetch('/api/categories'),
-          fetch('/api/featured', { cache: 'no-store' }),
+          fetch('/api/featured?includeInactive=true', { cache: 'no-store' }),
         ]);
 
         const catData = await catRes.json();
@@ -140,7 +140,13 @@ export default function FeaturedPage() {
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!imageUrl || !selectedProductId) {
+
+    if (!isActive && !bannerId && (!imageUrl || !selectedProductId)) {
+      alert('Banner is already inactive. Add image/product and enable it whenever you want to use it.');
+      return;
+    }
+
+    if (isActive && (!imageUrl || !selectedProductId)) {
       alert('Please upload a banner image and select a product.');
       return;
     }
@@ -268,6 +274,11 @@ export default function FeaturedPage() {
                   Banner active (show to visitors)
                 </label>
               </div>
+              {!isActive && (
+                <p className="text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded-md px-2.5 py-1.5">
+                  Banner is inactive. The startup popup will not appear for visitors.
+                </p>
+              )}
             </div>
             <div>
               <ImageUpload

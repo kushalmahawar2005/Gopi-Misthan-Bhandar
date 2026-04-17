@@ -57,15 +57,15 @@ const CategoriesSection: React.FC<CategoriesSectionProps> = ({ categories }) => 
         </div>
 
         {/* MOBILE CATEGORIES: 3-Column Grid (No Slider) */}
-        <div className="grid md:hidden w-full grid-cols-3 gap-y-4 gap-x-2 pb-2 pt-0 px-1">
+        <div className="grid md:hidden w-full grid-cols-3 gap-y-3 gap-x-2 pb-2 pt-0 px-1">
           {categories.slice(0, 6).map((category) => (
             <Link
               key={category.id}
               href={`/products?category=${category.slug}`}
-              className="flex flex-col items-center gap-3 group"
+              className="flex flex-col items-center gap-2.5 group"
             >
               {/* Circular Card */}
-              <div className="w-[96px] h-[96px] xs:w-[112px] xs:h-[112px] rounded-full overflow-hidden relative transition-transform duration-300 group-hover:scale-[1.03]">
+              <div className="w-[82px] h-[82px] xs:w-[94px] xs:h-[94px] rounded-full overflow-hidden relative transition-transform duration-300 group-hover:scale-[1.03]">
                 {category.image ? (
                   <Image 
                     src={category.image} 
@@ -74,13 +74,13 @@ const CategoriesSection: React.FC<CategoriesSectionProps> = ({ categories }) => 
                     className="object-cover transition-transform duration-500 group-hover:scale-110"
                   />
                 ) : (
-                  <div className="w-full h-full flex items-center justify-center text-3xl">
+                  <div className="w-full h-full flex items-center justify-center text-2xl">
                     {getEmoji(category.slug)}
                   </div>
                 )}
               </div>
               {/* Category Name */}
-              <span className="text-[12px] sm:text-[13px] font-dm-sans font-semibold text-[#503223] text-center w-full leading-tight break-words uppercase tracking-[0.05em]">
+              <span className="text-[11px] sm:text-[12px] font-dm-sans font-semibold text-[#503223] text-center w-full leading-tight break-words uppercase tracking-[0.05em]">
                 {category.name}
               </span>
             </Link>

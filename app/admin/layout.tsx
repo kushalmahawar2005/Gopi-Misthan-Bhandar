@@ -23,7 +23,6 @@ import {
   FiGift,
   FiBox,
   FiEye,
-  FiGrid,
   FiStar,
   FiTruck,
   FiHeart,
@@ -80,12 +79,10 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
   const contentMenuItems = [
     { href: '/admin/hero-slider', icon: FiImage, label: 'Hero Slider' },
-    { href: '/admin/about-us', icon: FiType, label: 'About Us' },
     { href: '/admin/site-content', icon: FiType, label: 'Offer Line' },
     { href: '/admin/featured', icon: FiTrendingUp, label: "What's Trending" },
     { href: '/admin/blog', icon: FiFile, label: 'Blog Posts' },
     { href: '/admin/instabook', icon: FiEye, label: 'InstaBook' },
-    { href: '/admin/gallery', icon: FiGrid, label: 'Gallery' },
     { href: '/admin/reviews', icon: FiStar, label: 'Reviews' },
   ];
 
