@@ -8,7 +8,7 @@ import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
 import Cart from '@/components/Cart';
 import ProtectedRoute from '@/components/ProtectedRoute';
-import { FiPackage, FiShoppingBag, FiCalendar, FiMapPin, FiDollarSign, FiEye, FiTruck } from 'react-icons/fi';
+import { FiPackage, FiShoppingBag, FiCalendar, FiMapPin, FiDollarSign, FiEye, FiTruck, FiDownload } from 'react-icons/fi';
 import Link from 'next/link';
 import Image from 'next/image';
 
@@ -48,6 +48,7 @@ export default function OrdersPage() {
   const router = useRouter();
   const [orders, setOrders] = useState<Order[]>([]);
   const [loadingOrders, setLoadingOrders] = useState(true);
+  const [downloadingInvoiceFor, setDownloadingInvoiceFor] = useState<string | null>(null);
 
   // Fetch orders
   useEffect(() => {
@@ -111,6 +112,33 @@ export default function OrdersPage() {
       month: 'long',
       day: 'numeric',
     });
+  };
+
+  const handleDownloadReceipt = async (orderNumber: string) => {
+    try {
+      setDownloadingInvoiceFor(orderNumber);
+
+      const response = await fetch(`/api/orders/${encodeURIComponent(orderNumber)}/invoice`);
+
+      if (!response.ok) {
+        throw new Error('Unable to download receipt right now.');
+      }
+
+      const pdfBlob = await response.blob();
+      const blobUrl = window.URL.createObjectURL(pdfBlob);
+      const tempLink = document.createElement('a');
+      tempLink.href = blobUrl;
+      tempLink.download = `receipt-${orderNumber}.pdf`;
+      document.body.appendChild(tempLink);
+      tempLink.click();
+      tempLink.remove();
+      window.URL.revokeObjectURL(blobUrl);
+    } catch (error) {
+      console.error('Error downloading receipt:', error);
+      alert('Unable to download receipt right now. Please try again.');
+    } finally {
+      setDownloadingInvoiceFor(null);
+    }
   };
 
   if (isLoading || loadingOrders) {
@@ -199,6 +227,14 @@ export default function OrdersPage() {
                         <span className={`px-3 py-1 rounded-full text-sm font-medium capitalize ${getStatusColor(order.status)}`}>
                           {order.status}
                         </span>
+                        <button
+                          onClick={() => handleDownloadReceipt(order.orderNumber)}
+                          disabled={downloadingInvoiceFor === order.orderNumber}
+                          className="flex items-center gap-2 px-4 py-2 border border-[#FE8E02] text-[#FE8E02] rounded-md hover:bg-orange-50 transition-colors text-sm font-medium disabled:opacity-60 disabled:cursor-not-allowed"
+                        >
+                          <FiDownload className="w-4 h-4" />
+                          {downloadingInvoiceFor === order.orderNumber ? 'Downloading...' : 'Download Receipt'}
+                        </button>
                         <button
                           onClick={() => router.push(`/orders/track?orderNumber=${order.orderNumber}`)}
                           className="flex items-center gap-2 px-4 py-2 bg-[#FE8E02] text-white rounded-md hover:bg-[#FF9D2E] transition-colors text-sm font-medium"

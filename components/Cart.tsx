@@ -75,13 +75,13 @@ const Cart: React.FC = () => {
     <>
       {/* Overlay */}
       <div
-        className="fixed inset-0 bg-black/50 z-[60] transition-opacity animate-in fade-in duration-300"
+        className="fixed inset-0 bg-black/50 z-[160] transition-opacity animate-in fade-in duration-300"
         onClick={handleManualClose}
       />
       
       {/* Cart Sidebar */}
       <div 
-        className="fixed right-0 bottom-0 md:top-0 h-[92vh] md:h-full w-full max-w-md bg-white shadow-2xl z-[70] transform transition-transform duration-300 ease-in-out overflow-y-auto rounded-t-3xl md:rounded-none animate-in slide-in-from-bottom md:slide-in-from-right"
+        className="fixed right-0 bottom-0 md:top-0 h-[92vh] md:h-full w-full max-w-md bg-white shadow-2xl z-[170] transform transition-transform duration-300 ease-in-out overflow-y-auto rounded-t-3xl md:rounded-none animate-in slide-in-from-bottom md:slide-in-from-right"
         onTouchStart={handleTouchStart}
         onTouchMove={handleTouchMove}
         onTouchEnd={handleTouchEnd}

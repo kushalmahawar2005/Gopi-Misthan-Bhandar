@@ -155,23 +155,23 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, showAddToCart = true
             </div>
 
             {showAddToCart && hasMultipleSizes && (
-              <div className="w-[140px] self-start">
-                <div className="flex gap-1.5 overflow-x-auto scrollbar-hide justify-end">
+              <div className="w-[152px] self-start">
+                <div className="flex gap-2 overflow-x-auto scrollbar-hide">
                   {sizeOptions.map((size) => (
                     <button
                       key={`${product.id}-${size.weight}`}
                       type="button"
                       onClick={() => setSelectedWeight(size.weight)}
-                      className={`min-w-[64px] rounded border px-1.5 pt-1 pb-1.5 text-left transition-colors ${
+                      className={`min-w-[72px] min-h-[58px] rounded border px-3 py-2 text-left transition-colors ${
                         selectedWeight === size.weight
                           ? 'border-[#FE8E02] bg-orange-50'
                           : 'border-[#d6cec6] bg-white hover:border-[#FE8E02]/60'
                       }`}
                     >
-                      <p className={`text-[11px] font-bold leading-tight ${selectedWeight === size.weight ? 'text-[#FE8E02]' : 'text-[#503223]'}`}>
+                      <p className={`text-[14px] font-bold leading-tight ${selectedWeight === size.weight ? 'text-[#FE8E02]' : 'text-[#503223]'}`}>
                         {size.weight}
                       </p>
-                      <p className="text-[10px] leading-[1.1] text-[#503223]">₹{size.price}</p>
+                      <p className="text-[12px] leading-[1.2] text-[#503223]">₹{size.price}</p>
                     </button>
                   ))}
                 </div>

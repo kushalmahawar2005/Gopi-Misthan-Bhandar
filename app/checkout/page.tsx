@@ -27,6 +27,7 @@ export default function CheckoutPage() {
     cartItems,
     getTotalPrice,
     clearCart,
+    openCart,
   } = useCart();
 
   const [currentStep, setCurrentStep] = useState(1); // 1: Address, 2: Billing, 3: Payment
@@ -74,14 +75,17 @@ export default function CheckoutPage() {
   const [couponError, setCouponError] = useState('');
   const [couponSuccess, setCouponSuccess] = useState('');
   const [isApplyingCoupon, setIsApplyingCoupon] = useState(false);
+  const [isRedirectingAfterPayment, setIsRedirectingAfterPayment] = useState(false);
 
   const subtotalAmount = getTotalPrice();
   const shippingAmount = selectedCourier?.charge || 0;
   const totalAmount = Math.max(0, subtotalAmount - appliedCouponDiscount + shippingAmount);
 
   useEffect(() => {
-    if (cartItems.length === 0) router.push('/products');
-  }, [cartItems.length, router]);
+    if (cartItems.length === 0 && !isPlacingOrder && !isRedirectingAfterPayment) {
+      router.push('/products');
+    }
+  }, [cartItems.length, isPlacingOrder, isRedirectingAfterPayment, router]);
 
   useEffect(() => {
     const script = document.createElement('script');
@@ -326,24 +330,28 @@ export default function CheckoutPage() {
             
             if (verifyResult.success) {
               // Payment verified! Clear cart and redirect to success
+              setIsRedirectingAfterPayment(true);
               clearCart();
-              router.push(`/checkout/success?orderId=${createdOrderNumber}&paymentId=${r.razorpay_payment_id}`);
+              router.replace(`/checkout/success?orderId=${createdOrderNumber}&paymentId=${r.razorpay_payment_id}`);
             } else {
               // Verification failed — redirect to failed page
-              router.push(`/checkout/failed?orderId=${createdOrderNumber}&reason=${encodeURIComponent(verifyResult.error || 'Payment verification failed')}`);
+              setIsRedirectingAfterPayment(true);
+              router.replace(`/checkout/failed?orderId=${createdOrderNumber}&reason=${encodeURIComponent(verifyResult.error || 'Payment verification failed')}`);
             }
           } catch (verifyError) {
             // Network error during verification — still redirect to success
             // The webhook will handle the actual status update
+            setIsRedirectingAfterPayment(true);
             clearCart();
-            router.push(`/checkout/success?orderId=${createdOrderNumber}&paymentId=${r.razorpay_payment_id}`);
+            router.replace(`/checkout/success?orderId=${createdOrderNumber}&paymentId=${r.razorpay_payment_id}`);
           }
         },
         modal: {
           ondismiss: () => {
             // User closed Razorpay popup without completing payment
             setIsPlacingOrder(false);
-            router.push(`/checkout/failed?orderId=${createdOrderNumber}&reason=${encodeURIComponent('Payment was cancelled. You can retry from your orders page.')}`);
+            setIsRedirectingAfterPayment(true);
+            router.replace(`/checkout/failed?orderId=${createdOrderNumber}&reason=${encodeURIComponent('Payment was cancelled. You can retry from your orders page.')}`);
           },
           escape: true,
           confirm_close: true,
@@ -357,7 +365,8 @@ export default function CheckoutPage() {
         // Razorpay payment failed (bank declined, etc.)
         const reason = response.error?.description || response.error?.reason || 'Payment failed';
         setIsPlacingOrder(false);
-        router.push(`/checkout/failed?orderId=${createdOrderNumber}&reason=${encodeURIComponent(reason)}&code=${response.error?.code || ''}`);
+        setIsRedirectingAfterPayment(true);
+        router.replace(`/checkout/failed?orderId=${createdOrderNumber}&reason=${encodeURIComponent(reason)}&code=${response.error?.code || ''}`);
       });
 
       rzp.open();
@@ -365,7 +374,8 @@ export default function CheckoutPage() {
       setIsPlacingOrder(false);
       if (createdOrderNumber) {
         // Order was created but payment failed to start — redirect to failed page
-        router.push(`/checkout/failed?orderId=${createdOrderNumber}&reason=${encodeURIComponent(e.message || 'Something went wrong')}`);
+        setIsRedirectingAfterPayment(true);
+        router.replace(`/checkout/failed?orderId=${createdOrderNumber}&reason=${encodeURIComponent(e.message || 'Something went wrong')}`);
       } else {
         // Order creation itself failed — show error on checkout page
         setErrors(prev => ({ ...prev, general: e.message || 'Something went wrong. Please try again.' }));
@@ -379,7 +389,7 @@ export default function CheckoutPage() {
   return (
     <div className="min-h-screen bg-gray-50 overflow-x-hidden">
       {/* --- DESKTOP VIEW: STANDARD HEADER/NAV --- */}
-      <div className="hidden lg:block"><Header /><Navigation /><Cart /></div>
+      <div className="hidden lg:block"><Header /><Navigation /></div>
 
       {/* --- MOBILE VIEW: MINI HEADER --- */}
       <header className="lg:hidden sticky top-0 z-[100] bg-white border-b border-gray-200 px-4 py-4">
@@ -401,6 +411,9 @@ export default function CheckoutPage() {
           ))}
         </div>
       </div>
+
+      {/* Cart drawer should be available on both desktop and mobile checkout */}
+      <Cart />
 
       <main className="max-w-7xl mx-auto px-4 py-8 lg:py-12 flex flex-col lg:flex-row gap-8">
         {/* Left Section: Form */}
@@ -524,6 +537,16 @@ export default function CheckoutPage() {
                  <div><p className="text-sm font-bold line-clamp-1">{i.name}</p><p className="text-xs text-gray-400">Qty: {i.quantity} | {i.selectedSize || i.defaultWeight}</p></div>
                </div>
              ))}
+
+             <button
+               type="button"
+               onClick={openCart}
+               className="w-full mb-4 inline-flex items-center justify-center gap-2 rounded-xl border border-[#FE8E02]/35 bg-[#fff7ed] px-4 py-3 text-[13px] font-bold text-[#8f4e07] hover:bg-[#ffedd5] transition-colors"
+             >
+               <FiShoppingCart className="w-4 h-4" />
+               Modify Items (Go to Cart)
+             </button>
+
              <div className="pt-6 border-t border-gray-100 space-y-3">
                <div className="p-3 rounded-xl border border-gray-100 bg-gray-50">
                  <p className="text-xs font-bold text-gray-700 mb-2">Have a coupon?</p>
@@ -579,7 +602,7 @@ export default function CheckoutPage() {
 
       {/* --- MOBILE VIEW: STICKY ACTIONS --- */}
       <footer className="lg:hidden fixed bottom-0 left-0 right-0 bg-white border-t p-4 z-[100] shadow-lg">
-         <div className="flex items-center justify-between gap-4 max-w-md mx-auto">
+         <div className="flex flex-col gap-3 max-w-md mx-auto">
             {currentStep < 3 ? (
               <button onClick={() => validateStep(currentStep) && setCurrentStep(currentStep+1)} className="w-full bg-gray-900 text-white py-4 rounded-xl font-bold flex items-center justify-center gap-2">Next <FiChevronRight /></button>
             ) : (
@@ -587,6 +610,14 @@ export default function CheckoutPage() {
                 {isPlacingOrder ? 'Processing...' : `Pay ₹${totalAmount.toLocaleString()}`}
               </button>
             )}
+
+            <button
+              type="button"
+              onClick={openCart}
+              className="w-full text-center text-[13px] font-bold text-[#8f4e07] underline decoration-[#FE8E02]/60 underline-offset-4"
+            >
+              Want to add/remove items? Go to Cart
+            </button>
          </div>
       </footer>
 

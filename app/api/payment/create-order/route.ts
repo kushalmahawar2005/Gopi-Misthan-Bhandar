@@ -89,7 +89,7 @@ export async function POST(request: NextRequest) {
       paymentStatus: 'pending',
       status: 'pending',
     })
-      .select('orderNumber items paymentStatus shipping')
+      .select('orderNumber items paymentStatus shipping shippingCost deliveryCharge selectedCourier subtotal')
       .sort({ createdAt: -1 })
       .limit(25);
 
@@ -113,12 +113,17 @@ export async function POST(request: NextRequest) {
       return total + itemWeightKg * quantity;
     }, 0);
 
-    let serverCourierCharge = FALLBACK_COURIER_CHARGE;
+    const persistedShippingCost = Number(orderToUpdate.shippingCost ?? orderToUpdate.deliveryCharge);
+    const hasPersistedShipping = Number.isFinite(persistedShippingCost) && persistedShippingCost >= 0;
+    const selectedCourierName = String(orderToUpdate.selectedCourier || '').trim().toLowerCase();
+
+    // Keep checkout-summary charge as baseline; if Nimbus returns matching courier, overwrite with fresh authoritative value.
+    let serverCourierCharge = hasPersistedShipping ? persistedShippingCost : FALLBACK_COURIER_CHARGE;
     if (/^\d{6}$/.test(orderDeliveryPincode)) {
       const serviceability = await checkServiceability({
         pincode: orderDeliveryPincode,
         weight: totalWeightKg > 0 ? totalWeightKg : 0.5,
-        order_amount: 0,
+        order_amount: Math.max(0, Number(orderToUpdate.subtotal || 0)),
         payment_method: 'prepaid',
       });
 
@@ -129,8 +134,18 @@ export async function POST(request: NextRequest) {
           return currentCharge < minCharge ? current : min;
         }, serviceability.data[0]);
 
+        const selectedCourierMatch = selectedCourierName
+          ? serviceability.data.find((courier: any) => String(courier?.name || '').trim().toLowerCase() === selectedCourierName)
+          : null;
+
+        const selectedCourierCharge = Number(
+          selectedCourierMatch?.total_charges ?? selectedCourierMatch?.freight_charges
+        );
+
         const computedCharge = Number(cheapest?.total_charges ?? cheapest?.freight_charges);
-        if (Number.isFinite(computedCharge) && computedCharge >= 0) {
+        if (Number.isFinite(selectedCourierCharge) && selectedCourierCharge >= 0) {
+          serverCourierCharge = selectedCourierCharge;
+        } else if (!hasPersistedShipping && Number.isFinite(computedCharge) && computedCharge >= 0) {
           serverCourierCharge = computedCharge;
         }
       }
