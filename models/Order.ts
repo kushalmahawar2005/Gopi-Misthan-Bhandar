@@ -51,6 +51,7 @@ export interface IOrder extends Document {
   trackingUrl?: string;
   deliveryCharge?: number;
   selectedCourier?: string;
+  selectedCourierId?: string;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -122,6 +123,7 @@ const OrderSchema = new Schema<IOrder>(
     trackingUrl: { type: String },
     deliveryCharge: { type: Number },
     selectedCourier: { type: String },
+    selectedCourierId: { type: String },
   },
   {
     timestamps: true,

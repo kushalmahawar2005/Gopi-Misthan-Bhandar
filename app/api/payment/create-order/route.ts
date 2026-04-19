@@ -6,26 +6,9 @@ import { calculateOrderAmount } from '@/lib/orderUtils';
 import { getRequestAuth } from '@/lib/auth';
 import { checkServiceability } from '@/lib/nimbuspost';
 import { cleanupExpiredPendingOrders } from '@/lib/orderCleanup';
+import { parseWeightToKg } from '@/lib/weight';
 
 const FALLBACK_COURIER_CHARGE = 60;
-
-function parseWeightToKg(weight: string): number {
-  const raw = String(weight || '').trim().toLowerCase();
-  if (!raw) return 0;
-
-  const match = raw.match(/^(\d+(?:\.\d+)?)\s*(kg|g|gm|gram|grams)?$/i);
-  if (!match) {
-    const numeric = Number(raw);
-    return Number.isFinite(numeric) && numeric > 0 ? numeric : 0;
-  }
-
-  const value = Number(match[1]);
-  const unit = (match[2] || 'kg').toLowerCase();
-
-  if (!Number.isFinite(value) || value <= 0) return 0;
-  if (unit === 'kg') return value;
-  return value / 1000;
-}
 
 function buildItemsSignature(items: any[]): string {
   return items

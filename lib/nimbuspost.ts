@@ -1,4 +1,5 @@
 import axios, { AxiosInstance } from 'axios';
+import { parseWeightToKg } from '@/lib/weight';
 
 const BASE_URL = process.env.NIMBUSPOST_BASE_URL || 'https://api.nimbuspost.com/v1';
 const API_KEY = process.env.NIMBUSPOST_API_KEY; // Usually the password
@@ -68,6 +69,16 @@ export interface ServiceabilityParams {
   payment_method: 'prepaid' | 'cod';
 }
 
+export interface ResolveCourierParams extends ServiceabilityParams {
+  preferredCourierName?: string;
+  preferredCourierId?: string | number;
+}
+
+export interface ResolvedCourier {
+  id: string;
+  name?: string;
+}
+
 export async function checkServiceability(params: ServiceabilityParams) {
   try {
     const origin = process.env.SENDER_PINCODE;
@@ -98,6 +109,51 @@ export async function checkServiceability(params: ServiceabilityParams) {
   }
 }
 
+export async function resolveCourierForShipment(params: ResolveCourierParams): Promise<ResolvedCourier | null> {
+  const result = await checkServiceability(params);
+
+  if (!result?.status || !Array.isArray(result?.data) || result.data.length === 0) {
+    return null;
+  }
+
+  const preferredName = String(params.preferredCourierName || '').trim().toLowerCase();
+  const preferredId = String(params.preferredCourierId || '').trim();
+  const couriers = result.data;
+
+  const extractCourierId = (courier: any): string => {
+    return String(courier?.id || courier?.courier_id || courier?.courier_company_id || '').trim();
+  };
+
+  const toCharge = (courier: any): number => {
+    const charge = Number(courier?.total_charges ?? courier?.freight_charges ?? Number.MAX_SAFE_INTEGER);
+    return Number.isFinite(charge) ? charge : Number.MAX_SAFE_INTEGER;
+  };
+
+  const byId = preferredId
+    ? couriers.find((courier: any) => extractCourierId(courier) === preferredId)
+    : null;
+
+  const byName = !byId && preferredName
+    ? couriers.find((courier: any) => String(courier?.name || '').trim().toLowerCase() === preferredName)
+    : null;
+
+  const cheapest = couriers.reduce((best: any, current: any) => {
+    return toCharge(current) < toCharge(best) ? current : best;
+  }, couriers[0]);
+
+  const selected = byId || byName || cheapest;
+  const selectedId = extractCourierId(selected);
+
+  if (!selectedId) {
+    return null;
+  }
+
+  return {
+    id: selectedId,
+    name: String(selected?.name || '').trim() || undefined,
+  };
+}
+
 /**
  * Create Shipment
  */
@@ -126,6 +182,7 @@ export interface ShipmentParams {
     qty: number;
     price: number;
     sku?: string;
+    weight?: string;
   }>;
   payment_method: 'prepaid' | 'cod';
   total_amount: number;
@@ -134,7 +191,8 @@ export interface ShipmentParams {
   order_total?: number;
   order_amount?: number | string;
   pickup_warehouse_name?: string;
-  weight: number; // kg
+  courier_id?: string | number;
+  weight: number; // kg input from app, converted to grams for Nimbus shipment payload
   length: number; // cm
   breadth: number; // cm
   height: number; // cm
@@ -157,6 +215,30 @@ export async function createShipment(params: ShipmentParams) {
       return { status: false, message: 'Pickup warehouse name is missing. Set NIMBUSPOST_PICKUP_WAREHOUSE_NAME.' };
     }
 
+    const rawCourierId = String(params.courier_id || '').trim();
+    const normalizedCourierId = rawCourierId
+      ? (Number.isFinite(Number(rawCourierId)) ? Number(rawCourierId) : rawCourierId)
+      : undefined;
+
+    // Nimbus UI order-create sends package weight in grams, so keep grams aliases for compatibility.
+    const shipmentWeightInGrams = Math.max(1, Math.round(Number(params.weight || 0) * 1000));
+    const packageLength = Math.max(1, Math.round(Number(params.length || 0)));
+    const packageBreadth = Math.max(1, Math.round(Number(params.breadth || 0)));
+    const packageHeight = Math.max(1, Math.round(Number(params.height || 0)));
+
+    const orderProducts = (params.order_items || []).map((item) => {
+      const unitWeightKg = parseWeightToKg(String(item.weight || ''));
+      const unitWeightGrams = unitWeightKg > 0 ? Math.max(1, Math.round(unitWeightKg * 1000)) : undefined;
+
+      return {
+        product_name: item.name,
+        product_qty: item.qty,
+        product_price: item.price,
+        product_sku: item.sku || '',
+        ...(unitWeightGrams ? { product_weight: unitWeightGrams } : {}),
+      };
+    });
+
     // NimbusPost expects specific format
     const payload = {
       order_number: params.order_id,
@@ -165,15 +247,22 @@ export async function createShipment(params: ShipmentParams) {
       cod_charges: 0,
       payment_method: paymentType,
       payment_type: paymentType,
+      order_payment_type: paymentType,
       total_amount: orderAmount,
       order_total: orderAmount,
       order_amount: String(orderAmount),
-      weight: params.weight,
-      length: params.length,
-      breadth: params.breadth,
-      height: params.height,
+      weight: shipmentWeightInGrams,
+      package_weight: shipmentWeightInGrams,
+      dead_weight: shipmentWeightInGrams,
+      length: packageLength,
+      breadth: packageBreadth,
+      height: packageHeight,
+      package_length: packageLength,
+      package_breadth: packageBreadth,
+      package_height: packageHeight,
       pickup_warehouse_name: pickupWarehouseName,
       pickup_location: pickupWarehouseName,
+      order_type: 'ecom',
       consignee: {
         name: params.consignee.name,
         address: params.consignee.address,
@@ -193,6 +282,8 @@ export async function createShipment(params: ShipmentParams) {
         phone: params.pickup.phone,
       },
       order_items: params.order_items,
+      order_products: orderProducts,
+      ...(normalizedCourierId ? { courier_id: normalizedCourierId } : {}),
     };
 
     const response = await nimbusClient.post('/shipments', payload);

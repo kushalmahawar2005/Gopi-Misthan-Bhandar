@@ -38,7 +38,7 @@ export async function POST(req: NextRequest) {
           name: c.name,
           charge: c.total_charges || c.freight_charges || 0,
           estimatedDays: days > 0 ? days : 5,
-          id: c.id
+          id: c.id || c.courier_id || c.courier_company_id
         };
       });
 

@@ -11,6 +11,7 @@ import Header from '@/components/Header';
 import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
 import Cart from '@/components/Cart';
+import { parseWeightToKg, pickWeightLabel } from '@/lib/weight';
 
 type PaymentMethod = 'upi' | 'card';
 
@@ -110,7 +111,7 @@ export default function CheckoutPage() {
       price: i.price,
       quantity: i.quantity,
       image: i.image,
-      weight: i.selectedSize || i.defaultWeight || ''
+      weight: i.selectedWeight || i.selectedSize || i.defaultWeight || ''
     }));
   };
 
@@ -178,13 +179,8 @@ export default function CheckoutPage() {
       // Calculate total weight for the cart
       let totalWeight = 0;
       cartItems.forEach(item => {
-        const w = item.selectedSize || item.defaultWeight || '0.5kg';
-        const value = parseFloat(w);
-        if (w.toLowerCase().includes('g')) {
-          totalWeight += (value / 1000) * item.quantity;
-        } else {
-          totalWeight += value * item.quantity;
-        }
+        const lineWeight = pickWeightLabel(item) || '0.5kg';
+        totalWeight += parseWeightToKg(lineWeight) * item.quantity;
       });
       if (totalWeight === 0) totalWeight = 0.5;
 
@@ -283,6 +279,7 @@ export default function CheckoutPage() {
           paymentMethod, 
           paymentStatus: 'pending',
           selectedCourier: selectedCourier?.name,
+          selectedCourierId: selectedCourier?.id ? String(selectedCourier.id) : undefined,
           deliveryCharge: selectedCourier?.charge
         }) 
       });
@@ -534,7 +531,7 @@ export default function CheckoutPage() {
              {cartItems.map(i => (
                <div key={`${i.id}-${i.selectedWeight || i.selectedSize || i.defaultWeight || 'base'}`} className="flex gap-4 mb-4">
                  <div className="relative w-14 h-14 rounded-lg overflow-hidden border border-gray-100"><Image src={i.image} alt={i.name} fill className="object-cover" /></div>
-                 <div><p className="text-sm font-bold line-clamp-1">{i.name}</p><p className="text-xs text-gray-400">Qty: {i.quantity} | {i.selectedSize || i.defaultWeight}</p></div>
+                <div><p className="text-sm font-bold line-clamp-1">{i.name}</p><p className="text-xs text-gray-400">Qty: {i.quantity} | {i.selectedWeight || i.selectedSize || i.defaultWeight}</p></div>
                </div>
              ))}
 

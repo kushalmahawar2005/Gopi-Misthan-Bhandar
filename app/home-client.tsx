@@ -90,15 +90,15 @@ export default function HomeClient({
         </ScrollAnimation>
       )}
 
-      <div className="my-3 md:my-0">
-        <PurityBanner />
-      </div>
-
       <ScrollAnimation>
         <div id="about">
           <AboutSection />
         </div>
       </ScrollAnimation>
+
+      <div className="my-5 md:my-7">
+        <PurityBanner />
+      </div>
 
       <ScrollAnimation>
         <div id="gifting">

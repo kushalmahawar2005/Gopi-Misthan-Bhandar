@@ -6,6 +6,8 @@ import Product from '@/models/Product';
 import Coupon from '@/models/Coupon';
 import { sendOrderConfirmationEmail } from '@/lib/email';
 import { sendOrderConfirmationSMS } from '@/lib/sms';
+import { createShipment, resolveCourierForShipment } from '@/lib/nimbuspost';
+import { calculateTotalWeightKg } from '@/lib/weight';
 
 export async function POST(req: Request) {
   try {
@@ -84,13 +86,7 @@ export async function POST(req: Request) {
 
       // Automated Shipment
       try {
-        let totalWeight = 0;
-        order.items.forEach((item: any) => {
-           const w = item.weight || '0.5kg';
-           const value = parseFloat(w);
-           totalWeight += (w.toLowerCase().includes('g') ? value / 1000 : value) * item.quantity;
-        });
-        if (totalWeight === 0) totalWeight = 0.5;
+        const totalWeight = calculateTotalWeightKg(order.items || []);
 
         const nimbusPaymentType = order.paymentMethod === 'cod' ? 'cod' : 'prepaid';
         const pickupWarehouseName =
@@ -98,7 +94,21 @@ export async function POST(req: Request) {
           process.env.SENDER_NAME ||
           'Gopi Misthan Bhandar';
 
-        const { createShipment } = await import('@/lib/nimbuspost');
+        const shippingPincode = String(order.shipping?.zipCode || '').trim();
+        const canResolveCourier = /^\d{6}$/.test(shippingPincode);
+        const resolvedCourier = canResolveCourier
+          ? await resolveCourierForShipment({
+              pincode: shippingPincode,
+              weight: totalWeight,
+              order_amount: Math.max(0, Number(order.total || 0)),
+              payment_method: nimbusPaymentType,
+              preferredCourierName: String(order.selectedCourier || ''),
+              preferredCourierId: String(order.selectedCourierId || ''),
+            })
+          : null;
+
+        const courierIdForShipment = String(order.selectedCourierId || resolvedCourier?.id || '').trim() || undefined;
+
         const shipmentResult = await createShipment({
           order_id: order.orderNumber,
           consignee: {
@@ -124,19 +134,37 @@ export async function POST(req: Request) {
             name: item.name,
             qty: item.quantity,
             price: item.price,
+            weight: item.weight,
           })),
           payment_method: nimbusPaymentType,
           total_amount: order.total,
           order_amount: String(order.total),
+          courier_id: courierIdForShipment,
           weight: totalWeight,
           length: 10, breadth: 10, height: 10,
         });
 
         if (shipmentResult.status && shipmentResult.data) {
-          order.awbNumber = shipmentResult.data.awb_number;
-          order.status = 'shipped';
-          order.shipmentStatus = 'shipped';
-          await order.save();
+          const awb = String(
+            shipmentResult?.data?.awb_number || shipmentResult?.data?.awb || shipmentResult?.data?.waybill || ''
+          ).trim();
+
+          if (!awb) {
+            console.error('Auto-shipment created without AWB in response:', shipmentResult);
+          } else {
+            order.awbNumber = awb;
+            order.courierName = shipmentResult.data.courier_name || resolvedCourier?.name || order.selectedCourier || order.courierName;
+            if (!order.selectedCourier && resolvedCourier?.name) {
+              order.selectedCourier = resolvedCourier.name;
+            }
+            if (!order.selectedCourierId && resolvedCourier?.id) {
+              order.selectedCourierId = resolvedCourier.id;
+            }
+            order.trackingUrl = `https://nimbuspost.com/track?awb=${awb}`;
+            order.status = 'shipped';
+            order.shipmentStatus = 'shipped';
+            await order.save();
+          }
         }
       } catch (e) {
         console.error('Auto shipment creation failed:', e);
