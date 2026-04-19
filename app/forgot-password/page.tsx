@@ -12,16 +12,34 @@ export default function ForgotPasswordPage() {
   const [email, setEmail] = useState('');
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState('');
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError('');
     setIsLoading(true);
 
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 1500));
+    try {
+      const response = await fetch('/api/auth/forgot-password', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email: email.trim() }),
+      });
 
-    setIsSubmitted(true);
-    setIsLoading(false);
+      const data = await response.json();
+      if (!response.ok || !data.success) {
+        setError(data.error || 'Unable to send reset email. Please try again.');
+        return;
+      }
+
+      setIsSubmitted(true);
+    } catch (apiError) {
+      setError('Unable to send reset email. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -33,7 +51,7 @@ export default function ForgotPasswordPage() {
       {/* Page Header */}
       <div className="bg-gradient-to-r from-primary-red to-primary-darkRed py-8 md:py-12 px-4">
         <div className="max-w-7xl mx-auto text-center">
-          <h1 className="text-3xl md:text-4xl font-bold font-general-sansal-sansal-sansal-sans text-white">
+          <h1 className="text-3xl md:text-4xl font-bold font-general-sans text-white">
             Forgot Password
           </h1>
           <p className="text-lg text-gray-100 mt-2">
@@ -49,6 +67,11 @@ export default function ForgotPasswordPage() {
               <p className="text-gray-600 mb-6 text-center">
                 Don't worry! Enter your email address and we'll send you a link to reset your password.
               </p>
+              {error && (
+                <div className="mb-6 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">
+                  {error}
+                </div>
+              )}
               <form onSubmit={handleSubmit} className="space-y-6">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -70,7 +93,7 @@ export default function ForgotPasswordPage() {
                 <button
                   type="submit"
                   disabled={isLoading}
-                  className="w-full bg-primary-red text-white py-3 px-6 rounded-lg font-bold font-general-sansal-sansal-sansal-sans text-lg hover:bg-primary-darkRed transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="w-full bg-primary-red text-white py-3 px-6 rounded-lg font-bold font-general-sans text-lg hover:bg-primary-darkRed transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {isLoading ? 'Sending...' : 'Send Reset Link'}
                 </button>
@@ -89,7 +112,7 @@ export default function ForgotPasswordPage() {
           ) : (
             <div className="text-center">
               <FiCheckCircle className="w-16 h-16 text-green-500 mx-auto mb-4" />
-              <h2 className="text-2xl font-bold font-general-sansal-sansal-sansal-sans text-gray-800 mb-4">
+              <h2 className="text-2xl font-bold font-general-sans text-gray-800 mb-4">
                 Check Your Email
               </h2>
               <p className="text-gray-600 mb-6">
@@ -101,7 +124,7 @@ export default function ForgotPasswordPage() {
               <div className="space-y-3">
                 <Link
                   href="/login"
-                  className="block w-full bg-primary-red text-white py-3 px-6 rounded-lg font-bold font-general-sansal-sansal-sansal-sans text-lg hover:bg-primary-darkRed transition-colors"
+                  className="block w-full bg-primary-red text-white py-3 px-6 rounded-lg font-bold font-general-sans text-lg hover:bg-primary-darkRed transition-colors"
                 >
                   Back to Login
                 </Link>
@@ -109,8 +132,9 @@ export default function ForgotPasswordPage() {
                   onClick={() => {
                     setIsSubmitted(false);
                     setEmail('');
+                    setError('');
                   }}
-                  className="block w-full bg-gray-200 text-gray-700 py-3 px-6 rounded-lg font-bold font-general-sansal-sansal-sansal-sans text-lg hover:bg-gray-300 transition-colors"
+                  className="block w-full bg-gray-200 text-gray-700 py-3 px-6 rounded-lg font-bold font-general-sans text-lg hover:bg-gray-300 transition-colors"
                 >
                   Resend Email
                 </button>

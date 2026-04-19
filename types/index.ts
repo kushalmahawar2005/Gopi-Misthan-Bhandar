@@ -6,6 +6,9 @@ export interface ProductSize {
 
 export interface Product {
   id: string;
+  slug?: string;
+  selectedSize?: string;
+  selectedWeight?: string;
   name: string;
   description: string;
   price: number;

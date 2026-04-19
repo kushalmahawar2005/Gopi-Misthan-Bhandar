@@ -16,6 +16,7 @@ export interface User {
     street: string;
     city: string;
     state: string;
+    pincode?: string;
   }[];
   address?: string;
   city?: string;
@@ -104,6 +105,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             address: primaryAddress?.street || '',
             city: primaryAddress?.city || '',
             state: primaryAddress?.state || '',
+            pincode: primaryAddress?.pincode || '',
           };
         }
       }
@@ -218,11 +220,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       } else if (
         userData.address !== undefined ||
         userData.city !== undefined ||
-        userData.state !== undefined
+        userData.state !== undefined ||
+        userData.pincode !== undefined
       ) {
         payload.address = userData.address || '';
         payload.city = userData.city || '';
         payload.state = userData.state || '';
+        payload.pincode = userData.pincode || '';
       }
 
       const response = await fetch('/api/users/profile', {
@@ -256,6 +260,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           address: primaryAddress?.street || '',
           city: primaryAddress?.city || '',
           state: primaryAddress?.state || '',
+          pincode: primaryAddress?.pincode || '',
         };
       });
 

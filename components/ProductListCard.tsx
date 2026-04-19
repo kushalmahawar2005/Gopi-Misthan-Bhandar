@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Product } from '@/types';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -18,18 +18,64 @@ const ProductListCard: React.FC<ProductListCardProps> = ({ product, showAddToCar
   const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
   const [isHovered, setIsHovered] = useState(false);
   const [isAdding, setIsAdding] = useState(false);
+  const productUrl = `/product/${product.slug || product.id}`;
   const isFavorite = isInWishlist(product.id);
+
+  const sizeOptions = useMemo(() => {
+    if (!Array.isArray(product.sizes)) return [];
+
+    return product.sizes
+      .map((size) => {
+        const weight = String(size?.weight || '').trim();
+        const price = Number(size?.price);
+
+        if (!weight || !Number.isFinite(price)) return null;
+
+        return {
+          weight,
+          price,
+        };
+      })
+      .filter((size): size is { weight: string; price: number } => Boolean(size));
+  }, [product.sizes]);
+
+  const defaultSizeOption = useMemo(() => {
+    if (sizeOptions.length === 0) return null;
+
+    const preferredWeight = String(product.defaultWeight || '').trim().toLowerCase();
+    return sizeOptions.find((size) => size.weight.toLowerCase() === preferredWeight) || sizeOptions[0];
+  }, [sizeOptions, product.defaultWeight]);
+
+  const [selectedWeight, setSelectedWeight] = useState(defaultSizeOption?.weight || '');
+
+  useEffect(() => {
+    setSelectedWeight(defaultSizeOption?.weight || '');
+  }, [defaultSizeOption?.weight, product.id]);
+
+  const activeSize = sizeOptions.find((size) => size.weight === selectedWeight) || defaultSizeOption;
+  const displayPrice = activeSize ? activeSize.price : product.price;
+  const hasMultipleSizes = sizeOptions.length > 1;
 
   const handleAddToCart = async (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
     setIsAdding(true);
-    addToCart(product, 1);
+
+    const variantWeight = activeSize?.weight || String(product.defaultWeight || '').trim();
+    const productForCart: Product = {
+      ...product,
+      price: displayPrice,
+      selectedSize: variantWeight || undefined,
+      selectedWeight: variantWeight || undefined,
+      defaultWeight: variantWeight || product.defaultWeight,
+    };
+
+    addToCart(productForCart, 1);
     setTimeout(() => setIsAdding(false), 500);
   };
 
   return (
-    <Link href={`/product/${product.id}`} className="group block">
+    <Link href={productUrl} className="group block">
       <div 
         className="flex flex-row gap-4 md:gap-6 p-4 md:p-6 border border-gray-200 rounded-lg hover:shadow-lg transition-all duration-300 bg-white"
         onMouseEnter={() => setIsHovered(true)}
@@ -53,6 +99,38 @@ const ProductListCard: React.FC<ProductListCardProps> = ({ product, showAddToCar
             <p className="text-black text-[10px] md:text-xs font-general-sansal-sansal-sansal-sans mb-1 font-normal">
               GOPI MISTHAN BHANDAR
             </p>
+
+            {showAddToCart && hasMultipleSizes && (
+              <div
+                className="mb-3 max-w-[320px]"
+                onClick={(e) => e.stopPropagation()}
+                onMouseDown={(e) => e.stopPropagation()}
+              >
+                <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
+                  {sizeOptions.map((size) => (
+                    <button
+                      key={`${product.id}-${size.weight}`}
+                      type="button"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        setSelectedWeight(size.weight);
+                      }}
+                      className={`min-w-[88px] rounded-md border px-2 pt-1.5 pb-2 text-left transition-colors ${
+                        selectedWeight === size.weight
+                          ? 'border-[#FE8E02] bg-orange-50'
+                          : 'border-[#d6cec6] bg-white hover:border-[#FE8E02]/60'
+                      }`}
+                    >
+                      <p className={`text-[12px] font-bold leading-tight ${selectedWeight === size.weight ? 'text-[#FE8E02]' : 'text-[#503223]'}`}>
+                        {size.weight}
+                      </p>
+                      <p className="text-[11px] leading-tight text-[#503223]">₹{size.price}</p>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
             
             {/* Product Name */}
             <h3 className="text-base md:text-lg lg:text-xl font-general-sansal-sansal-sansal-sans font-bold text-black mb-2 line-clamp-2">
@@ -66,12 +144,13 @@ const ProductListCard: React.FC<ProductListCardProps> = ({ product, showAddToCar
             
             {/* Price */}
             <p className="text-primary-red font-bold text-lg md:text-xl lg:text-2xl font-general-sansal-sansal-sansal-sans mb-4">
-              ₹{product.price}
+              ₹{displayPrice}
             </p>
           </div>
 
           {/* Action Buttons */}
-          <div className="flex items-center gap-3">
+          <div className="space-y-3">
+            <div className="flex items-center gap-3">
             {showAddToCart && (
               <button
                 onClick={handleAddToCart}
@@ -84,7 +163,7 @@ const ProductListCard: React.FC<ProductListCardProps> = ({ product, showAddToCar
             )}
             
             <Link
-              href={`/product/${product.id}`}
+              href={productUrl}
               onClick={(e) => e.stopPropagation()}
               className="p-2 md:p-3 border border-gray-300 rounded-lg hover:bg-gray-100 transition-colors"
               aria-label="View details"
@@ -111,6 +190,7 @@ const ProductListCard: React.FC<ProductListCardProps> = ({ product, showAddToCar
             >
               <FiHeart className={`w-4 h-4 md:w-5 md:h-5 ${isFavorite ? 'fill-red-600' : ''}`} />
             </button>
+            </div>
           </div>
         </div>
       </div>

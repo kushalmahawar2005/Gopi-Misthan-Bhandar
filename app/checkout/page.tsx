@@ -68,6 +68,16 @@ export default function CheckoutPage() {
   const [availableCouriers, setAvailableCouriers] = useState<any[]>([]);
   const [selectedCourier, setSelectedCourier] = useState<any>(null);
   const [checkingDelivery, setCheckingDelivery] = useState(false);
+  const [couponCodeInput, setCouponCodeInput] = useState('');
+  const [appliedCouponCode, setAppliedCouponCode] = useState('');
+  const [appliedCouponDiscount, setAppliedCouponDiscount] = useState(0);
+  const [couponError, setCouponError] = useState('');
+  const [couponSuccess, setCouponSuccess] = useState('');
+  const [isApplyingCoupon, setIsApplyingCoupon] = useState(false);
+
+  const subtotalAmount = getTotalPrice();
+  const shippingAmount = selectedCourier?.charge || 0;
+  const totalAmount = Math.max(0, subtotalAmount - appliedCouponDiscount + shippingAmount);
 
   useEffect(() => {
     if (cartItems.length === 0) router.push('/products');
@@ -88,6 +98,74 @@ export default function CheckoutPage() {
       return () => clearTimeout(timer);
     }
   }, [formData.pincode]);
+
+  const buildOrderItems = () => {
+    return cartItems.map(i => ({
+      productId: i.id,
+      name: i.name,
+      price: i.price,
+      quantity: i.quantity,
+      image: i.image,
+      weight: i.selectedSize || i.defaultWeight || ''
+    }));
+  };
+
+  const handleApplyCoupon = async () => {
+    const normalizedCode = couponCodeInput.trim().toUpperCase();
+
+    if (!normalizedCode) {
+      setCouponError('Please enter a coupon code');
+      setCouponSuccess('');
+      return;
+    }
+
+    setCouponError('');
+    setCouponSuccess('');
+    setIsApplyingCoupon(true);
+
+    try {
+      const response = await fetch('/api/coupons/validate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          cartItems: buildOrderItems(),
+          couponCode: normalizedCode,
+          deliveryPincode: formData.pincode,
+          courierCharge: shippingAmount,
+        }),
+      });
+
+      const result = await response.json();
+      if (!response.ok || !result.success) {
+        throw new Error(result.error || 'Failed to apply coupon');
+      }
+
+      const discount = Number(result.data?.breakdown?.discount || 0);
+      if (!discount || discount <= 0) {
+        throw new Error('Coupon is valid but no discount applied');
+      }
+
+      const appliedCode = String(result.data?.appliedCouponCode || normalizedCode);
+      setAppliedCouponCode(appliedCode);
+      setAppliedCouponDiscount(discount);
+      setCouponCodeInput(appliedCode);
+      setCouponSuccess(`Coupon applied successfully. You saved ₹${discount.toLocaleString()}`);
+    } catch (error: any) {
+      setAppliedCouponCode('');
+      setAppliedCouponDiscount(0);
+      setCouponSuccess('');
+      setCouponError(error?.message || 'Unable to apply coupon right now');
+    } finally {
+      setIsApplyingCoupon(false);
+    }
+  };
+
+  const handleRemoveCoupon = () => {
+    setAppliedCouponCode('');
+    setAppliedCouponDiscount(0);
+    setCouponError('');
+    setCouponSuccess('Coupon removed');
+  };
 
   const checkDelivery = async () => {
     if (!formData.pincode || formData.pincode.length !== 6) return;
@@ -172,8 +250,10 @@ export default function CheckoutPage() {
     let createdOrderNumber = '';
 
     try {
-      const orderItems = cartItems.map(i => ({ productId: i.id, name: i.name, price: i.price, quantity: i.quantity, image: i.image, weight: i.selectedSize || i.defaultWeight || '' }));
+      const orderItems = buildOrderItems();
       const shippingAddress = { name: `${formData.firstName} ${formData.lastName}`, email: formData.email, phone: formData.phone, street: formData.address, city: formData.city, state: formData.state, zipCode: formData.pincode };
+      const couponDiscount = appliedCouponDiscount || 0;
+      const finalTotal = Math.max(0, getTotalPrice() - couponDiscount + (selectedCourier?.charge || 0));
       
       // Step 1: Create order in database
       const orderResp = await fetch('/api/orders', { 
@@ -193,7 +273,9 @@ export default function CheckoutPage() {
           }, 
           shippingCost: selectedCourier?.charge || 0, 
           subtotal: getTotalPrice(), 
-          total: getTotalPrice() + (selectedCourier?.charge || 0), 
+          couponDiscount,
+          appliedCouponCode: appliedCouponCode || undefined,
+          total: finalTotal,
           paymentMethod, 
           paymentStatus: 'pending',
           selectedCourier: selectedCourier?.name,
@@ -213,6 +295,7 @@ export default function CheckoutPage() {
         headers: { 'Content-Type': 'application/json' }, 
         body: JSON.stringify({ 
           cartItems: orderItems, 
+          couponCode: appliedCouponCode || undefined,
           deliveryPincode: formData.pincode
         }) 
       });
@@ -436,15 +519,54 @@ export default function CheckoutPage() {
            <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 sticky top-24">
              <h2 className="text-xl font-bold mb-6">Order Summary</h2>
              {cartItems.map(i => (
-               <div key={i.id} className="flex gap-4 mb-4">
+               <div key={`${i.id}-${i.selectedWeight || i.selectedSize || i.defaultWeight || 'base'}`} className="flex gap-4 mb-4">
                  <div className="relative w-14 h-14 rounded-lg overflow-hidden border border-gray-100"><Image src={i.image} alt={i.name} fill className="object-cover" /></div>
                  <div><p className="text-sm font-bold line-clamp-1">{i.name}</p><p className="text-xs text-gray-400">Qty: {i.quantity} | {i.selectedSize || i.defaultWeight}</p></div>
                </div>
              ))}
              <div className="pt-6 border-t border-gray-100 space-y-3">
-               <div className="flex justify-between text-sm"><span>Subtotal</span><span className="font-bold">₹{getTotalPrice().toLocaleString()}</span></div>
-               <div className="flex justify-between text-sm"><span>Shipping</span><span className="font-bold">₹{(selectedCourier?.charge || 0).toLocaleString()}</span></div>
-               <div className="flex justify-between text-lg font-bold border-t pt-3"><span>Total</span><span className="text-primary-red">₹{(getTotalPrice() + (selectedCourier?.charge || 0)).toLocaleString()}</span></div>
+               <div className="p-3 rounded-xl border border-gray-100 bg-gray-50">
+                 <p className="text-xs font-bold text-gray-700 mb-2">Have a coupon?</p>
+                 <div className="flex items-center gap-2">
+                   <input
+                     type="text"
+                     value={couponCodeInput}
+                     onChange={(e) => setCouponCodeInput(e.target.value.toUpperCase())}
+                     placeholder="Enter code"
+                     disabled={isApplyingCoupon || isPlacingOrder}
+                     className="flex-1 p-2 text-sm rounded-lg border border-gray-200 bg-white disabled:bg-gray-100"
+                   />
+                   {appliedCouponCode ? (
+                     <button
+                       onClick={handleRemoveCoupon}
+                       type="button"
+                       className="px-3 py-2 text-xs font-bold rounded-lg border border-gray-200 text-gray-700 hover:bg-gray-100"
+                     >
+                       Remove
+                     </button>
+                   ) : (
+                     <button
+                       onClick={handleApplyCoupon}
+                       type="button"
+                       disabled={isApplyingCoupon || isPlacingOrder}
+                       className="px-3 py-2 text-xs font-bold rounded-lg bg-gray-900 text-white disabled:opacity-50"
+                     >
+                       {isApplyingCoupon ? 'Applying...' : 'Apply'}
+                     </button>
+                   )}
+                 </div>
+                 {couponError && <p className="text-xs text-red-600 mt-2">{couponError}</p>}
+                 {couponSuccess && <p className="text-xs text-green-700 mt-2">{couponSuccess}</p>}
+                 {appliedCouponCode && (
+                   <p className="text-[11px] text-gray-500 mt-1">Applied: {appliedCouponCode}</p>
+                 )}
+               </div>
+               <div className="flex justify-between text-sm"><span>Subtotal</span><span className="font-bold">₹{subtotalAmount.toLocaleString()}</span></div>
+               <div className="flex justify-between text-sm"><span>Shipping</span><span className="font-bold">₹{shippingAmount.toLocaleString()}</span></div>
+               {appliedCouponDiscount > 0 && (
+                 <div className="flex justify-between text-sm text-green-700"><span>Coupon Discount</span><span className="font-bold">-₹{appliedCouponDiscount.toLocaleString()}</span></div>
+               )}
+               <div className="flex justify-between text-lg font-bold border-t pt-3"><span>Total</span><span className="text-primary-red">₹{totalAmount.toLocaleString()}</span></div>
              </div>
              
              {/* Desktop Action Button */}
@@ -462,7 +584,7 @@ export default function CheckoutPage() {
               <button onClick={() => validateStep(currentStep) && setCurrentStep(currentStep+1)} className="w-full bg-gray-900 text-white py-4 rounded-xl font-bold flex items-center justify-center gap-2">Next <FiChevronRight /></button>
             ) : (
               <button onClick={handlePlaceOrder} disabled={isPlacingOrder || !selectedCourier} className="w-full bg-[#FE8E02] text-white py-4 rounded-xl font-bold disabled:opacity-50 disabled:cursor-not-allowed">
-                {isPlacingOrder ? 'Processing...' : `Pay ₹${(getTotalPrice()+(selectedCourier?.charge||0)).toLocaleString()}`}
+                {isPlacingOrder ? 'Processing...' : `Pay ₹${totalAmount.toLocaleString()}`}
               </button>
             )}
          </div>

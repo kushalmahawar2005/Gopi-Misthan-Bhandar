@@ -1,6 +1,8 @@
 import { Metadata } from 'next';
 import connectDB from '@/lib/mongodb';
 import Product from '@/models/Product';
+import Review from '@/models/Review';
+import { buildProductSlug, extractObjectIdFromSlug } from '@/lib/slug';
 
 const BASE_URL = process.env.NEXTAUTH_URL || 'https://gopimisthanbhandar.com';
 
@@ -8,12 +10,23 @@ interface Props {
   params: Promise<{ id: string }>;
 }
 
+const findProductByIdentifier = async (identifier: string) => {
+  const normalized = String(identifier || '').toLowerCase();
+  const objectId = extractObjectIdFromSlug(normalized);
+
+  if (objectId) {
+    return Product.findOne({ $or: [{ _id: objectId }, { slug: normalized }] }).lean();
+  }
+
+  return Product.findOne({ slug: normalized }).lean();
+};
+
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { id } = await params;
 
   try {
     await connectDB();
-    const product = await Product.findById(id).lean();
+    const product = await findProductByIdentifier(id);
 
     if (!product) {
       return {
@@ -23,11 +36,12 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     }
 
     const p = product as any;
+    const productSlug = p.slug || buildProductSlug(p.name, String(p._id));
     const title = `${p.name} - Buy Online`;
     const description = p.description
       ? `${p.description.slice(0, 155)}...`
       : `Buy ${p.name} online from Gopi Misthan Bhandar Neemuch. Premium traditional Indian sweets with pan-India delivery.`;
-    const productUrl = `${BASE_URL}/product/${id}`;
+    const productUrl = `${BASE_URL}/product/${productSlug}`;
     const productImage = p.image || '/logo.png';
 
     return {
@@ -91,14 +105,42 @@ export default async function ProductLayout({
 
   try {
     await connectDB();
-    const product = await Product.findById(id).lean() as any;
+    const product = (await findProductByIdentifier(id)) as any;
 
     if (product) {
+      const productSlug = product.slug || buildProductSlug(product.name, String(product._id));
+      const productUrl = `${BASE_URL}/product/${productSlug}`;
+
+      const reviewSummary = await Review.aggregate([
+        {
+          $match: {
+            productId: String(product._id),
+            isApproved: true,
+          },
+        },
+        {
+          $group: {
+            _id: '$productId',
+            averageRating: { $avg: '$rating' },
+            reviewCount: { $sum: 1 },
+          },
+        },
+      ]);
+
+      const aggregateRating = reviewSummary[0]
+        ? {
+            '@type': 'AggregateRating',
+            ratingValue: Number(reviewSummary[0].averageRating.toFixed(1)),
+            reviewCount: reviewSummary[0].reviewCount,
+          }
+        : null;
+
       // Product Schema (Google Rich Snippets)
       jsonLd = {
         '@context': 'https://schema.org',
         '@type': 'Product',
         name: product.name,
+        sku: String(product._id),
         image: product.image ? [product.image, ...(product.images || [])] : ['/logo.png'],
         description: product.description || `Buy ${product.name} from Gopi Misthan Bhandar`,
         brand: {
@@ -107,7 +149,7 @@ export default async function ProductLayout({
         },
         offers: {
           '@type': 'Offer',
-          url: `${BASE_URL}/product/${id}`,
+          url: productUrl,
           priceCurrency: 'INR',
           price: product.price,
           availability: product.stock === undefined || product.stock > 0
@@ -119,6 +161,7 @@ export default async function ProductLayout({
           },
         },
         category: product.category?.replace(/-/g, ' '),
+        ...(aggregateRating && { aggregateRating }),
         ...(product.shelfLife && { additionalProperty: { '@type': 'PropertyValue', name: 'Shelf Life', value: product.shelfLife } }),
       };
 
@@ -130,7 +173,7 @@ export default async function ProductLayout({
           { '@type': 'ListItem', position: 1, name: 'Home', item: BASE_URL },
           { '@type': 'ListItem', position: 2, name: 'Products', item: `${BASE_URL}/products` },
           { '@type': 'ListItem', position: 3, name: product.category?.replace(/-/g, ' ') || 'Category', item: `${BASE_URL}/products?category=${product.category}` },
-          { '@type': 'ListItem', position: 4, name: product.name, item: `${BASE_URL}/product/${id}` },
+          { '@type': 'ListItem', position: 4, name: product.name, item: productUrl },
         ],
       };
     }

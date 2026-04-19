@@ -2,13 +2,55 @@ import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
 import User from '@/models/User';
 import { signToken } from '@/lib/jwt';
+import { checkRateLimit } from '@/lib/rateLimit';
+
+const FIFTEEN_MINUTES = 15 * 60 * 1000;
+
+function tooManyRequestsResponse(retryAfter: number) {
+  return NextResponse.json(
+    {
+      success: false,
+      error: 'Too many registration attempts. Please try again later.',
+      retryAfter,
+    },
+    { status: 429 }
+  );
+}
 
 export async function POST(request: NextRequest) {
   try {
-    await connectDB();
-    
     const body = await request.json();
-    const { name, email, password, phone } = body;
+    const name = String(body?.name || '').trim();
+    const email = String(body?.email || '').trim().toLowerCase();
+    const password = String(body?.password || '');
+    const phone = body?.phone ? String(body.phone).trim() : undefined;
+
+    const ipLimit = checkRateLimit({
+      request,
+      keyPrefix: 'auth:register:ip',
+      maxRequests: 10,
+      windowMs: FIFTEEN_MINUTES,
+    });
+
+    if (!ipLimit.allowed) {
+      return tooManyRequestsResponse(ipLimit.retryAfter);
+    }
+
+    if (!name || !email || !password) {
+      return NextResponse.json(
+        { success: false, error: 'Name, email, and password are required' },
+        { status: 400 }
+      );
+    }
+
+    if (password.length < 6) {
+      return NextResponse.json(
+        { success: false, error: 'Password must be at least 6 characters long' },
+        { status: 400 }
+      );
+    }
+
+    await connectDB();
 
     // Check if user already exists
     const existingUser = await User.findOne({ email });

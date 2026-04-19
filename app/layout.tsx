@@ -14,10 +14,10 @@ const BASE_URL = process.env.NEXTAUTH_URL || 'https://gopimisthanbhandar.com';
 export const metadata: Metadata = {
   metadataBase: new URL(BASE_URL),
   title: {
-    default: 'Gopi Misthan Bhandar Neemuch - Traditional Indian Sweets Since 1968',
+    default: 'Gopi Misthan Bhandar - Indian Sweets Since 1968',
     template: '%s | Gopi Misthan Bhandar',
   },
-  description: 'Serving Tradition & Sweetness Since 1968. Order authentic traditional Indian sweets, premium dry fruit boxes, namkeen, and gift hampers online from Neemuch, Madhya Pradesh. Pan-India delivery.',
+  description: 'Order authentic Indian sweets, namkeen, and gift hampers online from Gopi Misthan Bhandar, Neemuch. Serving trusted quality since 1968 with pan-India delivery.',
   keywords: [
     'Indian sweets', 'mithai', 'sweets online', 'Neemuch sweets', 'traditional sweets',
     'Gopi Misthan Bhandar', 'namkeen', 'dry fruit boxes', 'gift hampers', 'wedding sweets',
@@ -35,10 +35,11 @@ export const metadata: Metadata = {
   openGraph: {
     type: 'website',
     locale: 'en_IN',
+    alternateLocale: ['hi_IN'],
     url: BASE_URL,
     siteName: 'Gopi Misthan Bhandar',
     title: 'Gopi Misthan Bhandar - Traditional Indian Sweets Since 1968',
-    description: 'Order authentic traditional Indian sweets, premium dry fruit boxes, namkeen & gift hampers online. Pan-India delivery from Neemuch.',
+    description: 'Order authentic Indian sweets, namkeen and gifting boxes online from Neemuch with pan-India delivery.',
     images: [
       {
         url: '/logo.png',
@@ -126,7 +127,7 @@ export default function RootLayout({
               foundingDate: '1968',
               address: {
                 '@type': 'PostalAddress',
-                streetAddress: 'Main Road',
+                streetAddress: 'Shop No. 123, Main Street',
                 addressLocality: 'Neemuch',
                 addressRegion: 'Madhya Pradesh',
                 postalCode: '458441',
@@ -137,14 +138,32 @@ export default function RootLayout({
                 latitude: 24.4619,
                 longitude: 74.8666,
               },
+              telephone: '+91-9425922445',
+              email: 'gopimisthan1968@gmail.com',
               servesCuisine: 'Indian Sweets',
               priceRange: '₹₹',
+              currenciesAccepted: 'INR',
+              paymentAccepted: ['UPI', 'Credit Card', 'Debit Card', 'Net Banking', 'Cash'],
               openingHoursSpecification: [{
                 '@type': 'OpeningHoursSpecification',
-                dayOfWeek: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
-                opens: '08:00',
+                dayOfWeek: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
+                opens: '10:00',
                 closes: '21:00',
               }],
+              contactPoint: {
+                '@type': 'ContactPoint',
+                contactType: 'customer support',
+                telephone: '+91-9425922445',
+                email: 'gopimisthan1968@gmail.com',
+                areaServed: 'IN',
+                availableLanguage: ['en', 'hi'],
+              },
+              sameAs: [
+                'https://instagram.com/gopimisthanbhandar',
+                'https://facebook.com/gopimisthanbhandar',
+                'https://youtube.com/@gopimisthan1968',
+              ],
+              hasMap: 'https://maps.google.com/maps?q=Gopi%20Misthan%20Bhandar%20Neemuch%20Madhya%20Pradesh&t=&z=15&ie=UTF8&iwloc=&output=embed',
               hasOfferCatalog: {
                 '@type': 'OfferCatalog',
                 name: 'Gopi Misthan Bhandar Products',

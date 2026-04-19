@@ -64,6 +64,9 @@ const MobileBottomNav = () => {
     if (href === '/') {
       return pathname === '/';
     }
+    if (href.startsWith('/products?category=')) {
+      return pathname === '/products';
+    }
     if (href === '#') {
       return false;
     }

@@ -24,6 +24,7 @@ function normalizeAddresses(addresses: any[]): any[] {
       street: String(address?.street || '').trim(),
       city: String(address?.city || '').trim(),
       state: String(address?.state || '').trim(),
+      pincode: String(address?.pincode || address?.zipCode || '').trim(),
     }))
     .filter((address) => address.street || address.city || address.state)
     .map((address) => {
@@ -122,12 +123,15 @@ export async function PUT(request: NextRequest) {
       const hasLegacyAddressFields =
         body.address !== undefined ||
         body.city !== undefined ||
-        body.state !== undefined;
+        body.state !== undefined ||
+        body.pincode !== undefined ||
+        body.zipCode !== undefined;
 
       if (hasLegacyAddressFields) {
         const street = String(body.address || '').trim();
         const city = String(body.city || '').trim();
         const state = String(body.state || '').trim();
+        const pincode = String(body.pincode || body.zipCode || '').trim();
 
         if (street || city || state) {
           if (!street || !city || !state) {
@@ -143,6 +147,7 @@ export async function PUT(request: NextRequest) {
               street,
               city,
               state,
+              pincode,
             },
           ];
         } else {

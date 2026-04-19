@@ -46,6 +46,12 @@ export async function POST(req: NextRequest) {
     });
     if (totalWeight === 0) totalWeight = 0.5;
 
+    const nimbusPaymentType: 'prepaid' | 'cod' = order.paymentMethod === 'cod' ? 'cod' : 'prepaid';
+    const pickupWarehouseName =
+      process.env.NIMBUSPOST_PICKUP_WAREHOUSE_NAME ||
+      process.env.SENDER_NAME ||
+      'Gopi Misthan Bhandar';
+
     const shipmentParams = {
       order_id: order.orderNumber,
       consignee: {
@@ -66,13 +72,15 @@ export async function POST(req: NextRequest) {
         phone: process.env.SENDER_PHONE || '',
         email: process.env.SENDER_EMAIL || '',
       },
+      pickup_warehouse_name: pickupWarehouseName,
       order_items: order.items.map((item: any) => ({
         name: item.name,
         qty: item.quantity,
         price: item.price,
       })),
-      payment_method: 'prepaid' as const,
+      payment_method: nimbusPaymentType,
       total_amount: order.total,
+      order_amount: String(order.total),
       weight: totalWeight,
       length: 10, // Default dimensions if not specified
       breadth: 10,

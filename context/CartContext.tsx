@@ -13,8 +13,8 @@ export interface CartItem extends Product {
 interface CartContextType {
   cartItems: CartItem[];
   addToCart: (product: Product, quantity?: number) => void;
-  removeFromCart: (productId: string) => void;
-  updateQuantity: (productId: string, quantity: number) => void;
+  removeFromCart: (productId: string, selectedSize?: string, selectedWeight?: string) => void;
+  updateQuantity: (productId: string, quantity: number, selectedSize?: string, selectedWeight?: string) => void;
   clearCart: () => void;
   getTotalPrice: () => number;
   getTotalItems: () => number;
@@ -24,6 +24,34 @@ interface CartContextType {
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
+
+const normalizeLineVariant = (item: { selectedSize?: string; selectedWeight?: string; defaultWeight?: string }) => {
+  return String(item.selectedWeight || item.selectedSize || item.defaultWeight || '').trim();
+};
+
+const isSameCartLine = (
+  item: { id: string; selectedSize?: string; selectedWeight?: string; defaultWeight?: string },
+  candidate: { id: string; selectedSize?: string; selectedWeight?: string; defaultWeight?: string }
+) => {
+  if (item.id !== candidate.id) return false;
+  return normalizeLineVariant(item) === normalizeLineVariant(candidate);
+};
+
+const isTargetCartLine = (
+  item: { id: string; selectedSize?: string; selectedWeight?: string; defaultWeight?: string },
+  productId: string,
+  selectedSize?: string,
+  selectedWeight?: string
+) => {
+  if (item.id !== productId) return false;
+
+  if (selectedSize === undefined && selectedWeight === undefined) {
+    return true;
+  }
+
+  const targetVariant = normalizeLineVariant({ selectedSize, selectedWeight });
+  return normalizeLineVariant(item) === targetVariant;
+};
 
 export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
@@ -102,11 +130,11 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const addToCart = (product: Product, quantity: number = 1) => {
     setCartItems((prevItems) => {
       // Find existing item keeping size/weight into account if they exist
-      const existingItem = prevItems.find((item) => item.id === product.id);
+      const existingItem = prevItems.find((item) => isSameCartLine(item, product));
       
       if (existingItem) {
         return prevItems.map((item) =>
-          item.id === product.id
+          isSameCartLine(item, product)
             ? { ...item, quantity: item.quantity + quantity }
             : item
         );
@@ -117,19 +145,23 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setIsCartOpen(true);
   };
 
-  const removeFromCart = (productId: string) => {
-    setCartItems((prevItems) => prevItems.filter((item) => item.id !== productId));
+  const removeFromCart = (productId: string, selectedSize?: string, selectedWeight?: string) => {
+    setCartItems((prevItems) =>
+      prevItems.filter((item) => !isTargetCartLine(item, productId, selectedSize, selectedWeight))
+    );
   };
 
-  const updateQuantity = (productId: string, quantity: number) => {
+  const updateQuantity = (productId: string, quantity: number, selectedSize?: string, selectedWeight?: string) => {
     if (quantity <= 0) {
-      removeFromCart(productId);
+      removeFromCart(productId, selectedSize, selectedWeight);
       return;
     }
     
     setCartItems((prevItems) =>
       prevItems.map((item) =>
-        item.id === productId ? { ...item, quantity } : item
+        isTargetCartLine(item, productId, selectedSize, selectedWeight)
+          ? { ...item, quantity }
+          : item
       )
     );
   };

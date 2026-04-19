@@ -13,9 +13,10 @@ interface FeaturedCollectionProps {
 const FeaturedProductCard: React.FC<{ product: Product }> = ({ product }) => {
   const [isHovered, setIsHovered] = useState(false);
   const hasSecondImage = product.images && product.images.length > 0;
+  const productUrl = `/product/${product.slug || product.id}`;
 
   return (
-    <Link href={`/product/${product.id}`} className="group block">
+    <Link href={productUrl} className="group block">
       <div
         className="relative flex flex-col cursor-pointer mb-0 h-full"
         onMouseEnter={() => setIsHovered(true)}

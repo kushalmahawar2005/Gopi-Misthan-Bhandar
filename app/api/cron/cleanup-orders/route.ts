@@ -1,54 +1,36 @@
 import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
-import Order from '@/models/Order';
-import Product from '@/models/Product';
+import { cleanupExpiredPendingOrders } from '@/lib/orderCleanup';
 
 export async function GET(request: NextRequest) {
   try {
-    // 1. Verify CRON_SECRET
-    const authHeader = request.headers.get('x-cron-secret');
-    if (authHeader !== process.env.CRON_SECRET) {
+    const cronSecret = process.env.CRON_SECRET;
+    const secretHeader = request.headers.get('x-cron-secret') || '';
+    const authorizationHeader = request.headers.get('authorization') || '';
+    const bearerSecret = authorizationHeader.startsWith('Bearer ')
+      ? authorizationHeader.slice('Bearer '.length)
+      : '';
+
+    if (!cronSecret || (secretHeader !== cronSecret && bearerSecret !== cronSecret)) {
       return NextResponse.json({ success: false, message: 'Unauthorized' }, { status: 401 });
     }
 
     await connectDB();
 
-    // 2. Find pending orders older than 30 minutes
-    const thirtyMinutesAgo = new Date(Date.now() - 30 * 60 * 1000);
-    
-    const expiredOrders = await Order.find({
-      status: 'pending',
-      createdAt: { $lt: thirtyMinutesAgo }
+    const result = await cleanupExpiredPendingOrders({
+      olderThanMinutes: 30,
+      limit: 200,
     });
 
-    if (expiredOrders.length === 0) {
+    if (result.expiredCount === 0) {
       return NextResponse.json({ success: true, message: 'No expired orders found', count: 0 });
     }
 
-    // 3. Process each expired order
-    const results = await Promise.allSettled(expiredOrders.map(async (order) => {
-      // a. Restore stock for each item
-      await Promise.allSettled(order.items.map(async (item: any) => {
-        if (item.productId) {
-          await Product.findByIdAndUpdate(item.productId, {
-            $inc: { stock: item.quantity }
-          });
-        }
-      }));
-
-      // b. Mark order as expired
-      order.status = 'expired';
-      await order.save();
-      
-      return order._id;
-    }));
-
-    const successfulCleanups = results.filter(r => r.status === 'fulfilled').length;
-
     return NextResponse.json({
       success: true,
-      message: `Cleaned up ${successfulCleanups} orders`,
-      count: successfulCleanups
+      message: `Cleaned up ${result.expiredCount} orders`,
+      count: result.expiredCount,
+      scanned: result.scannedCount,
     });
 
   } catch (error: any) {

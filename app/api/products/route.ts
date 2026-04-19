@@ -4,6 +4,16 @@ import Product from '@/models/Product';
 import Category from '@/models/Category';
 import { requireAdmin } from '@/lib/auth';
 
+const CATEGORY_ALIASES: Record<string, string> = {
+  'bakery-items': 'bakery',
+};
+
+function normalizeCategorySlug(value: string | null): string | null {
+  if (!value) return null;
+  const normalized = value.trim().toLowerCase();
+  return CATEGORY_ALIASES[normalized] || normalized;
+}
+
 
 // GET all products with pagination
 export async function GET(request: NextRequest) {
@@ -11,7 +21,7 @@ export async function GET(request: NextRequest) {
     await connectDB();
     
     const searchParams = request.nextUrl.searchParams;
-    const category = searchParams.get('category');
+    const category = normalizeCategorySlug(searchParams.get('category'));
     const subcategory = searchParams.get('subcategory');
 
     const featured = searchParams.get('featured');
@@ -53,7 +63,7 @@ export async function GET(request: NextRequest) {
 
     const [products, totalCount] = await Promise.all([
       Product.find(query)
-        .select('name description price image images category subcategory featured isPremium isClassic sizes defaultWeight shelfLife deliveryTime stock')
+        .select('name slug description price image images category subcategory featured isPremium isClassic sizes defaultWeight shelfLife deliveryTime stock')
         .sort({ createdAt: -1 })
         .skip(skip)
         .limit(limit)

@@ -5,6 +5,7 @@ import Order from '@/models/Order';
 import { calculateOrderAmount } from '@/lib/orderUtils';
 import { getRequestAuth } from '@/lib/auth';
 import { checkServiceability } from '@/lib/nimbuspost';
+import { cleanupExpiredPendingOrders } from '@/lib/orderCleanup';
 
 const FALLBACK_COURIER_CHARGE = 60;
 
@@ -66,6 +67,13 @@ export async function POST(request: NextRequest) {
     }
 
     await connectDB();
+
+    // Free-plan friendly fallback: cleanup stale pending orders during checkout flow.
+    await cleanupExpiredPendingOrders({
+      userId: auth.user.id,
+      olderThanMinutes: 30,
+      limit: 50,
+    });
 
     const cartSignature = buildItemsSignature(cartItems);
     if (!cartSignature) {

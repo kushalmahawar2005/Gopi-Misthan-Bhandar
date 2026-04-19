@@ -1,4 +1,5 @@
 import mongoose, { Schema, Document, Model } from 'mongoose';
+import { buildProductSlug, slugifyText } from '@/lib/slug';
 
 export interface IProductSize {
   weight: string;
@@ -7,6 +8,7 @@ export interface IProductSize {
 }
 
 export interface IProduct extends Document {
+  slug?: string;
   name: string;
   description: string;
   price: number;
@@ -36,6 +38,7 @@ const ProductSizeSchema = new Schema<IProductSize>({
 
 const ProductSchema = new Schema<IProduct>(
   {
+    slug: { type: String, trim: true, lowercase: true, index: true },
     name: { type: String, required: true },
     description: { type: String, required: true },
     price: { type: Number, required: true },
@@ -70,6 +73,16 @@ const ProductSchema = new Schema<IProduct>(
     timestamps: true,
   }
 );
+
+ProductSchema.pre('validate', function (next) {
+  if (this.slug && typeof this.slug === 'string') {
+    this.slug = slugifyText(this.slug);
+  } else if (this.name) {
+    this.slug = buildProductSlug(this.name, String(this._id));
+  }
+
+  next();
+});
 
 // Add indexes for better query performance
 ProductSchema.index({ category: 1, featured: 1 });

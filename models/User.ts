@@ -12,7 +12,10 @@ export interface IUser extends Document {
     street: string;
     city: string;
     state: string;
+    pincode?: string;
   }[];
+  resetPasswordToken?: string;
+  resetPasswordExpires?: Date;
   createdAt: Date;
   updatedAt: Date;
   comparePassword(candidatePassword: string): Promise<boolean>;
@@ -23,6 +26,7 @@ const AddressSchema = new Schema({
   street: { type: String, required: true },
   city: { type: String, required: true },
   state: { type: String, required: true },
+  pincode: { type: String, trim: true },
 });
 
 const UserSchema = new Schema<IUser>(
@@ -33,6 +37,8 @@ const UserSchema = new Schema<IUser>(
     phone: { type: String },
     role: { type: String, enum: ['user', 'admin'], default: 'user' },
     addresses: [AddressSchema],
+    resetPasswordToken: { type: String, select: false },
+    resetPasswordExpires: { type: Date, select: false },
   },
   {
     timestamps: true,

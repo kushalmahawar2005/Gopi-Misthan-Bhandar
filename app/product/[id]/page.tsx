@@ -32,7 +32,7 @@ import {
 } from 'react-icons/fi';
 import { Product } from '@/types';
 
-type LightweightProduct = Pick<Product, 'id' | 'name' | 'price' | 'image' | 'category' | 'images'>;
+type LightweightProduct = Pick<Product, 'id' | 'slug' | 'name' | 'price' | 'image' | 'category' | 'images'>;
 
 export default function ProductDetailPage() {
   const params = useParams();
@@ -165,6 +165,7 @@ export default function ProductDetailPage() {
 
       const newEntry: LightweightProduct = {
         id: product.id,
+        slug: product.slug,
         name: product.name,
         price: product.price,
         image: product.image,
@@ -244,10 +245,13 @@ export default function ProductDetailPage() {
 
   const createProductPayload = () => {
     if (!product) return null;
+    const selectedWeight = selectedSize?.weight;
     return {
       ...product,
       price: currentPrice,
-      selectedSize: selectedSize?.weight,
+      selectedSize: selectedWeight,
+      selectedWeight,
+      defaultWeight: selectedWeight || product.defaultWeight,
     };
   };
 
@@ -354,10 +358,11 @@ const accordionItems = [
 
 const renderProductTile = (item: Product | LightweightProduct) => {
   const cardImage = item.images && item.images.length > 0 ? item.images[0] : item.image;
+  const productUrl = `/product/${item.slug || item.id}`;
   return (
     <Link
       key={item.id}
-      href={`/product/${item.id}`}
+      href={productUrl}
       className="group h-full rounded-xl border border-gray-200 bg-white shadow-sm transition hover:-translate-y-1 hover:shadow-xl"
     >
       <div className="relative w-full aspect-square overflow-hidden rounded-t-xl bg-gray-50">
@@ -372,7 +377,7 @@ const renderProductTile = (item: Product | LightweightProduct) => {
       <div className="p-4 space-y-2">
         <h3 className="text-base font-semibold text-gray-900 line-clamp-2">{item.name}</h3>
         <p className="text-sm uppercase tracking-wide text-primary-brown">
-          {item.category.replace(/-/g, ' ')}
+                  {/* Removed label line from size selection */}
         </p>
         <p className="text-lg font-bold text-primary-red">₹{item.price.toLocaleString()}</p>
       </div>

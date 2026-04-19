@@ -1,9 +1,13 @@
 import { Product, Category, InstagramPost } from '@/types';
+import { buildProductSlug } from '@/lib/slug';
 
 // Transform MongoDB document to frontend format
 const transformProduct = (product: any): Product => {
+  const id = product._id ? String(product._id) : product.id;
+
   return {
-    id: product._id ? String(product._id) : product.id,
+    id,
+    slug: product.slug || buildProductSlug(product.name, id),
     name: product.name,
     description: product.description,
     price: product.price,

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Product } from '@/types';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -19,8 +19,44 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, showAddToCart = true
   const [isHovered, setIsHovered] = useState(false);
   const [isAdding, setIsAdding] = useState(false);
   const [quantity, setQuantity] = useState(1);
+  const productUrl = `/product/${product.slug || product.id}`;
   const isFavorite = isInWishlist(product.id);
   const maxQuantity = typeof product.stock === 'number' && product.stock > 0 ? product.stock : 99;
+
+  const sizeOptions = useMemo(() => {
+    if (!Array.isArray(product.sizes)) return [];
+
+    return product.sizes
+      .map((size) => {
+        const weight = String(size?.weight || '').trim();
+        const price = Number(size?.price);
+
+        if (!weight || !Number.isFinite(price)) return null;
+
+        return {
+          weight,
+          price,
+        };
+      })
+      .filter((size): size is { weight: string; price: number } => Boolean(size));
+  }, [product.sizes]);
+
+  const defaultSizeOption = useMemo(() => {
+    if (sizeOptions.length === 0) return null;
+
+    const preferredWeight = String(product.defaultWeight || '').trim().toLowerCase();
+    return sizeOptions.find((size) => size.weight.toLowerCase() === preferredWeight) || sizeOptions[0];
+  }, [sizeOptions, product.defaultWeight]);
+
+  const [selectedWeight, setSelectedWeight] = useState(defaultSizeOption?.weight || '');
+
+  useEffect(() => {
+    setSelectedWeight(defaultSizeOption?.weight || '');
+  }, [defaultSizeOption?.weight, product.id]);
+
+  const activeSize = sizeOptions.find((size) => size.weight === selectedWeight) || defaultSizeOption;
+  const displayPrice = activeSize ? activeSize.price : product.price;
+  const hasMultipleSizes = sizeOptions.length > 1;
 
   const increaseQuantity = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -38,7 +74,17 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, showAddToCart = true
     e.preventDefault();
     e.stopPropagation();
     setIsAdding(true);
-    addToCart(product, quantity);
+
+    const variantWeight = activeSize?.weight || String(product.defaultWeight || '').trim();
+    const productForCart: Product = {
+      ...product,
+      price: displayPrice,
+      selectedSize: variantWeight || undefined,
+      selectedWeight: variantWeight || undefined,
+      defaultWeight: variantWeight || product.defaultWeight,
+    };
+
+    addToCart(productForCart, quantity);
     setTimeout(() => setIsAdding(false), 800);
   };
 
@@ -51,7 +97,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, showAddToCart = true
       >
         {/* Image Container - Square with Rounded Corners */}
         <div className="relative w-full aspect-square mb-4 rounded-[20px] overflow-hidden bg-[#F9F6F3]">
-          <Link href={`/product/${product.id}`} className="block relative w-full h-full">
+          <Link href={productUrl} className="block relative w-full h-full">
             {/* Main Image */}
             <Image
               src={product.image && product.image.trim() !== '' ? product.image : `https://picsum.photos/seed/product${product.id}/500/500`}
@@ -96,21 +142,46 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, showAddToCart = true
         
         {/* Product Info Section - Left Aligned */}
         <div className="w-full flex-grow flex flex-col items-start text-left px-1">
-          <Link href={`/product/${product.id}`} className="block mb-2 group-hover:opacity-80 transition-opacity">
-            <h3 className="text-[#1A1A1A] text-[16px] md:text-[17px] font-medium font-flama leading-relaxed line-clamp-2">
-              {product.name}
-            </h3>
-          </Link>
-          
-          {/* Price Section - Bold Current, Struckthrough Original, Tag for Discount */}
-          <div className="flex items-center flex-wrap gap-2 mb-4">
-            <span className="text-[#503223] font-bold text-[16px] md:text-[17px] font-inter">
-              ₹{product.price}
-            </span>
+          <div className="mb-3 w-full grid grid-cols-[minmax(0,1fr)_auto] items-start gap-3">
+            <div className="min-w-0 flex-1">
+              <Link href={productUrl} className="block mb-1 group-hover:opacity-80 transition-opacity">
+                <h3 className="text-[#1A1A1A] text-[16px] md:text-[17px] font-medium font-flama leading-relaxed line-clamp-2">
+                  {product.name}
+                </h3>
+              </Link>
+              <span className="text-[#503223] font-bold text-[16px] md:text-[17px] font-inter">
+                ₹{displayPrice}
+              </span>
+            </div>
+
+            {showAddToCart && hasMultipleSizes && (
+              <div className="w-[140px] self-start">
+                <div className="flex gap-1.5 overflow-x-auto scrollbar-hide justify-end">
+                  {sizeOptions.map((size) => (
+                    <button
+                      key={`${product.id}-${size.weight}`}
+                      type="button"
+                      onClick={() => setSelectedWeight(size.weight)}
+                      className={`min-w-[64px] rounded border px-1.5 pt-1 pb-1.5 text-left transition-colors ${
+                        selectedWeight === size.weight
+                          ? 'border-[#FE8E02] bg-orange-50'
+                          : 'border-[#d6cec6] bg-white hover:border-[#FE8E02]/60'
+                      }`}
+                    >
+                      <p className={`text-[11px] font-bold leading-tight ${selectedWeight === size.weight ? 'text-[#FE8E02]' : 'text-[#503223]'}`}>
+                        {size.weight}
+                      </p>
+                      <p className="text-[10px] leading-[1.1] text-[#503223]">₹{size.price}</p>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
           
           {showAddToCart && (
-            <div className="mt-auto w-full flex flex-col gap-2 md:flex-row md:items-center md:gap-3">
+            <div className="mt-auto w-full flex flex-col gap-2 md:gap-3">
+              <div className="w-full flex flex-col gap-2 md:flex-row md:items-center md:gap-3">
               <div className="w-full md:w-auto flex items-center justify-between h-[42px] md:h-[50px] md:min-w-[120px] px-2.5 md:px-3 border border-[#d6cec6] bg-white">
                 <button
                   onClick={decreaseQuantity}
@@ -147,6 +218,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, showAddToCart = true
                   </span>
                 )}
               </button>
+              </div>
             </div>
           )}
         </div>

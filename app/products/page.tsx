@@ -39,12 +39,30 @@ function ProductsContent() {
   });
   const [loading, setLoading] = useState(true);
 
+  const normalizeCategorySlug = (value: string) => {
+    if (value === 'bakery-items') return 'bakery';
+    return value;
+  };
+
   // Sync state with URL params
   useEffect(() => {
     const search = searchParams.get('search') || '';
     setSearchQuery(search);
     
-    const category = searchParams.get('category') || 'all';
+    const rawCategory = searchParams.get('category') || 'all';
+    const category = normalizeCategorySlug(rawCategory);
+
+    if (rawCategory !== category) {
+      const params = new URLSearchParams(searchParams.toString());
+      if (category === 'all') {
+        params.delete('category');
+      } else {
+        params.set('category', category);
+      }
+      router.replace(`${pathname}?${params.toString()}`);
+      return;
+    }
+
     setSelectedCategory(category);
     
     const subcategory = searchParams.get('subcategory') || 'all';
@@ -55,7 +73,7 @@ function ProductsContent() {
     setSortBy(sort);
 
     loadProducts(page, category === 'all' ? undefined : category, subcategory === 'all' ? undefined : subcategory, search);
-  }, [searchParams]);
+  }, [searchParams, router, pathname]);
 
   useEffect(() => {
     const loadCategories = async () => {

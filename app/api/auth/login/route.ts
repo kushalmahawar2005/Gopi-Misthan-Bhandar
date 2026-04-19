@@ -2,13 +2,55 @@ import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
 import User from '@/models/User';
 import { signToken } from '@/lib/jwt';
+import { checkRateLimit } from '@/lib/rateLimit';
+
+const FIFTEEN_MINUTES = 15 * 60 * 1000;
+
+function tooManyRequestsResponse(retryAfter: number) {
+  return NextResponse.json(
+    {
+      success: false,
+      error: 'Too many login attempts. Please try again later.',
+      retryAfter,
+    },
+    { status: 429 }
+  );
+}
 
 export async function POST(request: NextRequest) {
   try {
-    await connectDB();
-    
     const body = await request.json();
-    const { email, password } = body;
+    const email = String(body?.email || '').trim().toLowerCase();
+    const password = String(body?.password || '');
+
+    const ipLimit = checkRateLimit({
+      request,
+      keyPrefix: 'auth:login:ip',
+      maxRequests: 25,
+      windowMs: FIFTEEN_MINUTES,
+    });
+
+    if (!ipLimit.allowed) {
+      return tooManyRequestsResponse(ipLimit.retryAfter);
+    }
+
+    const identityLimit = checkRateLimit({
+      request,
+      keyPrefix: 'auth:login:identity',
+      identifier: email || 'anonymous',
+      maxRequests: 8,
+      windowMs: FIFTEEN_MINUTES,
+    });
+
+    if (!identityLimit.allowed) {
+      return tooManyRequestsResponse(identityLimit.retryAfter);
+    }
+
+    if (!email || !password) {
+      return NextResponse.json({ success: false, error: 'Email and password are required' }, { status: 400 });
+    }
+
+    await connectDB();
 
     // Find user
     const user = await User.findOne({ email });

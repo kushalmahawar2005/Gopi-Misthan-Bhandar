@@ -31,9 +31,15 @@ export default function AdminDashboard() {
     avgOrderValue: 0,
     lowStockItems: 0,
     couponUses: 0,
+    activeHeroSlides: 0,
+    publishedBlogs: 0,
+    totalBlogs: 0,
+    activeInstaItems: 0,
+    totalInstaItems: 0,
   });
 
   const [recentOrders, setRecentOrders] = useState<any[]>([]);
+  const [lowStockProducts, setLowStockProducts] = useState<any[]>([]);
 
   useEffect(() => {
     fetchStats();
@@ -41,44 +47,89 @@ export default function AdminDashboard() {
 
   const fetchStats = async () => {
     try {
-      const [productsRes, categoriesRes, ordersRes, usersRes] = await Promise.all([
-        fetch('/api/products'),
+      const [
+        productsRes,
+        categoriesRes,
+        ordersRes,
+        usersRes,
+        heroSlidesRes,
+        blogsRes,
+        instaBooksRes,
+        couponsRes,
+      ] = await Promise.all([
+        fetch('/api/products?limit=500'),
         fetch('/api/categories'),
         fetch('/api/orders'),
         fetch('/api/users'),
+        fetch('/api/hero-slider?all=true'),
+        fetch('/api/blog/all'),
+        fetch('/api/instabook?all=true'),
+        fetch('/api/coupons'),
       ]);
 
       const productsData = await productsRes.json();
       const categoriesData = await categoriesRes.json();
       const ordersData = await ordersRes.json();
       const usersData = await usersRes.json();
+      const heroSlidesData = await heroSlidesRes.json();
+      const blogsData = await blogsRes.json();
+      const instaBooksData = await instaBooksRes.json();
+      const couponsData = await couponsRes.json();
 
-      if (ordersData.data) {
-        setRecentOrders(ordersData.data.slice(0, 8));
+      const products = productsData.data || [];
+      const categories = categoriesData.data || [];
+      const orders = ordersData.data || [];
+      const users = usersData.data || [];
+      const heroSlides = heroSlidesData.data || [];
+      const blogs = blogsData.data || [];
+      const instaBooks = instaBooksData.data || [];
+      const coupons = couponsData.data || [];
+
+      if (orders.length > 0) {
+        setRecentOrders(orders.slice(0, 8));
       }
 
-      const totalRevenue = ordersData.data?.reduce((sum: number, order: any) => sum + order.total, 0) || 0;
+      const totalRevenue = orders.reduce((sum: number, order: any) => sum + order.total, 0) || 0;
       const today = new Date().toISOString().split('T')[0];
-      const todayOrders = ordersData.data?.filter((order: any) =>
+      const todayOrders = orders.filter((order: any) =>
         order.createdAt?.startsWith(today)
       ).length || 0;
       const todayRevenue =
-        ordersData.data
+        orders
           ?.filter((order: any) => order.createdAt?.startsWith(today))
           .reduce((sum: number, order: any) => sum + order.total, 0) || 0;
-      const avgOrderValue = ordersData.data?.length > 0 ? totalRevenue / ordersData.data.length : 0;
+      const avgOrderValue = orders.length > 0 ? totalRevenue / orders.length : 0;
+
+      const lowStock = products
+        .filter((product: any) => typeof product.stock === 'number' && product.stock > 0 && product.stock <= 10)
+        .sort((a: any, b: any) => a.stock - b.stock);
+
+      setLowStockProducts(lowStock.slice(0, 8));
+
+      const activeHeroSlides = heroSlides.filter((slide: any) => slide.isActive !== false).length;
+      const publishedBlogs = blogs.filter((blog: any) => blog.isActive !== false).length;
+      const activeInstaItems = instaBooks.filter((item: any) => item.isActive !== false).length;
+
+      const couponUsesFromOrders = orders.filter((order: any) => Boolean(order.appliedCouponCode)).length;
+      const couponUsesFromCoupons = coupons.reduce((sum: number, coupon: any) => sum + (coupon.usedCount || 0), 0);
+      const couponUses = Math.max(couponUsesFromOrders, couponUsesFromCoupons);
 
       setStats({
-        products: productsData.data?.length || 0,
-        categories: categoriesData.data?.length || 0,
-        orders: ordersData.data?.length || 0,
-        users: usersData.data?.length || 0,
+        products: products.length || 0,
+        categories: categories.length || 0,
+        orders: orders.length || 0,
+        users: users.length || 0,
         revenue: totalRevenue,
         todayOrders,
         todayRevenue,
         avgOrderValue: Math.round(avgOrderValue),
-        lowStockItems: 0,
-        couponUses: 0,
+        lowStockItems: lowStock.length,
+        couponUses,
+        activeHeroSlides,
+        publishedBlogs,
+        totalBlogs: blogs.length,
+        activeInstaItems,
+        totalInstaItems: instaBooks.length,
       });
     } catch (error) {
       console.error('Error fetching stats:', error);
@@ -108,7 +159,7 @@ export default function AdminDashboard() {
     {
       title: 'Hero Slider',
       icon: FiImage,
-      stats: ['Active Slides: 4', 'Auto-play: Enabled'],
+      stats: [`Active Slides: ${stats.activeHeroSlides}`, 'Auto-play: Enabled'],
       action: { label: '+ Add New Slide', href: '/admin/hero-slider/new' },
       manage: { href: '/admin/hero-slider' },
     },
@@ -122,14 +173,14 @@ export default function AdminDashboard() {
     {
       title: 'Blog Posts',
       icon: FiFile,
-      stats: ['Published: 4', 'Draft: 0'],
+      stats: [`Published: ${stats.publishedBlogs}`, `Total: ${stats.totalBlogs}`],
       action: { label: '+ New Blog Post', href: '/admin/blog/new' },
       manage: { href: '/admin/blog' },
     },
     {
       title: 'InstaBook',
       icon: FiEye,
-      stats: ['Active Items: 5', 'Auto-play: Enabled'],
+      stats: [`Active Items: ${stats.activeInstaItems}`, `Total Items: ${stats.totalInstaItems}`],
       action: { label: '+ Add Item', href: '/admin/instabook/new' },
       manage: { href: '/admin/instabook' },
     },
@@ -238,7 +289,23 @@ export default function AdminDashboard() {
               Manage Stock
             </Link>
           </div>
-          <p className="text-gray-500 text-sm">No low stock items</p>
+          {lowStockProducts.length === 0 ? (
+            <p className="text-gray-500 text-sm">No low stock items</p>
+          ) : (
+            <div className="space-y-3">
+              {lowStockProducts.map((product) => (
+                <div key={product._id || product.id} className="flex items-center justify-between p-3 bg-orange-50 rounded-lg border border-orange-100">
+                  <div>
+                    <p className="text-sm font-medium text-primary-brown line-clamp-1">{product.name}</p>
+                    <p className="text-xs text-gray-500 capitalize">{product.category?.replace(/-/g, ' ')}</p>
+                  </div>
+                  <span className="text-xs px-2 py-1 rounded-full bg-orange-100 text-orange-700 font-semibold">
+                    Stock: {product.stock}
+                  </span>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       </div>
 

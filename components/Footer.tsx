@@ -22,9 +22,9 @@ const Footer = () => {
   };
 
   const socialLinks = [
-    { icon: FiFacebook, href: 'https://facebook.com', label: 'Facebook' },
-    { icon: FiInstagram, href: 'https://instagram.com', label: 'Instagram' },
-    { icon: FiYoutube, href: 'https://youtube.com', label: 'YouTube' },
+    { icon: FiFacebook, href: 'https://facebook.com/gopimisthanbhandar', label: 'Facebook' },
+    { icon: FiInstagram, href: 'https://instagram.com/gopimisthanbhandar', label: 'Instagram' },
+    { icon: FiYoutube, href: 'https://youtube.com/@gopimisthan1968', label: 'YouTube' },
   ];
 
   const paymentStripSrc = '/visa.svg';
@@ -32,8 +32,8 @@ const Footer = () => {
   const rangeLinks = [
     { label: 'Sweets', href: '/products?category=sweets' },
     { label: 'Dry Fruits', href: '/products?category=dry-fruit' },
-    { label: 'Gifting', href: '/#gifting' },
-    { label: 'Indian Bakery', href: '/products?category=bakery-items' },
+    { label: 'Gifting', href: '/products?category=gifting-' },
+    { label: 'Indian Bakery', href: '/products?category=bakery' },
     { label: 'Namkeen', href: '/products?category=namkeen' },
     { label: 'Savoury Snacks', href: '/products?category=savoury-snacks' },
   ];

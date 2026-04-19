@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { usePathname, useRouter } from 'next/navigation';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import {
   FiSearch,
   FiMenu,
@@ -29,6 +29,7 @@ const Navigation = () => {
   const [categories, setCategories] = useState<Category[]>([]);
   const [hoveredCategory, setHoveredCategory] = useState<string | null>(null);
   const pathname = usePathname();
+  const searchParams = useSearchParams();
   const router = useRouter();
   const { openCart, getTotalItems } = useCart();
   const { user, isAuthenticated, logout } = useAuth();
@@ -119,16 +120,18 @@ const Navigation = () => {
     { label: 'Home', href: '/' },
     { label: 'Sweets', href: '/products?category=sweets', slug: 'sweets' },
     { label: 'Dry Fruits', href: '/products?category=dry-fruit', slug: 'dry-fruit' },
-    { label: 'Bakery Items', href: '/products?category=bakery-items', slug: 'bakery-items' },
+    { label: 'Bakery Items', href: '/products?category=bakery', slug: 'bakery' },
     { label: 'Namkeen', href: '/products?category=namkeen', slug: 'namkeen' },
     { label: 'Savoury Snacks', href: '/products?category=savoury-snacks', slug: 'savoury-snacks' },
-    { label: 'Gifting', href: '/#gifting', slug: 'gifting-' },
+    { label: 'Gifting', href: '/products?category=gifting-', slug: 'gifting-' },
   ];
 
   const isActive = (href: string) => {
     if (href === '/') return pathname === '/';
-    if (href.startsWith('/category/')) {
-      return pathname === href || pathname.startsWith(href);
+    if (href.startsWith('/products?category=')) {
+      const targetCategory = href.split('category=')[1]?.split('&')[0] || '';
+      const activeCategory = searchParams.get('category') || '';
+      return pathname === '/products' && targetCategory === activeCategory;
     }
     return pathname.includes(href.replace('#', ''));
   };
@@ -250,7 +253,7 @@ const Navigation = () => {
                 }`}>
                 <Image
                   src="/logo.png"
-                  alt="Logo"
+                  alt="Gopi Misthan Bhandar Logo"
                   fill
                   className="object-contain"
                   sizes="(max-width: 768px) 106px, (max-width: 1024px) 138px, 170px"
@@ -319,7 +322,7 @@ const Navigation = () => {
                           {searchResults.slice(0, 5).map((product) => (
                             <Link
                               key={product.id}
-                              href={`/product/${product.id}`}
+                              href={`/product/${product.slug || product.id}`}
                               onClick={() => { setShowDropdown(false); setSearchQuery(''); }}
                               className="flex items-center gap-3 p-2 hover:bg-gray-50"
                             >
@@ -540,7 +543,7 @@ const Navigation = () => {
                         {searchResults.slice(0, 6).map((product) => (
                           <Link
                             key={product.id}
-                            href={`/product/${product.id}`}
+                            href={`/product/${product.slug || product.id}`}
                             onClick={() => {
                               setShowDropdown(false);
                               setSearchQuery('');
@@ -693,7 +696,7 @@ const Navigation = () => {
                     {searchResults.slice(0, 6).map((product) => (
                       <Link
                         key={product.id}
-                        href={`/product/${product.id}`}
+                        href={`/product/${product.slug || product.id}`}
                         onClick={() => {
                           setIsSearchOpen(false);
                           setSearchQuery('');

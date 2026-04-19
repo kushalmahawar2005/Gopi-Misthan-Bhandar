@@ -12,6 +12,8 @@ export default function robots(): MetadataRoute.Robots {
           '/admin/',        // Admin dashboard (private)
           '/api/',          // Backend API routes
           '/checkout/',     // Checkout flow (private to user)
+          '/checkout/success',
+          '/checkout/failed',
           '/orders/',       // User orders (private)
           '/profile/',      // User profile (private)
           '/login',         // Auth pages (no SEO value)
@@ -22,7 +24,7 @@ export default function robots(): MetadataRoute.Robots {
       {
         userAgent: 'Googlebot',
         allow: '/',
-        disallow: ['/admin/', '/api/', '/checkout/', '/orders/', '/profile/'],
+        disallow: ['/admin/', '/api/', '/checkout/', '/checkout/success', '/checkout/failed', '/orders/', '/profile/'],
       },
     ],
     sitemap: `${BASE_URL}/sitemap.xml`,

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
 import Blog from '@/models/Blog';
 import { requireAdmin } from '@/lib/auth';
+import { extractObjectIdFromSlug } from '@/lib/slug';
 
 
 export async function GET(
@@ -10,7 +11,14 @@ export async function GET(
 ) {
   try {
     await connectDB();
-    const blog = await Blog.findById(params.id)
+
+    const normalized = String(params.id || '').toLowerCase();
+    const objectId = extractObjectIdFromSlug(normalized);
+    const query = objectId
+      ? { $or: [{ _id: objectId }, { slug: normalized }] }
+      : { slug: normalized };
+
+    const blog = await Blog.findOne(query)
       .select('title description imageUrl content slug publishedDate order isActive')
       .lean();
     if (!blog) {

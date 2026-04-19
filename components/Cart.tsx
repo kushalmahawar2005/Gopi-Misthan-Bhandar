@@ -121,7 +121,7 @@ const Cart: React.FC = () => {
               <div className="space-y-4">
                 {cartItems.map((item) => (
                   <div
-                    key={item.id}
+                    key={`${item.id}-${item.selectedWeight || item.selectedSize || item.defaultWeight || 'base'}`}
                     className="flex gap-4 p-4 border border-gray-200 rounded-lg hover:shadow-md transition-shadow bg-white"
                   >
                     {/* Product Image */}
@@ -152,7 +152,7 @@ const Cart: React.FC = () => {
                       {/* Quantity Controls */}
                       <div className="flex items-center gap-3">
                         <button
-                          onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                          onClick={() => updateQuantity(item.id, item.quantity - 1, item.selectedSize, item.selectedWeight)}
                           className="p-1 border border-gray-300 rounded hover:bg-gray-100 transition-colors"
                           aria-label="Decrease quantity"
                         >
@@ -162,7 +162,7 @@ const Cart: React.FC = () => {
                           {item.quantity}
                         </span>
                         <button
-                          onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                          onClick={() => updateQuantity(item.id, item.quantity + 1, item.selectedSize, item.selectedWeight)}
                           className="p-1 border border-gray-300 rounded hover:bg-gray-100 transition-colors"
                           aria-label="Increase quantity"
                         >
@@ -173,7 +173,7 @@ const Cart: React.FC = () => {
 
                     {/* Remove Button */}
                     <button
-                      onClick={() => removeFromCart(item.id)}
+                      onClick={() => removeFromCart(item.id, item.selectedSize, item.selectedWeight)}
                       className="p-2 text-gray-400 hover:text-red-500 transition-colors self-start"
                       aria-label="Remove item"
                     >

@@ -129,6 +129,11 @@ export interface ShipmentParams {
   }>;
   payment_method: 'prepaid' | 'cod';
   total_amount: number;
+  // Optional aliases for Nimbus payload variants
+  payment_type?: 'prepaid' | 'cod';
+  order_total?: number;
+  order_amount?: number | string;
+  pickup_warehouse_name?: string;
   weight: number; // kg
   length: number; // cm
   breadth: number; // cm
@@ -137,18 +142,38 @@ export interface ShipmentParams {
 
 export async function createShipment(params: ShipmentParams) {
   try {
+    const paymentType = params.payment_type || params.payment_method;
+    const orderAmount = Number(params.order_amount ?? params.order_total ?? params.total_amount ?? 0);
+    const pickupWarehouseName =
+      params.pickup_warehouse_name ||
+      process.env.NIMBUSPOST_PICKUP_WAREHOUSE_NAME ||
+      params.pickup.name;
+
+    if (!Number.isFinite(orderAmount) || orderAmount <= 0) {
+      return { status: false, message: 'Order amount is missing or invalid for shipment.' };
+    }
+
+    if (!pickupWarehouseName || !pickupWarehouseName.trim()) {
+      return { status: false, message: 'Pickup warehouse name is missing. Set NIMBUSPOST_PICKUP_WAREHOUSE_NAME.' };
+    }
+
     // NimbusPost expects specific format
     const payload = {
       order_number: params.order_id,
       shipping_charges: 0,
       discount: 0,
       cod_charges: 0,
-      payment_method: params.payment_method,
-      total_amount: params.total_amount,
+      payment_method: paymentType,
+      payment_type: paymentType,
+      total_amount: orderAmount,
+      order_total: orderAmount,
+      order_amount: String(orderAmount),
       weight: params.weight,
       length: params.length,
       breadth: params.breadth,
       height: params.height,
+      pickup_warehouse_name: pickupWarehouseName,
+      pickup_location: pickupWarehouseName,
       consignee: {
         name: params.consignee.name,
         address: params.consignee.address,
@@ -159,6 +184,7 @@ export async function createShipment(params: ShipmentParams) {
         email: params.consignee.email,
       },
       pickup: {
+        warehouse_name: pickupWarehouseName,
         name: params.pickup.name,
         address: params.pickup.address,
         city: params.pickup.city,
@@ -172,8 +198,14 @@ export async function createShipment(params: ShipmentParams) {
     const response = await nimbusClient.post('/shipments', payload);
     return response.data;
   } catch (error: any) {
-    console.error('NimbusPost Create Shipment Error:', error.response?.data || error.message);
-    throw error;
+    const nimbusData = error.response?.data;
+    const message =
+      nimbusData?.message ||
+      (Array.isArray(nimbusData?.errors) ? nimbusData.errors.join(' ') : nimbusData?.errors) ||
+      error.message;
+
+    console.error('NimbusPost Create Shipment Error:', nimbusData || error.message);
+    return { status: false, message };
   }
 }
 
