@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
 import { cleanupExpiredPendingOrders } from '@/lib/orderCleanup';
 
+export const dynamic = 'force-dynamic';
+
 export async function GET(request: NextRequest) {
   try {
     const cronSecret = process.env.CRON_SECRET;

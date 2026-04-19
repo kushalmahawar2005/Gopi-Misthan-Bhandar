@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { Suspense, useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
@@ -21,7 +21,7 @@ import { useWishlist } from '@/context/WishlistContext';
 import { fetchProducts, fetchCategories } from '@/lib/api';
 import { Category } from '@/types';
 
-const Navigation = () => {
+const NavigationContent = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false); // mobile modal
   const [searchQuery, setSearchQuery] = useState('');
@@ -757,4 +757,20 @@ const Navigation = () => {
   );
 };
 
-export default Navigation;
+function NavigationFallback() {
+  return (
+    <nav id="main-nav" className="bg-white w-full border-b border-[#d6cec6] z-50 sticky top-0 left-0 right-0">
+      <div className="max-w-[1700px] mx-auto">
+        <div className="h-[90px] md:h-[115px]" />
+      </div>
+    </nav>
+  );
+}
+
+export default function Navigation() {
+  return (
+    <Suspense fallback={<NavigationFallback />}>
+      <NavigationContent />
+    </Suspense>
+  );
+}

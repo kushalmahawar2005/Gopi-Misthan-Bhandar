@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { trackShipment } from '@/lib/nimbuspost';
 
+export const dynamic = 'force-dynamic';
+
 export async function GET(req: NextRequest) {
   try {
     const awb = req.nextUrl.searchParams.get('awb');
