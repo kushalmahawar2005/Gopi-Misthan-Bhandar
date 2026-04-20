@@ -50,6 +50,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, showAddToCart = true
 
   const [selectedWeight, setSelectedWeight] = useState(defaultSizeOption?.weight || '');
   const [isMobileSizeMenuOpen, setIsMobileSizeMenuOpen] = useState(false);
+  const [mobileSizeMenuDirection, setMobileSizeMenuDirection] = useState<'up' | 'down'>('up');
   const mobileSizeMenuRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
@@ -85,6 +86,20 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, showAddToCart = true
   const displayPrice = activeSize ? activeSize.price : product.price;
   const hasMultipleSizes = sizeOptions.length > 1;
   const displayWeight = activeSize?.weight || String(product.defaultWeight || '').trim() || 'Default';
+
+  const toCompactWeightLabel = (weight: string) => {
+    const normalized = String(weight || '').trim().toLowerCase().replace(/\s+/g, '');
+    if (!normalized) return 'Default';
+
+    if (normalized.endsWith('grams')) return `${normalized.replace(/grams$/, '')}g`;
+    if (normalized.endsWith('gram')) return `${normalized.replace(/gram$/, '')}g`;
+    if (normalized.endsWith('gms')) return `${normalized.replace(/gms$/, '')}g`;
+    if (normalized.endsWith('gm')) return `${normalized.replace(/gm$/, '')}g`;
+
+    return normalized;
+  };
+
+  const compactDisplayWeight = toCompactWeightLabel(displayWeight);
 
   const increaseQuantity = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -219,14 +234,32 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, showAddToCart = true
                         onClick={(e) => {
                           e.preventDefault();
                           e.stopPropagation();
-                          setIsMobileSizeMenuOpen((prev) => !prev);
+
+                          const shouldOpen = !isMobileSizeMenuOpen;
+                          if (shouldOpen && mobileSizeMenuRef.current) {
+                            const rect = mobileSizeMenuRef.current.getBoundingClientRect();
+                            const viewportHeight = window.innerHeight;
+                            const spaceAbove = rect.top;
+                            const spaceBelow = viewportHeight - rect.bottom;
+                            const estimatedMenuHeight = Math.min(sizeOptions.length * 40 + 8, 176);
+
+                            const openUp =
+                              spaceAbove >= estimatedMenuHeight ||
+                              (spaceBelow < estimatedMenuHeight && spaceAbove > spaceBelow);
+
+                            setMobileSizeMenuDirection(openUp ? 'up' : 'down');
+                          }
+
+                          setIsMobileSizeMenuOpen(shouldOpen);
                         }}
-                        className="flex h-full w-full items-center justify-between rounded-[12px] border border-[#d6cec6] bg-white px-3 text-[14px] font-semibold text-[#2D2D2D]"
+                        className="flex h-full w-full items-center justify-between gap-1 rounded-[12px] border border-[#d6cec6] bg-white px-2.5 text-[12px] font-semibold text-[#2D2D2D]"
                         aria-haspopup="listbox"
                         aria-expanded={isMobileSizeMenuOpen}
                         aria-label="Select weight"
                       >
-                        <span className="truncate pr-3">{displayWeight}</span>
+                        <span className="block min-w-0 flex-1 overflow-hidden text-ellipsis whitespace-nowrap">
+                          {compactDisplayWeight}
+                        </span>
                         <FiChevronDown
                           className={`h-4 w-4 shrink-0 text-[#503223] transition-transform ${
                             isMobileSizeMenuOpen ? 'rotate-180' : ''
@@ -236,7 +269,9 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, showAddToCart = true
 
                       {isMobileSizeMenuOpen && (
                         <div
-                          className="absolute left-0 right-0 top-[calc(100%+6px)] z-30 max-h-44 overflow-y-auto rounded-[12px] border border-[#d6cec6] bg-white py-1 shadow-[0_10px_30px_rgba(0,0,0,0.16)]"
+                          className={`absolute left-0 right-0 z-30 max-h-44 overflow-y-auto rounded-[12px] border border-[#d6cec6] bg-white py-1 shadow-[0_10px_30px_rgba(0,0,0,0.16)] ${
+                            mobileSizeMenuDirection === 'up' ? 'bottom-[calc(100%+6px)]' : 'top-[calc(100%+6px)]'
+                          }`}
                           role="listbox"
                           aria-label="Weight options"
                         >
@@ -252,7 +287,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, showAddToCart = true
                                   setSelectedWeight(size.weight);
                                   setIsMobileSizeMenuOpen(false);
                                 }}
-                                className={`w-full px-3 py-2 text-left text-[13px] transition-colors ${
+                                className={`w-full px-3 py-2 text-left text-[12px] transition-colors ${
                                   isSelected
                                     ? 'bg-orange-50 font-semibold text-[#FE8E02]'
                                     : 'text-[#2D2D2D] hover:bg-[#f8f3ed]'
@@ -260,7 +295,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, showAddToCart = true
                                 role="option"
                                 aria-selected={isSelected}
                               >
-                                {size.weight}
+                                {toCompactWeightLabel(size.weight)}
                               </button>
                             );
                           })}
@@ -274,22 +309,22 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, showAddToCart = true
                   )}
                 </div>
 
-                <div className="flex h-[42px] items-center justify-between rounded-[12px] border border-[#d6cec6] bg-white px-2.5">
+                <div className="flex h-[44px] items-center justify-between rounded-[12px] border border-[#d6cec6] bg-white px-2">
                   <button
                     onClick={decreaseQuantity}
                     disabled={quantity <= 1}
-                    className="h-7 w-7 flex items-center justify-center text-[20px] leading-none text-[#503223] disabled:opacity-40"
+                    className="h-8 w-8 flex items-center justify-center text-[22px] leading-none text-[#503223] disabled:opacity-40"
                     aria-label="Decrease quantity"
                   >
                     -
                   </button>
-                  <span className="min-w-[16px] text-center text-[16px] leading-none text-[#2D2D2D] font-inter font-semibold">
+                  <span className="min-w-[22px] text-center text-[18px] leading-none text-[#2D2D2D] font-inter font-semibold">
                     {quantity}
                   </span>
                   <button
                     onClick={increaseQuantity}
                     disabled={quantity >= maxQuantity}
-                    className="h-7 w-7 flex items-center justify-center text-[20px] leading-none text-[#503223] disabled:opacity-40"
+                    className="h-8 w-8 flex items-center justify-center text-[22px] leading-none text-[#503223] disabled:opacity-40"
                     aria-label="Increase quantity"
                   >
                     +
