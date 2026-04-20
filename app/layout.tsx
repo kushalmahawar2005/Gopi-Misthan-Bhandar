@@ -127,7 +127,7 @@ export default function RootLayout({
               foundingDate: '1968',
               address: {
                 '@type': 'PostalAddress',
-                streetAddress: 'Shop No. 123, Main Street',
+                streetAddress: 'SHOP-1 - 304,TILAK MARG NEEMUCH (M.P)',
                 addressLocality: 'Neemuch',
                 addressRegion: 'Madhya Pradesh',
                 postalCode: '458441',

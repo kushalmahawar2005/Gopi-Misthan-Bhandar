@@ -98,20 +98,20 @@ const FeaturedCollection: React.FC<FeaturedCollectionProps> = ({ products }) => 
   if (products.length === 0) return null;
 
   return (
-    <section className="py-8 md:py-10 w-full">
-      <div className="max-w-[1600px] mx-auto px-4 md:px-[50px]">
+    <section className="py-7 sm:py-8 md:py-10 w-full">
+      <div className="max-w-[1600px] mx-auto px-4 sm:px-5 md:px-8 lg:px-[50px]">
         {/* Header: Centered Titles */}
-        <div className="text-center mb-8 md:mb-10">
-          <p className="text-[12px] md:text-[14px] font-flama tracking-[0.3em] uppercase text-[#FE8E02] mb-3">
+        <div className="text-center mb-7 sm:mb-8 md:mb-10">
+          <p className="text-[11px] sm:text-[12px] md:text-[14px] font-flama tracking-[0.3em] uppercase text-[#FE8E02] mb-3">
             Featured Collection
           </p>
-          <h2 className="text-3xl md:text-5xl font-flama-condensed tracking-[0.1em] uppercase text-[#503223]">
+          <h2 className="text-[30px] leading-tight sm:text-4xl md:text-5xl font-flama-condensed tracking-[0.1em] uppercase text-[#503223]">
             Our Best Sellers
           </h2>
         </div>
 
         {/* Product Grid - 4 Columns on Desktop */}
-        <div ref={gridRef} className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-[50px]">
+        <div ref={gridRef} className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-5 md:gap-8 lg:gap-[50px]">
           {products.slice(0, 4).map((product, index) => (
             <div
               key={product.id}
@@ -128,7 +128,7 @@ const FeaturedCollection: React.FC<FeaturedCollectionProps> = ({ products }) => 
         <div className="text-center mt-8 md:mt-10">
           <Link
             href="/products"
-            className="group relative inline-flex items-center justify-center py-[14px] px-[40px] font-flama tracking-[0.15em] uppercase text-[13px] border-2 border-[#FE8E02] transition-colors duration-500 overflow-hidden"
+            className="group relative inline-flex items-center justify-center py-[12px] px-[28px] sm:py-[14px] sm:px-[40px] font-flama tracking-[0.15em] uppercase text-[12px] sm:text-[13px] border-2 border-[#FE8E02] transition-colors duration-500 overflow-hidden"
           >
             {/* Sliding Background Layer */}
             <span

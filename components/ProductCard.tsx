@@ -1,12 +1,12 @@
 'use client';
 
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Product } from '@/types';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useCart } from '@/context/CartContext';
 import { useWishlist } from '@/context/WishlistContext';
-import { FiHeart } from 'react-icons/fi';
+import { FiChevronDown, FiHeart } from 'react-icons/fi';
 
 interface ProductCardProps {
   product: Product;
@@ -49,14 +49,42 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, showAddToCart = true
   }, [sizeOptions, product.defaultWeight]);
 
   const [selectedWeight, setSelectedWeight] = useState(defaultSizeOption?.weight || '');
+  const [isMobileSizeMenuOpen, setIsMobileSizeMenuOpen] = useState(false);
+  const mobileSizeMenuRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     setSelectedWeight(defaultSizeOption?.weight || '');
+    setIsMobileSizeMenuOpen(false);
   }, [defaultSizeOption?.weight, product.id]);
+
+  useEffect(() => {
+    const handleOutsideClick = (event: MouseEvent | TouchEvent) => {
+      if (!mobileSizeMenuRef.current) return;
+      if (mobileSizeMenuRef.current.contains(event.target as Node)) return;
+      setIsMobileSizeMenuOpen(false);
+    };
+
+    const handleEscape = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        setIsMobileSizeMenuOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleOutsideClick);
+    document.addEventListener('touchstart', handleOutsideClick);
+    document.addEventListener('keydown', handleEscape);
+
+    return () => {
+      document.removeEventListener('mousedown', handleOutsideClick);
+      document.removeEventListener('touchstart', handleOutsideClick);
+      document.removeEventListener('keydown', handleEscape);
+    };
+  }, []);
 
   const activeSize = sizeOptions.find((size) => size.weight === selectedWeight) || defaultSizeOption;
   const displayPrice = activeSize ? activeSize.price : product.price;
   const hasMultipleSizes = sizeOptions.length > 1;
+  const displayWeight = activeSize?.weight || String(product.defaultWeight || '').trim() || 'Default';
 
   const increaseQuantity = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -142,36 +170,36 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, showAddToCart = true
         
         {/* Product Info Section - Left Aligned */}
         <div className="w-full flex-grow flex flex-col items-start text-left px-1">
-          <div className="mb-3 w-full grid grid-cols-[minmax(0,1fr)_auto] items-start gap-3">
+          <div className="mb-3 w-full flex flex-col gap-2 md:grid md:grid-cols-[minmax(0,1fr)_auto] md:items-start md:gap-3">
             <div className="min-w-0 flex-1">
               <Link href={productUrl} className="block mb-1 group-hover:opacity-80 transition-opacity">
-                <h3 className="text-[#1A1A1A] text-[16px] md:text-[17px] font-medium font-flama leading-relaxed line-clamp-2">
+                <h3 className="text-[#1A1A1A] text-[14px] sm:text-[15px] md:text-[17px] font-medium font-flama leading-snug line-clamp-2">
                   {product.name}
                 </h3>
               </Link>
-              <span className="text-[#503223] font-bold text-[16px] md:text-[17px] font-inter">
+              <span className="text-[#503223] font-bold text-[15px] sm:text-[16px] md:text-[17px] font-inter">
                 ₹{displayPrice}
               </span>
             </div>
 
             {showAddToCart && hasMultipleSizes && (
-              <div className="w-[152px] self-start">
-                <div className="flex gap-2 overflow-x-auto scrollbar-hide">
+              <div className="hidden w-full self-start md:block md:w-auto md:max-w-[152px]">
+                <div className="flex gap-2 overflow-x-auto pb-1 no-scrollbar md:pb-0">
                   {sizeOptions.map((size) => (
                     <button
                       key={`${product.id}-${size.weight}`}
                       type="button"
                       onClick={() => setSelectedWeight(size.weight)}
-                      className={`min-w-[72px] min-h-[58px] rounded border px-3 py-2 text-left transition-colors ${
+                      className={`min-w-[66px] sm:min-w-[72px] min-h-[52px] sm:min-h-[58px] rounded border px-2.5 sm:px-3 py-1.5 sm:py-2 text-left transition-colors ${
                         selectedWeight === size.weight
                           ? 'border-[#FE8E02] bg-orange-50'
                           : 'border-[#d6cec6] bg-white hover:border-[#FE8E02]/60'
                       }`}
                     >
-                      <p className={`text-[14px] font-bold leading-tight ${selectedWeight === size.weight ? 'text-[#FE8E02]' : 'text-[#503223]'}`}>
+                      <p className={`text-[13px] sm:text-[14px] font-bold leading-tight ${selectedWeight === size.weight ? 'text-[#FE8E02]' : 'text-[#503223]'}`}>
                         {size.weight}
                       </p>
-                      <p className="text-[12px] leading-[1.2] text-[#503223]">₹{size.price}</p>
+                      <p className="text-[11px] sm:text-[12px] leading-[1.2] text-[#503223]">₹{size.price}</p>
                     </button>
                   ))}
                 </div>
@@ -181,36 +209,101 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, showAddToCart = true
           
           {showAddToCart && (
             <div className="mt-auto w-full flex flex-col gap-2 md:gap-3">
-              <div className="w-full flex flex-col gap-2 md:flex-row md:items-center md:gap-3">
-              <div className="w-full md:w-auto flex items-center justify-between h-[42px] md:h-[50px] md:min-w-[120px] px-2.5 md:px-3 border border-[#d6cec6] bg-white">
-                <button
-                  onClick={decreaseQuantity}
-                  disabled={quantity <= 1}
-                  className="w-7 h-7 flex items-center justify-center text-[18px] leading-none text-[#503223] disabled:opacity-40"
-                  aria-label="Decrease quantity"
-                >
-                  -
-                </button>
-                <span className="min-w-[16px] text-center text-[16px] md:text-[18px] leading-none text-[#2D2D2D] font-inter font-semibold">
-                  {quantity}
-                </span>
-                <button
-                  onClick={increaseQuantity}
-                  disabled={quantity >= maxQuantity}
-                  className="w-7 h-7 flex items-center justify-center text-[18px] leading-none text-[#503223] disabled:opacity-40"
-                  aria-label="Increase quantity"
-                >
-                  +
-                </button>
+              {/* Mobile controls: size selector + quantity row */}
+              <div className="grid grid-cols-2 gap-2 md:hidden">
+                <div ref={mobileSizeMenuRef} className="relative h-[42px]">
+                  {sizeOptions.length > 0 ? (
+                    <>
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          setIsMobileSizeMenuOpen((prev) => !prev);
+                        }}
+                        className="flex h-full w-full items-center justify-between rounded-[12px] border border-[#d6cec6] bg-white px-3 text-[14px] font-semibold text-[#2D2D2D]"
+                        aria-haspopup="listbox"
+                        aria-expanded={isMobileSizeMenuOpen}
+                        aria-label="Select weight"
+                      >
+                        <span className="truncate pr-3">{displayWeight}</span>
+                        <FiChevronDown
+                          className={`h-4 w-4 shrink-0 text-[#503223] transition-transform ${
+                            isMobileSizeMenuOpen ? 'rotate-180' : ''
+                          }`}
+                        />
+                      </button>
+
+                      {isMobileSizeMenuOpen && (
+                        <div
+                          className="absolute left-0 right-0 top-[calc(100%+6px)] z-30 max-h-44 overflow-y-auto rounded-[12px] border border-[#d6cec6] bg-white py-1 shadow-[0_10px_30px_rgba(0,0,0,0.16)]"
+                          role="listbox"
+                          aria-label="Weight options"
+                        >
+                          {sizeOptions.map((size) => {
+                            const isSelected = selectedWeight === size.weight;
+                            return (
+                              <button
+                                key={`${product.id}-mobile-${size.weight}`}
+                                type="button"
+                                onClick={(e) => {
+                                  e.preventDefault();
+                                  e.stopPropagation();
+                                  setSelectedWeight(size.weight);
+                                  setIsMobileSizeMenuOpen(false);
+                                }}
+                                className={`w-full px-3 py-2 text-left text-[13px] transition-colors ${
+                                  isSelected
+                                    ? 'bg-orange-50 font-semibold text-[#FE8E02]'
+                                    : 'text-[#2D2D2D] hover:bg-[#f8f3ed]'
+                                }`}
+                                role="option"
+                                aria-selected={isSelected}
+                              >
+                                {size.weight}
+                              </button>
+                            );
+                          })}
+                        </div>
+                      )}
+                    </>
+                  ) : (
+                    <div className="flex h-full items-center rounded-[12px] border border-[#d6cec6] bg-white px-3 text-[14px] font-semibold text-[#2D2D2D]">
+                      {displayWeight}
+                    </div>
+                  )}
+                </div>
+
+                <div className="flex h-[42px] items-center justify-between rounded-[12px] border border-[#d6cec6] bg-white px-2.5">
+                  <button
+                    onClick={decreaseQuantity}
+                    disabled={quantity <= 1}
+                    className="h-7 w-7 flex items-center justify-center text-[20px] leading-none text-[#503223] disabled:opacity-40"
+                    aria-label="Decrease quantity"
+                  >
+                    -
+                  </button>
+                  <span className="min-w-[16px] text-center text-[16px] leading-none text-[#2D2D2D] font-inter font-semibold">
+                    {quantity}
+                  </span>
+                  <button
+                    onClick={increaseQuantity}
+                    disabled={quantity >= maxQuantity}
+                    className="h-7 w-7 flex items-center justify-center text-[20px] leading-none text-[#503223] disabled:opacity-40"
+                    aria-label="Increase quantity"
+                  >
+                    +
+                  </button>
+                </div>
               </div>
 
               <button
                 onClick={handleAddToCart}
                 disabled={isAdding}
-                className="w-full md:flex-1 h-[42px] md:h-[50px] bg-[#FE8E02] text-white text-[11px] md:text-[12px] font-bold tracking-[0.15em] uppercase transition-all duration-300 active:scale-[0.97] disabled:opacity-75 flex items-center justify-center overflow-hidden relative"
+                className="md:hidden w-full h-[44px] rounded-[14px] bg-primary-red text-white text-[12px] font-semibold transition-all duration-300 active:scale-[0.97] disabled:opacity-75 flex items-center justify-center overflow-hidden relative"
               >
                 <span className={`transition-all duration-300 ${isAdding ? 'translate-y-10 opacity-0' : 'translate-y-0 opacity-100'}`}>
-                  ADD TO CART
+                  Add To Cart
                 </span>
                 {isAdding && (
                   <span className="absolute inset-0 flex items-center justify-center text-white bg-green-600 animate-in fade-in zoom-in duration-300">
@@ -218,6 +311,45 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, showAddToCart = true
                   </span>
                 )}
               </button>
+
+              {/* Desktop controls */}
+              <div className="hidden w-full md:flex md:flex-row md:items-center md:gap-3">
+                <div className="w-full md:w-auto flex items-center justify-between h-[42px] md:h-[50px] md:min-w-[120px] px-2 md:px-3 border border-[#d6cec6] bg-white">
+                  <button
+                    onClick={decreaseQuantity}
+                    disabled={quantity <= 1}
+                    className="w-7 h-7 flex items-center justify-center text-[18px] leading-none text-[#503223] disabled:opacity-40"
+                    aria-label="Decrease quantity"
+                  >
+                    -
+                  </button>
+                  <span className="min-w-[16px] text-center text-[16px] md:text-[18px] leading-none text-[#2D2D2D] font-inter font-semibold">
+                    {quantity}
+                  </span>
+                  <button
+                    onClick={increaseQuantity}
+                    disabled={quantity >= maxQuantity}
+                    className="w-7 h-7 flex items-center justify-center text-[18px] leading-none text-[#503223] disabled:opacity-40"
+                    aria-label="Increase quantity"
+                  >
+                    +
+                  </button>
+                </div>
+
+                <button
+                  onClick={handleAddToCart}
+                  disabled={isAdding}
+                  className="w-full md:flex-1 h-[42px] md:h-[50px] bg-[#FE8E02] text-white text-[10px] sm:text-[11px] md:text-[12px] font-bold tracking-[0.1em] md:tracking-[0.15em] uppercase transition-all duration-300 active:scale-[0.97] disabled:opacity-75 flex items-center justify-center overflow-hidden relative"
+                >
+                  <span className={`transition-all duration-300 ${isAdding ? 'translate-y-10 opacity-0' : 'translate-y-0 opacity-100'}`}>
+                    ADD TO CART
+                  </span>
+                  {isAdding && (
+                    <span className="absolute inset-0 flex items-center justify-center text-white bg-green-600 animate-in fade-in zoom-in duration-300">
+                      ADDED!
+                    </span>
+                  )}
+                </button>
               </div>
             </div>
           )}

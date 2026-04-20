@@ -126,14 +126,14 @@ export default function FloatingContactButtons() {
 
   return (
     <>
-      <div className="fixed bottom-24 md:bottom-6 right-4 sm:right-6 z-40 flex flex-col items-end gap-3">
+      <div className="fixed bottom-[calc(env(safe-area-inset-bottom)+1rem)] md:bottom-6 right-3 sm:right-6 z-40 flex flex-col items-end gap-2.5 md:gap-3">
         <button
           type="button"
           onClick={() => setIsModalOpen(true)}
-          className="group relative flex items-center justify-center rounded-full bg-primary-red w-[65px] h-[65px] text-white shadow-lg transition hover:scale-105 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-red"
+          className="group relative flex items-center justify-center rounded-full bg-primary-red w-14 h-14 md:w-[65px] md:h-[65px] text-white shadow-lg transition hover:scale-105 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-red"
         >
-          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-white/15">
-            <FiGift className="h-5 w-5" />
+          <div className="flex h-9 w-9 md:h-10 md:w-10 items-center justify-center rounded-full bg-white/15">
+            <FiGift className="h-4 w-4 md:h-5 md:w-5" />
           </div>
           <div className="pointer-events-none absolute right-[110%] hidden min-w-[200px] translate-y-1 flex-col rounded-xl bg-primary-red px-4 py-3 gap-2 text-left text-white shadow-lg transition group-hover:flex">
             <span className="text-sm font-flama font-semibold uppercase tracking-wide">Bulk Enquiry</span>
@@ -145,11 +145,11 @@ export default function FloatingContactButtons() {
           href={whatsappHref}
           target="_blank"
           rel="noopener noreferrer"
-          className="group relative flex items-center justify-center rounded-full bg-[#25D366] w-[65px] h-[65px] text-white shadow-lg transition hover:scale-105 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#25D366]"
+          className="group relative flex items-center justify-center rounded-full bg-[#25D366] w-14 h-14 md:w-[65px] md:h-[65px] text-white shadow-lg transition hover:scale-105 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#25D366]"
           aria-label="Chat with us on WhatsApp"
         >
-          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-white/15">
-            <FaWhatsapp className="h-5 w-5" />
+          <div className="flex h-9 w-9 md:h-10 md:w-10 items-center justify-center rounded-full bg-white/15">
+            <FaWhatsapp className="h-4 w-4 md:h-5 md:w-5" />
           </div>
           <div className="pointer-events-none absolute right-[110%] hidden min-w-[200px] translate-y-1 flex-col rounded-xl bg-[#1fb455] px-4 py-3 text-left text-white shadow-lg transition group-hover:flex">
             <span className="text-sm font-semibold uppercase tracking-wide">WhatsApp</span>

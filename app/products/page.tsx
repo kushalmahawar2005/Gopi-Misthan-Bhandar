@@ -179,17 +179,17 @@ function ProductsContent() {
       <Cart />
 
       {/* --- MOBILE ONLY: HORIZONTAL CHIPS --- */}
-      <div className="lg:hidden sticky top-[55px] z-40 bg-white border-b border-gray-100 pt-4 pb-2">
-        <div className="flex items-center gap-3 overflow-x-auto px-6 no-scrollbar whitespace-nowrap">
-          <button onClick={() => handleFilterChange({ category: 'all' })} className={`px-8 py-3.5 rounded-full text-[13px] font-bold uppercase transition-all border ${selectedCategory === 'all' ? 'bg-[#FE8E02] text-white shadow-sm' : 'bg-white border-gray-200 text-gray-400'}`}>All Items</button>
+      <div className="lg:hidden sticky top-[55px] z-40 bg-white border-b border-gray-100 pt-3 pb-2">
+        <div className="flex items-center gap-3 overflow-x-auto px-4 sm:px-6 no-scrollbar whitespace-nowrap">
+          <button onClick={() => handleFilterChange({ category: 'all' })} className={`px-5 py-2.5 rounded-full text-[11px] sm:text-[12px] font-bold uppercase transition-all border ${selectedCategory === 'all' ? 'bg-[#FE8E02] text-white shadow-sm' : 'bg-white border-gray-200 text-gray-400'}`}>All Items</button>
           {categories.map(c => (
-            <button key={c.id} onClick={() => handleFilterChange({ category: c.slug })} className={`px-8 py-3.5 rounded-full text-[13px] font-bold uppercase transition-all border ${selectedCategory === c.slug ? 'bg-[#FE8E02] text-white shadow-sm' : 'bg-white border-gray-200 text-gray-400'}`}>{c.name}</button>
+            <button key={c.id} onClick={() => handleFilterChange({ category: c.slug })} className={`px-5 py-2.5 rounded-full text-[11px] sm:text-[12px] font-bold uppercase transition-all border ${selectedCategory === c.slug ? 'bg-[#FE8E02] text-white shadow-sm' : 'bg-white border-gray-200 text-gray-400'}`}>{c.name}</button>
           ))}
         </div>
       </div>
 
-      <div className="w-full px-6 py-8 max-w-[1600px] mx-auto">
-        <div className="flex flex-col lg:flex-row gap-16">
+      <div className="w-full px-4 sm:px-6 py-6 sm:py-8 max-w-[1600px] mx-auto">
+        <div className="flex flex-col lg:flex-row gap-8 lg:gap-16">
           
           {/* --- DESKTOP SIDEBAR (Matches 2nd Image) --- */}
           <aside className="hidden lg:block lg:w-64 flex-shrink-0">
@@ -254,7 +254,7 @@ function ProductsContent() {
               <div className="py-20 text-center bg-gray-50 rounded-3xl font-bold text-gray-400 uppercase tracking-widest">No products found</div>
             ) : (
               <>
-                <div className={viewMode === 'grid' ? 'grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8' : 'space-y-6'}>
+                <div className={viewMode === 'grid' ? 'grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6 lg:gap-8' : 'space-y-6'}>
                   {processedProducts.map(p => viewMode === 'grid' ? <ProductCard key={p.id} product={p} /> : <ProductListCard key={p.id} product={p} />)}
                 </div>
                 <Pagination currentPage={pagination.currentPage} totalPages={pagination.totalPages} onPageChange={handlePageChange} />

@@ -51,9 +51,7 @@ export default function ProductDetailPage() {
   // Size selection state
   const [selectedSize, setSelectedSize] = useState<{ weight: string; price: number; label?: string } | null>(null);
 
-  // Zoom and Slider State
-  const [isZoomed, setIsZoomed] = useState(false);
-  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+  // Slider State
   const touchStart = useRef<number | null>(null);
   const touchEnd = useRef<number | null>(null);
   
@@ -83,14 +81,6 @@ export default function ProductDetailPage() {
     });
   };
   
-  // Zoom Handlers
-  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    const { left, top, width, height } = e.currentTarget.getBoundingClientRect();
-    const x = ((e.clientX - left) / width) * 100;
-    const y = ((e.clientY - top) / height) * 100;
-    setMousePosition({ x, y });
-  };
-
   // Slider Handlers
   const handleNextImage = (e?: React.MouseEvent) => {
     e?.stopPropagation();
@@ -412,10 +402,8 @@ const shortDescription =
       </div>
 
       {/* Product Details */}
-      <section className="relative overflow-hidden px-4 py-6 sm:py-8 md:py-12">
-        <div className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(circle_at_top_left,_rgba(236,213,179,0.45),_transparent_55%),radial-gradient(circle_at_bottom_right,_rgba(254,226,226,0.45),_transparent_50%)]" />
-
-        <div className="mx-auto grid w-full max-w-7xl items-start gap-6 lg:grid-cols-[1.02fr,0.98fr] lg:gap-10">
+      <section className="px-4 py-6 sm:py-8 md:py-10">
+        <div className="mx-auto grid w-full max-w-7xl items-start gap-6 md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:grid-cols-[1.02fr,0.98fr] md:gap-8 lg:gap-10">
           {/* Product Images Gallery */}
           <div className="h-fit animate-[fadeInUp_0.55s_ease-out]">
             <div className="grid gap-3 md:grid-cols-[88px,1fr]">
@@ -447,9 +435,6 @@ const shortDescription =
               <div
                 className="group relative w-full overflow-hidden rounded-2xl border border-[#e6d8c7] bg-white"
                 style={{ aspectRatio: activeImageAspectRatio }}
-                onMouseEnter={() => setIsZoomed(true)}
-                onMouseLeave={() => setIsZoomed(false)}
-                onMouseMove={handleMouseMove}
                 onTouchStart={onTouchStart}
                 onTouchMove={onTouchMove}
                 onTouchEnd={onTouchEnd}
@@ -458,11 +443,7 @@ const shortDescription =
                   src={currentImage || product.image}
                   alt={product.name}
                   fill
-                  className="object-contain transition-transform duration-200"
-                  style={{
-                    transformOrigin: `${mousePosition.x}% ${mousePosition.y}%`,
-                    transform: isZoomed ? 'scale(2)' : 'scale(1)',
-                  }}
+                  className="object-contain"
                   onLoadingComplete={(img) =>
                     handleImageLoad(currentImage || product.image, img.naturalWidth, img.naturalHeight)
                   }
@@ -602,39 +583,39 @@ const shortDescription =
               </div>
 
               <div className="flex flex-col gap-3 pt-1 sm:flex-row sm:items-stretch">
-                <div className="inline-flex h-[54px] items-center justify-between rounded-xl border border-[#d8c7b5] bg-[#fffaf3] px-2 sm:w-[120px]">
+                <div className="inline-flex h-[58px] sm:h-[54px] items-center justify-between rounded-xl border border-[#d8c7b5] bg-[#fffaf3] px-2 sm:w-[120px]">
                   <button
                     type="button"
                     onClick={() => handleQuantityChange(-1)}
-                    className="rounded-md p-2 text-[#4b3e33] transition hover:bg-[#f3e8db] disabled:cursor-not-allowed disabled:opacity-50"
+                    className="rounded-md p-2.5 sm:p-2 text-[#4b3e33] transition hover:bg-[#f3e8db] disabled:cursor-not-allowed disabled:opacity-50"
                     disabled={quantity <= 1}
                     aria-label="Decrease quantity"
                   >
-                    <FiMinus className="h-4 w-4" />
+                    <FiMinus className="h-4 w-4 sm:h-4 sm:w-4" />
                   </button>
-                  <span className="w-8 text-center text-lg font-semibold text-[#201914]">{quantity}</span>
+                  <span className="w-8 text-center text-[22px] sm:text-lg font-semibold text-[#201914]">{quantity}</span>
                   <button
                     type="button"
                     onClick={() => handleQuantityChange(1)}
-                    className="rounded-md p-2 text-[#4b3e33] transition hover:bg-[#f3e8db] disabled:cursor-not-allowed disabled:opacity-50"
+                    className="rounded-md p-2.5 sm:p-2 text-[#4b3e33] transition hover:bg-[#f3e8db] disabled:cursor-not-allowed disabled:opacity-50"
                     disabled={quantity >= 10}
                     aria-label="Increase quantity"
                   >
-                    <FiPlus className="h-4 w-4" />
+                    <FiPlus className="h-4 w-4 sm:h-4 sm:w-4" />
                   </button>
                 </div>
 
                 <button
                   onClick={handleAddToCart}
                   disabled={isAdding || (product.stock !== undefined && product.stock === 0)}
-                  className="h-[54px] flex-1 rounded-xl border border-[#30251d] bg-white px-5 text-sm font-semibold uppercase tracking-[0.08em] text-[#30251d] transition hover:bg-[#f8f1e9] disabled:cursor-not-allowed disabled:opacity-50"
+                  className="h-[56px] sm:h-[54px] flex-1 rounded-xl border border-[#30251d] bg-white px-5 text-[17px] sm:text-sm font-semibold uppercase tracking-[0.11em] sm:tracking-[0.08em] text-[#30251d] transition hover:bg-[#f8f1e9] disabled:cursor-not-allowed disabled:opacity-50"
                 >
                   {isAdding ? 'Adding...' : 'Add To Cart'}
                 </button>
                 <button
                   onClick={handleBuyNow}
                   disabled={isBuying || (product.stock !== undefined && product.stock === 0)}
-                  className="h-[54px] flex-1 rounded-xl bg-[#b58a3a] px-5 text-sm font-semibold uppercase tracking-[0.08em] text-white transition hover:bg-[#9d742f] disabled:cursor-not-allowed disabled:opacity-50"
+                  className="h-[56px] sm:h-[54px] flex-1 rounded-xl bg-[#b58a3a] px-5 text-[17px] sm:text-sm font-semibold uppercase tracking-[0.11em] sm:tracking-[0.08em] text-white transition hover:bg-[#9d742f] disabled:cursor-not-allowed disabled:opacity-50"
                 >
                   {isBuying ? 'Redirecting...' : 'Buy It Now'}
                 </button>

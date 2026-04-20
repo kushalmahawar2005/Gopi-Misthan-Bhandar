@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { FiChevronDown, FiCreditCard, FiFacebook, FiHeadphones, FiInstagram, FiThumbsUp, FiTruck, FiYoutube } from 'react-icons/fi';
+import { FiChevronDown, FiFacebook, FiInstagram, FiYoutube } from 'react-icons/fi';
 
 type MobileFooterSectionKey = 'range' | 'about' | 'legal';
 
@@ -28,29 +28,6 @@ const Footer = () => {
   ];
 
   const paymentStripSrc = '/visa.svg';
-
-  const trustHighlights = [
-    {
-      icon: FiTruck,
-      title: 'PAN India Delivery',
-      description: 'Neemuch ki asli mithaas, Bharat ke kone-kone tak.',
-    },
-    {
-      icon: FiThumbsUp,
-      title: 'Authentic & Traditional',
-      description: 'Har bite mein asli parampara ka swaad.',
-    },
-    {
-      icon: FiCreditCard,
-      title: '100% Secure Payments',
-      description: 'Har order, har payment. Puri tarah surakshit.',
-    },
-    {
-      icon: FiHeadphones,
-      title: 'Fast Support',
-      description: 'Aapke sawaalon ka jawab, daily 10AM - 7PM.',
-    },
-  ];
 
   const rangeLinks = [
     { label: 'Sweets', href: '/products?category=sweets' },
@@ -91,30 +68,7 @@ const Footer = () => {
 
   return (
     <footer id="contact" className="w-full bg-[#FFF8F1] text-[#503223]">
-      <section className="w-full bg-[#F7EFE6]">
-        <div className="max-w-[1400px] mx-auto px-5 sm:px-6 md:px-8 lg:px-12 py-8 md:py-12">
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-5 md:gap-6">
-            {trustHighlights.map((item) => (
-              <div
-                key={item.title}
-                className="rounded-xl sm:rounded-2xl border border-[#f0ddc8] bg-white px-3 sm:px-4 md:px-5 py-4 sm:py-6 md:py-7 text-center shadow-[0_8px_22px_rgba(80,50,35,0.06)] transition-transform duration-300 hover:-translate-y-1"
-              >
-                <div className="mx-auto mb-3 sm:mb-4 flex h-10 w-10 sm:h-12 sm:w-12 md:h-14 md:w-14 items-center justify-center rounded-full border border-[#ffd8a8] bg-[#fff4e7]">
-                  <item.icon className="h-5 w-5 sm:h-6 sm:w-6 md:h-7 md:w-7 text-[#FE8E02]" />
-                </div>
-                <h3 className="text-[15px] sm:text-[17px] md:text-[20px] leading-tight font-roboto text-[#2B2B2B] mb-1.5 sm:mb-2">
-                  {item.title}
-                </h3>
-                <p className="mx-auto max-w-[230px] text-[12px] sm:text-[14px] md:text-[16px] leading-snug sm:leading-relaxed text-[#7B6A5B] font-flama">
-                  {item.description}
-                </p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <div className="w-full mt-4 md:mt-5 px-5 sm:px-6 md:px-8 lg:px-12 pt-3 md:pt-4 pb-8 max-w-[1400px] mx-auto">
+      <div className="w-full px-5 sm:px-6 md:px-8 lg:px-12 pt-3 md:pt-4 pb-8 max-w-[1400px] mx-auto">
         <div className="flex items-center justify-center md:justify-between border-b border-[#e8d7c3] pb-6 md:pb-7">
           <Link href="/" className="relative w-[210px] h-[60px] md:w-[250px] md:h-[72px] mx-auto md:mx-0">
             <Image src="/logo.png" alt="Gopi Misthan Bhandar" fill className="object-contain object-center md:object-left" />
@@ -200,7 +154,7 @@ const Footer = () => {
             </div>
             <div>
               <p className="font-semibold mb-1">Address :</p>
-              <p>Shop No. 123, Main Street, Neemuch, MP 458441</p>
+              <p>SHOP-1 - 304,TILAK MARG NEEMUCH (M.P),458441</p>
             </div>
           </div>
         </div>
@@ -287,7 +241,7 @@ const Footer = () => {
               </div>
               <div>
                 <p className="font-semibold mb-1">Address :</p>
-                <p>Shop No. 123, Main Street, Neemuch, MP 458441</p>
+                <p>SHOP-1 - 304,TILAK MARG NEEMUCH (M.P),458441</p>
               </div>
             </div>
           </div>

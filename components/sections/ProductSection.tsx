@@ -43,20 +43,20 @@ const ProductSection: React.FC<ProductSectionProps> = ({
   }, []);
 
   return (
-    <section className="w-full py-8 md:py-10">
-      <div className="section-container max-w-6xl lg:max-w-7xl mx-auto px-0 md:px-0 w-full">
+    <section className="w-full py-7 sm:py-8 md:py-10">
+      <div className="section-container max-w-6xl lg:max-w-7xl w-full">
 
         {/* ----------------------
             HEADING + SUBTITLE
         ---------------------- */}
         {title && (
-          <div className="text-center mb-10 md:mb-12 px-4 md:px-6">
+          <div className="text-center mb-8 sm:mb-10 md:mb-12 px-2 sm:px-4 md:px-6">
             {subtitle && (
-              <p className="text-[13px] md:text-[16px] font-flama tracking-[0.3em] uppercase text-[#FE8E02] mb-3">
+              <p className="text-[12px] sm:text-[13px] md:text-[16px] font-flama tracking-[0.3em] uppercase text-[#FE8E02] mb-3">
                 {subtitle}
               </p>
             )}
-            <h2 className="text-4xl md:text-5xl lg:text-[64px] font-flama-condensed tracking-[0.05em] xl:tracking-[0.1em] uppercase text-[#503223]">
+            <h2 className="text-[30px] leading-tight sm:text-4xl md:text-5xl lg:text-[64px] font-flama-condensed tracking-[0.05em] xl:tracking-[0.1em] uppercase text-[#503223]">
               {title}
             </h2>
           </div>
@@ -73,8 +73,10 @@ const ProductSection: React.FC<ProductSectionProps> = ({
             sm:grid-cols-2
             md:grid-cols-3
             lg:grid-cols-4
-            gap-6
-            md:gap-[50px]
+            gap-4
+            sm:gap-5
+            md:gap-8
+            lg:gap-[50px]
             mb-6
           "
         >
@@ -97,7 +99,7 @@ const ProductSection: React.FC<ProductSectionProps> = ({
           <div className="text-center mt-8 md:mt-10">
             <Link
               href={viewMoreLink}
-              className="group relative inline-flex items-center justify-center py-[14px] px-[40px] font-flama tracking-[0.15em] uppercase text-[13px] border-2 border-[#FE8E02] transition-colors duration-500 overflow-hidden"
+              className="group relative inline-flex items-center justify-center py-[12px] px-[28px] sm:py-[14px] sm:px-[40px] font-flama tracking-[0.15em] uppercase text-[12px] sm:text-[13px] border-2 border-[#FE8E02] transition-colors duration-500 overflow-hidden"
             >
               <span
                 className="absolute inset-0 bg-[#FE8E02] transition-transform duration-500 group-hover:translate-x-full"
