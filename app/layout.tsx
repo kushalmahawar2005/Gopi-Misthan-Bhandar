@@ -8,6 +8,7 @@ import MobileBottomNav from '@/components/MobileBottomNav'
 import SmoothScroll from '@/components/SmoothScroll'
 import TrendingBannerModal from '@/components/TrendingBannerModal'
 import NextAuthSessionProvider from '@/components/NextAuthSessionProvider'
+import Script from 'next/script'
 
 const BASE_URL = process.env.NEXTAUTH_URL || 'https://gopimisthanbhandar.com';
 
@@ -93,6 +94,20 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
+        {/* Google Analytics */}
+        <Script
+          src="https://www.googletagmanager.com/gtag/js?id=G-2YH8XGBEV6"
+          strategy="afterInteractive"
+        />
+        <Script id="google-analytics" strategy="afterInteractive">
+          {`
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+
+            gtag('config', 'G-2YH8XGBEV6');
+          `}
+        </Script>
         {/* Preconnect to font CDN - reduces DNS lookup time */}
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
