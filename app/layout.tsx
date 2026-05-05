@@ -11,20 +11,25 @@ import NextAuthSessionProvider from '@/components/NextAuthSessionProvider'
 import Script from 'next/script'
 
 const BASE_URL = process.env.NEXTAUTH_URL || 'https://gopimisthanbhandar.com';
+const FSSAI_LICENSE = process.env.NEXT_PUBLIC_FSSAI_LICENSE || '';
+const GST_NUMBER = process.env.NEXT_PUBLIC_GST_NUMBER || '';
+
+const SAME_AS_EXTRA = [
+  process.env.NEXT_PUBLIC_JUSTDIAL_URL,
+  process.env.NEXT_PUBLIC_MAGICPIN_URL,
+  process.env.NEXT_PUBLIC_INDIAMART_URL,
+  process.env.NEXT_PUBLIC_WIKIDATA_URL,
+  process.env.NEXT_PUBLIC_ZOMATO_URL,
+  process.env.NEXT_PUBLIC_SWIGGY_URL,
+].filter((url): url is string => typeof url === 'string' && url.trim().length > 0);
 
 export const metadata: Metadata = {
   metadataBase: new URL(BASE_URL),
   title: {
-    default: 'Gopi Misthan Bhandar - Indian Sweets Since 1968',
+    default: 'Buy Indian Sweets Online — Mithai, Namkeen & Gift Boxes | Gopi Misthan Bhandar',
     template: '%s | Gopi Misthan Bhandar',
   },
-  description: 'Order authentic Indian sweets, namkeen, and gift hampers online from Gopi Misthan Bhandar, Neemuch. Serving trusted quality since 1968 with pan-India delivery.',
-  keywords: [
-    'Indian sweets', 'mithai', 'sweets online', 'Neemuch sweets', 'traditional sweets',
-    'Gopi Misthan Bhandar', 'namkeen', 'dry fruit boxes', 'gift hampers', 'wedding sweets',
-    'premium sweets', 'Madhya Pradesh sweets', 'buy sweets online India', 'mithai delivery',
-    'Diwali sweets', 'Rakhi gift box', 'corporate gifting sweets',
-  ],
+  description: 'Order authentic Indian sweets online — Kaju Katli, Soan Papdi, Motichoor Ladoo, Milk Cake, Rasgulla, Gulab Jamun, Bikaneri Bhujia, Namkeen & premium dry-fruit gift hampers. Fresh, handcrafted mithai with 60-day shelf life. Pan-India delivery from Gopi Misthan Bhandar Neemuch since 1968.',
   authors: [{ name: 'Gopi Misthan Bhandar' }],
   creator: 'Gopi Misthan Bhandar',
   publisher: 'Gopi Misthan Bhandar',
@@ -36,25 +41,24 @@ export const metadata: Metadata = {
   openGraph: {
     type: 'website',
     locale: 'en_IN',
-    alternateLocale: ['hi_IN'],
     url: BASE_URL,
     siteName: 'Gopi Misthan Bhandar',
-    title: 'Gopi Misthan Bhandar - Traditional Indian Sweets Since 1968',
-    description: 'Order authentic Indian sweets, namkeen and gifting boxes online from Neemuch with pan-India delivery.',
+    title: 'Buy Indian Sweets, Mithai & Gift Boxes Online | Gopi Misthan Bhandar',
+    description: 'Kaju Katli, Soan Papdi, Motichoor Ladoo, Milk Cake, Bhujia, Sev & premium gift hampers — fresh, handcrafted, pan-India delivery from Neemuch since 1968.',
     images: [
       {
-        url: '/logo.png',
-        width: 512,
-        height: 512,
-        alt: 'Gopi Misthan Bhandar Logo',
+        url: '/Hamper.jpg',
+        width: 1200,
+        height: 630,
+        alt: 'Gopi Misthan Bhandar — premium Indian sweets and gift hampers since 1968',
       },
     ],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Gopi Misthan Bhandar - Traditional Indian Sweets Since 1968',
-    description: 'Order authentic traditional Indian sweets, premium dry fruit boxes & gift hampers online from Neemuch.',
-    images: ['/logo.png'],
+    title: 'Buy Indian Sweets Online — Mithai, Namkeen & Gift Boxes',
+    description: 'Kaju Katli, Soan Papdi, Motichoor Ladoo, Milk Cake, Bhujia & dry-fruit hampers. Pan-India delivery from Gopi Misthan Bhandar Neemuch.',
+    images: ['/Hamper.jpg'],
   },
   robots: {
     index: true,
@@ -180,7 +184,20 @@ export default function RootLayout({
                 'https://instagram.com/gopimisthanbhandar',
                 'https://facebook.com/gopimisthanbhandar',
                 'https://youtube.com/@gopimisthan1968',
+                ...SAME_AS_EXTRA,
               ],
+              ...(FSSAI_LICENSE && {
+                hasCredential: {
+                  '@type': 'EducationalOccupationalCredential',
+                  credentialCategory: 'FSSAI License',
+                  recognizedBy: { '@type': 'Organization', name: 'Food Safety and Standards Authority of India' },
+                  identifier: FSSAI_LICENSE,
+                },
+              }),
+              ...(GST_NUMBER && {
+                taxID: GST_NUMBER,
+                vatID: GST_NUMBER,
+              }),
               hasMap: 'https://maps.google.com/maps?q=Gopi%20Misthan%20Bhandar%20Neemuch%20Madhya%20Pradesh&t=&z=15&ie=UTF8&iwloc=&output=embed',
               hasOfferCatalog: {
                 '@type': 'OfferCatalog',

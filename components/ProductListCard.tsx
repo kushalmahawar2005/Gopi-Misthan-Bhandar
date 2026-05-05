@@ -82,7 +82,7 @@ const ProductListCard: React.FC<ProductListCardProps> = ({ product, showAddToCar
         onMouseLeave={() => setIsHovered(false)}
       >
         {/* Product Image */}
-        <div className="relative w-32 h-32 md:w-40 md:h-40 lg:w-48 lg:h-48 flex-shrink-0 overflow-hidden rounded-lg shadow-md">
+        <div className="relative w-32 h-32 md:w-40 md:h-40 lg:w-48 lg:h-48 flex-shrink-0 overflow-hidden shadow-md">
           <Image
             src={product.image && product.image.trim() !== '' ? product.image : `https://picsum.photos/seed/product${product.id}/240/240`}
             alt={product.name}

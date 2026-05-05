@@ -47,14 +47,14 @@ export default function ProductDetailPage() {
   const [recentlyViewed, setRecentlyViewed] = useState<LightweightProduct[]>([]);
   const [openAccordion, setOpenAccordion] = useState<string | null>(null);
   const reviewSectionRef = useRef<HTMLDivElement | null>(null);
-  
+
   // Size selection state
   const [selectedSize, setSelectedSize] = useState<{ weight: string; price: number; label?: string } | null>(null);
 
   // Slider State
   const touchStart = useRef<number | null>(null);
   const touchEnd = useRef<number | null>(null);
-  
+
   // Get all product images (main image + additional images)
   const getAllImages = () => {
     if (!product) return [];
@@ -64,7 +64,7 @@ export default function ProductDetailPage() {
     }
     return images;
   };
-  
+
   const productImages = getAllImages();
   const currentImage = productImages[selectedImageIndex] || product?.image;
   const activeImageAspectRatio = currentImage ? imageAspectMap[currentImage] || 1 : 1;
@@ -80,7 +80,7 @@ export default function ProductDetailPage() {
       return { ...prev, [imageUrl]: aspectRatio };
     });
   };
-  
+
   // Slider Handlers
   const handleNextImage = (e?: React.MouseEvent) => {
     e?.stopPropagation();
@@ -107,7 +107,7 @@ export default function ProductDetailPage() {
     const distance = touchStart.current - touchEnd.current;
     const isLeftSwipe = distance > 50;
     const isRightSwipe = distance < -50;
-    
+
     if (isLeftSwipe) handleNextImage();
     if (isRightSwipe) handlePrevImage();
   };
@@ -124,7 +124,7 @@ export default function ProductDetailPage() {
 
   useEffect(() => {
     if (!product) return;
-    
+
     // Prefetch related product images to make navigation faster
     if (relatedProducts.length > 0) {
       relatedProducts.forEach(p => {
@@ -159,9 +159,9 @@ export default function ProductDetailPage() {
 
       setRecentlyViewed(updated.filter((item) => item.id !== product.id));
     } catch (error) {
-    console.error('Error updating recently viewed products:', error);
-  }
-}, [product]);
+      console.error('Error updating recently viewed products:', error);
+    }
+  }, [product]);
 
   const loadProduct = async () => {
     try {
@@ -186,7 +186,7 @@ export default function ProductDetailPage() {
   };
 
   const isFavorite = product ? isInWishlist(product.id) : false;
-  
+
   // Calculate current price based on selected size
   const currentPrice = selectedSize ? selectedSize.price : (product?.price || 0);
   const displayWeight = selectedSize ? selectedSize.weight : (product?.defaultWeight || '500g');
@@ -274,109 +274,109 @@ export default function ProductDetailPage() {
     }
   };
 
-const availabilityText =
-  product.stock !== undefined
-    ? product.stock > 0
-      ? `${product.stock} in stock`
-      : 'Currently unavailable'
-    : 'Available on request';
+  const availabilityText =
+    product.stock !== undefined
+      ? product.stock > 0
+        ? `${product.stock} in stock`
+        : 'Currently unavailable'
+      : 'Available on request';
 
-const infoItems = [
-  {
-    title: 'Availability',
-    description: availabilityText,
-    icon: <FiCheckCircle className="w-5 h-5 text-green-500" />,
-  },
-  {
-    title: 'Delivery',
-    description: product.deliveryTime || 'Delivery within 2-3 business days',
-    icon: <FiTruck className="w-5 h-5 text-primary-brown" />,
-  },
-  {
-    title: 'Shelf Life',
-    description: product.shelfLife || 'Enjoy fresh goodies with optimal taste',
-    icon: <FiClock className="w-5 h-5 text-primary-brown" />,
-  },
-  {
-    title: 'Packaging Disclaimer',
-    description: 'Final box design depends on stock availability at the time of dispatch.',
-    icon: <FiPackage className="w-5 h-5 text-primary-brown" />,
-  },
-];
+  const infoItems = [
+    {
+      title: 'Availability',
+      description: availabilityText,
+      icon: <FiCheckCircle className="w-5 h-5 text-green-500" />,
+    },
+    {
+      title: 'Delivery',
+      description: product.deliveryTime || 'Delivery within 2-3 business days',
+      icon: <FiTruck className="w-5 h-5 text-primary-brown" />,
+    },
+    {
+      title: 'Shelf Life',
+      description: product.shelfLife || 'Enjoy fresh goodies with optimal taste',
+      icon: <FiClock className="w-5 h-5 text-primary-brown" />,
+    },
+    {
+      title: 'Packaging Disclaimer',
+      description: 'Final box design depends on stock availability at the time of dispatch.',
+      icon: <FiPackage className="w-5 h-5 text-primary-brown" />,
+    },
+  ];
 
-const accordionItems = [
-  {
-    key: 'Description',
-    title: 'Description',
-    content: (
-      <p className="leading-relaxed text-gray-600">
-        {product.description || 'Delightful gourmet sweets crafted with premium ingredients.'}
-      </p>
-    ),
-  },
-  {
-    key: 'RefundPolicy',
-    title: 'Refund & Cancellation Policy',
-    content: (
-      <p className="leading-relaxed text-gray-600">
-        Due to the perishable nature of our sweets, cancellations are accepted within 2 hours of placing the order.
-        For concerns about your delivery, please reach out to our support team the same day with images and order
-        details.
-      </p>
-    ),
-  },
-  {
-    key: 'Terms',
-    title: 'Terms & Conditions',
-    content: (
-      <p className="leading-relaxed text-gray-600">
-        All orders are subject to availability. Delivery timelines may vary based on pin code. By placing an order,
-        you agree to our privacy policy and terms of service available on the website.
-      </p>
-    ),
-  },
-];
-
-const renderProductTile = (item: Product | LightweightProduct) => {
-  const cardImage = item.images && item.images.length > 0 ? item.images[0] : item.image;
-  const productUrl = `/product/${item.slug || item.id}`;
-  return (
-    <Link
-      key={item.id}
-      href={productUrl}
-      className="group h-full rounded-xl border border-gray-200 bg-white shadow-sm transition hover:-translate-y-1 hover:shadow-xl"
-    >
-      <div className="relative w-full aspect-square overflow-hidden rounded-t-xl bg-gray-50">
-        <Image
-          src={cardImage && cardImage.trim() !== '' ? cardImage : item.image}
-          alt={item.name}
-          fill
-          className="object-cover transition-transform duration-500 group-hover:scale-105"
-          sizes="(max-width: 640px) 50vw, (max-width: 1024px) 25vw, 20vw"
-        />
-      </div>
-      <div className="p-4 space-y-2">
-        <h3 className="text-base font-semibold text-gray-900 line-clamp-2">{item.name}</h3>
-        <p className="text-sm uppercase tracking-wide text-primary-brown">
-                  {/* Removed label line from size selection */}
+  const accordionItems = [
+    {
+      key: 'Description',
+      title: 'Description',
+      content: (
+        <p className="leading-relaxed text-gray-600">
+          {product.description || 'Delightful gourmet sweets crafted with premium ingredients.'}
         </p>
-        <p className="text-lg font-bold text-primary-red">₹{item.price.toLocaleString()}</p>
-      </div>
-    </Link>
-  );
-};
+      ),
+    },
+    {
+      key: 'RefundPolicy',
+      title: 'Refund & Cancellation Policy',
+      content: (
+        <p className="leading-relaxed text-gray-600">
+          Due to the perishable nature of our sweets, cancellations are accepted within 2 hours of placing the order.
+          For concerns about your delivery, please reach out to our support team the same day with images and order
+          details.
+        </p>
+      ),
+    },
+    {
+      key: 'Terms',
+      title: 'Terms & Conditions',
+      content: (
+        <p className="leading-relaxed text-gray-600">
+          All orders are subject to availability. Delivery timelines may vary based on pin code. By placing an order,
+          you agree to our privacy policy and terms of service available on the website.
+        </p>
+      ),
+    },
+  ];
 
-const shortDescription =
-  product.description && product.description.length > 180
-    ? `${product.description.slice(0, 180)}...`
-    : product.description || 'Handcrafted sweets made with premium ingredients.';
+  const renderProductTile = (item: Product | LightweightProduct) => {
+    const cardImage = item.images && item.images.length > 0 ? item.images[0] : item.image;
+    const productUrl = `/product/${item.slug || item.id}`;
+    return (
+      <Link
+        key={item.id}
+        href={productUrl}
+        className="group h-full rounded-xl border border-gray-200 bg-white shadow-sm transition hover:-translate-y-1 hover:shadow-xl"
+      >
+        <div className="relative w-full aspect-square overflow-hidden rounded-t-xl bg-gray-50">
+          <Image
+            src={cardImage && cardImage.trim() !== '' ? cardImage : item.image}
+            alt={item.name}
+            fill
+            className="object-cover transition-transform duration-500 group-hover:scale-105"
+            sizes="(max-width: 640px) 50vw, (max-width: 1024px) 25vw, 20vw"
+          />
+        </div>
+        <div className="p-4 space-y-2">
+          <h3 className="text-base font-semibold text-gray-900 line-clamp-2">{item.name}</h3>
+          <p className="text-sm uppercase tracking-wide text-primary-brown">
+            {/* Removed label line from size selection */}
+          </p>
+          <p className="text-lg font-bold text-primary-red">₹{item.price.toLocaleString()}</p>
+        </div>
+      </Link>
+    );
+  };
+
+  const shortDescription =
+    product.description && product.description.length > 180
+      ? `${product.description.slice(0, 180)}...`
+      : product.description || 'Handcrafted sweets made with premium ingredients.';
 
   return (
     <div className="min-h-screen bg-white">
       <Header />
       <Navigation />
       <Cart />
-      
+
       {/* Breadcrumb */}
       <div className="bg-gray-50 py-4 px-4">
         <div className="w-full">
@@ -414,11 +414,10 @@ const shortDescription =
                       key={index}
                       type="button"
                       onClick={() => setSelectedImageIndex(index)}
-                      className={`relative h-[88px] w-full overflow-hidden rounded-xl border-2 transition ${
-                        selectedImageIndex === index
-                          ? 'border-[#b58a3a] shadow-[0_0_0_2px_rgba(181,138,58,0.18)]'
-                          : 'border-[#e6d8c7] hover:border-[#c99c53]'
-                      }`}
+                      className={`relative h-[88px] w-full overflow-hidden rounded-xl border-2 transition ${selectedImageIndex === index
+                        ? 'border-[#b58a3a] shadow-[0_0_0_2px_rgba(181,138,58,0.18)]'
+                        : 'border-[#e6d8c7] hover:border-[#c99c53]'
+                        }`}
                     >
                       <Image
                         src={img}
@@ -432,9 +431,14 @@ const shortDescription =
                 </div>
               )}
 
+              <style>{`
+                .product-image-container { aspect-ratio: 1 / 1; }
+                @media (min-width: 768px) {
+                  .product-image-container { aspect-ratio: ${activeImageAspectRatio}; }
+                }
+              `}</style>
               <div
-                className="group relative w-full overflow-hidden rounded-2xl border border-[#e6d8c7] bg-white"
-                style={{ aspectRatio: activeImageAspectRatio }}
+                className="group relative w-full overflow-hidden rounded-2xl border border-[#e6d8c7] bg-white product-image-container"
                 onTouchStart={onTouchStart}
                 onTouchMove={onTouchMove}
                 onTouchEnd={onTouchEnd}
@@ -482,9 +486,8 @@ const shortDescription =
                       key={index}
                       type="button"
                       onClick={() => setSelectedImageIndex(index)}
-                      className={`relative h-[70px] w-[70px] shrink-0 overflow-hidden rounded-lg border-2 transition ${
-                        selectedImageIndex === index ? 'border-[#b58a3a]' : 'border-[#e6d8c7]'
-                      }`}
+                      className={`relative h-[70px] w-[70px] shrink-0 overflow-hidden rounded-lg border-2 transition ${selectedImageIndex === index ? 'border-[#b58a3a]' : 'border-[#e6d8c7]'
+                        }`}
                     >
                       <Image
                         src={img}
@@ -505,7 +508,7 @@ const shortDescription =
             <div className="space-y-5">
               <div className="flex items-start justify-between gap-4">
                 <div className="space-y-3">
-                  <h1 className="font-['Platina','Georgia','serif'] text-4xl leading-tight text-[#1f1a17] sm:text-5xl">
+                  <h1 className="font-['FlamaCondensed','Flama','sans-serif'] text-4xl leading-tight text-[#1f1a17] sm:text-5xl">
                     {product.name}
                   </h1>
                   <div className="flex flex-wrap gap-2">
@@ -520,11 +523,10 @@ const shortDescription =
 
                 <button
                   onClick={handleWishlistToggle}
-                  className={`rounded-xl border p-2 transition ${
-                    isFavorite
-                      ? 'border-[#d23030] bg-red-50 text-[#d23030]'
-                      : 'border-[#e3d4c2] text-[#6b5647] hover:border-[#c99c53] hover:text-[#c99c53]'
-                  }`}
+                  className={`rounded-xl border p-2 transition ${isFavorite
+                    ? 'border-[#d23030] bg-red-50 text-[#d23030]'
+                    : 'border-[#e3d4c2] text-[#6b5647] hover:border-[#c99c53] hover:text-[#c99c53]'
+                    }`}
                   title={isFavorite ? 'Remove from wishlist' : 'Add to wishlist'}
                   aria-label={isFavorite ? 'Remove from wishlist' : 'Add to wishlist'}
                 >
@@ -559,11 +561,10 @@ const shortDescription =
                           key={index}
                           type="button"
                           onClick={() => handleSizeChange(size)}
-                          className={`group flex min-h-[96px] flex-col items-center justify-center rounded-2xl border-2 px-3 py-2 text-center transition ${
-                            isSelected
-                              ? 'border-[#b58a3a] bg-[#fff6e8] shadow-[0_8px_22px_rgba(181,138,58,0.18)]'
-                              : 'border-[#cfad6a] bg-white hover:bg-[#fffaf2]'
-                          }`}
+                          className={`group flex min-h-[96px] flex-col items-center justify-center rounded-2xl border-2 px-3 py-2 text-center transition ${isSelected
+                            ? 'border-[#b58a3a] bg-[#fff6e8] shadow-[0_8px_22px_rgba(181,138,58,0.18)]'
+                            : 'border-[#cfad6a] bg-white hover:bg-[#fffaf2]'
+                            }`}
                         >
                           <span className="font-['FlamaCondensed','Flama','sans-serif'] text-4xl leading-none text-[#161311]">
                             {compactWeight}
@@ -682,6 +683,44 @@ const shortDescription =
           </div>
         </div>
       )}
+
+      {/* FAQ Section (visible content matching FAQPage schema) */}
+      <section className="w-full px-4 py-10 md:py-12">
+        <div className="max-w-5xl mx-auto">
+          <h2 className="text-2xl md:text-3xl font-bold text-primary-brown mb-2 font-general-sansal-sansal-sans">
+            Frequently asked questions
+          </h2>
+          <p className="text-sm text-gray-500 mb-6">Everything you need to know before ordering {product.name}.</p>
+          <div className="space-y-3">
+            {[
+              {
+                q: `Is ${product.name} fresh and how long does it last?`,
+                a: `Yes — every order is handcrafted in our Neemuch kitchen and shipped within 24 hours. Shelf life: ${product.shelfLife || 'up to 60 days when sealed'}. Once opened, transfer to an airtight jar and consume within 7-10 days for the best taste.`,
+              },
+              {
+                q: `Do you deliver ${product.name} pan-India?`,
+                a: `Yes. We ship ${product.name} to every PIN code in India through trusted cold-chain courier partners. Delivery typically takes 2-5 working days depending on the destination city.`,
+              },
+              {
+                q: `Is ${product.name} pure vegetarian and free from preservatives?`,
+                a: `Yes — ${product.name} is 100% pure vegetarian. No artificial preservatives, no synthetic colours, no palm oil. Made with farm-fresh milk, pure ghee, sugar and premium dry fruits.`,
+              },
+              {
+                q: `Can I order ${product.name} for Diwali, Rakhi, or wedding gifting in bulk?`,
+                a: `Absolutely. We offer custom hampers and bulk pricing for Diwali, Rakhi, weddings and corporate gifting. WhatsApp +91-9425922445 with your quantity and delivery date and our team will design a hamper within 24 hours.`,
+              },
+            ].map((item, i) => (
+              <details key={i} className="rounded-xl border border-[#eadfce] bg-white p-5 group">
+                <summary className="cursor-pointer font-semibold text-[#1f1a17] list-none flex items-center justify-between">
+                  <span>{item.q}</span>
+                  <span className="text-[#FE8E02] text-xl group-open:rotate-45 transition-transform">+</span>
+                </summary>
+                <p className="text-sm text-[#5e4a3b] leading-relaxed mt-3">{item.a}</p>
+              </details>
+            ))}
+          </div>
+        </div>
+      </section>
 
       {/* Related Products */}
       {relatedProducts.length > 0 && (

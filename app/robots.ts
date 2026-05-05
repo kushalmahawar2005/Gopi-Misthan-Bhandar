@@ -27,6 +27,9 @@ export default function robots(): MetadataRoute.Robots {
         disallow: ['/admin/', '/api/', '/checkout/', '/checkout/success', '/checkout/failed', '/orders/', '/profile/'],
       },
     ],
-    sitemap: `${BASE_URL}/sitemap.xml`,
+    sitemap: [
+      `${BASE_URL}/sitemap.xml`,
+      `${BASE_URL}/sitemap-images.xml`,
+    ],
   };
 }

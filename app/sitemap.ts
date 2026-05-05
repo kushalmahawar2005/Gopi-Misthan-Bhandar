@@ -3,6 +3,7 @@ import connectDB from '@/lib/mongodb';
 import Product from '@/models/Product';
 import Blog from '@/models/Blog';
 import { buildBlogSlug, buildProductSlug } from '@/lib/slug';
+import { listCategorySlugs } from '@/lib/categoryContent';
 
 const BASE_URL = process.env.NEXTAUTH_URL || 'https://gopimisthanbhandar.com';
 const GIFTBOX_CATEGORIES = ['assorted', 'dry-fruit', 'souvenir'];
@@ -23,6 +24,12 @@ const getStaticPages = (): MetadataRoute.Sitemap => {
       lastModified: now,
       changeFrequency: 'weekly' as const,
       priority: 0.6,
+    })),
+    ...listCategorySlugs().map((slug) => ({
+      url: `${BASE_URL}/category/${slug}`,
+      lastModified: now,
+      changeFrequency: 'weekly' as const,
+      priority: 0.85,
     })),
   ];
 };

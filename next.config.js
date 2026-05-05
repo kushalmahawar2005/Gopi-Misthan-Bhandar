@@ -42,6 +42,18 @@ const nextConfig = {
   // Enable production source maps for debugging (optional, can disable)
   productionBrowserSourceMaps: false,
   
+  // Redirect www → apex (consolidates SEO signals on a single canonical host)
+  async redirects() {
+    return [
+      {
+        source: '/:path*',
+        has: [{ type: 'host', value: 'www.gopimisthanbhandar.com' }],
+        destination: 'https://gopimisthanbhandar.com/:path*',
+        permanent: true,
+      },
+    ];
+  },
+
   // Performance headers
   async headers() {
     return [

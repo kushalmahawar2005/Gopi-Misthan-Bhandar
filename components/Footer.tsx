@@ -32,11 +32,14 @@ const Footer = () => {
   const rangeLinks = [
     { label: 'Sweets', href: '/products?category=sweets' },
     { label: 'Dry Fruits', href: '/products?category=dry-fruit' },
-    { label: 'Gifting', href: '/products?category=gifting-' },
+    { label: 'Gifting', href: '/giftbox' },
     { label: 'Indian Bakery', href: '/products?category=bakery' },
     { label: 'Namkeen', href: '/products?category=namkeen' },
     { label: 'Savoury Snacks', href: '/products?category=savoury-snacks' },
   ];
+
+  const fssaiLicense = process.env.NEXT_PUBLIC_FSSAI_LICENSE || '';
+  const gstNumber = process.env.NEXT_PUBLIC_GST_NUMBER || '';
 
   const aboutLinks = [
     { label: 'Company', href: '/#about' },
@@ -57,10 +60,10 @@ const Footer = () => {
     title: string;
     links: Array<{ label: string; href: string }>;
   }> = [
-    { key: 'range', title: 'Our Range', links: rangeLinks },
-    { key: 'about', title: 'About Us', links: aboutLinks },
-    { key: 'legal', title: 'Legal', links: legalLinks },
-  ];
+      { key: 'range', title: 'Our Range', links: rangeLinks },
+      { key: 'about', title: 'About Us', links: aboutLinks },
+      { key: 'legal', title: 'Legal', links: legalLinks },
+    ];
 
   const toggleMobileSection = (section: MobileFooterSectionKey) => {
     setOpenMobileSection((prev) => (prev === section ? null : section));
@@ -74,8 +77,8 @@ const Footer = () => {
             <Image src="/logo.png" alt="Gopi Misthan Bhandar" fill className="object-contain object-center md:object-left" />
           </Link>
 
-          <div className="hidden md:block relative w-[110px] h-[76px] opacity-80">
-            <Image src="/bird.avif" alt="Decorative bird" fill className="object-contain" />
+          <div className="hidden md:block relative w-[130px] h-[130px] opacity-80">
+            <Image src="/Main.png" alt="Gopi Logo" fill className="object-contain" />
           </div>
         </div>
 
@@ -276,6 +279,23 @@ const Footer = () => {
           </div>
         </div>
       </div>
+
+      {(fssaiLicense || gstNumber) && (
+        <div className="border-t border-[#ead9c6] bg-white">
+          <div className="max-w-[1400px] mx-auto px-4 md:px-8 lg:px-12 py-3 flex flex-wrap justify-center md:justify-start items-center gap-x-6 gap-y-1 text-[12px] text-[#735f50] font-flama">
+            {fssaiLicense && (
+              <p>
+                <span className="font-semibold text-[#503223]">FSSAI Lic. No.</span> {fssaiLicense}
+              </p>
+            )}
+            {gstNumber && (
+              <p>
+                <span className="font-semibold text-[#503223]">GSTIN:</span> {gstNumber}
+              </p>
+            )}
+          </div>
+        </div>
+      )}
 
       <div className="border-t border-[#ead9c6] bg-[#fff9f2]">
         <div className="max-w-[1400px] mx-auto px-4 md:px-8 lg:px-12 py-4 flex flex-col md:flex-row justify-between items-center gap-3 text-[14px] text-[#503223] font-flama">

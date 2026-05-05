@@ -123,7 +123,7 @@ const NavigationContent = () => {
     { label: 'Bakery Items', href: '/products?category=bakery', slug: 'bakery' },
     { label: 'Namkeen', href: '/products?category=namkeen', slug: 'namkeen' },
     { label: 'Savoury Snacks', href: '/products?category=savoury-snacks', slug: 'savoury-snacks' },
-    { label: 'Gifting', href: '/products?category=gifting-', slug: 'gifting-' },
+    { label: 'Gifting', href: '/giftbox', slug: 'gifting-' },
   ];
 
   const isActive = (href: string) => {

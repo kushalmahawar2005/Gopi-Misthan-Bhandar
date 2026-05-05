@@ -1,12 +1,13 @@
 'use client';
 
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { Product } from '@/types';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useCart } from '@/context/CartContext';
 import { useWishlist } from '@/context/WishlistContext';
-import { FiChevronDown, FiHeart } from 'react-icons/fi';
+import { useRouter } from 'next/navigation';
+import { FiShoppingCart, FiX, FiHeart } from 'react-icons/fi';
 
 interface ProductCardProps {
   product: Product;
@@ -16,12 +17,11 @@ interface ProductCardProps {
 const ProductCard: React.FC<ProductCardProps> = ({ product, showAddToCart = true }) => {
   const { addToCart } = useCart();
   const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
-  const [isHovered, setIsHovered] = useState(false);
+  const router = useRouter();
+  const [isOverlayOpen, setIsOverlayOpen] = useState(false);
   const [isAdding, setIsAdding] = useState(false);
-  const [quantity, setQuantity] = useState(1);
   const productUrl = `/product/${product.slug || product.id}`;
   const isFavorite = isInWishlist(product.id);
-  const maxQuantity = typeof product.stock === 'number' && product.stock > 0 ? product.stock : 99;
 
   const sizeOptions = useMemo(() => {
     if (!Array.isArray(product.sizes)) return [];
@@ -43,75 +43,14 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, showAddToCart = true
 
   const defaultSizeOption = useMemo(() => {
     if (sizeOptions.length === 0) return null;
-
     const preferredWeight = String(product.defaultWeight || '').trim().toLowerCase();
     return sizeOptions.find((size) => size.weight.toLowerCase() === preferredWeight) || sizeOptions[0];
   }, [sizeOptions, product.defaultWeight]);
 
   const [selectedWeight, setSelectedWeight] = useState(defaultSizeOption?.weight || '');
-  const [isMobileSizeMenuOpen, setIsMobileSizeMenuOpen] = useState(false);
-  const [mobileSizeMenuDirection, setMobileSizeMenuDirection] = useState<'up' | 'down'>('up');
-  const mobileSizeMenuRef = useRef<HTMLDivElement | null>(null);
-
-  useEffect(() => {
-    setSelectedWeight(defaultSizeOption?.weight || '');
-    setIsMobileSizeMenuOpen(false);
-  }, [defaultSizeOption?.weight, product.id]);
-
-  useEffect(() => {
-    const handleOutsideClick = (event: MouseEvent | TouchEvent) => {
-      if (!mobileSizeMenuRef.current) return;
-      if (mobileSizeMenuRef.current.contains(event.target as Node)) return;
-      setIsMobileSizeMenuOpen(false);
-    };
-
-    const handleEscape = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') {
-        setIsMobileSizeMenuOpen(false);
-      }
-    };
-
-    document.addEventListener('mousedown', handleOutsideClick);
-    document.addEventListener('touchstart', handleOutsideClick);
-    document.addEventListener('keydown', handleEscape);
-
-    return () => {
-      document.removeEventListener('mousedown', handleOutsideClick);
-      document.removeEventListener('touchstart', handleOutsideClick);
-      document.removeEventListener('keydown', handleEscape);
-    };
-  }, []);
 
   const activeSize = sizeOptions.find((size) => size.weight === selectedWeight) || defaultSizeOption;
   const displayPrice = activeSize ? activeSize.price : product.price;
-  const hasMultipleSizes = sizeOptions.length > 1;
-  const displayWeight = activeSize?.weight || String(product.defaultWeight || '').trim() || 'Default';
-
-  const toCompactWeightLabel = (weight: string) => {
-    const normalized = String(weight || '').trim().toLowerCase().replace(/\s+/g, '');
-    if (!normalized) return 'Default';
-
-    if (normalized.endsWith('grams')) return `${normalized.replace(/grams$/, '')}g`;
-    if (normalized.endsWith('gram')) return `${normalized.replace(/gram$/, '')}g`;
-    if (normalized.endsWith('gms')) return `${normalized.replace(/gms$/, '')}g`;
-    if (normalized.endsWith('gm')) return `${normalized.replace(/gm$/, '')}g`;
-
-    return normalized;
-  };
-
-  const compactDisplayWeight = toCompactWeightLabel(displayWeight);
-
-  const increaseQuantity = (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setQuantity((prev) => Math.min(maxQuantity, prev + 1));
-  };
-
-  const decreaseQuantity = (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setQuantity((prev) => Math.max(1, prev - 1));
-  };
 
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -127,46 +66,145 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, showAddToCart = true
       defaultWeight: variantWeight || product.defaultWeight,
     };
 
-    addToCart(productForCart, quantity);
-    setTimeout(() => setIsAdding(false), 800);
+    addToCart(productForCart, 1);
+    setTimeout(() => {
+      setIsAdding(false);
+      setIsOverlayOpen(false);
+    }, 600);
   };
 
+  const handleBuyNow = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    const variantWeight = activeSize?.weight || String(product.defaultWeight || '').trim();
+    const productForCart: Product = {
+      ...product,
+      price: displayPrice,
+      selectedSize: variantWeight || undefined,
+      selectedWeight: variantWeight || undefined,
+      defaultWeight: variantWeight || product.defaultWeight,
+    };
+
+    addToCart(productForCart, 1);
+    // Optionally redirect to checkout directly
+    // router.push('/checkout'); 
+    setIsOverlayOpen(false);
+  };
+
+  // Render the hover overlay
+  const renderOverlay = () => (
+    <div
+      className={`absolute inset-0 bg-white/95 flex flex-col transition-opacity duration-300 ease-in-out z-20 ${
+        isOverlayOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
+      }`}
+      onClick={(e) => e.stopPropagation()} // Prevent navigating when clicking inside overlay
+    >
+      {/* Top Content Area */}
+      <div className="flex-1 flex flex-col p-2 sm:p-4">
+        {/* Close Button */}
+        <div className="flex justify-end mb-1 sm:mb-2">
+          <button
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              setIsOverlayOpen(false);
+            }}
+            className="flex items-center gap-1 text-[10px] sm:text-[13px] font-semibold text-gray-800 hover:text-black tracking-wide"
+          >
+            <FiX className="w-3 h-3 sm:w-4 sm:h-4" /> <span className="hidden sm:inline">CLOSE</span>
+          </button>
+        </div>
+
+        {/* Content Centered */}
+        <div className="flex-1 flex flex-col items-center justify-center -mt-2 sm:-mt-4">
+          <div className="text-[12px] sm:text-[15px] text-black mb-1.5 sm:mb-3">
+            <span className="font-semibold">Weight :</span> <span className="text-gray-500">: {selectedWeight}</span>
+          </div>
+          
+          <div className="flex flex-wrap justify-center gap-1.5 sm:gap-2 mb-2 sm:mb-6">
+            {sizeOptions.length > 0 ? (
+              sizeOptions.map((size) => {
+                const isSelected = selectedWeight === size.weight;
+                return (
+                  <button
+                    key={size.weight}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      setSelectedWeight(size.weight);
+                    }}
+                    className={`px-2 py-1 sm:px-3 sm:py-1.5 text-[10px] sm:text-[14px] transition-colors rounded-[4px] leading-tight ${
+                      isSelected
+                        ? 'border-[1.5px] border-black text-black font-semibold'
+                        : 'border border-gray-300 text-black hover:border-gray-400'
+                    }`}
+                  >
+                    {size.weight}
+                  </button>
+                );
+              })
+            ) : (
+              <span className="text-[10px] sm:text-[14px] text-gray-500">Standard Size</span>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* Bottom Section (Price & Buttons) */}
+      <div className="w-full mt-auto flex flex-col">
+        <div className="text-center w-full mb-1.5 sm:mb-3 text-[14px] sm:text-[18px] md:text-[20px] font-semibold text-[#444444]">
+          ₹ {displayPrice}
+        </div>
+        <div className="flex w-full">
+          <button
+            onClick={handleAddToCart}
+            disabled={isAdding}
+            className="flex-1 flex items-center justify-center gap-1 sm:gap-2 bg-[#3e5c4a] hover:bg-[#2d4738] text-white py-2 sm:py-3.5 text-[9px] sm:text-[12px] md:text-[13px] font-medium tracking-wide transition-colors disabled:opacity-75"
+          >
+            <FiShoppingCart className="w-3 h-3 sm:w-4 sm:h-4" />
+            <span className="truncate">{isAdding ? 'ADDING...' : 'ADD TO CART'}</span>
+          </button>
+          <div className="w-[1px] bg-white/20"></div>
+          <button
+            onClick={handleBuyNow}
+            className="flex-1 flex items-center justify-center gap-1 sm:gap-2 bg-[#3e5c4a] hover:bg-[#2d4738] text-white py-2 sm:py-3.5 text-[9px] sm:text-[12px] md:text-[13px] font-medium tracking-wide transition-colors"
+          >
+            <FiShoppingCart className="w-3 h-3 sm:w-4 sm:h-4" />
+            <span className="truncate">BUY NOW</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+
   return (
-    <div className="group block h-full">
-      <div 
-        className="flex flex-col w-full cursor-pointer mb-0 h-full transition-all duration-300"
-        onMouseEnter={() => setIsHovered(true)}
-        onMouseLeave={() => setIsHovered(false)}
-      >
-        {/* Image Container - Square with Rounded Corners */}
-        <div className="relative w-full aspect-square mb-4 rounded-[20px] overflow-hidden bg-[#F9F6F3]">
-          <Link href={productUrl} className="block relative w-full h-full">
-            {/* Main Image */}
+    <div className="group flex flex-col w-full h-full">
+      {/* Image & Overlay Wrapper */}
+      <div className="relative w-full aspect-square mb-4 overflow-hidden rounded-[6px] bg-[#F9F6F3]">
+        <Link href={productUrl} className="block relative w-full h-full">
+          <Image
+            src={product.image && product.image.trim() !== '' ? product.image : `https://picsum.photos/seed/product${product.id}/500/500`}
+            alt={product.name}
+            fill
+            className={`object-cover object-center transition-all duration-700 scale-100 group-hover:scale-110 ${
+              product.images && product.images.length > 0 ? 'group-hover:opacity-0' : ''
+            }`}
+            sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
+          />
+          {/* Second Image on Hover */}
+          {product.images && product.images.length > 0 && (
             <Image
-              src={product.image && product.image.trim() !== '' ? product.image : `https://picsum.photos/seed/product${product.id}/500/500`}
-              alt={`${product.name} | ${product.category?.replace(/-/g, ' ') || 'Indian Sweets'} - Gopi Misthan Bhandar`}
+              src={product.images[0]}
+              alt={`${product.name} - View 2`}
               fill
-              className={`object-cover object-center transition-opacity duration-700 ${
-                isHovered && product.images && product.images.length > 0 ? 'opacity-0' : 'opacity-100'
-              }`}
+              loading="lazy"
+              className="object-cover object-center transition-all duration-700 opacity-0 scale-100 group-hover:opacity-100 group-hover:scale-110"
               sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
             />
-            {/* Second Image on Hover — lazy loaded since not visible initially */}
-            {product.images && product.images.length > 0 && (
-              <Image
-                src={product.images[0]}
-                alt={`${product.name} - View 2 | Gopi Misthan Bhandar`}
-                fill
-                loading="lazy"
-                className={`object-cover object-center transition-opacity duration-700 ${
-                  isHovered ? 'opacity-100' : 'opacity-0'
-                }`}
-                sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
-              />
-            )}
-          </Link>
-          
-          {/* Heart Icon Top Right - Subtly visible */}
+          )}
+
+          {/* Wishlist Heart Icon (Top Right) - Appears on Hover */}
           <button
             onClick={(e) => {
               e.preventDefault();
@@ -177,217 +215,44 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, showAddToCart = true
                 addToWishlist(product);
               }
             }}
-            className="absolute top-3 right-3 w-8 h-8 flex items-center justify-center rounded-full bg-white bg-opacity-80 hover:bg-opacity-100 transition-all z-10 shadow-sm"
+            className="absolute top-3 right-3 w-8 h-8 flex items-center justify-center rounded-full bg-white bg-opacity-90 hover:bg-opacity-100 transition-all z-10 shadow-sm opacity-0 group-hover:opacity-100"
           >
             <FiHeart className={`w-4 h-4 transition-colors ${isFavorite ? 'fill-[#FE8E02] text-[#FE8E02]' : 'text-gray-500 hover:text-[#FE8E02]'}`} />
           </button>
-        </div>
+        </Link>
         
-        {/* Product Info Section - Left Aligned */}
-        <div className="w-full flex-grow flex flex-col items-start text-left px-1">
-          <div className="mb-3 w-full flex flex-col gap-2 md:grid md:grid-cols-[minmax(0,1fr)_auto] md:items-start md:gap-3">
-            <div className="min-w-0 flex-1">
-              <Link href={productUrl} className="block mb-1 group-hover:opacity-80 transition-opacity">
-                <h3 className="text-[#1A1A1A] text-[14px] sm:text-[15px] md:text-[17px] font-medium font-flama leading-snug line-clamp-2">
-                  {product.name}
-                </h3>
-              </Link>
-              <span className="text-[#503223] font-bold text-[15px] sm:text-[16px] md:text-[17px] font-inter">
-                ₹{displayPrice}
-              </span>
-            </div>
+        {/* Hover Overlay */}
+        {renderOverlay()}
+      </div>
 
-            {showAddToCart && hasMultipleSizes && (
-              <div className="hidden w-full self-start md:block md:w-auto md:max-w-[152px]">
-                <div className="flex gap-2 overflow-x-auto pb-1 no-scrollbar md:pb-0">
-                  {sizeOptions.map((size) => (
-                    <button
-                      key={`${product.id}-${size.weight}`}
-                      type="button"
-                      onClick={() => setSelectedWeight(size.weight)}
-                      className={`min-w-[66px] sm:min-w-[72px] min-h-[52px] sm:min-h-[58px] rounded border px-2.5 sm:px-3 py-1.5 sm:py-2 text-left transition-colors ${
-                        selectedWeight === size.weight
-                          ? 'border-[#FE8E02] bg-orange-50'
-                          : 'border-[#d6cec6] bg-white hover:border-[#FE8E02]/60'
-                      }`}
-                    >
-                      <p className={`text-[13px] sm:text-[14px] font-bold leading-tight ${selectedWeight === size.weight ? 'text-[#FE8E02]' : 'text-[#503223]'}`}>
-                        {size.weight}
-                      </p>
-                      <p className="text-[11px] sm:text-[12px] leading-[1.2] text-[#503223]">₹{size.price}</p>
-                    </button>
-                  ))}
-                </div>
-              </div>
-            )}
-          </div>
-          
-          {showAddToCart && (
-            <div className="mt-auto w-full flex flex-col gap-2 md:gap-3">
-              {/* Mobile controls: size selector + quantity row */}
-              <div className="grid grid-cols-2 gap-2 md:hidden">
-                <div ref={mobileSizeMenuRef} className="relative h-[42px]">
-                  {sizeOptions.length > 0 ? (
-                    <>
-                      <button
-                        type="button"
-                        onClick={(e) => {
-                          e.preventDefault();
-                          e.stopPropagation();
+      {/* Product Info (Default State) */}
+      <div className="w-full flex flex-col items-start text-left px-1 mt-1">
+        <Link href={productUrl} className="block mb-1 hover:opacity-80 transition-opacity w-full">
+          <h3 className="text-[#333333] text-[13px] sm:text-[15px] md:text-[16px] lg:text-[18px] font-bold font-sans leading-snug line-clamp-2">
+            {product.name}
+          </h3>
+        </Link>
 
-                          const shouldOpen = !isMobileSizeMenuOpen;
-                          if (shouldOpen && mobileSizeMenuRef.current) {
-                            const rect = mobileSizeMenuRef.current.getBoundingClientRect();
-                            const viewportHeight = window.innerHeight;
-                            const spaceAbove = rect.top;
-                            const spaceBelow = viewportHeight - rect.bottom;
-                            const estimatedMenuHeight = Math.min(sizeOptions.length * 40 + 8, 176);
+        {/* Price (Visible Default) / Select Options (Visible Hover) */}
+        <div className="w-full text-left relative min-h-[24px]">
+          {/* Price */}
+          <span className="text-[#555555] font-normal text-[14px] sm:text-[15px] md:text-[16px] font-inter absolute top-0 left-0 transition-opacity duration-200 group-hover:opacity-0 group-hover:pointer-events-none pointer-events-auto">
+            ₹ {displayPrice}
+          </span>
 
-                            const openUp =
-                              spaceAbove >= estimatedMenuHeight ||
-                              (spaceBelow < estimatedMenuHeight && spaceAbove > spaceBelow);
-
-                            setMobileSizeMenuDirection(openUp ? 'up' : 'down');
-                          }
-
-                          setIsMobileSizeMenuOpen(shouldOpen);
-                        }}
-                        className="flex h-full w-full items-center justify-between gap-1 rounded-[12px] border border-[#d6cec6] bg-white px-2.5 text-[12px] font-semibold text-[#2D2D2D]"
-                        aria-haspopup="listbox"
-                        aria-expanded={isMobileSizeMenuOpen}
-                        aria-label="Select weight"
-                      >
-                        <span className="block min-w-0 flex-1 overflow-hidden text-ellipsis whitespace-nowrap">
-                          {compactDisplayWeight}
-                        </span>
-                        <FiChevronDown
-                          className={`h-4 w-4 shrink-0 text-[#503223] transition-transform ${
-                            isMobileSizeMenuOpen ? 'rotate-180' : ''
-                          }`}
-                        />
-                      </button>
-
-                      {isMobileSizeMenuOpen && (
-                        <div
-                          className={`absolute left-0 right-0 z-30 max-h-44 overflow-y-auto rounded-[12px] border border-[#d6cec6] bg-white py-1 shadow-[0_10px_30px_rgba(0,0,0,0.16)] ${
-                            mobileSizeMenuDirection === 'up' ? 'bottom-[calc(100%+6px)]' : 'top-[calc(100%+6px)]'
-                          }`}
-                          role="listbox"
-                          aria-label="Weight options"
-                        >
-                          {sizeOptions.map((size) => {
-                            const isSelected = selectedWeight === size.weight;
-                            return (
-                              <button
-                                key={`${product.id}-mobile-${size.weight}`}
-                                type="button"
-                                onClick={(e) => {
-                                  e.preventDefault();
-                                  e.stopPropagation();
-                                  setSelectedWeight(size.weight);
-                                  setIsMobileSizeMenuOpen(false);
-                                }}
-                                className={`w-full px-3 py-2 text-left text-[12px] transition-colors ${
-                                  isSelected
-                                    ? 'bg-orange-50 font-semibold text-[#FE8E02]'
-                                    : 'text-[#2D2D2D] hover:bg-[#f8f3ed]'
-                                }`}
-                                role="option"
-                                aria-selected={isSelected}
-                              >
-                                {toCompactWeightLabel(size.weight)}
-                              </button>
-                            );
-                          })}
-                        </div>
-                      )}
-                    </>
-                  ) : (
-                    <div className="flex h-full items-center rounded-[12px] border border-[#d6cec6] bg-white px-3 text-[14px] font-semibold text-[#2D2D2D]">
-                      {displayWeight}
-                    </div>
-                  )}
-                </div>
-
-                <div className="flex h-[44px] items-center justify-between rounded-[12px] border border-[#d6cec6] bg-white px-2">
-                  <button
-                    onClick={decreaseQuantity}
-                    disabled={quantity <= 1}
-                    className="h-8 w-8 flex items-center justify-center text-[22px] leading-none text-[#503223] disabled:opacity-40"
-                    aria-label="Decrease quantity"
-                  >
-                    -
-                  </button>
-                  <span className="min-w-[22px] text-center text-[18px] leading-none text-[#2D2D2D] font-inter font-semibold">
-                    {quantity}
-                  </span>
-                  <button
-                    onClick={increaseQuantity}
-                    disabled={quantity >= maxQuantity}
-                    className="h-8 w-8 flex items-center justify-center text-[22px] leading-none text-[#503223] disabled:opacity-40"
-                    aria-label="Increase quantity"
-                  >
-                    +
-                  </button>
-                </div>
-              </div>
-
-              <button
-                onClick={handleAddToCart}
-                disabled={isAdding}
-                className="md:hidden w-full h-[44px] rounded-[14px] bg-primary-red text-white text-[12px] font-semibold transition-all duration-300 active:scale-[0.97] disabled:opacity-75 flex items-center justify-center overflow-hidden relative"
-              >
-                <span className={`transition-all duration-300 ${isAdding ? 'translate-y-10 opacity-0' : 'translate-y-0 opacity-100'}`}>
-                  Add To Cart
-                </span>
-                {isAdding && (
-                  <span className="absolute inset-0 flex items-center justify-center text-white bg-green-600 animate-in fade-in zoom-in duration-300">
-                    ADDED!
-                  </span>
-                )}
-              </button>
-
-              {/* Desktop controls */}
-              <div className="hidden w-full md:flex md:flex-row md:items-center md:gap-3">
-                <div className="w-full md:w-auto flex items-center justify-between h-[42px] md:h-[50px] md:min-w-[120px] px-2 md:px-3 border border-[#d6cec6] bg-white">
-                  <button
-                    onClick={decreaseQuantity}
-                    disabled={quantity <= 1}
-                    className="w-7 h-7 flex items-center justify-center text-[18px] leading-none text-[#503223] disabled:opacity-40"
-                    aria-label="Decrease quantity"
-                  >
-                    -
-                  </button>
-                  <span className="min-w-[16px] text-center text-[16px] md:text-[18px] leading-none text-[#2D2D2D] font-inter font-semibold">
-                    {quantity}
-                  </span>
-                  <button
-                    onClick={increaseQuantity}
-                    disabled={quantity >= maxQuantity}
-                    className="w-7 h-7 flex items-center justify-center text-[18px] leading-none text-[#503223] disabled:opacity-40"
-                    aria-label="Increase quantity"
-                  >
-                    +
-                  </button>
-                </div>
-
-                <button
-                  onClick={handleAddToCart}
-                  disabled={isAdding}
-                  className="w-full md:flex-1 h-[42px] md:h-[50px] bg-[#FE8E02] text-white text-[10px] sm:text-[11px] md:text-[12px] font-bold tracking-[0.1em] md:tracking-[0.15em] uppercase transition-all duration-300 active:scale-[0.97] disabled:opacity-75 flex items-center justify-center overflow-hidden relative"
-                >
-                  <span className={`transition-all duration-300 ${isAdding ? 'translate-y-10 opacity-0' : 'translate-y-0 opacity-100'}`}>
-                    ADD TO CART
-                  </span>
-                  {isAdding && (
-                    <span className="absolute inset-0 flex items-center justify-center text-white bg-green-600 animate-in fade-in zoom-in duration-300">
-                      ADDED!
-                    </span>
-                  )}
-                </button>
-              </div>
-            </div>
-          )}
+          {/* Select Options Link */}
+          <button
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              setIsOverlayOpen(true);
+            }}
+            className="text-[#555555] text-[14px] sm:text-[15px] absolute top-0 left-0 transition-opacity duration-200 opacity-0 group-hover:opacity-100 group-hover:pointer-events-auto pointer-events-none"
+          >
+            <span className="border-b border-[#555555] pb-[1px] hover:text-black hover:border-black transition-colors">
+              Select Options
+            </span>
+          </button>
         </div>
       </div>
     </div>
