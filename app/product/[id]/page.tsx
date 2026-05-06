@@ -18,12 +18,12 @@ import {
   FiMinus,
   FiPlus,
   FiHeart,
-  FiTruck,
-  FiPackage,
-  FiClock,
-  FiCheckCircle,
   FiChevronLeft,
   FiChevronRight,
+  FiStar,
+  FiShare2,
+  FiFacebook,
+  FiTwitter,
 } from 'react-icons/fi';
 import { Product } from '@/types';
 
@@ -43,9 +43,12 @@ export default function ProductDetailPage() {
   const [isBuying, setIsBuying] = useState(false);
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const [imageAspectMap, setImageAspectMap] = useState<Record<string, number>>({});
-  const [showReviews, setShowReviews] = useState(false);
   const [recentlyViewed, setRecentlyViewed] = useState<LightweightProduct[]>([]);
-  const [openAccordion, setOpenAccordion] = useState<string | null>(null);
+  const [openAccordion, setOpenAccordion] = useState<string | null>('Description');
+  const [reviewStats, setReviewStats] = useState<{ averageRating: number; totalReviews: number }>({
+    averageRating: 0,
+    totalReviews: 0,
+  });
   const reviewSectionRef = useRef<HTMLDivElement | null>(null);
 
   // Size selection state
@@ -117,10 +120,23 @@ export default function ProductDetailPage() {
   }, [productId]);
 
   useEffect(() => {
-    if (showReviews) {
-      reviewSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
-  }, [showReviews]);
+    if (!productId) return;
+    fetch(`/api/reviews?productId=${productId}&approved=true`)
+      .then((res) => res.json())
+      .then((data) => {
+        if (data?.stats) {
+          setReviewStats({
+            averageRating: data.stats.averageRating || 0,
+            totalReviews: data.stats.totalReviews || 0,
+          });
+        }
+      })
+      .catch(() => {});
+  }, [productId]);
+
+  const scrollToReviews = () => {
+    reviewSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
 
   useEffect(() => {
     if (!product) return;
@@ -174,7 +190,7 @@ export default function ProductDetailPage() {
           setSelectedSize(defaultSize);
         }
         // Load related products
-        const relatedResp = await fetchProducts({ category: productData.category, limit: 4 });
+        const relatedResp = await fetchProducts({ category: productData.category, limit: 8 });
         const related = Array.isArray(relatedResp) ? relatedResp : relatedResp.products;
         setRelatedProducts(related.filter(p => p.id !== productData.id).slice(0, 4));
       }
@@ -274,102 +290,67 @@ export default function ProductDetailPage() {
     }
   };
 
-  const availabilityText =
-    product.stock !== undefined
-      ? product.stock > 0
-        ? `${product.stock} in stock`
-        : 'Currently unavailable'
-      : 'Available on request';
+  const priceRange = (() => {
+    if (!product.sizes || product.sizes.length === 0) return null;
+    const prices = product.sizes.map((s) => s.price);
+    const min = Math.min(...prices);
+    const max = Math.max(...prices);
+    return min === max ? null : { min, max };
+  })();
 
-  const infoItems = [
-    {
-      title: 'Availability',
-      description: availabilityText,
-      icon: <FiCheckCircle className="w-5 h-5 text-green-500" />,
-    },
-    {
-      title: 'Delivery',
-      description: product.deliveryTime || 'Delivery within 2-3 business days',
-      icon: <FiTruck className="w-5 h-5 text-primary-brown" />,
-    },
-    {
-      title: 'Shelf Life',
-      description: product.shelfLife || 'Enjoy fresh goodies with optimal taste',
-      icon: <FiClock className="w-5 h-5 text-primary-brown" />,
-    },
-    {
-      title: 'Packaging Disclaimer',
-      description: 'Final box design depends on stock availability at the time of dispatch.',
-      icon: <FiPackage className="w-5 h-5 text-primary-brown" />,
-    },
-  ];
+  const sku = `GMB-${product.id.slice(-8).toUpperCase()}`;
 
   const accordionItems = [
     {
       key: 'Description',
       title: 'Description',
       content: (
-        <p className="leading-relaxed text-gray-600">
+        <p className="leading-relaxed text-[#6f5d4e]">
           {product.description || 'Delightful gourmet sweets crafted with premium ingredients.'}
         </p>
       ),
     },
     {
-      key: 'RefundPolicy',
-      title: 'Refund & Cancellation Policy',
+      key: 'AdditionalInfo',
+      title: 'Additional Information',
       content: (
-        <p className="leading-relaxed text-gray-600">
-          Due to the perishable nature of our sweets, cancellations are accepted within 2 hours of placing the order.
-          For concerns about your delivery, please reach out to our support team the same day with images and order
-          details.
-        </p>
-      ),
-    },
-    {
-      key: 'Terms',
-      title: 'Terms & Conditions',
-      content: (
-        <p className="leading-relaxed text-gray-600">
-          All orders are subject to availability. Delivery timelines may vary based on pin code. By placing an order,
-          you agree to our privacy policy and terms of service available on the website.
-        </p>
+        <dl className="grid grid-cols-1 gap-x-6 gap-y-2 text-sm text-[#6f5d4e] sm:grid-cols-2">
+          {product.shelfLife && (
+            <div className="flex justify-between border-b border-[#f0e5d8] py-1.5">
+              <dt className="font-medium text-[#3f3228]">Shelf Life</dt>
+              <dd>{product.shelfLife}</dd>
+            </div>
+          )}
+          {product.deliveryTime && (
+            <div className="flex justify-between border-b border-[#f0e5d8] py-1.5">
+              <dt className="font-medium text-[#3f3228]">Delivery</dt>
+              <dd>{product.deliveryTime}</dd>
+            </div>
+          )}
+          <div className="flex justify-between border-b border-[#f0e5d8] py-1.5">
+            <dt className="font-medium text-[#3f3228]">Availability</dt>
+            <dd>
+              {product.stock !== undefined && product.stock > 0
+                ? `${product.stock} in stock`
+                : product.stock === 0
+                  ? 'Currently unavailable'
+                  : 'Available on request'}
+            </dd>
+          </div>
+          <div className="flex justify-between border-b border-[#f0e5d8] py-1.5 capitalize">
+            <dt className="font-medium text-[#3f3228]">Category</dt>
+            <dd>{product.category}</dd>
+          </div>
+          {product.defaultWeight && (
+            <div className="flex justify-between border-b border-[#f0e5d8] py-1.5">
+              <dt className="font-medium text-[#3f3228]">Default Weight</dt>
+              <dd>{product.defaultWeight}</dd>
+            </div>
+          )}
+        </dl>
       ),
     },
   ];
-
-  const renderProductTile = (item: Product | LightweightProduct) => {
-    const cardImage = item.images && item.images.length > 0 ? item.images[0] : item.image;
-    const productUrl = `/product/${item.slug || item.id}`;
-    return (
-      <Link
-        key={item.id}
-        href={productUrl}
-        className="group h-full rounded-xl border border-gray-200 bg-white shadow-sm transition hover:-translate-y-1 hover:shadow-xl"
-      >
-        <div className="relative w-full aspect-square overflow-hidden rounded-t-xl bg-gray-50">
-          <Image
-            src={cardImage && cardImage.trim() !== '' ? cardImage : item.image}
-            alt={item.name}
-            fill
-            className="object-cover transition-transform duration-500 group-hover:scale-105"
-            sizes="(max-width: 640px) 50vw, (max-width: 1024px) 25vw, 20vw"
-          />
-        </div>
-        <div className="p-4 space-y-2">
-          <h3 className="text-base font-semibold text-gray-900 line-clamp-2">{item.name}</h3>
-          <p className="text-sm uppercase tracking-wide text-primary-brown">
-            {/* Removed label line from size selection */}
-          </p>
-          <p className="text-lg font-bold text-primary-red">₹{item.price.toLocaleString()}</p>
-        </div>
-      </Link>
-    );
-  };
-
-  const shortDescription =
-    product.description && product.description.length > 180
-      ? `${product.description.slice(0, 180)}...`
-      : product.description || 'Handcrafted sweets made with premium ingredients.';
 
   return (
     <div className="min-h-screen bg-white">
@@ -504,26 +485,16 @@ export default function ProductDetailPage() {
           </div>
 
           {/* Product Info */}
-          <div className="rounded-[28px] border border-[#ead8c3] bg-white p-5 shadow-[0_16px_46px_rgba(133,74,31,0.10)] animate-[fadeInUp_0.65s_ease-out] sm:p-7">
+          <div className="h-fit animate-[fadeInUp_0.65s_ease-out]">
             <div className="space-y-5">
+              {/* Title + wishlist */}
               <div className="flex items-start justify-between gap-4">
-                <div className="space-y-3">
-                  <h1 className="font-['FlamaCondensed','Flama','sans-serif'] text-4xl leading-tight text-[#1f1a17] sm:text-5xl">
-                    {product.name}
-                  </h1>
-                  <div className="flex flex-wrap gap-2">
-                    <span className="rounded-md bg-[#f6e8e2] px-3 py-1 text-xs font-semibold text-[#5f4738]">
-                      Handmade in India
-                    </span>
-                    <span className="rounded-md bg-[#f6e8e2] px-3 py-1 text-xs font-semibold text-[#5f4738]">
-                      Traditional Products
-                    </span>
-                  </div>
-                </div>
-
+                <h1 className="font-['FlamaCondensed','Flama','sans-serif'] text-4xl leading-tight text-[#1f1a17] sm:text-5xl">
+                  {product.name}
+                </h1>
                 <button
                   onClick={handleWishlistToggle}
-                  className={`rounded-xl border p-2 transition ${isFavorite
+                  className={`shrink-0 rounded-xl border p-2 transition ${isFavorite
                     ? 'border-[#d23030] bg-red-50 text-[#d23030]'
                     : 'border-[#e3d4c2] text-[#6b5647] hover:border-[#c99c53] hover:text-[#c99c53]'
                     }`}
@@ -534,204 +505,232 @@ export default function ProductDetailPage() {
                 </button>
               </div>
 
-              <p className="text-sm leading-relaxed text-[#735f50]">{shortDescription}</p>
+              {/* Rating + reviews link */}
+              <button
+                type="button"
+                onClick={scrollToReviews}
+                className="flex items-center gap-2 text-left"
+              >
+                <span className="flex items-center gap-0.5">
+                  {[1, 2, 3, 4, 5].map((s) => {
+                    const filled = s <= Math.round(reviewStats.averageRating || 5);
+                    return (
+                      <FiStar
+                        key={s}
+                        className={`h-4 w-4 ${filled ? 'fill-[#f5b820] text-[#f5b820]' : 'text-[#d8c7b5]'}`}
+                      />
+                    );
+                  })}
+                </span>
+                <span className="text-sm text-[#6f5d4e] underline-offset-2 hover:underline">
+                  ({reviewStats.totalReviews > 0 ? `${reviewStats.totalReviews} customer review${reviewStats.totalReviews > 1 ? 's' : ''}` : 'Write a review'})
+                </span>
+              </button>
 
-              <div className="flex flex-wrap items-end justify-between gap-3">
-                <p className="font-['FlamaCondensed','Flama','sans-serif'] text-4xl font-bold text-[#1f1a17]">
-                  Rs. {currentPrice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                </p>
-                <p className="text-sm text-[#7f6a58]">Subtotal: Rs. {(currentPrice * quantity).toLocaleString()}</p>
-              </div>
+              {/* Price (range or single) */}
+              <p className="font-['FlamaCondensed','Flama','sans-serif'] text-3xl font-bold text-[#1f1a17] sm:text-4xl">
+                {priceRange ? (
+                  <>
+                    ₹ {priceRange.min.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                    {' – '}
+                    ₹ {priceRange.max.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                  </>
+                ) : (
+                  <>₹ {currentPrice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</>
+                )}
+              </p>
 
-              <div className="h-px bg-[#efe5d9]" />
-
-              <div className="space-y-4">
-                <p className="text-base font-semibold text-[#45372d]">
-                  Weight : <span className="ml-1 font-normal text-[#8a7360]">{displayWeight}</span>
-                </p>
-
-                {product.sizes && product.sizes.length > 0 ? (
-                  <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+              {/* Weight pills */}
+              {product.sizes && product.sizes.length > 0 && (
+                <div className="space-y-2">
+                  <p className="text-sm font-semibold text-[#45372d]">
+                    Weight : <span className="ml-1 font-normal text-[#8a7360]">{displayWeight}</span>
+                  </p>
+                  <div className="flex flex-wrap gap-2">
                     {product.sizes.map((size, index) => {
-                      const compactWeight = size.weight.replace(/\s+/g, '').toLowerCase();
                       const isSelected = selectedSize?.weight === size.weight;
-
                       return (
                         <button
                           key={index}
                           type="button"
                           onClick={() => handleSizeChange(size)}
-                          className={`group flex min-h-[96px] flex-col items-center justify-center rounded-2xl border-2 px-3 py-2 text-center transition ${isSelected
-                            ? 'border-[#b58a3a] bg-[#fff6e8] shadow-[0_8px_22px_rgba(181,138,58,0.18)]'
-                            : 'border-[#cfad6a] bg-white hover:bg-[#fffaf2]'
+                          className={`rounded-md border px-4 py-2 text-sm font-medium transition ${isSelected
+                            ? 'border-[#b58a3a] bg-white text-[#1f1a17] shadow-[inset_0_0_0_1px_#b58a3a]'
+                            : 'border-[#d8c7b5] bg-white text-[#3f3228] hover:border-[#b58a3a]'
                             }`}
                         >
-                          <span className="font-['FlamaCondensed','Flama','sans-serif'] text-4xl leading-none text-[#161311]">
-                            {compactWeight}
-                          </span>
-                          <span className="mt-1 text-xs font-semibold uppercase tracking-wide text-[#7f6a58]">
-                            Rs. {size.price.toLocaleString()}
-                          </span>
+                          {size.weight}
                         </button>
                       );
                     })}
                   </div>
-                ) : (
-                  <div className="inline-flex rounded-xl border border-[#cfad6a] bg-white px-4 py-3 text-lg font-semibold text-[#1f1a17]">
-                    {displayWeight}
-                  </div>
-                )}
-              </div>
+                  {selectedSize && (
+                    <button
+                      type="button"
+                      onClick={() => setSelectedSize(null)}
+                      className="flex items-center gap-1 text-xs text-[#7f6a58] hover:text-[#1f1a17]"
+                    >
+                      <FiPlus className="h-3 w-3 rotate-45" /> Clear
+                    </button>
+                  )}
+                </div>
+              )}
 
-              <div className="flex flex-col gap-3 pt-1 sm:flex-row sm:items-stretch">
-                <div className="inline-flex h-[58px] sm:h-[54px] items-center justify-between rounded-xl border border-[#d8c7b5] bg-[#fffaf3] px-2 sm:w-[120px]">
+              {/* Selected price (when size picked from a multi-price product) */}
+              {priceRange && selectedSize && (
+                <p className="font-['FlamaCondensed','Flama','sans-serif'] text-3xl font-bold text-[#1f1a17]">
+                  ₹ {currentPrice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                </p>
+              )}
+
+              {/* Qty + Add to Cart + Buy Now */}
+              <div className="flex flex-wrap items-stretch gap-3">
+                <div className="inline-flex h-[48px] items-center justify-between rounded-md border border-[#d8c7b5] bg-white px-1 w-[110px]">
                   <button
                     type="button"
                     onClick={() => handleQuantityChange(-1)}
-                    className="rounded-md p-2.5 sm:p-2 text-[#4b3e33] transition hover:bg-[#f3e8db] disabled:cursor-not-allowed disabled:opacity-50"
+                    className="rounded p-2 text-[#4b3e33] transition hover:bg-[#f3e8db] disabled:cursor-not-allowed disabled:opacity-50"
                     disabled={quantity <= 1}
                     aria-label="Decrease quantity"
                   >
-                    <FiMinus className="h-4 w-4 sm:h-4 sm:w-4" />
+                    <FiMinus className="h-4 w-4" />
                   </button>
-                  <span className="w-8 text-center text-[22px] sm:text-lg font-semibold text-[#201914]">{quantity}</span>
+                  <span className="w-6 text-center text-base font-semibold text-[#201914]">{quantity}</span>
                   <button
                     type="button"
                     onClick={() => handleQuantityChange(1)}
-                    className="rounded-md p-2.5 sm:p-2 text-[#4b3e33] transition hover:bg-[#f3e8db] disabled:cursor-not-allowed disabled:opacity-50"
+                    className="rounded p-2 text-[#4b3e33] transition hover:bg-[#f3e8db] disabled:cursor-not-allowed disabled:opacity-50"
                     disabled={quantity >= 10}
                     aria-label="Increase quantity"
                   >
-                    <FiPlus className="h-4 w-4 sm:h-4 sm:w-4" />
+                    <FiPlus className="h-4 w-4" />
                   </button>
                 </div>
 
                 <button
                   onClick={handleAddToCart}
                   disabled={isAdding || (product.stock !== undefined && product.stock === 0)}
-                  className="h-[56px] sm:h-[54px] flex-1 rounded-xl border border-[#30251d] bg-white px-5 text-[17px] sm:text-sm font-semibold uppercase tracking-[0.11em] sm:tracking-[0.08em] text-[#30251d] transition hover:bg-[#f8f1e9] disabled:cursor-not-allowed disabled:opacity-50"
+                  className="h-[48px] flex-1 min-w-[140px] rounded-md bg-[#b58a3a] px-5 text-sm font-semibold uppercase tracking-[0.08em] text-white transition hover:bg-[#9d742f] disabled:cursor-not-allowed disabled:opacity-50"
                 >
                   {isAdding ? 'Adding...' : 'Add To Cart'}
                 </button>
                 <button
                   onClick={handleBuyNow}
                   disabled={isBuying || (product.stock !== undefined && product.stock === 0)}
-                  className="h-[56px] sm:h-[54px] flex-1 rounded-xl bg-[#b58a3a] px-5 text-[17px] sm:text-sm font-semibold uppercase tracking-[0.11em] sm:tracking-[0.08em] text-white transition hover:bg-[#9d742f] disabled:cursor-not-allowed disabled:opacity-50"
+                  className="h-[48px] flex-1 min-w-[140px] rounded-md border-2 border-[#b58a3a] bg-white px-5 text-sm font-semibold uppercase tracking-[0.08em] text-[#b58a3a] transition hover:bg-[#fff6e8] disabled:cursor-not-allowed disabled:opacity-50"
                 >
-                  {isBuying ? 'Redirecting...' : 'Buy It Now'}
+                  {isBuying ? 'Redirecting...' : 'Buy Now'}
                 </button>
               </div>
 
-              <div className="grid gap-3 rounded-2xl border border-[#f0e5d8] bg-[#fffbf5] p-4 sm:grid-cols-2">
-                {infoItems.map((item, index) => (
-                  <div key={`${item.title}-${index}`} className="flex items-start gap-3 rounded-xl bg-white/80 p-3">
-                    <div className="mt-0.5 rounded-full bg-[#f9efe3] p-2">{item.icon}</div>
-                    <div>
-                      <p className="text-sm font-semibold text-[#3f3228]">{item.title}</p>
-                      <p className="text-xs text-[#7a6655]">{item.description}</p>
-                    </div>
-                  </div>
-                ))}
+              {/* Delivery info line */}
+              <p className="text-sm leading-relaxed text-[#6f5d4e]">
+                Same-day dispatch from Neemuch.{' '}
+                Expected delivery time across India:{' '}
+                <span className="font-medium text-[#3f3228]">{product.deliveryTime || '3-5 Working Days'}</span>.
+              </p>
+
+              {/* Payment icons */}
+              <div className="relative h-9 w-full max-w-[320px]">
+                <Image
+                  src="/visa.svg"
+                  alt="Accepted payment methods: Visa, Mastercard, RuPay, UPI"
+                  fill
+                  className="object-contain object-left"
+                />
               </div>
 
+              {/* Accordions */}
               <div className="space-y-2 pt-1">
                 {accordionItems.map((item) => {
                   const isOpen = openAccordion === item.key;
                   return (
-                    <div key={item.key} className="overflow-hidden rounded-2xl border border-[#eadfce] bg-[#fffdf8]">
+                    <div key={item.key} className="overflow-hidden border-b border-[#eadfce]">
                       <button
                         type="button"
                         onClick={() => setOpenAccordion(isOpen ? null : item.key)}
-                        className="flex w-full items-center justify-between px-5 py-4 text-left"
+                        className="flex w-full items-center justify-between py-4 text-left"
                       >
-                        <span className="text-base font-semibold text-[#2b221b]">{item.title}</span>
+                        <span className="text-sm font-semibold uppercase tracking-wide text-[#2b221b]">
+                          {item.title}
+                        </span>
                         {isOpen ? (
                           <FiMinus className="h-4 w-4 text-[#2b221b]" />
                         ) : (
                           <FiPlus className="h-4 w-4 text-[#2b221b]" />
                         )}
                       </button>
-                      {isOpen && <div className="px-5 pb-5 text-sm text-[#6f5d4e]">{item.content}</div>}
+                      {isOpen && <div className="pb-5 text-sm">{item.content}</div>}
                     </div>
                   );
                 })}
               </div>
+
+              {/* SKU */}
+              <p className="text-xs text-[#7f6a58]">
+                <span className="font-medium text-[#3f3228]">SKU:</span> {sku}
+              </p>
+
+              {/* Share */}
+              <div className="flex items-center gap-3 text-xs text-[#7f6a58]">
+                <span className="font-medium text-[#3f3228]">Share:</span>
+                <a
+                  href={`https://www.facebook.com/sharer/sharer.php?u=${typeof window !== 'undefined' ? encodeURIComponent(window.location.href) : ''}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-[#7f6a58] hover:text-[#b58a3a]"
+                  aria-label="Share on Facebook"
+                >
+                  <FiFacebook className="h-4 w-4" />
+                </a>
+                <a
+                  href={`https://twitter.com/intent/tweet?url=${typeof window !== 'undefined' ? encodeURIComponent(window.location.href) : ''}&text=${encodeURIComponent(product.name)}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-[#7f6a58] hover:text-[#b58a3a]"
+                  aria-label="Share on Twitter"
+                >
+                  <FiTwitter className="h-4 w-4" />
+                </a>
+                <a
+                  href={`https://api.whatsapp.com/send?text=${typeof window !== 'undefined' ? encodeURIComponent(product.name + ' ' + window.location.href) : ''}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-[#7f6a58] hover:text-[#b58a3a]"
+                  aria-label="Share on WhatsApp"
+                >
+                  <FiShare2 className="h-4 w-4" />
+                </a>
+              </div>
+
+              {/* Disclaimer */}
+              <p className="text-xs leading-relaxed text-[#9c8773]">
+                Images shown on this website are for reference purpose only. Actual product or packaging may vary.
+              </p>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Product Reviews */}
-      <div className="w-full px-4 pb-4 md:pb-8">
-        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-          <div>
-            <h2 className="text-2xl md:text-3xl font-bold font-general-sansal-sansal-sans text-primary-brown">Reviews & Ratings</h2>
-            <p className="text-sm text-gray-500">Click below to read experiences or share your own.</p>
-          </div>
-          <button
-            onClick={() => setShowReviews((prev) => !prev)}
-            className="self-start sm:self-auto px-5 py-2 border border-primary-red text-primary-red rounded-lg font-semibold uppercase tracking-wide hover:bg-primary-red hover:text-white transition-colors text-sm"
-          >
-            {showReviews ? 'Close Reviews' : 'Write a Review'}
-          </button>
+      {/* Product Reviews — always visible */}
+      <div ref={reviewSectionRef} className="w-full px-4 pb-8 md:pb-12">
+        <div className="max-w-7xl mx-auto">
+          <ProductReviews productId={productId} productName={product.name} />
         </div>
       </div>
-      {showReviews && (
-        <div ref={reviewSectionRef} className="w-full px-4 pb-8 md:pb-12">
-          <div className="max-w-7xl mx-auto">
-            <ProductReviews productId={productId} />
-          </div>
-        </div>
-      )}
-
-      {/* FAQ Section (visible content matching FAQPage schema) */}
-      <section className="w-full px-4 py-10 md:py-12">
-        <div className="max-w-5xl mx-auto">
-          <h2 className="text-2xl md:text-3xl font-bold text-primary-brown mb-2 font-general-sansal-sansal-sans">
-            Frequently asked questions
-          </h2>
-          <p className="text-sm text-gray-500 mb-6">Everything you need to know before ordering {product.name}.</p>
-          <div className="space-y-3">
-            {[
-              {
-                q: `Is ${product.name} fresh and how long does it last?`,
-                a: `Yes — every order is handcrafted in our Neemuch kitchen and shipped within 24 hours. Shelf life: ${product.shelfLife || 'up to 60 days when sealed'}. Once opened, transfer to an airtight jar and consume within 7-10 days for the best taste.`,
-              },
-              {
-                q: `Do you deliver ${product.name} pan-India?`,
-                a: `Yes. We ship ${product.name} to every PIN code in India through trusted cold-chain courier partners. Delivery typically takes 2-5 working days depending on the destination city.`,
-              },
-              {
-                q: `Is ${product.name} pure vegetarian and free from preservatives?`,
-                a: `Yes — ${product.name} is 100% pure vegetarian. No artificial preservatives, no synthetic colours, no palm oil. Made with farm-fresh milk, pure ghee, sugar and premium dry fruits.`,
-              },
-              {
-                q: `Can I order ${product.name} for Diwali, Rakhi, or wedding gifting in bulk?`,
-                a: `Absolutely. We offer custom hampers and bulk pricing for Diwali, Rakhi, weddings and corporate gifting. WhatsApp +91-9425922445 with your quantity and delivery date and our team will design a hamper within 24 hours.`,
-              },
-            ].map((item, i) => (
-              <details key={i} className="rounded-xl border border-[#eadfce] bg-white p-5 group">
-                <summary className="cursor-pointer font-semibold text-[#1f1a17] list-none flex items-center justify-between">
-                  <span>{item.q}</span>
-                  <span className="text-[#FE8E02] text-xl group-open:rotate-45 transition-transform">+</span>
-                </summary>
-                <p className="text-sm text-[#5e4a3b] leading-relaxed mt-3">{item.a}</p>
-              </details>
-            ))}
-          </div>
-        </div>
-      </section>
 
       {/* Related Products */}
       {relatedProducts.length > 0 && (
-        <div className="w-full px-4 py-8 md:py-12 bg-gray-50">
-          <h2 className="text-2xl md:text-3xl font-bold font-general-sansal-sansal-sans text-primary-brown mb-8 text-center">
-            Related Products
-          </h2>
-          <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-3 gap-3 md:gap-4 lg:gap-5">
-            {relatedProducts.map((relatedProduct) => (
-              <ProductCard key={relatedProduct.id} product={relatedProduct} />
-            ))}
+        <div className="w-full px-4 py-8 md:py-12 bg-white">
+          <div className="mx-auto max-w-7xl">
+            <h2 className="text-2xl md:text-3xl font-bold font-general-sansal-sansal-sans text-primary-brown mb-8 text-center">
+              Related Products
+            </h2>
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-4 lg:gap-5">
+              {relatedProducts.map((relatedProduct) => (
+                <ProductCard key={relatedProduct.id} product={relatedProduct} />
+              ))}
+            </div>
           </div>
         </div>
       )}
