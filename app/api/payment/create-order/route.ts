@@ -131,6 +131,17 @@ export async function POST(request: NextRequest) {
         } else if (!hasPersistedShipping && Number.isFinite(computedCharge) && computedCharge >= 0) {
           serverCourierCharge = computedCharge;
         }
+
+        // 30% off on delivery for orders >= ₹500 (customer pays 70% of Nimbus charge).
+        // Applied here whenever Nimbus returned a fresh raw value above; persistedShippingCost
+        // is already-discounted from /api/delivery/check-pincode and is left untouched.
+        const cartSubtotal = Math.max(0, Number(orderToUpdate.subtotal || 0));
+        const usedFreshNimbusCharge =
+          (Number.isFinite(selectedCourierCharge) && selectedCourierCharge >= 0) ||
+          (!hasPersistedShipping && Number.isFinite(computedCharge) && computedCharge >= 0);
+        if (usedFreshNimbusCharge && cartSubtotal >= 500 && serverCourierCharge > 0) {
+          serverCourierCharge = Math.round(serverCourierCharge * 0.7);
+        }
       }
     }
 

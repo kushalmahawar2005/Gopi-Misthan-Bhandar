@@ -20,6 +20,10 @@ export async function POST(req: NextRequest) {
     });
 
     if (result.status && result.data && result.data.length > 0) {
+      // 30% off on delivery charge for orders >= ₹500 (customer pays 70%)
+      const cartSubtotal = Number(orderAmount) || 0;
+      const applyDeliveryDiscount = cartSubtotal >= 500;
+
       const couriers = result.data.map((c: any) => {
         // Calculate estimated days from edd (format: "19-04-2026")
         let days = 5;
@@ -34,9 +38,12 @@ export async function POST(req: NextRequest) {
           }
         }
 
+        const baseCharge = Number(c.total_charges || c.freight_charges || 0);
+        const charge = applyDeliveryDiscount ? Math.round(baseCharge * 0.7) : baseCharge;
+
         return {
           name: c.name,
-          charge: c.total_charges || c.freight_charges || 0,
+          charge,
           estimatedDays: days > 0 ? days : 5,
           id: c.id || c.courier_id || c.courier_company_id
         };
@@ -49,6 +56,10 @@ export async function POST(req: NextRequest) {
 
       // Only return the absolute cheapest option as requested
       const topOptions = [cheapest];
+
+      console.log(`[Pincode Check] Weight: ${weightKg}kg, Order: ₹${orderAmount}, Discount Applied: ${applyDeliveryDiscount}`);
+      console.log(`[Pincode Check] Couriers:`, couriers.map((c: any) => `${c.name}: ${c.charge}`).join(', '));
+      console.log(`[Pincode Check] Selected: ${cheapest.name} @ ₹${cheapest.charge}`);
 
       return NextResponse.json({
         success: true,

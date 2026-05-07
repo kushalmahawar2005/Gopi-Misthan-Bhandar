@@ -97,12 +97,56 @@ export default function CheckoutPage() {
     return () => { if (document.body.contains(script)) document.body.removeChild(script); };
   }, []);
 
+  const cartTotalPrice = getTotalPrice();
+  const cartTotalWeight = React.useMemo(() => {
+    let weight = 0;
+    cartItems.forEach(item => {
+      const lineWeight = pickWeightLabel(item) || '0.5kg';
+      weight += parseWeightToKg(lineWeight) * item.quantity;
+    });
+    return weight || 0.5;
+  }, [cartItems]);
+
+  const checkDelivery = React.useCallback(async () => {
+    if (!formData.pincode || formData.pincode.length !== 6) return;
+    setCheckingDelivery(true);
+    try {
+      const resp = await fetch('/api/delivery/check-pincode', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          pincode: formData.pincode, 
+          weight: cartTotalWeight, 
+          orderAmount: cartTotalPrice 
+        })
+      });
+      
+      const result = await resp.json();
+      if (result.success) {
+        setDeliveryInfo(result.data);
+        if (result.data.isServiceable) {
+          setAvailableCouriers(result.data.couriers);
+          setSelectedCourier(result.data.cheapestOption);
+          setErrors(p => { const { pincode, ...rest } = p; return rest; });
+        } else {
+          setAvailableCouriers([]);
+          setSelectedCourier(null);
+          setErrors(p => ({ ...p, pincode: 'Delivery not available at this pincode' }));
+        }
+      }
+    } catch (e) { 
+      console.error('checkDelivery error:', e); 
+    } finally { 
+      setCheckingDelivery(false); 
+    }
+  }, [formData.pincode, cartTotalWeight, cartTotalPrice]);
+
   useEffect(() => {
     if (formData.pincode && formData.pincode.length === 6) {
       const timer = setTimeout(() => checkDelivery(), 500);
       return () => clearTimeout(timer);
     }
-  }, [formData.pincode]);
+  }, [formData.pincode, cartTotalWeight, cartTotalPrice, checkDelivery]);
 
   const buildOrderItems = () => {
     return cartItems.map(i => ({
@@ -172,47 +216,7 @@ export default function CheckoutPage() {
     setCouponSuccess('Coupon removed');
   };
 
-  const checkDelivery = async () => {
-    if (!formData.pincode || formData.pincode.length !== 6) return;
-    setCheckingDelivery(true);
-    try {
-      // Calculate total weight for the cart
-      let totalWeight = 0;
-      cartItems.forEach(item => {
-        const lineWeight = pickWeightLabel(item) || '0.5kg';
-        totalWeight += parseWeightToKg(lineWeight) * item.quantity;
-      });
-      if (totalWeight === 0) totalWeight = 0.5;
-
-      const resp = await fetch('/api/delivery/check-pincode', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
-          pincode: formData.pincode, 
-          weight: totalWeight, 
-          orderAmount: getTotalPrice() 
-        })
-      });
-      
-      const result = await resp.json();
-      if (result.success) {
-        setDeliveryInfo(result.data);
-        if (result.data.isServiceable) {
-          setAvailableCouriers(result.data.couriers);
-          setSelectedCourier(result.data.cheapestOption);
-          setErrors(p => { const { pincode, ...rest } = p; return rest; });
-        } else {
-          setAvailableCouriers([]);
-          setSelectedCourier(null);
-          setErrors(p => ({ ...p, pincode: 'Delivery not available at this pincode' }));
-        }
-      }
-    } catch (e) { 
-      console.error(e); 
-    } finally { 
-      setCheckingDelivery(false); 
-    }
-  };
+  // checkDelivery is now defined above with useCallback
 
   const validateStep = (step: number) => {
     const newErrors: { [key: string]: string } = {};

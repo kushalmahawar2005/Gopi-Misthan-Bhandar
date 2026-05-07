@@ -169,8 +169,11 @@ export const calculateOrderAmount = async (
     }
 
     // 3. Calculate delivery charge
+    // Note: courierCharge is expected to already include the 70%-of-charge rule
+    // for orders >= ₹500 (applied at the Nimbus boundary in /api/delivery/check-pincode
+    // and /api/payment/create-order). Do not re-apply here or it would double-discount.
     let deliveryCharge = courierCharge || 0;
-    
+
     // If no courierCharge but pincode is provided, we can't accurately calculate anymore
     // using the old method if we want to stick to NimbusPost.
     // However, some old flows might still use this.
