@@ -9,7 +9,7 @@ async function test() {
     order_amount: 400,
     payment_method: 'prepaid',
   });
-  console.log('0.5kg:', result1.data.map(c => c.total_charges).sort((a,b)=>a-b)[0]);
+  console.log('0.5kg:', result1.data.map((c: any) => c.total_charges).sort((a: number,b: number)=>a-b)[0]);
 
   const result2 = await checkServiceability({
     pincode,
@@ -17,6 +17,6 @@ async function test() {
     order_amount: 2000,
     payment_method: 'prepaid',
   });
-  console.log('2.5kg:', result2.data.map(c => c.total_charges).sort((a,b)=>a-b)[0]);
+  console.log('2.5kg:', result2.data.map((c: any) => c.total_charges).sort((a: number,b: number)=>a-b)[0]);
 }
 test();
