@@ -16,6 +16,7 @@ const transformProduct = (product: any): Product => {
     category: product.category,
     subcategory: product.subcategory,
     featured: product.featured || false,
+    isActive: product.isActive !== false,
     isPremium: product.isPremium || false,
     isClassic: product.isClassic || false,
     sizes: product.sizes || [],

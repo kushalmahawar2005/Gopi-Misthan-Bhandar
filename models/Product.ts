@@ -16,6 +16,7 @@ export interface IProduct extends Document {
   images?: string[]; // Multiple images array
   category: string; // Main category slug
   subcategory?: string; // Optional subcategory slug
+  isActive?: boolean;
   featured?: boolean;
   isPremium?: boolean;
   isClassic?: boolean;
@@ -52,6 +53,7 @@ const ProductSchema = new Schema<IProduct>(
       type: String,
       required: false,
     },
+    isActive: { type: Boolean, default: true },
     featured: { type: Boolean, default: false },
     isPremium: { type: Boolean, default: false },
     isClassic: { type: Boolean, default: false },

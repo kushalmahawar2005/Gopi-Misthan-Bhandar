@@ -45,6 +45,7 @@ const toProduct = (product: any): Product => {
     category: product.category,
     subcategory: product.subcategory,
     featured: Boolean(product.featured),
+    isActive: product.isActive !== false, // Default to true for backward compatibility
     isPremium: Boolean(product.isPremium),
     isClassic: Boolean(product.isClassic),
     sizes: normalizedSizes,
@@ -101,7 +102,7 @@ async function getProductsData(searchParams: ProductsPageProps['searchParams']) 
   try {
     await connectDB();
 
-    const query: Record<string, any> = {};
+    const query: Record<string, any> = { isActive: { $ne: false } }; // Only show active products on frontend
     if (subcategorySlug && subcategorySlug !== 'all') {
       query.subcategory = subcategorySlug;
     } else if (categorySlug && categorySlug !== 'all') {
@@ -115,7 +116,7 @@ async function getProductsData(searchParams: ProductsPageProps['searchParams']) 
 
     const [productDocs, totalCount, categoryDocs] = await Promise.all([
       ProductModel.find(query)
-        .select('name slug description price image images category subcategory featured isPremium isClassic sizes defaultWeight shelfLife deliveryTime stock giftBoxSubCategory giftBoxSize')
+        .select('name slug description price image images category subcategory isActive featured isPremium isClassic sizes defaultWeight shelfLife deliveryTime stock giftBoxSubCategory giftBoxSize')
         .sort({ createdAt: -1 })
         .skip(skip)
         .limit(PAGE_LIMIT)

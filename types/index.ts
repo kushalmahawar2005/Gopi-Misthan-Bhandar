@@ -16,6 +16,7 @@ export interface Product {
   images?: string[]; // Multiple images array
   category: string; // Main category slug
   subcategory?: string; // Optional subcategory slug
+  isActive?: boolean;
   featured?: boolean;
   isPremium?: boolean;
   isClassic?: boolean;

@@ -15,6 +15,7 @@ interface Product {
   image: string;
   category: string;
   featured: boolean;
+  isActive: boolean;
   stock: number;
 }
 
@@ -85,18 +86,16 @@ export default function AdminProducts() {
       if (categoryFilter !== 'all') {
         params.set('category', categoryFilter);
       }
-      if (statusFilter === 'active') {
-        params.set('featured', 'true');
-      }
-
-      const response = await fetch(`/api/products?${params.toString()}`);
+      const response = await fetch(`/api/products?${params.toString()}&admin=true`);
       const data = await response.json();
       if (data.success) {
         let filteredData = data.data;
 
-        // Client-side filter for inactive (API doesn't support featured=false)
+        // Client-side filter for inactive (isActive=false)
         if (statusFilter === 'inactive') {
-          filteredData = data.data.filter((p: Product) => !p.featured);
+          filteredData = data.data.filter((p: Product) => p.isActive === false);
+        } else if (statusFilter === 'active') {
+          filteredData = data.data.filter((p: Product) => p.isActive !== false);
         }
 
         setProducts(filteredData);
@@ -136,6 +135,23 @@ export default function AdminProducts() {
       }
     } catch (error) {
       console.error('Error deleting product:', error);
+    }
+  };
+
+  const handleToggleActive = async (id: string, currentStatus: boolean) => {
+    try {
+      const response = await fetch(`/api/products/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ isActive: !currentStatus }),
+      });
+      const data = await response.json();
+      if (data.success) {
+        // Update local state immediately for instant feedback
+        setProducts(prev => prev.map(p => p._id === id ? { ...p, isActive: !currentStatus } : p));
+      }
+    } catch (error) {
+      console.error('Error toggling product status:', error);
     }
   };
 
@@ -222,6 +238,7 @@ export default function AdminProducts() {
                     <th className="px-4 lg:px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Price</th>
                     <th className="px-4 lg:px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Stock</th>
                     <th className="px-4 lg:px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Status</th>
+                    <th className="px-4 lg:px-6 py-3 text-center text-xs font-semibold text-gray-600 uppercase tracking-wider">Visibility</th>
                     <th className="px-4 lg:px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider hidden lg:table-cell">Updated</th>
                     <th className="px-4 lg:px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Actions</th>
                   </tr>
@@ -229,7 +246,7 @@ export default function AdminProducts() {
                 <tbody className="bg-white divide-y divide-gray-200">
                   {products.length === 0 ? (
                     <tr>
-                      <td colSpan={7} className="px-6 py-12 text-center text-gray-500">No products found</td>
+                      <td colSpan={8} className="px-6 py-12 text-center text-gray-500">No products found</td>
                     </tr>
                   ) : (
                     products.map((product) => (
@@ -264,10 +281,25 @@ export default function AdminProducts() {
                         </td>
                         <td className="px-4 lg:px-6 py-4 whitespace-nowrap">
                           <span
-                            className={`px-2 py-1 text-xs font-medium rounded-full ${product.featured ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}`}
+                            className={`px-2 py-1 text-xs font-medium rounded-full ${product.isActive !== false ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}`}
                           >
-                            {product.featured ? 'active' : 'inactive'}
+                            {product.isActive !== false ? 'active' : 'inactive'}
                           </span>
+                        </td>
+                        <td className="px-4 lg:px-6 py-4 whitespace-nowrap text-center">
+                          <button
+                            onClick={() => handleToggleActive(product._id, product.isActive !== false)}
+                            className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-primary-red focus:ring-offset-2 ${
+                              product.isActive !== false ? 'bg-green-500' : 'bg-gray-300'
+                            }`}
+                            title={product.isActive !== false ? 'Click to hide from store' : 'Click to show on store'}
+                          >
+                            <span
+                              className={`inline-block h-4 w-4 transform rounded-full bg-white shadow-lg transition-transform duration-300 ease-in-out ${
+                                product.isActive !== false ? 'translate-x-6' : 'translate-x-1'
+                              }`}
+                            />
+                          </button>
                         </td>
                         <td className="px-4 lg:px-6 py-4 whitespace-nowrap text-sm text-gray-500 hidden lg:table-cell">
                           {new Date().toLocaleDateString()}
@@ -340,10 +372,23 @@ export default function AdminProducts() {
                     </div>
                     <div className="flex items-center justify-between pt-3 border-t border-gray-100">
                       <span
-                        className={`px-2 py-1 text-xs font-medium rounded-full ${product.featured ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}`}
+                        className={`px-2 py-1 text-xs font-medium rounded-full ${product.isActive !== false ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}`}
                       >
-                        {product.featured ? 'active' : 'inactive'}
+                        {product.isActive !== false ? 'active' : 'inactive'}
                       </span>
+                      <button
+                        onClick={() => handleToggleActive(product._id, product.isActive !== false)}
+                        className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-300 ease-in-out focus:outline-none ${
+                          product.isActive !== false ? 'bg-green-500' : 'bg-gray-300'
+                        }`}
+                        title={product.isActive !== false ? 'Click to hide from store' : 'Click to show on store'}
+                      >
+                        <span
+                          className={`inline-block h-4 w-4 transform rounded-full bg-white shadow-lg transition-transform duration-300 ease-in-out ${
+                            product.isActive !== false ? 'translate-x-6' : 'translate-x-1'
+                          }`}
+                        />
+                      </button>
                       <div className="flex items-center gap-2">
                         <Link
                           href={`/admin/products/${product._id}`}

@@ -149,7 +149,7 @@ async function getHomeData(): Promise<HomeData> {
       galleryDocs,
       blogDocs,
     ] = await Promise.all([
-      ProductModel.find({ featured: true })
+      ProductModel.find({ featured: true, isActive: { $ne: false } })
         .select('name slug description price image images category subcategory featured isPremium isClassic sizes defaultWeight shelfLife deliveryTime stock giftBoxSubCategory giftBoxSize')
         .sort({ createdAt: -1 })
         .limit(8)
@@ -158,12 +158,12 @@ async function getHomeData(): Promise<HomeData> {
         .select('name slug image description subCategories order')
         .sort({ order: 1, name: 1 })
         .lean(),
-      ProductModel.find({ isClassic: true })
+      ProductModel.find({ isClassic: true, isActive: { $ne: false } })
         .select('name slug description price image images category subcategory featured isPremium isClassic sizes defaultWeight shelfLife deliveryTime stock giftBoxSubCategory giftBoxSize')
         .sort({ createdAt: -1 })
         .limit(8)
         .lean(),
-      ProductModel.find({ isPremium: true })
+      ProductModel.find({ isPremium: true, isActive: { $ne: false } })
         .select('name slug description price image images category subcategory featured isPremium isClassic sizes defaultWeight shelfLife deliveryTime stock giftBoxSubCategory giftBoxSize')
         .sort({ createdAt: -1 })
         .limit(8)

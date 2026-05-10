@@ -33,6 +33,12 @@ export async function GET(request: NextRequest) {
 
     let query: any = {};
 
+    // For frontend (non-admin) requests, only show active products
+    const isAdmin = searchParams.get('admin');
+    if (isAdmin !== 'true') {
+      query.isActive = { $ne: false }; // Show products where isActive is true or undefined (backward compatible)
+    }
+
     if (subcategory && subcategory !== 'all') {
       // If subcategory is provided, filter by subcategory
       query.subcategory = subcategory;
@@ -63,7 +69,7 @@ export async function GET(request: NextRequest) {
 
     const [products, totalCount] = await Promise.all([
       Product.find(query)
-        .select('name slug description price image images category subcategory featured isPremium isClassic sizes defaultWeight shelfLife deliveryTime stock')
+        .select('name slug description price image images category subcategory isActive featured isPremium isClassic sizes defaultWeight shelfLife deliveryTime stock')
         .sort({ createdAt: -1 })
         .skip(skip)
         .limit(limit)

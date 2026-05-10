@@ -66,6 +66,7 @@ async function getCategoryProducts(canonicalSlug: string) {
   const matchSlugs = [canonicalSlug, ...subSlugs];
 
   const productDocs = await ProductModel.find({
+    isActive: { $ne: false },
     $or: [
       { category: { $in: matchSlugs } },
       { subcategory: { $in: matchSlugs } },
