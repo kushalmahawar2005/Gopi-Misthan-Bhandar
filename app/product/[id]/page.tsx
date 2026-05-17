@@ -350,6 +350,97 @@ export default function ProductDetailPage() {
         </dl>
       ),
     },
+    {
+      key: 'Shipping',
+      title: 'Shipping & Storage',
+      content: (
+        <div className="space-y-3 text-sm leading-relaxed text-[#6f5d4e]">
+          <p>
+            Same-day dispatch from our Jaipur kitchen for orders placed before 2 PM. Pan-India delivery
+            via trusted partners — expected transit time is{' '}
+            <span className="font-medium text-[#3f3228]">{product.deliveryTime || '3-5 working days'}</span>.
+          </p>
+          <ul className="list-disc space-y-1.5 pl-5">
+            <li>All sweets are packed fresh in food-grade, tamper-evident boxes.</li>
+            <li>Final box design may vary based on stock availability at the time of dispatch.</li>
+            <li>
+              Store in a cool, dry place. Best consumed within{' '}
+              <span className="font-medium text-[#3f3228]">{product.shelfLife || '5-7 days'}</span> of
+              delivery for optimal taste and freshness.
+            </li>
+            <li>Self-pickup available at SL Marg, Chandrakala Colony, Durgapura — usually ready in 24 hours.</li>
+          </ul>
+        </div>
+      ),
+    },
+    {
+      key: 'RefundPolicy',
+      title: 'Refund & Cancellation Policy',
+      content: (
+        <div className="space-y-3 text-sm leading-relaxed text-[#6f5d4e]">
+          <p>
+            As our products are perishable food items prepared fresh on order, we follow a strict
+            no-return policy. However, your satisfaction is our priority.
+          </p>
+          <ul className="list-disc space-y-1.5 pl-5">
+            <li>
+              <span className="font-medium text-[#3f3228]">Cancellations:</span> Orders can be cancelled
+              free of cost within 2 hours of placement, provided dispatch has not started.
+            </li>
+            <li>
+              <span className="font-medium text-[#3f3228]">Damaged / Wrong Item:</span> If the product
+              arrives damaged or incorrect, share unboxing photos within 24 hours of delivery for a
+              full refund or replacement.
+            </li>
+            <li>
+              <span className="font-medium text-[#3f3228]">Refund Timeline:</span> Approved refunds
+              are processed within 5-7 business days to the original payment method.
+            </li>
+            <li>
+              Refunds are not applicable for taste preferences or delays caused by incorrect
+              addresses, courier issues, or unavailability of the recipient.
+            </li>
+          </ul>
+          <p>
+            For any concerns, reach out via WhatsApp or email — we&apos;re here to help.
+          </p>
+        </div>
+      ),
+    },
+    {
+      key: 'Terms',
+      title: 'Terms & Conditions',
+      content: (
+        <div className="space-y-3 text-sm leading-relaxed text-[#6f5d4e]">
+          <ul className="list-disc space-y-1.5 pl-5">
+            <li>
+              All prices are inclusive of applicable taxes. GST invoice is provided with every order
+              on request.
+            </li>
+            <li>
+              Product weight mentioned is the gross packed weight, including standard packaging.
+              Minor variation of ±5% may occur in handcrafted items.
+            </li>
+            <li>
+              Images on the website are for representation purposes only. Actual product colour,
+              shape, or garnish may vary slightly based on seasonal ingredients.
+            </li>
+            <li>
+              Delivery is subject to serviceable pincodes. Estimated delivery dates are indicative
+              and may shift due to weather, festivals, or courier delays.
+            </li>
+            <li>
+              By placing an order, you confirm that the recipient is available to receive the parcel
+              at the provided address.
+            </li>
+            <li>
+              Gopi Misthan Bhandar reserves the right to refuse or cancel any order at its sole
+              discretion, with a full refund initiated for the cancelled order.
+            </li>
+          </ul>
+        </div>
+      ),
+    },
   ];
 
   return (
