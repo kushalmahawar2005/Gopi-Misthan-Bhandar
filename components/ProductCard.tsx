@@ -138,8 +138,8 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, showAddToCart = true
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
       >
-        {/* Image Container - Square with Rounded Corners */}
-        <div className="relative w-full aspect-square mb-4 rounded-[20px] overflow-hidden bg-[#F9F6F3]">
+        {/* Image Container - Square */}
+        <div className="relative w-full aspect-square mb-4 overflow-hidden bg-[#F9F6F3]">
           <Link href={productUrl} className="block relative w-full h-full">
             {/* Main Image */}
             <Image

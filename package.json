@@ -7,7 +7,6 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "update-admin": "tsx scripts/updateAdminUser.ts",
     "create-categories": "tsx scripts/createCategories.ts"
   },
   "dependencies": {
