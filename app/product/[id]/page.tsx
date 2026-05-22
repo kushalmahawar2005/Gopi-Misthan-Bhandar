@@ -4,7 +4,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
-import { fetchProductById, fetchProducts } from '@/lib/api';
+import { fetchProductById, fetchProducts, fetchProductTagline } from '@/lib/api';
 import { useCart } from '@/context/CartContext';
 import { useWishlist } from '@/context/WishlistContext';
 import ProductCard from '@/components/ProductCard';
@@ -49,6 +49,7 @@ export default function ProductDetailPage() {
     averageRating: 0,
     totalReviews: 0,
   });
+  const [tagline, setTagline] = useState<string | null>(null);
   const reviewSectionRef = useRef<HTMLDivElement | null>(null);
 
   // Size selection state
@@ -57,6 +58,10 @@ export default function ProductDetailPage() {
   // Slider State
   const touchStart = useRef<number | null>(null);
   const touchEnd = useRef<number | null>(null);
+
+  useEffect(() => {
+    fetchProductTagline().then(setTagline);
+  }, []);
 
   // Get all product images (main image + additional images)
   const getAllImages = () => {
@@ -580,9 +585,16 @@ export default function ProductDetailPage() {
             <div className="space-y-5">
               {/* Title + wishlist */}
               <div className="flex items-start justify-between gap-4">
-                <h1 className="font-['FlamaCondensed','Flama','sans-serif'] text-4xl leading-tight text-[#1f1a17] sm:text-5xl">
-                  {product.name}
-                </h1>
+                <div>
+                  <h1 className="font-['FlamaCondensed','Flama','sans-serif'] text-4xl leading-tight text-[#1f1a17] sm:text-5xl">
+                    {product.name}
+                  </h1>
+                  {tagline && (
+                    <p className="text-gray-500 italic text-sm sm:text-base mt-2">
+                      {tagline}
+                    </p>
+                  )}
+                </div>
                 <button
                   onClick={handleWishlistToggle}
                   className={`shrink-0 rounded-xl border p-2 transition ${isFavorite

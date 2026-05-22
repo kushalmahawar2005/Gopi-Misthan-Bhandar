@@ -4,6 +4,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Product } from '@/types';
 import Image from 'next/image';
 import Link from 'next/link';
+import { fetchProductTagline } from '@/lib/api';
 
 interface FeaturedCollectionProps {
   products: Product[];
@@ -12,8 +13,13 @@ interface FeaturedCollectionProps {
 // Rectangular Product Card (like Chhappan Bhog style)
 const FeaturedProductCard: React.FC<{ product: Product }> = ({ product }) => {
   const [isHovered, setIsHovered] = useState(false);
+  const [tagline, setTagline] = useState<string | null>(null);
   const hasSecondImage = product.images && product.images.length > 0;
   const productUrl = `/product/${product.slug || product.id}`;
+
+  useEffect(() => {
+    fetchProductTagline().then(setTagline);
+  }, []);
 
   return (
     <Link href={productUrl} className="group block">
@@ -63,6 +69,11 @@ const FeaturedProductCard: React.FC<{ product: Product }> = ({ product }) => {
           <h3 className="text-[12px] md:text-[14px] font-flama tracking-[0.1em] uppercase text-[#503223] mb-1 line-clamp-1">
             {product.name}
           </h3>
+          {tagline && (
+            <p className="text-gray-500 italic text-[10px] md:text-[11px] -mt-0.5 mb-1 line-clamp-1">
+              {tagline}
+            </p>
+          )}
           <p className="text-[11px] md:text-[13px] font-flama text-[#FE8E02]">
             Rs. {product.price || '700.00'}
           </p>

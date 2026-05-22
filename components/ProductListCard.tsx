@@ -7,6 +7,7 @@ import Link from 'next/link';
 import { useCart } from '@/context/CartContext';
 import { useWishlist } from '@/context/WishlistContext';
 import { FiShoppingCart, FiEye, FiHeart } from 'react-icons/fi';
+import { fetchProductTagline } from '@/lib/api';
 
 interface ProductListCardProps {
   product: Product;
@@ -18,8 +19,13 @@ const ProductListCard: React.FC<ProductListCardProps> = ({ product, showAddToCar
   const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
   const [isHovered, setIsHovered] = useState(false);
   const [isAdding, setIsAdding] = useState(false);
+  const [tagline, setTagline] = useState<string | null>(null);
   const productUrl = `/product/${product.slug || product.id}`;
   const isFavorite = isInWishlist(product.id);
+
+  useEffect(() => {
+    fetchProductTagline().then(setTagline);
+  }, []);
 
   const sizeOptions = useMemo(() => {
     if (!Array.isArray(product.sizes)) return [];
@@ -136,6 +142,11 @@ const ProductListCard: React.FC<ProductListCardProps> = ({ product, showAddToCar
             <h3 className="text-base md:text-lg lg:text-xl font-general-sansal-sansal-sansal-sans font-bold text-black mb-2 line-clamp-2">
               {product.name}
             </h3>
+            {tagline && (
+              <p className="text-gray-500 italic text-[11px] sm:text-[12px] -mt-1 mb-2 line-clamp-1">
+                {tagline}
+              </p>
+            )}
             
             {/* Description */}
             <p className="text-sm md:text-base text-gray-600 mb-3 line-clamp-2 hidden md:block">

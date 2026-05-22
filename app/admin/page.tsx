@@ -16,6 +16,7 @@ import {
   FiFile,
   FiSettings,
   FiEdit,
+  FiTag,
 } from 'react-icons/fi';
 import Link from 'next/link';
 
@@ -36,6 +37,8 @@ export default function AdminDashboard() {
     totalBlogs: 0,
     activeInstaItems: 0,
     totalInstaItems: 0,
+    taglineText: 'Not Set',
+    taglineActive: false,
   });
 
   const [recentOrders, setRecentOrders] = useState<any[]>([]);
@@ -56,6 +59,7 @@ export default function AdminDashboard() {
         blogsRes,
         instaBooksRes,
         couponsRes,
+        taglineRes,
       ] = await Promise.all([
         fetch('/api/products?limit=500'),
         fetch('/api/categories'),
@@ -65,6 +69,7 @@ export default function AdminDashboard() {
         fetch('/api/blog/all'),
         fetch('/api/instabook?all=true'),
         fetch('/api/coupons'),
+        fetch('/api/site-content/section/product-tagline?includeInactive=true'),
       ]);
 
       const productsData = await productsRes.json();
@@ -84,6 +89,20 @@ export default function AdminDashboard() {
       const blogs = blogsData.data || [];
       const instaBooks = instaBooksData.data || [];
       const coupons = couponsData.data || [];
+
+      let taglineText = 'Not Set';
+      let taglineActive = false;
+      if (taglineRes.ok) {
+        try {
+          const taglineData = await taglineRes.json();
+          if (taglineData.success && taglineData.data) {
+            taglineText = taglineData.data.description || 'Not Set';
+            taglineActive = taglineData.data.isActive;
+          }
+        } catch (e) {
+          console.error('Error parsing tagline:', e);
+        }
+      }
 
       if (orders.length > 0) {
         setRecentOrders(orders.slice(0, 8));
@@ -130,6 +149,8 @@ export default function AdminDashboard() {
         totalBlogs: blogs.length,
         activeInstaItems,
         totalInstaItems: instaBooks.length,
+        taglineText,
+        taglineActive,
       });
     } catch (error) {
       console.error('Error fetching stats:', error);
@@ -169,6 +190,16 @@ export default function AdminDashboard() {
       stats: [`Total Categories: ${stats.categories}`, 'Slider Speed: 3s'],
       action: { label: '+ Add Category', href: '/admin/categories/new' },
       manage: { href: '/admin/categories' },
+    },
+    {
+      title: 'Product Tag Line',
+      icon: FiTag,
+      stats: [
+        `Status: ${stats.taglineActive ? 'Active' : 'Hidden'}`,
+        `Text: "${stats.taglineText.length > 25 ? stats.taglineText.slice(0, 25) + '...' : stats.taglineText}"`,
+      ],
+      action: { label: 'Manage Tag Line', href: '/admin/product-tagline' },
+      manage: { href: '/admin/product-tagline' },
     },
     {
       title: 'Blog Posts',

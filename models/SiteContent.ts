@@ -16,7 +16,7 @@ export interface IAboutCard {
 }
 
 export interface ISiteContent extends Document {
-  section: 'about' | 'hero' | 'footer' | 'header' | 'marquee';
+  section: 'about' | 'hero' | 'footer' | 'header' | 'marquee' | 'product-tagline';
   title?: string;
   subtitle?: string;
   description?: string;
@@ -66,7 +66,7 @@ const SiteContentSchema = new Schema<ISiteContent>(
   {
     section: {
       type: String,
-      enum: ['about', 'hero', 'footer', 'header', 'marquee'],
+      enum: ['about', 'hero', 'footer', 'header', 'marquee', 'product-tagline'],
       required: true,
       unique: true,
     },

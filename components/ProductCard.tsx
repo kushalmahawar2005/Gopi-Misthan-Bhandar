@@ -7,6 +7,7 @@ import Link from 'next/link';
 import { useCart } from '@/context/CartContext';
 import { useWishlist } from '@/context/WishlistContext';
 import { FiChevronDown, FiHeart } from 'react-icons/fi';
+import { fetchProductTagline } from '@/lib/api';
 
 interface ProductCardProps {
   product: Product;
@@ -19,9 +20,14 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, showAddToCart = true
   const [isHovered, setIsHovered] = useState(false);
   const [isAdding, setIsAdding] = useState(false);
   const [quantity, setQuantity] = useState(1);
+  const [tagline, setTagline] = useState<string | null>(null);
   const productUrl = `/product/${product.slug || product.id}`;
   const isFavorite = isInWishlist(product.id);
   const maxQuantity = typeof product.stock === 'number' && product.stock > 0 ? product.stock : 99;
+
+  useEffect(() => {
+    fetchProductTagline().then(setTagline);
+  }, []);
 
   const sizeOptions = useMemo(() => {
     if (!Array.isArray(product.sizes)) return [];
@@ -191,6 +197,11 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, showAddToCart = true
                 <h3 className="text-[#1A1A1A] text-[14px] sm:text-[15px] md:text-[17px] font-medium font-flama leading-snug line-clamp-2">
                   {product.name}
                 </h3>
+                {tagline && (
+                  <p className="text-gray-500 italic text-[11px] sm:text-[12px] mt-0.5 line-clamp-1">
+                    {tagline}
+                  </p>
+                )}
               </Link>
               <span className="text-[#503223] font-bold text-[15px] sm:text-[16px] md:text-[17px] font-inter">
                 ₹{displayPrice}

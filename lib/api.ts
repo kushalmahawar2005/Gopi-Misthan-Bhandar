@@ -308,3 +308,29 @@ export const fetchBlogs = async (): Promise<BlogItem[]> => {
     return [];
   }
 };
+
+let cachedTaglinePromise: Promise<string | null> | null = null;
+
+export const fetchProductTagline = async (): Promise<string | null> => {
+  if (cachedTaglinePromise) {
+    return cachedTaglinePromise;
+  }
+
+  cachedTaglinePromise = (async () => {
+    try {
+      const response = await fetch('/api/site-content/section/product-tagline');
+      if (!response.ok) return null;
+      const data = await response.json();
+      if (data.success && data.data?.description && data.data?.isActive) {
+        return data.data.description;
+      }
+      return null;
+    } catch (error) {
+      console.error('Error fetching product tagline:', error);
+      return null;
+    }
+  })();
+
+  return cachedTaglinePromise;
+};
+

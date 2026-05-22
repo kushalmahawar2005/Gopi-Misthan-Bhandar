@@ -27,6 +27,7 @@ import {
   FiTruck,
   FiHeart,
   FiType,
+  FiTag,
 } from 'react-icons/fi';
 import { useState } from 'react';
 
@@ -80,6 +81,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const contentMenuItems = [
     { href: '/admin/hero-slider', icon: FiImage, label: 'Hero Slider' },
     { href: '/admin/site-content', icon: FiType, label: 'Offer Line' },
+    { href: '/admin/product-tagline', icon: FiTag, label: 'Product Tag Line' },
     { href: '/admin/featured', icon: FiTrendingUp, label: "What's Trending" },
     { href: '/admin/blog', icon: FiFile, label: 'Blog Posts' },
     { href: '/admin/instabook', icon: FiEye, label: 'InstaBook' },
