@@ -29,6 +29,8 @@ export default function EditProduct() {
     sizes: [] as { weight: string; price: string; label: string }[],
     giftBoxSubCategory: '' as '' | 'assorted' | 'dry-fruit' | 'souvenir',
     giftBoxSize: '' as '' | 'small' | 'large',
+    tagline: '',
+    taglineActive: false,
   });
 
   const [categories, setCategories] = useState<any[]>([]);
@@ -78,6 +80,8 @@ export default function EditProduct() {
           })) || [],
           giftBoxSubCategory: product.giftBoxSubCategory || '',
           giftBoxSize: product.giftBoxSize || '',
+          tagline: product.tagline || '',
+          taglineActive: product.taglineActive || false,
         });
       }
     } catch (error) {
@@ -376,6 +380,34 @@ export default function EditProduct() {
             />
             <span className="text-sm font-medium text-gray-700">Classic Sweets</span>
           </label>
+        </div>
+
+        {/* Product Tag Line */}
+        <div className="border border-orange-200 rounded-lg p-4 bg-orange-50">
+          <div className="flex items-center justify-between mb-3">
+            <div>
+              <label className="block text-sm font-semibold text-orange-800">Product Tag Line</label>
+              <p className="text-xs text-orange-600 mt-0.5">Custom tagline displayed below this product&apos;s name on the storefront.</p>
+            </div>
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={formData.taglineActive}
+                onChange={(e) => setFormData({ ...formData, taglineActive: e.target.checked })}
+                className="w-4 h-4 accent-orange-500"
+              />
+              <span className="text-sm font-medium text-orange-700">Enable Tag Line</span>
+            </label>
+          </div>
+          <input
+            type="text"
+            value={formData.tagline}
+            onChange={(e) => setFormData({ ...formData, tagline: e.target.value })}
+            placeholder="e.g., Fresh & Handmade Daily"
+            maxLength={150}
+            className="w-full px-4 py-2 border border-orange-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-400 bg-white text-gray-800 text-sm"
+          />
+          <p className="text-xs text-orange-500 mt-1 text-right">{formData.tagline.length}/150 characters</p>
         </div>
 
         <div>

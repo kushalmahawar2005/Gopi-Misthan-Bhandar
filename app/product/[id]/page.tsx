@@ -4,7 +4,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
-import { fetchProductById, fetchProducts, fetchProductTagline } from '@/lib/api';
+import { fetchProductById, fetchProducts } from '@/lib/api';
 import { useCart } from '@/context/CartContext';
 import { useWishlist } from '@/context/WishlistContext';
 import ProductCard from '@/components/ProductCard';
@@ -60,8 +60,13 @@ export default function ProductDetailPage() {
   const touchEnd = useRef<number | null>(null);
 
   useEffect(() => {
-    fetchProductTagline().then(setTagline);
-  }, []);
+    // Only show tagline if this product has its own tagline enabled
+    if (product?.taglineActive && product?.tagline) {
+      setTagline(product.tagline);
+    } else {
+      setTagline(null);
+    }
+  }, [product?.taglineActive, product?.tagline]);
 
   // Get all product images (main image + additional images)
   const getAllImages = () => {

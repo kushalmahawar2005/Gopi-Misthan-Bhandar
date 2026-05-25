@@ -26,6 +26,8 @@ const transformProduct = (product: any): Product => {
     stock: product.stock || 0,
     giftBoxSubCategory: product.giftBoxSubCategory,
     giftBoxSize: product.giftBoxSize,
+    tagline: product.tagline || '',
+    taglineActive: product.taglineActive || false,
   };
 };
 

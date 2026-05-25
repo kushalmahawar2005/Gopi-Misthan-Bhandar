@@ -27,6 +27,8 @@ export interface IProduct extends Document {
   stock?: number;
   giftBoxSubCategory?: 'assorted' | 'dry-fruit' | 'souvenir'; // For Gift Box products
   giftBoxSize?: 'small' | 'large'; // For Gift Box products
+  tagline?: string; // Per-product custom tag line
+  taglineActive?: boolean; // Whether the per-product tag line is active
   createdAt: Date;
   updatedAt: Date;
 }
@@ -70,6 +72,8 @@ const ProductSchema = new Schema<IProduct>(
       type: String,
       enum: ['small', 'large'],
     },
+    tagline: { type: String, default: '' },
+    taglineActive: { type: Boolean, default: false },
   },
   {
     timestamps: true,

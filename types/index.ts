@@ -27,6 +27,8 @@ export interface Product {
   stock?: number; // Stock quantity
   giftBoxSubCategory?: 'assorted' | 'dry-fruit' | 'souvenir'; // For Gift Box products
   giftBoxSize?: 'small' | 'large'; // For Gift Box products
+  tagline?: string; // Per-product custom tag line
+  taglineActive?: boolean; // Whether the per-product tag line is active
 }
 
 export interface SubCategory {

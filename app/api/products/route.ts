@@ -69,7 +69,7 @@ export async function GET(request: NextRequest) {
 
     const [products, totalCount] = await Promise.all([
       Product.find(query)
-        .select('name slug description price image images category subcategory isActive featured isPremium isClassic sizes defaultWeight shelfLife deliveryTime stock')
+        .select('name slug description price image images category subcategory isActive featured isPremium isClassic sizes defaultWeight shelfLife deliveryTime stock tagline taglineActive')
         .sort({ createdAt: -1 })
         .skip(skip)
         .limit(limit)

@@ -7,7 +7,7 @@ import Link from 'next/link';
 import { useCart } from '@/context/CartContext';
 import { useWishlist } from '@/context/WishlistContext';
 import { FiChevronDown, FiHeart } from 'react-icons/fi';
-import { fetchProductTagline } from '@/lib/api';
+
 
 interface ProductCardProps {
   product: Product;
@@ -22,12 +22,18 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, showAddToCart = true
   const [quantity, setQuantity] = useState(1);
   const [tagline, setTagline] = useState<string | null>(null);
   const productUrl = `/product/${product.slug || product.id}`;
-  const isFavorite = isInWishlist(product.id);
-  const maxQuantity = typeof product.stock === 'number' && product.stock > 0 ? product.stock : 99;
 
   useEffect(() => {
-    fetchProductTagline().then(setTagline);
-  }, []);
+    // Only show tagline if this product has its own tagline enabled
+    if (product.taglineActive && product.tagline) {
+      setTagline(product.tagline);
+    } else {
+      setTagline(null);
+    }
+  }, [product.taglineActive, product.tagline]);
+
+  const isFavorite = isInWishlist(product.id);
+  const maxQuantity = typeof product.stock === 'number' && product.stock > 0 ? product.stock : 99;
 
   const sizeOptions = useMemo(() => {
     if (!Array.isArray(product.sizes)) return [];

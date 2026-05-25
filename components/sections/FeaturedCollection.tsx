@@ -4,7 +4,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Product } from '@/types';
 import Image from 'next/image';
 import Link from 'next/link';
-import { fetchProductTagline } from '@/lib/api';
+
 
 interface FeaturedCollectionProps {
   products: Product[];
@@ -18,8 +18,13 @@ const FeaturedProductCard: React.FC<{ product: Product }> = ({ product }) => {
   const productUrl = `/product/${product.slug || product.id}`;
 
   useEffect(() => {
-    fetchProductTagline().then(setTagline);
-  }, []);
+    // Only show tagline if this product has its own tagline enabled
+    if (product.taglineActive && product.tagline) {
+      setTagline(product.tagline);
+    } else {
+      setTagline(null);
+    }
+  }, [product.taglineActive, product.tagline]);
 
   return (
     <Link href={productUrl} className="group block">
