@@ -4,10 +4,11 @@ import React from 'react';
 import dynamic from 'next/dynamic';
 import Header from '@/components/Header';
 import Navigation from '@/components/Navigation';
-import Cart from '@/components/Cart';
+const Cart = dynamic(() => import('@/components/Cart'), { ssr: false, loading: () => null });
 import HeroSection from '@/components/HeroSection';
 import Footer from '@/components/Footer';
 import ScrollAnimation from '@/components/ScrollAnimation';
+import LazySection from '@/components/LazySection';
 import { Product, Category, InstagramPost } from '@/types';
 
 // Dynamic Imports for performance
@@ -90,38 +91,62 @@ export default function HomeClient({
         </ScrollAnimation>
       )}
 
-      <ScrollAnimation>
-        <div id="about">
-          <AboutSection />
-        </div>
-      </ScrollAnimation>
+      <LazySection
+        fallback={<div className="h-80 w-full rounded-3xl bg-white/5" />}
+      >
+        <ScrollAnimation>
+          <div id="about">
+            <AboutSection />
+          </div>
+        </ScrollAnimation>
+      </LazySection>
 
-      <div className="my-5 md:my-7">
-        <PurityBanner />
-      </div>
-
-      <ScrollAnimation>
-        <div id="gifting">
-          <GiftBoxSection />
+      <LazySection
+        fallback={<div className="h-24 md:h-28 w-full rounded-3xl bg-white/5" />}
+      >
+        <div className="my-5 md:my-7">
+          <PurityBanner />
         </div>
-      </ScrollAnimation>
+      </LazySection>
+
+      <LazySection
+        fallback={<div className="h-80 w-full rounded-3xl bg-white/5" />}
+      >
+        <ScrollAnimation>
+          <div id="gifting">
+            <GiftBoxSection />
+          </div>
+        </ScrollAnimation>
+      </LazySection>
 
       {instaBooks.length > 0 && (
-        <ScrollAnimation>
-          <InstaBookSection instaBooks={instaBooks} />
-        </ScrollAnimation>
+        <LazySection
+          fallback={<div className="h-64 w-full rounded-3xl bg-white/5" />}
+        >
+          <ScrollAnimation>
+            <InstaBookSection instaBooks={instaBooks} />
+          </ScrollAnimation>
+        </LazySection>
       )}
 
       {galleryItems.length > 0 && (
-        <ScrollAnimation className={blogs.length === 0 ? 'mb-10 md:mb-16' : ''}>
-          <GallerySection galleryItems={galleryItems} />
-        </ScrollAnimation>
+        <LazySection
+          fallback={<div className="h-80 w-full rounded-3xl bg-white/5" />}
+        >
+          <ScrollAnimation className={blogs.length === 0 ? 'mb-10 md:mb-16' : ''}>
+            <GallerySection galleryItems={galleryItems} />
+          </ScrollAnimation>
+        </LazySection>
       )}
 
       {blogs.length > 0 && (
-        <ScrollAnimation>
-          <BlogSection blogs={blogs} />
-        </ScrollAnimation>
+        <LazySection
+          fallback={<div className="h-72 w-full rounded-3xl bg-white/5" />}
+        >
+          <ScrollAnimation>
+            <BlogSection blogs={blogs} />
+          </ScrollAnimation>
+        </LazySection>
       )}
 
       <Footer />

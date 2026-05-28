@@ -42,36 +42,37 @@ export async function POST(request: NextRequest) {
 
     await connectDB();
     const body = await request.json();
-    const { items, action } = body;
+    const { items, action, hasLocalCart } = body;
 
     if (action === 'sync') {
       // Sync operation: merge local items with DB items
       const dbCart = await Cart.findOne({ userId });
       const dbItems = dbCart ? dbCart.items : [];
-      let merged = [...dbItems];
-      
-      const localItems = items || [];
-      
-      localItems.forEach((localItem: any) => {
-        // Find if local item exists in DB cart (by ID and weight/size)
-        const existsIndex = merged.findIndex((i: any) => 
-          i.id === localItem.id && 
-          i.selectedWeight === localItem.selectedWeight && 
-          i.selectedSize === localItem.selectedSize
-        );
-        
-        if (existsIndex === -1) {
-          merged.push(localItem);
-        } else {
-          // Keep the larger quantity or overwrite
-          if (localItem.quantity > merged[existsIndex].quantity) {
-             merged[existsIndex].quantity = localItem.quantity;
-          }
-        }
-      });
+      const shouldTrustLocal = Boolean(hasLocalCart);
+      const localItems = Array.isArray(items) ? items : [];
+      let merged = shouldTrustLocal && localItems.length === 0 ? [] : [...dbItems];
 
-      // Avoid writing if nothing has changed.
-      const finalItems = (localItems.length === 0 && dbItems.length > 0) ? dbItems : merged;
+      if (localItems.length > 0) {
+        localItems.forEach((localItem: any) => {
+          // Find if local item exists in DB cart (by ID and weight/size)
+          const existsIndex = merged.findIndex((i: any) =>
+            i.id === localItem.id &&
+            i.selectedWeight === localItem.selectedWeight &&
+            i.selectedSize === localItem.selectedSize
+          );
+
+          if (existsIndex === -1) {
+            merged.push(localItem);
+          } else {
+            // Keep the larger quantity or overwrite
+            if (localItem.quantity > merged[existsIndex].quantity) {
+              merged[existsIndex].quantity = localItem.quantity;
+            }
+          }
+        });
+      }
+
+      const finalItems = shouldTrustLocal ? merged : dbItems;
       
       const newCart = await Cart.findOneAndUpdate(
         { userId },

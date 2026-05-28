@@ -144,9 +144,9 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, showAddToCart = true
   };
 
   return (
-    <div className="group block h-full">
+    <div className="group flex h-full flex-col">
       <div 
-        className="flex flex-col w-full cursor-pointer mb-0 h-full transition-all duration-300"
+        className="flex flex-1 flex-col w-full cursor-pointer mb-0 h-full transition-all duration-300"
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
       >
@@ -196,47 +196,60 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, showAddToCart = true
         </div>
         
         {/* Product Info Section - Left Aligned */}
-        <div className="w-full flex-grow flex flex-col items-start text-left px-1">
-          <div className="mb-3 w-full flex flex-col gap-2 md:grid md:grid-cols-[minmax(0,1fr)_auto] md:items-start md:gap-3">
-            <div className="min-w-0 flex-1">
-              <Link href={productUrl} className="block mb-1 group-hover:opacity-80 transition-opacity">
-                <h3 className="text-[#1A1A1A] text-[14px] sm:text-[15px] md:text-[17px] font-medium font-flama leading-snug line-clamp-2">
-                  {product.name}
-                </h3>
-                {tagline && (
-                  <p className="text-gray-500 italic text-[11px] sm:text-[12px] mt-0.5 line-clamp-1">
-                    {tagline}
-                  </p>
-                )}
-              </Link>
-              <span className="text-[#503223] font-bold text-[15px] sm:text-[16px] md:text-[17px] font-inter">
-                ₹{displayPrice}
-              </span>
-            </div>
-
-            {showAddToCart && hasMultipleSizes && (
-              <div className="hidden w-full self-start md:block md:w-auto md:max-w-[152px]">
-                <div className="flex gap-2 overflow-x-auto pb-1 no-scrollbar md:pb-0">
-                  {sizeOptions.map((size) => (
-                    <button
-                      key={`${product.id}-${size.weight}`}
-                      type="button"
-                      onClick={() => setSelectedWeight(size.weight)}
-                      className={`min-w-[66px] sm:min-w-[72px] min-h-[52px] sm:min-h-[58px] rounded border px-2.5 sm:px-3 py-1.5 sm:py-2 text-left transition-colors ${
-                        selectedWeight === size.weight
-                          ? 'border-[#FE8E02] bg-orange-50'
-                          : 'border-[#d6cec6] bg-white hover:border-[#FE8E02]/60'
-                      }`}
-                    >
-                      <p className={`text-[13px] sm:text-[14px] font-bold leading-tight ${selectedWeight === size.weight ? 'text-[#FE8E02]' : 'text-[#503223]'}`}>
-                        {size.weight}
-                      </p>
-                      <p className="text-[11px] sm:text-[12px] leading-[1.2] text-[#503223]">₹{size.price}</p>
-                    </button>
-                  ))}
-                </div>
+        <div className="w-full flex-1 flex flex-col items-start text-left px-1">
+          <div className="mb-3 w-full flex flex-col gap-2">
+            <div className="w-full flex flex-col gap-2 md:flex-row md:items-start md:justify-between md:gap-2">
+              <div className="min-w-0 flex-1">
+                <Link href={productUrl} className="block group-hover:opacity-80 transition-opacity">
+                  <h3 className="text-[#1A1A1A] text-[14px] sm:text-[15px] md:text-[16px] font-medium font-flama leading-snug line-clamp-2">
+                    {product.name}
+                  </h3>
+                  <span className="mt-2 block text-[#503223] font-bold text-[16px] sm:text-[18px] md:text-[16px] leading-none font-inter">
+                    ₹{displayPrice}
+                  </span>
+                  {tagline && (
+                    <p className="text-gray-500 italic text-[11px] sm:text-[12px] mt-1.5 line-clamp-1">
+                      {tagline}
+                    </p>
+                  )}
+                </Link>
               </div>
-            )}
+
+              {showAddToCart && hasMultipleSizes && (
+                <div className="hidden w-full self-start md:block md:w-auto md:max-w-[155px]">
+                  <div className="flex gap-1.5 overflow-x-auto pb-1 no-scrollbar md:pb-0">
+                    {sizeOptions.map((size) => {
+                      const compactLabel = toCompactWeightLabel(size.weight);
+                      const match = compactLabel.match(/^(\d+)(.*)$/);
+                      const val = match ? match[1] : compactLabel;
+                      const unit = match ? match[2] : '';
+                      const isSelected = selectedWeight === size.weight;
+
+                      return (
+                        <button
+                          key={`${product.id}-${size.weight}`}
+                          type="button"
+                          onClick={() => setSelectedWeight(size.weight)}
+                          className={`min-w-[48px] w-[48px] h-[38px] sm:min-w-[52px] sm:w-[52px] sm:h-[42px] rounded-lg border px-1 py-0.5 text-center transition-colors flex flex-col items-center justify-center ${
+                            isSelected
+                              ? 'border-[#FE8E02] bg-orange-50'
+                              : 'border-[#d6cec6] bg-white hover:border-[#FE8E02]/60'
+                          }`}
+                        >
+                          <p className={`text-[11px] sm:text-[12px] font-bold leading-none whitespace-nowrap ${isSelected ? 'text-[#FE8E02]' : 'text-[#503223]'}`}>
+                            {val}
+                            {unit && (
+                              <span className="text-[9px] sm:text-[10px] font-semibold lowercase ml-0.5 opacity-80">{unit}</span>
+                            )}
+                          </p>
+                          <p className={`mt-1 text-[9px] sm:text-[10px] font-semibold leading-none ${isSelected ? 'text-[#FE8E02]' : 'text-[#503223]/80'}`}>₹{size.price}</p>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
           
           {showAddToCart && (

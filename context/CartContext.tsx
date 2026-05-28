@@ -85,12 +85,22 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
       isSyncing.current = true;
       try {
         const localCartStr = localStorage.getItem('cart');
-        const localItems = localCartStr ? JSON.parse(localCartStr) : [];
+        const hasLocalCart = localCartStr !== null;
+        let localItems: CartItem[] = [];
+
+        if (hasLocalCart) {
+          try {
+            localItems = JSON.parse(localCartStr);
+          } catch (error) {
+            console.error('Error parsing cart from localStorage:', error);
+            localItems = [];
+          }
+        }
         
         const res = await fetch('/api/cart', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ userId: sourceId, items: localItems, action: 'sync' })
+          body: JSON.stringify({ userId: sourceId, items: localItems, action: 'sync', hasLocalCart })
         });
         
         const data = await res.json();

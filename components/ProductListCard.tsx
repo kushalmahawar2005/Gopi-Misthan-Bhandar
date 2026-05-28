@@ -144,7 +144,7 @@ const ProductListCard: React.FC<ProductListCardProps> = ({ product, showAddToCar
             )}
             
             {/* Product Name */}
-            <h3 className="text-base md:text-lg lg:text-xl font-general-sansal-sansal-sansal-sans font-bold text-black mb-2 line-clamp-2">
+            <h3 className="text-base md:text-lg lg:text-xl font-flama font-bold text-black mb-2 line-clamp-2">
               {product.name}
             </h3>
             {tagline && (
