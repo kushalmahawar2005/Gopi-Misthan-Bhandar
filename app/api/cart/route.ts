@@ -3,6 +3,17 @@ import connectDB from '@/lib/mongodb';
 import Cart from '@/models/Cart';
 import { getRequestAuth } from '@/lib/auth';
 
+// Mirror CartContext: a line is identified by product id + a single normalized
+// variant (selectedWeight || selectedSize || defaultWeight), not strict equality
+// on both size and weight separately.
+function normalizeLineVariant(item: any): string {
+  return String(item?.selectedWeight || item?.selectedSize || item?.defaultWeight || '').trim();
+}
+
+function isSameCartLine(a: any, b: any): boolean {
+  return a?.id === b?.id && normalizeLineVariant(a) === normalizeLineVariant(b);
+}
+
 async function getAuthenticatedUserId(request: NextRequest): Promise<string | null> {
   const auth = await getRequestAuth(request);
   if (!auth.isAuthenticated || !auth.user?.id) {
@@ -54,12 +65,8 @@ export async function POST(request: NextRequest) {
 
       if (localItems.length > 0) {
         localItems.forEach((localItem: any) => {
-          // Find if local item exists in DB cart (by ID and weight/size)
-          const existsIndex = merged.findIndex((i: any) =>
-            i.id === localItem.id &&
-            i.selectedWeight === localItem.selectedWeight &&
-            i.selectedSize === localItem.selectedSize
-          );
+          // Find if local item exists in DB cart (by ID + normalized variant)
+          const existsIndex = merged.findIndex((i: any) => isSameCartLine(i, localItem));
 
           if (existsIndex === -1) {
             merged.push(localItem);

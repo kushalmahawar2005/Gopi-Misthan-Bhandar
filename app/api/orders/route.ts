@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
 import Order from '@/models/Order';
 import { getRequestAuth } from '@/lib/auth';
+import { calculateOrderAmount } from '@/lib/orderUtils';
 
 function parsePositiveInt(value: string | null, fallback: number): number {
   if (!value) return fallback;
@@ -99,14 +100,62 @@ export async function POST(request: NextRequest) {
 
     const body = await request.json();
 
+    // --- Server-side re-validation: never trust client-supplied prices/totals ---
+    const clientItems = Array.isArray(body.items) ? body.items : [];
+    if (clientItems.length === 0) {
+      return NextResponse.json(
+        { success: false, error: 'Cart is empty or invalid' },
+        { status: 400 }
+      );
+    }
+
+    const cartForCalc = clientItems.map((item: any) => ({
+      productId: String(item?.productId || item?.id || '').trim(),
+      quantity: Math.max(1, Number(item?.quantity) || 0),
+      weight: String(item?.weight || item?.selectedWeight || item?.selectedSize || '').trim(),
+    }));
+
+    // Recomputes prices + validates stock against the DB. Shipping is provided as a
+    // provisional client value here and re-validated authoritatively in /api/payment/create-order.
+    const clientShippingCost = Number(body.shippingCost);
+    const calculation = await calculateOrderAmount(
+      cartForCalc,
+      body.appliedCouponCode,
+      body.shipping?.zipCode,
+      Number.isFinite(clientShippingCost) && clientShippingCost >= 0 ? clientShippingCost : undefined
+    );
+
+    if (!calculation.success) {
+      return NextResponse.json(
+        { success: false, error: calculation.error || 'Order validation failed' },
+        { status: 400 }
+      );
+    }
+
+    // Rebuild line items from validated products (image is display-only, fall back to client value).
+    const validatedItems = (calculation.products || []).map((product: any, idx: number) => ({
+      productId: String(product._id),
+      name: product.name,
+      price: product.price,
+      quantity: product.quantity,
+      image: product.image || clientItems[idx]?.image || '',
+      weight: product.weight || '',
+    }));
+
     // Generate orderNumber if not provided
     if (!body.orderNumber) {
       body.orderNumber = `ORD-${Date.now()}-${Math.floor(1000 + Math.random() * 9000)}`;
     }
 
-    // Force safe initial values to prevent premature confirmation
+    // Force safe initial values + server-validated financials to prevent tampering.
     const orderData = {
       ...body,
+      items: validatedItems,
+      subtotal: calculation.breakdown.subtotal,
+      couponDiscount: calculation.breakdown.discount,
+      appliedCouponCode: calculation.appliedCouponCode || undefined,
+      shippingCost: calculation.breakdown.deliveryCharge,
+      total: calculation.finalAmount,
       userId: auth.user.id,
       status: 'pending',
       paymentStatus: 'pending',

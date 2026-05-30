@@ -200,15 +200,15 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, showAddToCart = true
           <div className="mb-3 w-full flex flex-col gap-2">
             <div className="w-full flex flex-col gap-2 md:flex-row md:items-start md:justify-between md:gap-2">
               <div className="min-w-0 flex-1">
-                <Link href={productUrl} className="block group-hover:opacity-80 transition-opacity">
-                  <h3 className="text-[#1A1A1A] text-[14px] sm:text-[15px] md:text-[16px] font-medium font-flama leading-snug line-clamp-2">
+                <Link href={productUrl} className="flex flex-col gap-1.5 group-hover:opacity-80 transition-opacity">
+                  <h3 className="text-[#1A1A1A] text-[14px] sm:text-[15px] md:text-[16px] font-medium font-flama leading-tight line-clamp-2">
                     {product.name}
                   </h3>
-                  <span className="mt-2 block text-[#503223] font-bold text-[16px] sm:text-[18px] md:text-[16px] leading-none font-inter">
+                  <span className="text-[#503223] font-bold text-[16px] sm:text-[18px] md:text-[16px] leading-none font-inter">
                     ₹{displayPrice}
                   </span>
                   {tagline && (
-                    <p className="text-gray-500 italic text-[11px] sm:text-[12px] mt-1.5 line-clamp-1">
+                    <p className="text-gray-500 italic text-[11px] sm:text-[12px] mt-0.5 line-clamp-1">
                       {tagline}
                     </p>
                   )}
@@ -242,7 +242,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, showAddToCart = true
                               <span className="text-[9px] sm:text-[10px] font-semibold lowercase ml-0.5 opacity-80">{unit}</span>
                             )}
                           </p>
-                          <p className={`mt-1 text-[9px] sm:text-[10px] font-semibold leading-none ${isSelected ? 'text-[#FE8E02]' : 'text-[#503223]/80'}`}>₹{size.price}</p>
+                          <p className={`mt-1.5 text-[9px] sm:text-[10px] font-semibold leading-none ${isSelected ? 'text-[#FE8E02]' : 'text-[#503223]/80'}`}>₹{size.price}</p>
                         </button>
                       );
                     })}
