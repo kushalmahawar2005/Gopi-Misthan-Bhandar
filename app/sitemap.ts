@@ -5,7 +5,7 @@ import Blog from '@/models/Blog';
 import { buildBlogSlug, buildProductSlug } from '@/lib/slug';
 import { listCategorySlugs } from '@/lib/categoryContent';
 
-const BASE_URL = process.env.NEXTAUTH_URL || 'https://gopimisthanbhandar.com';
+const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://gopimisthanbhandar.com';
 const GIFTBOX_CATEGORIES = ['assorted', 'dry-fruit', 'souvenir'];
 
 const getStaticPages = (): MetadataRoute.Sitemap => {

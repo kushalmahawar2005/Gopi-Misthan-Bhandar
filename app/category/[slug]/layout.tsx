@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { getCategorySEO } from '@/lib/categoryContent';
 
-const BASE_URL = process.env.NEXTAUTH_URL || 'https://gopimisthanbhandar.com';
+const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://gopimisthanbhandar.com';
 
 interface Props {
   params: { slug: string };

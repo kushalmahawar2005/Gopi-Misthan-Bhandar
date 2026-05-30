@@ -43,6 +43,19 @@ const nextConfig = {
   productionBrowserSourceMaps: false,
   
 
+  // Canonical host: force www → non-www so Google indexes ONE version only.
+  // Prevents "Duplicate / Alternate page" issues in Search Console.
+  async redirects() {
+    return [
+      {
+        source: '/:path*',
+        has: [{ type: 'host', value: 'www.gopimisthanbhandar.com' }],
+        destination: 'https://gopimisthanbhandar.com/:path*',
+        permanent: true,
+      },
+    ];
+  },
+
   // Performance headers
   async headers() {
     return [

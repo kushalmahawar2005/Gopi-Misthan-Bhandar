@@ -147,18 +147,6 @@ const NavigationContent = () => {
     };
   }, [isMobileMenuOpen]);
 
-  const handleNavClick = (href: string) => {
-    if (href.startsWith('#')) {
-      const element = document.querySelector(href);
-      if (element) {
-        element.scrollIntoView({ behavior: 'smooth' });
-      }
-    } else {
-      router.push(href);
-    }
-    setIsMobileMenuOpen(false);
-  };
-
   const [isScrolled, setIsScrolled] = useState(false);
   const scrollRafRef = useRef<number | null>(null);
 
@@ -266,14 +254,15 @@ const NavigationContent = () => {
             <div className={`hidden lg:flex items-center justify-center gap-6 lg:gap-8 xl:gap-10 transition-all duration-500 transform-gpu will-change-transform absolute left-[150px] lg:left-[160px] right-[320px] xl:right-[380px] ${isScrolled ? 'opacity-100 translate-y-0 pointer-events-auto' : 'opacity-0 translate-y-4 pointer-events-none'
               }`}>
               {navItems.map((item) => (
-                <button
+                <Link
                   key={`scrolled-${item.label}`}
-                  onClick={() => handleNavClick(item.href)}
+                  href={item.href}
+                  onClick={() => setIsMobileMenuOpen(false)}
                   className={`text-[13px] xl:text-[15px] font-flama-condensed tracking-[0.15em] uppercase transition-colors font-semibold py-2 hover:text-[#FE8E02] whitespace-nowrap ${isActive(item.href) ? 'text-[#FE8E02]' : 'text-[#503223]'
                     }`}
                 >
                   {item.label}
-                </button>
+                </Link>
               ))}
             </div>
 
@@ -407,8 +396,8 @@ const NavigationContent = () => {
                   onMouseEnter={() => hasSubcategories ? setHoveredCategory(item.slug || null) : null}
                   onMouseLeave={() => setHoveredCategory(null)}
                 >
-                  <button
-                    onClick={() => handleNavClick(item.href)}
+                  <Link
+                    href={item.href}
                     className={`text-[16px] lg:text-[17px] font-flama tracking-[0.01em] transition-colors font-medium flex items-center gap-1.5 py-2 relative group ${isActive(item.href) ? 'text-[#2d2d2d]' : 'text-[#2d2d2d] hover:text-[#2d2d2d]'
                       }`}
                   >
@@ -423,7 +412,7 @@ const NavigationContent = () => {
                         : 'w-0 opacity-0 group-hover:w-full group-hover:opacity-100'
                         }`}
                     />
-                  </button>
+                  </Link>
 
                   {/* Subcategories Dropdown */}
                   {hasSubcategories && hoveredCategory === item.slug && (
@@ -587,19 +576,17 @@ const NavigationContent = () => {
 
             <div className="flex flex-col py-2">
               {navItems.map((item) => (
-                <button
+                <Link
                   key={item.label}
-                  onClick={() => {
-                    handleNavClick(item.href);
-                    setIsMobileMenuOpen(false);
-                  }}
+                  href={item.href}
+                  onClick={() => setIsMobileMenuOpen(false)}
                   className={`text-left w-full px-6 py-4 text-xs font-flama-condensed font-[500] tracking-[0.15em] uppercase transition-colors border-l-4 ${isActive(item.href)
                     ? 'text-[#FE8E02] bg-[#efe8e0] border-[#FE8E02]'
                     : 'text-[#5a4e44] hover:text-[#FE8E02] hover:bg-gray-50 border-transparent'
                     }`}
                 >
                   {item.label}
-                </button>
+                </Link>
               ))}
 
               {isAdmin && (

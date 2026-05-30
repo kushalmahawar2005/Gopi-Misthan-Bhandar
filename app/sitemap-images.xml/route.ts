@@ -2,7 +2,7 @@ import connectDB from '@/lib/mongodb';
 import Product from '@/models/Product';
 import { buildProductSlug } from '@/lib/slug';
 
-const BASE_URL = process.env.NEXTAUTH_URL || 'https://gopimisthanbhandar.com';
+const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://gopimisthanbhandar.com';
 
 export const revalidate = 3600;
 

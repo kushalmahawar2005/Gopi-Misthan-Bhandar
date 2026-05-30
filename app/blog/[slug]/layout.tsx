@@ -3,7 +3,7 @@ import connectDB from '@/lib/mongodb';
 import Blog from '@/models/Blog';
 import { buildBlogSlug, extractObjectIdFromSlug } from '@/lib/slug';
 
-const BASE_URL = process.env.NEXTAUTH_URL || 'https://gopimisthanbhandar.com';
+const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://gopimisthanbhandar.com';
 
 interface Props {
   params: Promise<{ slug: string }>;

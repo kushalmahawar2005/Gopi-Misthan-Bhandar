@@ -1,4 +1,4 @@
-const BASE_URL = process.env.NEXTAUTH_URL || 'https://gopimisthanbhandar.com';
+const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://gopimisthanbhandar.com';
 
 export const dynamic = 'force-static';
 export const revalidate = 86400;

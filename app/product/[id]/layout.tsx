@@ -4,7 +4,7 @@ import Product from '@/models/Product';
 import Review from '@/models/Review';
 import { buildProductSlug, extractObjectIdFromSlug } from '@/lib/slug';
 
-const BASE_URL = process.env.NEXTAUTH_URL || 'https://gopimisthanbhandar.com';
+const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://gopimisthanbhandar.com';
 
 interface Props {
   params: Promise<{ id: string }>;

@@ -15,7 +15,7 @@ import { Product } from '@/types';
 
 export const revalidate = 300;
 
-const BASE_URL = process.env.NEXTAUTH_URL || 'https://gopimisthanbhandar.com';
+const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://gopimisthanbhandar.com';
 
 const toProduct = (product: any): Product => {
   const id = String(product._id);

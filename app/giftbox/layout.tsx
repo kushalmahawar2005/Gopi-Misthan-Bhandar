@@ -1,6 +1,7 @@
 import { Metadata } from 'next';
+import BreadcrumbJsonLd from '@/components/BreadcrumbJsonLd';
 
-const BASE_URL = process.env.NEXTAUTH_URL || 'https://gopimisthanbhandar.com';
+const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://gopimisthanbhandar.com';
 
 export const metadata: Metadata = {
   title: 'Gift Boxes - Premium Dry Fruit & Sweet Hampers',
@@ -28,5 +29,10 @@ export const metadata: Metadata = {
 };
 
 export default function GiftboxLayout({ children }: { children: React.ReactNode }) {
-  return <>{children}</>;
+  return (
+    <>
+      <BreadcrumbJsonLd items={[{ name: 'Home', path: '' }, { name: 'Gift Boxes', path: '/giftbox' }]} />
+      {children}
+    </>
+  );
 }

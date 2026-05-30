@@ -10,7 +10,7 @@ import TrendingBannerModal from '@/components/TrendingBannerModal'
 import NextAuthSessionProvider from '@/components/NextAuthSessionProvider'
 import Script from 'next/script'
 
-const BASE_URL = process.env.NEXTAUTH_URL || 'https://gopimisthanbhandar.com';
+const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://gopimisthanbhandar.com';
 const FSSAI_LICENSE = process.env.NEXT_PUBLIC_FSSAI_LICENSE || '';
 const GST_NUMBER = process.env.NEXT_PUBLIC_GST_NUMBER || '';
 

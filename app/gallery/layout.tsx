@@ -1,6 +1,7 @@
 import { Metadata } from 'next';
+import BreadcrumbJsonLd from '@/components/BreadcrumbJsonLd';
 
-const BASE_URL = process.env.NEXTAUTH_URL || 'https://gopimisthanbhandar.com';
+const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://gopimisthanbhandar.com';
 
 export const metadata: Metadata = {
   title: 'Photo Gallery - Our Shop, Sweets & Events',
@@ -14,5 +15,10 @@ export const metadata: Metadata = {
 };
 
 export default function GalleryLayout({ children }: { children: React.ReactNode }) {
-  return <>{children}</>;
+  return (
+    <>
+      <BreadcrumbJsonLd items={[{ name: 'Home', path: '' }, { name: 'Gallery', path: '/gallery' }]} />
+      {children}
+    </>
+  );
 }
