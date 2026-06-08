@@ -20,7 +20,8 @@ const CategoriesSection = dynamic(() => import('@/components/sections/Categories
 const ProductSection = dynamic(() => import('@/components/sections/ProductSection'));
 const InstaBookSection = dynamic(() => import('@/components/sections/InstaBookSection'));
 const GallerySection = dynamic(() => import('@/components/sections/GallerySection'));
-const GiftBoxSection = dynamic(() => import('@/components/sections/GiftBoxSection'));
+// Hidden for now — kept for easy restore of the Exclusive Gifting section
+// const GiftBoxSection = dynamic(() => import('@/components/sections/GiftBoxSection'));
 const BlogSection = dynamic(() => import('@/components/sections/BlogSection'));
 const PurityBanner = dynamic(() => import('@/components/sections/PurityBanner'));
 
@@ -28,6 +29,7 @@ interface HomeClientProps {
   featuredProducts: Product[];
   classicProducts: Product[];
   premiumProducts: Product[];
+  savouryProducts: Product[];
   categories: Category[];
   instaBooks: InstagramPost[];
   galleryItems: any[];
@@ -38,6 +40,7 @@ export default function HomeClient({
   featuredProducts,
   classicProducts,
   premiumProducts,
+  savouryProducts,
   categories,
   instaBooks,
   galleryItems,
@@ -109,6 +112,8 @@ export default function HomeClient({
         </div>
       </LazySection>
 
+      {/* Exclusive Gifting hidden for now — replaced with Savoury section below.
+          To restore, uncomment the GiftBoxSection block and remove the Savoury block.
       <LazySection
         fallback={<div className="h-80 w-full rounded-3xl bg-white/5" />}
       >
@@ -118,6 +123,24 @@ export default function HomeClient({
           </div>
         </ScrollAnimation>
       </LazySection>
+      */}
+
+      {savouryProducts.length > 0 && (
+        <LazySection
+          fallback={<div className="h-80 w-full rounded-3xl bg-white/5" />}
+        >
+          <ScrollAnimation>
+            <div id="savoury">
+              <ProductSection
+                title="Namkeen & Savouries"
+                subtitle="Crispy Traditional Snacks"
+                products={savouryProducts}
+                viewMoreLink="/products?category=namkeen"
+              />
+            </div>
+          </ScrollAnimation>
+        </LazySection>
+      )}
 
       {instaBooks.length > 0 && (
         <LazySection

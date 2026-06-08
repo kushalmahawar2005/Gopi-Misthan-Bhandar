@@ -14,6 +14,7 @@ type HomeData = {
   featuredProducts: Product[];
   classicProducts: Product[];
   premiumProducts: Product[];
+  savouryProducts: Product[];
   categories: Category[];
   instaBooks: InstagramPost[];
   galleryItems: Array<{
@@ -144,6 +145,7 @@ async function getHomeData(): Promise<HomeData> {
       categoriesDocs,
       classicDocs,
       premiumDocs,
+      savouryDocs,
       allDocs,
       instaBookDocs,
       galleryDocs,
@@ -164,6 +166,11 @@ async function getHomeData(): Promise<HomeData> {
         .limit(8)
         .lean(),
       ProductModel.find({ isPremium: true, isActive: { $ne: false } })
+        .select('name slug description price image images category subcategory featured isPremium isClassic sizes defaultWeight shelfLife deliveryTime stock giftBoxSubCategory giftBoxSize')
+        .sort({ createdAt: -1 })
+        .limit(8)
+        .lean(),
+      ProductModel.find({ category: { $in: ['namkeen', 'savoury-snacks'] }, isActive: { $ne: false } })
         .select('name slug description price image images category subcategory featured isPremium isClassic sizes defaultWeight shelfLife deliveryTime stock giftBoxSubCategory giftBoxSize')
         .sort({ createdAt: -1 })
         .limit(8)
@@ -189,6 +196,7 @@ async function getHomeData(): Promise<HomeData> {
     const featuredProducts = featuredDocs.map(toProduct);
     const classicFlagged = classicDocs.map(toProduct);
     const premiumFlagged = premiumDocs.map(toProduct);
+    const savouryProducts = savouryDocs.map(toProduct);
     const categoriesData = categoriesDocs.map(toCategory);
 
     const categoriesWithCounts = categoriesData.map((category) => {
@@ -248,6 +256,7 @@ async function getHomeData(): Promise<HomeData> {
       featuredProducts,
       classicProducts: classicFiltered.slice(0, 8),
       premiumProducts: premiumFiltered.slice(0, 8),
+      savouryProducts: savouryProducts.slice(0, 8),
       categories: categoriesWithCounts,
       instaBooks: instaBookDocs.map(toInstaBook),
       galleryItems: galleryDocs.map(toGalleryItem),
@@ -260,6 +269,7 @@ async function getHomeData(): Promise<HomeData> {
       featuredProducts: [],
       classicProducts: [],
       premiumProducts: [],
+      savouryProducts: [],
       categories: [],
       instaBooks: [],
       galleryItems: [],
