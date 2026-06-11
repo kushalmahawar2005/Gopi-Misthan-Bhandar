@@ -24,22 +24,17 @@ export default function TermsPage() {
             </p>
 
             <div className="space-y-6 text-gray-700 font-general-sans">
-              <div>
-                <h2 className="text-lg font-semibold text-primary-brown mb-2">Orders</h2>
-                <p>All orders are subject to availability and confirmation. We may cancel or refund where necessary.</p>
-              </div>
-              <div>
-                <h2 className="text-lg font-semibold text-primary-brown mb-2">Pricing</h2>
-                <p>Prices may change without prior notice. Final price is confirmed at checkout.</p>
-              </div>
-              <div>
-                <h2 className="text-lg font-semibold text-primary-brown mb-2">Delivery</h2>
-                <p>Estimated delivery timelines are indicative and may vary due to logistics or location.</p>
-              </div>
-              <div>
-                <h2 className="text-lg font-semibold text-primary-brown mb-2">Use of Content</h2>
-                <p>Website content, images, and branding are owned by Gopi Misthan Bhandar and cannot be reused without permission.</p>
-              </div>
+              <ol className="list-decimal pl-5 space-y-3">
+                <li>All prices displayed on the website are inclusive of applicable taxes. A GST invoice can be provided upon request.</li>
+                <li>Product weights mentioned are approximate gross packed weights, including packaging. A minor variation of up to ±5% may occur in sweets, namkeen, and savoury items.</li>
+                <li>Product images are for representation purposes. While we strive to maintain consistency, slight variations in appearance, colour, or packaging may occur.</li>
+                <li>Delivery is available only to serviceable PIN codes. Estimated delivery timelines are indicative and may be affected by weather conditions, festivals, public holidays, or courier-related delays.</li>
+                <li>By placing an order, you confirm that the recipient will be available to receive the parcel at the provided delivery address.</li>
+                <li>Customers are responsible for providing accurate shipping details. We shall not be liable for delays, losses, or additional charges arising from incorrect or incomplete information.</li>
+                <li>Once an order has been dispatched, modifications to the delivery address or order contents may not be possible.</li>
+                <li>We reserve the right to refuse, cancel, or limit any order in case of pricing errors, stock unavailability, suspected fraud, or unforeseen circumstances.</li>
+                <li>By using this website and placing an order, you agree to these Terms &amp; Conditions and all related policies.</li>
+              </ol>
               <div>
                 <h2 className="text-lg font-semibold text-primary-brown mb-2">Contact</h2>
                 <p>For support, reach us at info@gopimisthanbhandar.com.</p>
