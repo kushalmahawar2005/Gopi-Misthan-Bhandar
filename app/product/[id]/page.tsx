@@ -362,57 +362,91 @@ export default function ProductDetailPage() {
     },
     {
       key: 'Shipping',
-      title: 'Shipping & Storage',
+      title: 'Shipping & Delivery',
       content: (
         <div className="space-y-3 text-sm leading-relaxed text-[#6f5d4e]">
-          <p>
-            Same-day dispatch from our Jaipur kitchen for orders placed before 2 PM. Pan-India delivery
-            via trusted partners — expected transit time is{' '}
-            <span className="font-medium text-[#3f3228]">{product.deliveryTime || '3-5 working days'}</span>.
-          </p>
-          <ul className="list-disc space-y-1.5 pl-5">
-            <li>All sweets are packed fresh in food-grade, tamper-evident boxes.</li>
-            <li>Final box design may vary based on stock availability at the time of dispatch.</li>
+          <ol className="list-decimal space-y-1.5 pl-5">
+            <li>Orders placed before 5:00 PM are dispatched the same day from our store.</li>
             <li>
-              Store in a cool, dry place. Best consumed within{' '}
-              <span className="font-medium text-[#3f3228]">{product.shelfLife || '5-7 days'}</span> of
-              delivery for optimal taste and freshness.
+              We deliver across India through trusted courier partners. Estimated delivery time is{' '}
+              <span className="font-medium text-[#3f3228]">{product.deliveryTime || '3–5 business days'}</span>.
             </li>
-            <li>Self-pickup available at SL Marg, Chandrakala Colony, Durgapura — usually ready in 24 hours.</li>
-          </ul>
+            <li>
+              All sweets, namkeen, and savouries are freshly packed in food-grade, tamper-evident
+              packaging to ensure quality and freshness.
+            </li>
+            <li>
+              Store products in a cool and dry place. For the best taste and freshness, consume
+              within the product&apos;s recommended shelf life.
+            </li>
+            <li>
+              <span className="font-medium text-[#3f3228]">Self Pick-Up Available:</span> Customers
+              may also choose to collect their order directly from our store.
+            </li>
+            <li>
+              Delivery timelines may vary slightly due to weather conditions, public holidays, or
+              courier delays.
+            </li>
+            <li>
+              Once your order is dispatched, tracking details will be shared via SMS/WhatsApp/Email
+              (if applicable).
+            </li>
+          </ol>
         </div>
       ),
     },
     {
       key: 'RefundPolicy',
-      title: 'Refund & Cancellation Policy',
+      title: 'Refund, Return & Cancellation Policy',
       content: (
         <div className="space-y-3 text-sm leading-relaxed text-[#6f5d4e]">
           <p>
-            As our products are perishable food items prepared fresh on order, we follow a strict
-            no-return policy. However, your satisfaction is our priority.
+            As our products are freshly prepared and fall under the category of perishable food
+            items, we follow a strict <span className="font-medium text-[#3f3228]">No Return Policy</span>.
+            However, customer satisfaction remains our top priority.
           </p>
-          <ul className="list-disc space-y-1.5 pl-5">
-            <li>
-              <span className="font-medium text-[#3f3228]">Cancellations:</span> Orders can be cancelled
-              free of cost within 2 hours of placement, provided dispatch has not started.
-            </li>
-            <li>
-              <span className="font-medium text-[#3f3228]">Damaged / Wrong Item:</span> If the product
-              arrives damaged or incorrect, share unboxing photos within 24 hours of delivery for a
-              full refund or replacement.
-            </li>
-            <li>
-              <span className="font-medium text-[#3f3228]">Refund Timeline:</span> Approved refunds
-              are processed within 5-7 business days to the original payment method.
-            </li>
-            <li>
-              Refunds are not applicable for taste preferences or delays caused by incorrect
-              addresses, courier issues, or unavailability of the recipient.
-            </li>
-          </ul>
+          <div>
+            <p className="font-medium text-[#3f3228]">1. Order Cancellation</p>
+            <ul className="mt-1 list-disc space-y-1.5 pl-5">
+              <li>
+                Orders can be cancelled free of charge within 1 hour of placement, provided the
+                order has not been dispatched or processing has not begun.
+              </li>
+            </ul>
+          </div>
+          <div>
+            <p className="font-medium text-[#3f3228]">2. Damaged or Incorrect Items</p>
+            <ul className="mt-1 list-disc space-y-1.5 pl-5">
+              <li>
+                If you receive a damaged, defective, or incorrect product, please share clear
+                unboxing photos and videos within 12 hours of delivery.
+              </li>
+              <li>After verification, we will arrange a suitable replacement or resolution.</li>
+            </ul>
+          </div>
+          <div>
+            <p className="font-medium text-[#3f3228]">3. Refund Eligibility</p>
+            <ul className="mt-1 list-disc space-y-1.5 pl-5">
+              <li>Refunds are not applicable for personal taste preferences.</li>
+              <li>
+                Refunds will not be issued for delays caused by incorrect shipping details,
+                courier-related delays, natural calamities, or recipient unavailability at the time
+                of delivery.
+              </li>
+            </ul>
+          </div>
+          <div>
+            <p className="font-medium text-[#3f3228]">4. Quality Assurance</p>
+            <ul className="mt-1 list-disc space-y-1.5 pl-5">
+              <li>
+                All products are packed and dispatched only after quality checks to ensure
+                freshness and hygiene.
+              </li>
+            </ul>
+          </div>
           <p>
-            For any concerns, reach out via WhatsApp or email — we&apos;re here to help.
+            <span className="font-medium text-[#3f3228]">Need Help?</span> For any concerns or
+            assistance, please contact us via WhatsApp or Email. Our team will be happy to help.
           </p>
         </div>
       ),
@@ -422,32 +456,46 @@ export default function ProductDetailPage() {
       title: 'Terms & Conditions',
       content: (
         <div className="space-y-3 text-sm leading-relaxed text-[#6f5d4e]">
-          <ul className="list-disc space-y-1.5 pl-5">
+          <ol className="list-decimal space-y-1.5 pl-5">
             <li>
-              All prices are inclusive of applicable taxes. GST invoice is provided with every order
-              on request.
+              All prices displayed on the website are inclusive of applicable taxes. A GST invoice
+              can be provided upon request.
             </li>
             <li>
-              Product weight mentioned is the gross packed weight, including standard packaging.
-              Minor variation of ±5% may occur in handcrafted items.
+              Product weights mentioned are approximate gross packed weights, including packaging.
+              A minor variation of up to ±5% may occur in sweets, namkeen, and savoury items.
             </li>
             <li>
-              Images on the website are for representation purposes only. Actual product colour,
-              shape, or garnish may vary slightly based on seasonal ingredients.
+              Product images are for representation purposes. While we strive to maintain
+              consistency, slight variations in appearance, colour, or packaging may occur.
             </li>
             <li>
-              Delivery is subject to serviceable pincodes. Estimated delivery dates are indicative
-              and may shift due to weather, festivals, or courier delays.
+              Delivery is available only to serviceable PIN codes. Estimated delivery timelines are
+              indicative and may be affected by weather conditions, festivals, public holidays, or
+              courier-related delays.
             </li>
             <li>
-              By placing an order, you confirm that the recipient is available to receive the parcel
-              at the provided address.
+              By placing an order, you confirm that the recipient will be available to receive the
+              parcel at the provided delivery address.
             </li>
             <li>
-              Gopi Misthan Bhandar reserves the right to refuse or cancel any order at its sole
-              discretion, with a full refund initiated for the cancelled order.
+              Customers are responsible for providing accurate shipping details. We shall not be
+              liable for delays, losses, or additional charges arising from incorrect or incomplete
+              information.
             </li>
-          </ul>
+            <li>
+              Once an order has been dispatched, modifications to the delivery address or order
+              contents may not be possible.
+            </li>
+            <li>
+              We reserve the right to refuse, cancel, or limit any order in case of pricing errors,
+              stock unavailability, suspected fraud, or unforeseen circumstances.
+            </li>
+            <li>
+              By using this website and placing an order, you agree to these Terms &amp; Conditions
+              and all related policies.
+            </li>
+          </ol>
         </div>
       ),
     },
