@@ -380,6 +380,8 @@ async function handleAction(
           out_for_delivery: 'Aaj delivery ke liye nikla 🛵',
           delivered: 'Deliver ho gaya 🎉',
           cancelled: 'Cancel ho gaya ❌',
+          failed: 'Fail ho gaya ⚠️',
+          expired: 'Expire ho gaya (payment nahi hua) ⌛',
         },
         en: {
           pending: 'Pending ⏳',
@@ -390,6 +392,8 @@ async function handleAction(
           out_for_delivery: 'Out for delivery 🛵',
           delivered: 'Delivered 🎉',
           cancelled: 'Cancelled ❌',
+          failed: 'Failed ⚠️',
+          expired: 'Expired (payment not completed) ⌛',
         },
       };
       const tracking = o.trackingUrl
@@ -438,14 +442,31 @@ async function handleAction(
         };
       }
 
-      // 2. Route to existing rich handlers by intent keywords.
+      // 2a. Auto-detect an "<order-id> <phone>" pair anywhere in the text and look
+      //     it up directly — works even if the customer never clicked "Track Order".
+      const phoneMatch = text.match(/(?:\+?91[\s-]?)?([6-9]\d{9})(?!\d)/);
+      if (phoneMatch) {
+        const phone = phoneMatch[1];
+        const orderToken =
+          text
+            .replace(phoneMatch[0], ' ')
+            .split(/[\s,]+/)
+            .map((s) => s.replace(/[^a-z0-9-]/gi, '').trim())
+            .filter((s) => s.length >= 4 && /\d/.test(s)) // order ids contain a number
+            .find(Boolean) || '';
+        if (orderToken) {
+          return handleAction('track', { orderNumber: orderToken, phone }, lang);
+        }
+      }
+
+      // 2b. Route to existing rich handlers by intent keywords.
       if (/\b(deliver|delivery|shipping|ship|kab milega|kitne din|pincode|charge)\b/i.test(lower)) {
         return handleAction('delivery', {}, lang);
       }
-      if (/\b(track|status|order kahan|mera order|where.*order|kahan hai)\b/i.test(lower)) {
+      if (/\b(track|order status|order update|order detail|last order|previous order|my order|mera order|order kahan|order kaha|where.*order|status of.*order)\b/i.test(lower)) {
         return handleAction('track:init', {}, lang);
       }
-      if (/\b(contact|phone|number|call|baat|address|location|kahan ho|shop|store address)\b/i.test(lower)) {
+      if (/\b(contact|phone number|call you|baat|address|location|kahan ho|shop address|store address)\b/i.test(lower)) {
         return handleAction('contact', {}, lang);
       }
 

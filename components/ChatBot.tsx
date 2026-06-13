@@ -34,7 +34,6 @@ export default function ChatBot() {
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [input, setInput] = useState('');
-  const [trackMode, setTrackMode] = useState(false);
   const [messages, setMessages] = useState<BotMessage[]>([]);
   const scrollRef = useRef<HTMLDivElement>(null);
   const greeted = useRef(false);
@@ -108,11 +107,6 @@ export default function ChatBot() {
 
   function handleSuggestion(s: Suggestion) {
     pushUser(s.label);
-    if (s.action === 'track:init') {
-      setTrackMode(true);
-      void send('track:init');
-      return;
-    }
     if (s.action.startsWith('search:')) {
       void send('search', { query: s.action.slice(7) });
       return;
@@ -126,17 +120,7 @@ export default function ChatBot() {
     if (!text || loading) return;
     setInput('');
     pushUser(text);
-
-    if (trackMode) {
-      // Expecting "ORDER123, 9876543210"
-      const parts = text.split(/[,\s]+/).filter(Boolean);
-      const phone = parts.find((p) => /^\+?\d[\d\s-]{5,}$/.test(p)) || '';
-      const orderNumber = parts.find((p) => p !== phone) || '';
-      setTrackMode(false);
-      void send('track', { orderNumber, phone });
-      return;
-    }
-
+    // Always free-text; the backend auto-detects order tracking, FAQs, search, etc.
     void send('ask', { text });
   }
 
@@ -271,7 +255,7 @@ export default function ChatBot() {
             <input
               value={input}
               onChange={(e) => setInput(e.target.value)}
-              placeholder={trackMode ? 'ORDER123, 9876543210' : 'Apna sawaal likhein…'}
+              placeholder="Type your question / sawaal likhein…"
               className="flex-1 rounded-full border border-gray-200 px-4 py-2 text-sm focus:border-primary-red focus:outline-none focus:ring-1 focus:ring-primary-red"
             />
             <button
