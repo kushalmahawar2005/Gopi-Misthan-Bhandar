@@ -38,6 +38,9 @@ export default function ChatBot() {
   const [messages, setMessages] = useState<BotMessage[]>([]);
   const scrollRef = useRef<HTMLDivElement>(null);
   const greeted = useRef(false);
+  // Remembers the language detected from the customer's typing so button clicks
+  // (which carry no text) keep replying in the same language.
+  const langRef = useRef<'en' | 'hi'>('hi');
 
   // Auto-scroll to newest message.
   useEffect(() => {
@@ -59,7 +62,11 @@ export default function ChatBot() {
     const res = await fetch('/api/chat', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ action, payload }),
+      // Carry the remembered language so button-only actions reply in it too.
+      body: JSON.stringify({
+        action,
+        payload: { lang: langRef.current, ...payload },
+      }),
     });
     return res.json();
   }
@@ -68,6 +75,9 @@ export default function ChatBot() {
     setLoading(true);
     try {
       const data = await callBot(action, payload);
+      if (data.lang === 'en' || data.lang === 'hi') {
+        langRef.current = data.lang;
+      }
       setMessages((prev) => [
         ...prev,
         {
