@@ -4,6 +4,7 @@ import { CartProvider } from '@/context/CartContext'
 import { AuthProvider } from '@/context/AuthContext'
 import { WishlistProvider } from '@/context/WishlistContext'
 import FloatingContactButtons from '@/components/FloatingContactButtons'
+import ChatBot from '@/components/ChatBot'
 import MobileBottomNav from '@/components/MobileBottomNav'
 import SmoothScroll from '@/components/SmoothScroll'
 import TrendingBannerModal from '@/components/TrendingBannerModal'
@@ -241,6 +242,7 @@ export default function RootLayout({
               <CartProvider>
                 {children}
                 <FloatingContactButtons />
+                <ChatBot />
                 <TrendingBannerModal />
                 {/* <MobileBottomNav /> */}
               </CartProvider>

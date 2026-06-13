@@ -126,7 +126,7 @@ export default function FloatingContactButtons() {
 
   return (
     <>
-      <div className="fixed bottom-[calc(env(safe-area-inset-bottom)+1rem)] md:bottom-6 right-3 sm:right-6 z-40 flex flex-col items-end gap-2.5 md:gap-3">
+      <div className="fixed bottom-[calc(env(safe-area-inset-bottom)+1rem)] md:bottom-6 left-3 sm:left-6 z-40 flex flex-col items-start gap-2.5 md:gap-3">
         <button
           type="button"
           onClick={() => setIsModalOpen(true)}
@@ -135,7 +135,7 @@ export default function FloatingContactButtons() {
           <div className="flex h-9 w-9 md:h-10 md:w-10 items-center justify-center rounded-full bg-white/15">
             <FiGift className="h-4 w-4 md:h-5 md:w-5" />
           </div>
-          <div className="pointer-events-none absolute right-[110%] hidden min-w-[200px] translate-y-1 flex-col rounded-xl bg-primary-red px-4 py-3 gap-2 text-left text-white shadow-lg transition group-hover:flex">
+          <div className="pointer-events-none absolute left-[110%] hidden min-w-[200px] translate-y-1 flex-col rounded-xl bg-primary-red px-4 py-3 gap-2 text-left text-white shadow-lg transition group-hover:flex">
             <span className="text-sm font-flama font-semibold uppercase tracking-wide">Bulk Enquiry</span>
             <span className="text-xs text-white/80">Plan your custom gift hampers</span>
           </div>
@@ -151,7 +151,7 @@ export default function FloatingContactButtons() {
           <div className="flex h-9 w-9 md:h-10 md:w-10 items-center justify-center rounded-full bg-white/15">
             <FaWhatsapp className="h-4 w-4 md:h-5 md:w-5" />
           </div>
-          <div className="pointer-events-none absolute right-[110%] hidden min-w-[200px] translate-y-1 flex-col rounded-xl bg-[#1fb455] px-4 py-3 text-left text-white shadow-lg transition group-hover:flex">
+          <div className="pointer-events-none absolute left-[110%] hidden min-w-[200px] translate-y-1 flex-col rounded-xl bg-[#1fb455] px-4 py-3 text-left text-white shadow-lg transition group-hover:flex">
             <span className="text-sm font-semibold uppercase tracking-wide">WhatsApp</span>
             <span className="text-xs text-white/80">Chat with our team</span>
           </div>
