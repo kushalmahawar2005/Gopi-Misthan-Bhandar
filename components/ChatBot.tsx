@@ -143,7 +143,7 @@ export default function ChatBot() {
           type="button"
           onClick={() => setOpen(true)}
           aria-label="Chat with us"
-          className="fixed bottom-[calc(env(safe-area-inset-bottom)+1rem)] md:bottom-6 left-3 sm:left-6 z-40 flex items-center gap-2 rounded-full bg-primary-red px-4 py-3 text-white shadow-lg transition hover:scale-105 hover:bg-primary-darkRed"
+          className="fixed bottom-[calc(env(safe-area-inset-bottom)+1rem)] md:bottom-6 right-3 sm:right-6 z-40 flex items-center gap-2 rounded-full bg-primary-red px-4 py-3 text-white shadow-lg transition hover:scale-105 hover:bg-primary-darkRed"
         >
           <FiMessageCircle className="h-5 w-5" />
           <span className="hidden text-sm font-semibold sm:inline">Chat</span>
@@ -152,7 +152,7 @@ export default function ChatBot() {
 
       {/* Chat panel */}
       {open && (
-        <div className="fixed bottom-[calc(env(safe-area-inset-bottom)+1rem)] md:bottom-6 left-1/2 z-50 flex h-[70vh] max-h-[560px] w-[94vw] max-w-[380px] -translate-x-1/2 flex-col overflow-hidden rounded-2xl bg-white shadow-2xl sm:left-6 sm:translate-x-0">
+        <div className="fixed bottom-[calc(env(safe-area-inset-bottom)+1rem)] md:bottom-6 left-1/2 z-50 flex h-[70vh] max-h-[560px] w-[94vw] max-w-[380px] -translate-x-1/2 flex-col overflow-hidden rounded-2xl bg-white shadow-2xl sm:left-auto sm:right-6 sm:translate-x-0">
           {/* Header */}
           <div className="flex items-center justify-between bg-primary-red px-4 py-3 text-white">
             <div className="flex items-center gap-2">
