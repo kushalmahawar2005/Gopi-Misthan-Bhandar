@@ -8,7 +8,7 @@ import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
 import Cart from '@/components/Cart';
 import ProtectedRoute from '@/components/ProtectedRoute';
-import { FiPackage, FiShoppingBag, FiCalendar, FiMapPin, FiDollarSign, FiEye, FiTruck, FiDownload } from 'react-icons/fi';
+import { FiPackage, FiShoppingBag, FiCalendar, FiMapPin, FiDollarSign, FiEye, FiTruck, FiDownload, FiFileText } from 'react-icons/fi';
 import Link from 'next/link';
 import Image from 'next/image';
 
@@ -228,12 +228,19 @@ export default function OrdersPage() {
                           {order.status}
                         </span>
                         <button
+                          onClick={() => router.push(`/orders/invoice/${encodeURIComponent(order.orderNumber)}`)}
+                          className="flex items-center gap-2 px-4 py-2 border border-[#FE8E02] text-[#FE8E02] rounded-md hover:bg-orange-50 transition-colors text-sm font-medium"
+                        >
+                          <FiFileText className="w-4 h-4" />
+                          View Invoice
+                        </button>
+                        <button
                           onClick={() => handleDownloadReceipt(order.orderNumber)}
                           disabled={downloadingInvoiceFor === order.orderNumber}
                           className="flex items-center gap-2 px-4 py-2 border border-[#FE8E02] text-[#FE8E02] rounded-md hover:bg-orange-50 transition-colors text-sm font-medium disabled:opacity-60 disabled:cursor-not-allowed"
                         >
                           <FiDownload className="w-4 h-4" />
-                          {downloadingInvoiceFor === order.orderNumber ? 'Downloading...' : 'Download Receipt'}
+                          {downloadingInvoiceFor === order.orderNumber ? 'Downloading...' : 'Download PDF'}
                         </button>
                         <button
                           onClick={() => router.push(`/orders/track?orderNumber=${order.orderNumber}`)}

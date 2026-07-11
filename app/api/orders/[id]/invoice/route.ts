@@ -1,9 +1,40 @@
 import { NextRequest, NextResponse } from 'next/server';
-import connectDB from '@/lib/mongodb';
-import Order from '@/models/Order';
+import fs from 'fs';
+import path from 'path';
 import { jsPDF } from 'jspdf';
 import autoTable from 'jspdf-autotable';
+import connectDB from '@/lib/mongodb';
+import Order from '@/models/Order';
 import { getRequestAuth } from '@/lib/auth';
+import {
+  buildInvoiceData,
+  formatINR,
+  formatInvoiceDate,
+  COMPANY,
+} from '@/lib/invoice';
+
+// Brand theme (saffron / brown) — matches the storefront.
+const BRAND: [number, number, number] = [254, 142, 2]; // #FE8E02
+const INK: [number, number, number] = [51, 24, 24]; // #331818
+const MUTED: [number, number, number] = [120, 110, 105];
+
+// jsPDF's built-in Helvetica has no ₹ glyph (it prints as "¹"), so use "Rs."
+// in the PDF. The on-screen react-to-print invoice keeps the ₹ symbol.
+const rupee = (n: number): string => formatINR(n).replace('₹', 'Rs. ');
+
+// Cache the logo as a base64 data URI across requests.
+let cachedLogo: string | null | undefined;
+function getLogoDataUri(): string | null {
+  if (cachedLogo !== undefined) return cachedLogo;
+  try {
+    const logoPath = path.join(process.cwd(), 'public', 'logo.png');
+    const buf = fs.readFileSync(logoPath);
+    cachedLogo = `data:image/png;base64,${buf.toString('base64')}`;
+  } catch {
+    cachedLogo = null;
+  }
+  return cachedLogo;
+}
 
 export async function GET(
   request: NextRequest,
@@ -19,9 +50,8 @@ export async function GET(
     }
 
     await connectDB();
-    
-    const order = await Order.findOne({ orderNumber: params.id }).lean() as any;
-    
+
+    const order = (await Order.findOne({ orderNumber: params.id }).lean()) as any;
     if (!order) {
       return NextResponse.json(
         { success: false, error: 'Order not found' },
@@ -37,92 +67,226 @@ export async function GET(
       );
     }
 
-    // Create PDF
-    const doc = new jsPDF();
-    
-    // Header
+    const invoice = buildInvoiceData(order);
+
+    // JSON mode powers the on-screen React invoice (/orders/invoice/[id]).
+    if (request.nextUrl.searchParams.get('format') === 'json') {
+      return NextResponse.json({ success: true, data: invoice }, { status: 200 });
+    }
+
+    // ---------- PDF (server-side, also reusable for email/save) ----------
+    const doc = new jsPDF({ unit: 'mm', format: 'a4' });
+    const pageW = doc.internal.pageSize.getWidth();
+    const marginX = 14;
+    const rightX = pageW - marginX;
+
+    // Header band
+    doc.setFillColor(...BRAND);
+    doc.rect(0, 0, pageW, 3, 'F');
+
+    const logo = getLogoDataUri();
+    let textX = marginX;
+    if (logo) {
+      try {
+        doc.addImage(logo, 'PNG', marginX, 10, 18, 18);
+        textX = marginX + 22;
+      } catch {
+        /* ignore bad image */
+      }
+    }
+
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(16);
+    doc.setTextColor(...INK);
+    doc.text(COMPANY.name, textX, 16);
+
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(8);
+    doc.setTextColor(...MUTED);
+    doc.text(COMPANY.tagline, textX, 21);
+    let hy = 25;
+    for (const line of COMPANY.addressLines) {
+      doc.text(line, textX, hy);
+      hy += 4;
+    }
+    doc.text(`${COMPANY.phone}  •  ${COMPANY.email}`, textX, hy);
+    hy += 4;
+    doc.text(`GSTIN: ${COMPANY.gstin}`, textX, hy);
+
+    // INVOICE label + meta (right)
+    doc.setFont('helvetica', 'bold');
     doc.setFontSize(20);
-    doc.setTextColor(186, 6, 6); // Primary red
-    doc.text('Gopi Misthan Bhandar', 14, 20);
+    doc.setTextColor(...BRAND);
+    doc.text('INVOICE', rightX, 16, { align: 'right' });
+
+    doc.setFontSize(8);
+    doc.setTextColor(...INK);
+    const meta: [string, string][] = [
+      ['Invoice No:', invoice.invoiceNumber],
+      ['Invoice Date:', formatInvoiceDate(invoice.invoiceDate)],
+      ['Due Date:', formatInvoiceDate(invoice.dueDate)],
+      ['Order No:', invoice.orderNumber],
+    ];
+    // Labels right-aligned in a fixed column, values left-aligned after them —
+    // avoids overlap even when the invoice / order number is long.
+    const labelRight = rightX - 55;
+    const valueLeft = rightX - 53;
+    let my = 23;
+    for (const [label, value] of meta) {
+      doc.setFont('helvetica', 'normal');
+      doc.setTextColor(...MUTED);
+      doc.text(label, labelRight, my, { align: 'right' });
+      doc.setFont('helvetica', 'bold');
+      doc.setTextColor(...INK);
+      doc.text(value, valueLeft, my);
+      my += 5;
+    }
+
+    const headerBottom = Math.max(hy, my) + 6;
+    doc.setDrawColor(...BRAND);
+    doc.setLineWidth(0.5);
+    doc.line(marginX, headerBottom, rightX, headerBottom);
+
+    // Bill To
+    let by = headerBottom + 8;
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(9);
+    doc.setTextColor(...BRAND);
+    doc.text('BILL TO', marginX, by);
+    by += 5;
+    doc.setTextColor(...INK);
     doc.setFontSize(10);
-    doc.setTextColor(0, 0, 0);
-    doc.text('Traditional Indian Sweets & Snacks', 14, 27);
-    doc.text('Neemuch, Madhya Pradesh', 14, 32);
-    doc.text(`Invoice #${order.orderNumber}`, 14, 37);
+    doc.text(invoice.billTo.name, marginX, by);
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(8.5);
+    doc.setTextColor(...MUTED);
+    for (const line of invoice.billTo.addressLines) {
+      by += 4.5;
+      doc.text(line, marginX, by);
+    }
+    if (invoice.billTo.phone) {
+      by += 4.5;
+      doc.text(`Phone: ${invoice.billTo.phone}`, marginX, by);
+    }
+    if (invoice.billTo.email) {
+      by += 4.5;
+      doc.text(`Email: ${invoice.billTo.email}`, marginX, by);
+    }
 
-    // Order Details
-    doc.setFontSize(12);
-    doc.text('Order Details', 14, 50);
-    
-    const orderDate = new Date(order.createdAt).toLocaleDateString('en-IN', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-    });
+    // Payment (right)
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(9);
+    doc.setTextColor(...BRAND);
+    doc.text('PAYMENT', rightX, headerBottom + 8, { align: 'right' });
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(8.5);
+    doc.setTextColor(...MUTED);
+    doc.text(`Method: ${invoice.paymentMethod}`, rightX, headerBottom + 13, { align: 'right' });
+    doc.text(`Status: ${invoice.paymentStatus}`, rightX, headerBottom + 17.5, { align: 'right' });
 
-    doc.setFontSize(10);
-    doc.text(`Order Date: ${orderDate}`, 14, 58);
-    doc.text(`Order Number: ${order.orderNumber}`, 14, 64);
-    doc.text(`Payment Method: ${order.paymentMethod.toUpperCase()}`, 14, 70);
-    doc.text(`Status: ${order.status}`, 14, 76);
-
-    // Shipping Address
-    doc.setFontSize(12);
-    doc.text('Shipping Address', 14, 88);
-    doc.setFontSize(10);
-    doc.text(order.shipping.name, 14, 96);
-    doc.text(order.shipping.street, 14, 102);
-    doc.text(`${order.shipping.city}, ${order.shipping.state} ${order.shipping.zipCode}`, 14, 108);
-    doc.text(`Phone: ${order.shipping.phone}`, 14, 114);
-
-    // Items Table
-    const tableData = order.items.map((item: any) => [
-      item.name,
-      item.quantity.toString(),
-      `₹${item.price.toLocaleString()}`,
-      `₹${(item.price * item.quantity).toLocaleString()}`,
+    // Items table
+    const body = invoice.items.map((item) => [
+      item.weight ? `${item.name}\n${item.weight}` : item.name,
+      String(item.quantity),
+      rupee(item.rate),
+      item.taxRate === 0 ? 'Nil' : `${item.taxRate}%`,
+      rupee(item.amount),
     ]);
 
     autoTable(doc, {
-      startY: 125,
-      head: [['Product', 'Qty', 'Price', 'Total']],
-      body: tableData,
+      startY: by + 8,
+      head: [['Description', 'Qty', 'Rate', 'GST%', 'Amount']],
+      body,
       theme: 'striped',
-      headStyles: { fillColor: [186, 6, 6] },
-      styles: { fontSize: 9 },
+      headStyles: { fillColor: INK, textColor: [255, 255, 255], fontSize: 9, halign: 'left' },
+      styles: { fontSize: 9, cellPadding: 2.5, textColor: INK },
+      alternateRowStyles: { fillColor: [255, 248, 240] },
+      columnStyles: {
+        0: { cellWidth: 'auto' },
+        1: { halign: 'center', cellWidth: 14 },
+        2: { halign: 'right', cellWidth: 32 },
+        3: { halign: 'center', cellWidth: 16 },
+        4: { halign: 'right', cellWidth: 34 },
+      },
+      margin: { left: marginX, right: marginX },
     });
 
-    // Calculate final Y position
-    const finalY = (doc as any).lastAutoTable.finalY || 125;
+    let finalY = (doc as any).lastAutoTable.finalY || by + 8;
 
-    // Price Summary
-    doc.setFontSize(10);
-    doc.text('Subtotal:', 140, finalY + 10);
-    doc.text(`₹${order.subtotal.toLocaleString()}`, 170, finalY + 10, { align: 'right' });
-    
-    doc.text('Shipping:', 140, finalY + 16);
-    doc.text(`₹${order.shippingCost.toLocaleString()}`, 170, finalY + 16, { align: 'right' });
-    
-    const tax = order.total - order.subtotal - order.shippingCost;
-    doc.text('Tax (GST):', 140, finalY + 22);
-    doc.text(`₹${tax.toLocaleString()}`, 170, finalY + 22, { align: 'right' });
-    
-    doc.setFontSize(12);
+    // Totals block (right aligned)
+    const totals: [string, string][] = [
+      ['Taxable Value', rupee(invoice.taxableValue)],
+      [`CGST (${invoice.taxRate / 2}%)`, rupee(invoice.cgst)],
+      [`SGST (${invoice.taxRate / 2}%)`, rupee(invoice.sgst)],
+      ['Shipping', rupee(invoice.shippingCost)],
+    ];
+    if (invoice.discount > 0) {
+      totals.push([
+        invoice.couponCode ? `Discount (${invoice.couponCode})` : 'Discount',
+        `- ${rupee(invoice.discount)}`,
+      ]);
+    }
+    if (Math.abs(invoice.roundOff) >= 0.01) {
+      totals.push(['Round Off', rupee(invoice.roundOff)]);
+    }
+
+    const boxW = 84;
+    const boxX = rightX - boxW;
+    let ty = finalY + 8;
+    doc.setFontSize(9);
+    for (const [label, value] of totals) {
+      doc.setFont('helvetica', 'normal');
+      doc.setTextColor(...MUTED);
+      doc.text(label, boxX, ty);
+      doc.setFont('helvetica', 'normal');
+      doc.setTextColor(...INK);
+      doc.text(value, rightX, ty, { align: 'right' });
+      ty += 6;
+    }
+
+    // Grand total bar
+    ty += 1;
+    doc.setFillColor(...BRAND);
+    doc.roundedRect(boxX - 2, ty - 5, boxW + 2, 9, 1, 1, 'F');
     doc.setFont('helvetica', 'bold');
-    doc.text('Total:', 140, finalY + 30);
-    doc.text(`₹${order.total.toLocaleString()}`, 170, finalY + 30, { align: 'right' });
+    doc.setFontSize(11);
+    doc.setTextColor(255, 255, 255);
+    doc.text('Grand Total', boxX + 1, ty + 1);
+    doc.text(rupee(invoice.grandTotal), rightX - 2, ty + 1, { align: 'right' });
 
-    // Footer
-    doc.setFontSize(8);
+    // Notes / terms footer
+    const notesY = Math.max(ty + 16, 250);
+    doc.setDrawColor(224, 211, 200);
+    doc.setLineWidth(0.2);
+    doc.line(marginX, notesY, rightX, notesY);
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(8.5);
+    doc.setTextColor(...INK);
+    doc.text('Notes & Terms', marginX, notesY + 5);
     doc.setFont('helvetica', 'normal');
-    doc.setTextColor(100, 100, 100);
-    doc.text('Thank you for your order!', 14, 280);
-    doc.text('For queries, contact: info@gopimisthanbhandar.com', 14, 285);
+    doc.setFontSize(7.5);
+    doc.setTextColor(...MUTED);
+    const notes = [
+      'All prices are inclusive of applicable GST. This is a computer-generated invoice.',
+      'Sweets & perishable food items are non-returnable once delivered.',
+      `For queries about this invoice, contact ${COMPANY.email} or ${COMPANY.phone}.`,
+    ];
+    let ny = notesY + 10;
+    for (const n of notes) {
+      doc.text(`•  ${n}`, marginX, ny);
+      ny += 4;
+    }
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(...BRAND);
+    doc.setFontSize(8.5);
+    doc.text(
+      `Thank you for shopping with ${COMPANY.name}!  •  ${COMPANY.website}`,
+      pageW / 2,
+      288,
+      { align: 'center' }
+    );
 
-    // Generate PDF buffer
     const pdfBuffer = Buffer.from(doc.output('arraybuffer'));
-
-    // Return PDF
     return new NextResponse(pdfBuffer, {
       headers: {
         'Content-Type': 'application/pdf',
@@ -137,4 +301,3 @@ export async function GET(
     );
   }
 }
-
