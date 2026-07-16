@@ -22,8 +22,7 @@ const defaultForm = {
 };
 
 const quantityOptions = [
-  { value: 'small', label: 'Small (up to 20 boxes)' },
-  { value: 'medium', label: 'Medium (20 - 100 boxes)' },
+  { value: 'small', label: 'Minimum (up to 50 boxes)' },
   { value: 'bulk', label: 'Bulk (100+ boxes)' },
   { value: 'custom', label: 'Custom Quantity' },
 ];

@@ -10,7 +10,8 @@ interface EnquiryFilters {
 }
 
 const quantityLabels: Record<string, string> = {
-  small: 'Small (up to 20 boxes)',
+  small: 'Minimum (up to 50 boxes)',
+  // Legacy value — kept so enquiries submitted before the options changed still show a label.
   medium: 'Medium (20 - 100 boxes)',
   bulk: 'Bulk (100+ boxes)',
   custom: 'Custom Quantity',
@@ -95,9 +96,9 @@ export default function WeddingEnquiriesPage() {
             className="w-full rounded-lg border border-gray-300 px-4 py-2 text-sm focus:border-primary-red focus:outline-none focus:ring-1 focus:ring-primary-red sm:w-48"
           >
             <option value="all">All Quantities</option>
-            <option value="small">Small</option>
-            <option value="medium">Medium</option>
-            <option value="bulk">Bulk</option>
+            <option value="small">Minimum (up to 50)</option>
+            <option value="medium">Medium (legacy)</option>
+            <option value="bulk">Bulk (100+)</option>
             <option value="custom">Custom</option>
           </select>
         </div>
