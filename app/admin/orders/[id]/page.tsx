@@ -129,7 +129,7 @@ export default function OrderDetails() {
                   Print Receipt
                 </Link>
                 <a
-                  href={`/api/orders/${order.orderNumber}/invoice`}
+                  href={`/api/orders/${order.orderNumber}/invoice?size=4x6`}
                   download
                   className="flex items-center gap-2 px-4 py-2 bg-[#F88E0C] text-white rounded-lg hover:bg-[#D87A0A] transition-colors text-sm font-medium"
                 >

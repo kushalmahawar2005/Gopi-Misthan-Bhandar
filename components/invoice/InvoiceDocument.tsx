@@ -8,23 +8,93 @@ import {
 } from '@/lib/invoice';
 
 /**
- * Presentational A4 invoice — brand theme (saffron #FE8E02 / brown #331818).
+ * Presentational invoice — brand theme (saffron #FE8E02 / brown #331818).
  * Pure UI: receives already-computed InvoiceData, renders nothing async.
- * Designed to be printed via react-to-print and to fit A4 cleanly.
+ * Two paper sizes:
+ *   - 'a4'  (default) — customer-facing invoice, printed via react-to-print
+ *   - '4x6' — compact 4in × 6in receipt used by the admin order print page
  */
 
 const BRAND = '#FE8E02';
 const BRAND_DARK = '#D87A0A';
 const INK = '#331818';
 
+export type InvoiceSize = 'a4' | '4x6';
+
+/** Size-dependent layout tokens so both papers share one markup tree. */
+const TOKENS = {
+  a4: {
+    width: '210mm',
+    minHeight: '297mm',
+    padding: '14mm 14mm 12mm',
+    baseFont: '12px',
+    logo: 64,
+    companyName: '20px',
+    tagline: '11px',
+    small: '11px',
+    sectionLabel: '10px',
+    badgeFont: '15px',
+    badgePad: '6px 14px',
+    metaFont: '11px',
+    billName: '13px',
+    tableFont: '11.5px',
+    cellPad: '8px 10px',
+    headPad: '9px 10px',
+    totalsWidth: '280px',
+    totalsFont: '12px',
+    totalsPad: '6px 10px',
+    grandFont: '13px',
+    grandPad: '10px 10px',
+    notesFont: '10.5px',
+    itemSub: '10px',
+    headerGap: '16px',
+    sectionGapTop: '18px',
+    tableTop: '16px',
+    notesTop: '22px',
+    markW: '22mm',
+  },
+  '4x6': {
+    width: '4in',
+    minHeight: '6in',
+    padding: '4mm 4mm 3mm',
+    baseFont: '8px',
+    logo: 30,
+    companyName: '11px',
+    tagline: '7px',
+    small: '7px',
+    sectionLabel: '6.5px',
+    badgeFont: '9px',
+    badgePad: '3px 8px',
+    metaFont: '7px',
+    billName: '8.5px',
+    tableFont: '7.5px',
+    cellPad: '3px 4px',
+    headPad: '4px 4px',
+    totalsWidth: '160px',
+    totalsFont: '7.5px',
+    totalsPad: '2.5px 4px',
+    grandFont: '9px',
+    grandPad: '5px 4px',
+    notesFont: '6.5px',
+    itemSub: '6.5px',
+    headerGap: '8px',
+    sectionGapTop: '8px',
+    tableTop: '8px',
+    notesTop: '10px',
+    markW: '13mm',
+  },
+} as const;
+
 interface Props {
   data: InvoiceData;
+  size?: InvoiceSize;
 }
 
 const InvoiceDocument = forwardRef<HTMLDivElement, Props>(function InvoiceDocument(
-  { data },
+  { data, size = 'a4' },
   ref
 ) {
+  const T = TOKENS[size];
   const {
     company,
     billTo,
@@ -52,16 +122,16 @@ const InvoiceDocument = forwardRef<HTMLDivElement, Props>(function InvoiceDocume
       ref={ref}
       className="invoice-sheet"
       style={{
-        width: '210mm',
-        minHeight: '297mm',
+        width: T.width,
+        minHeight: T.minHeight,
         margin: '0 auto',
         background: '#ffffff',
         color: INK,
         boxSizing: 'border-box',
-        padding: '14mm 14mm 12mm',
+        padding: T.padding,
         fontFamily:
           "'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif",
-        fontSize: '12px',
+        fontSize: T.baseFont,
         lineHeight: 1.5,
         position: 'relative',
       }}
@@ -72,21 +142,21 @@ const InvoiceDocument = forwardRef<HTMLDivElement, Props>(function InvoiceDocume
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'flex-start',
-          gap: '16px',
+          gap: T.headerGap,
           borderBottom: `2px solid ${BRAND}`,
-          paddingBottom: '16px',
+          paddingBottom: size === '4x6' ? '6px' : '16px',
         }}
       >
-        <div style={{ display: 'flex', gap: '14px', alignItems: 'flex-start' }}>
+        <div style={{ display: 'flex', gap: size === '4x6' ? '6px' : '14px', alignItems: 'flex-start' }}>
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={company.logoPath}
             alt={`${company.name} logo`}
-            width={64}
-            height={64}
+            width={T.logo}
+            height={T.logo}
             style={{
-              width: '64px',
-              height: '64px',
+              width: `${T.logo}px`,
+              height: `${T.logo}px`,
               objectFit: 'contain',
               flexShrink: 0,
             }}
@@ -95,7 +165,7 @@ const InvoiceDocument = forwardRef<HTMLDivElement, Props>(function InvoiceDocume
             <h1
               style={{
                 margin: 0,
-                fontSize: '20px',
+                fontSize: T.companyName,
                 fontWeight: 800,
                 letterSpacing: '-0.01em',
                 color: INK,
@@ -103,25 +173,25 @@ const InvoiceDocument = forwardRef<HTMLDivElement, Props>(function InvoiceDocume
             >
               {company.name}
             </h1>
-            <p style={{ margin: '2px 0 6px', color: BRAND_DARK, fontWeight: 600, fontSize: '11px' }}>
+            <p style={{ margin: '2px 0 4px', color: BRAND_DARK, fontWeight: 600, fontSize: T.tagline }}>
               {company.tagline}
             </p>
             {company.addressLines.map((line) => (
-              <p key={line} style={{ margin: 0, fontSize: '11px', color: '#5b4a42' }}>
+              <p key={line} style={{ margin: 0, fontSize: T.small, color: '#5b4a42' }}>
                 {line}
               </p>
             ))}
-            <p style={{ margin: '2px 0 0', fontSize: '11px', color: '#5b4a42' }}>
+            <p style={{ margin: '2px 0 0', fontSize: T.small, color: '#5b4a42' }}>
               {company.phone} &nbsp;•&nbsp; {company.email}
             </p>
-            <p style={{ margin: '2px 0 0', fontSize: '11px', color: '#5b4a42' }}>
+            <p style={{ margin: '2px 0 0', fontSize: T.small, color: '#5b4a42' }}>
               <strong>GSTIN:</strong> {company.gstin}
             </p>
           </div>
         </div>
 
         {/* Invoice meta */}
-        <div style={{ textAlign: 'right', minWidth: '150px' }}>
+        <div style={{ textAlign: 'right', minWidth: size === '4x6' ? '86px' : '150px' }}>
           <div
             style={{
               display: 'inline-block',
@@ -129,30 +199,30 @@ const InvoiceDocument = forwardRef<HTMLDivElement, Props>(function InvoiceDocume
               color: '#fff',
               fontWeight: 800,
               letterSpacing: '0.08em',
-              fontSize: '15px',
-              padding: '6px 14px',
-              borderRadius: '6px',
+              fontSize: T.badgeFont,
+              padding: T.badgePad,
+              borderRadius: '4px',
             }}
           >
             INVOICE
           </div>
-          <table style={{ marginTop: '12px', marginLeft: 'auto', fontSize: '11px', borderCollapse: 'collapse' }}>
+          <table style={{ marginTop: size === '4x6' ? '5px' : '12px', marginLeft: 'auto', fontSize: T.metaFont, borderCollapse: 'collapse' }}>
             <tbody>
               <tr>
-                <td style={{ padding: '2px 8px 2px 0', color: '#8a7a72', textAlign: 'right' }}>Invoice No.</td>
-                <td style={{ padding: '2px 0', fontWeight: 700, textAlign: 'right' }}>{invoiceNumber}</td>
+                <td style={{ padding: '1px 5px 1px 0', color: '#8a7a72', textAlign: 'right' }}>Invoice No.</td>
+                <td style={{ padding: '1px 0', fontWeight: 700, textAlign: 'right' }}>{invoiceNumber}</td>
               </tr>
               <tr>
-                <td style={{ padding: '2px 8px 2px 0', color: '#8a7a72', textAlign: 'right' }}>Invoice Date</td>
-                <td style={{ padding: '2px 0', fontWeight: 600, textAlign: 'right' }}>{formatInvoiceDate(invoiceDate)}</td>
+                <td style={{ padding: '1px 5px 1px 0', color: '#8a7a72', textAlign: 'right' }}>Invoice Date</td>
+                <td style={{ padding: '1px 0', fontWeight: 600, textAlign: 'right' }}>{formatInvoiceDate(invoiceDate)}</td>
               </tr>
               <tr>
-                <td style={{ padding: '2px 8px 2px 0', color: '#8a7a72', textAlign: 'right' }}>Due Date</td>
-                <td style={{ padding: '2px 0', fontWeight: 600, textAlign: 'right' }}>{formatInvoiceDate(dueDate)}</td>
+                <td style={{ padding: '1px 5px 1px 0', color: '#8a7a72', textAlign: 'right' }}>Due Date</td>
+                <td style={{ padding: '1px 0', fontWeight: 600, textAlign: 'right' }}>{formatInvoiceDate(dueDate)}</td>
               </tr>
               <tr>
-                <td style={{ padding: '2px 8px 2px 0', color: '#8a7a72', textAlign: 'right' }}>Order No.</td>
-                <td style={{ padding: '2px 0', fontWeight: 600, textAlign: 'right' }}>{orderNumber}</td>
+                <td style={{ padding: '1px 5px 1px 0', color: '#8a7a72', textAlign: 'right' }}>Order No.</td>
+                <td style={{ padding: '1px 0', fontWeight: 600, textAlign: 'right' }}>{orderNumber}</td>
               </tr>
             </tbody>
           </table>
@@ -160,25 +230,25 @@ const InvoiceDocument = forwardRef<HTMLDivElement, Props>(function InvoiceDocume
       </div>
 
       {/* ===== Bill To + Payment ===== */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', gap: '16px', marginTop: '18px' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', gap: T.headerGap, marginTop: T.sectionGapTop }}>
         <div style={{ maxWidth: '60%' }}>
-          <p style={{ margin: '0 0 4px', fontSize: '10px', textTransform: 'uppercase', letterSpacing: '0.08em', color: BRAND_DARK, fontWeight: 700 }}>
+          <p style={{ margin: '0 0 3px', fontSize: T.sectionLabel, textTransform: 'uppercase', letterSpacing: '0.08em', color: BRAND_DARK, fontWeight: 700 }}>
             Bill To
           </p>
-          <p style={{ margin: 0, fontWeight: 700, fontSize: '13px' }}>{billTo.name}</p>
+          <p style={{ margin: 0, fontWeight: 700, fontSize: T.billName }}>{billTo.name}</p>
           {billTo.addressLines.map((line, i) => (
-            <p key={i} style={{ margin: 0, fontSize: '11px', color: '#5b4a42' }}>{line}</p>
+            <p key={i} style={{ margin: 0, fontSize: T.small, color: '#5b4a42' }}>{line}</p>
           ))}
-          {billTo.phone && <p style={{ margin: '2px 0 0', fontSize: '11px', color: '#5b4a42' }}>Phone: {billTo.phone}</p>}
-          {billTo.email && <p style={{ margin: 0, fontSize: '11px', color: '#5b4a42' }}>Email: {billTo.email}</p>}
-          {billTo.gstin && <p style={{ margin: 0, fontSize: '11px', color: '#5b4a42' }}>GSTIN: {billTo.gstin}</p>}
+          {billTo.phone && <p style={{ margin: '2px 0 0', fontSize: T.small, color: '#5b4a42' }}>Phone: {billTo.phone}</p>}
+          {billTo.email && <p style={{ margin: 0, fontSize: T.small, color: '#5b4a42' }}>Email: {billTo.email}</p>}
+          {billTo.gstin && <p style={{ margin: 0, fontSize: T.small, color: '#5b4a42' }}>GSTIN: {billTo.gstin}</p>}
         </div>
         <div style={{ textAlign: 'right' }}>
-          <p style={{ margin: '0 0 4px', fontSize: '10px', textTransform: 'uppercase', letterSpacing: '0.08em', color: BRAND_DARK, fontWeight: 700 }}>
+          <p style={{ margin: '0 0 3px', fontSize: T.sectionLabel, textTransform: 'uppercase', letterSpacing: '0.08em', color: BRAND_DARK, fontWeight: 700 }}>
             Payment
           </p>
-          <p style={{ margin: 0, fontSize: '11px', color: '#5b4a42' }}>Method: <strong>{paymentMethod}</strong></p>
-          <p style={{ margin: 0, fontSize: '11px', color: '#5b4a42' }}>Status: <strong style={{ textTransform: 'capitalize' }}>{data.paymentStatus}</strong></p>
+          <p style={{ margin: 0, fontSize: T.small, color: '#5b4a42' }}>Method: <strong>{paymentMethod}</strong></p>
+          <p style={{ margin: 0, fontSize: T.small, color: '#5b4a42' }}>Status: <strong style={{ textTransform: 'capitalize' }}>{data.paymentStatus}</strong></p>
         </div>
       </div>
 
@@ -187,17 +257,17 @@ const InvoiceDocument = forwardRef<HTMLDivElement, Props>(function InvoiceDocume
         style={{
           width: '100%',
           borderCollapse: 'collapse',
-          marginTop: '16px',
-          fontSize: '11.5px',
+          marginTop: T.tableTop,
+          fontSize: T.tableFont,
         }}
       >
         <thead>
           <tr style={{ background: INK, color: '#fff' }}>
-            <th style={{ textAlign: 'left', padding: '9px 10px', fontWeight: 600, width: '48%' }}>Description</th>
-            <th style={{ textAlign: 'center', padding: '9px 10px', fontWeight: 600 }}>Qty</th>
-            <th style={{ textAlign: 'right', padding: '9px 10px', fontWeight: 600 }}>Rate</th>
-            <th style={{ textAlign: 'center', padding: '9px 10px', fontWeight: 600 }}>GST%</th>
-            <th style={{ textAlign: 'right', padding: '9px 10px', fontWeight: 600 }}>Amount</th>
+            <th style={{ textAlign: 'left', padding: T.headPad, fontWeight: 600, width: '48%' }}>Description</th>
+            <th style={{ textAlign: 'center', padding: T.headPad, fontWeight: 600 }}>Qty</th>
+            <th style={{ textAlign: 'right', padding: T.headPad, fontWeight: 600 }}>Rate</th>
+            <th style={{ textAlign: 'center', padding: T.headPad, fontWeight: 600 }}>GST%</th>
+            <th style={{ textAlign: 'right', padding: T.headPad, fontWeight: 600 }}>Amount</th>
           </tr>
         </thead>
         <tbody>
@@ -210,47 +280,48 @@ const InvoiceDocument = forwardRef<HTMLDivElement, Props>(function InvoiceDocume
                 pageBreakInside: 'avoid',
               }}
             >
-              <td style={{ padding: '8px 10px', verticalAlign: 'top' }}>
+              <td style={{ padding: T.cellPad, verticalAlign: 'top' }}>
                 <div style={{ fontWeight: 600, wordBreak: 'break-word' }}>{item.name}</div>
                 {item.weight && (
-                  <div style={{ fontSize: '10px', color: '#8a7a72' }}>{item.weight}</div>
+                  <div style={{ fontSize: T.itemSub, color: '#8a7a72' }}>{item.weight}</div>
                 )}
               </td>
-              <td style={{ padding: '8px 10px', textAlign: 'center', verticalAlign: 'top' }}>{item.quantity}</td>
-              <td style={{ padding: '8px 10px', textAlign: 'right', verticalAlign: 'top' }}>{formatINR(item.rate)}</td>
-              <td style={{ padding: '8px 10px', textAlign: 'center', verticalAlign: 'top' }}>
+              <td style={{ padding: T.cellPad, textAlign: 'center', verticalAlign: 'top' }}>{item.quantity}</td>
+              <td style={{ padding: T.cellPad, textAlign: 'right', verticalAlign: 'top' }}>{formatINR(item.rate)}</td>
+              <td style={{ padding: T.cellPad, textAlign: 'center', verticalAlign: 'top' }}>
                 {item.taxRate === 0 ? 'Nil' : `${item.taxRate}%`}
               </td>
-              <td style={{ padding: '8px 10px', textAlign: 'right', verticalAlign: 'top', fontWeight: 600 }}>{formatINR(item.amount)}</td>
+              <td style={{ padding: T.cellPad, textAlign: 'right', verticalAlign: 'top', fontWeight: 600 }}>{formatINR(item.amount)}</td>
             </tr>
           ))}
         </tbody>
       </table>
 
       {/* ===== Totals ===== */}
-      <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '14px' }}>
-        <table style={{ width: '280px', borderCollapse: 'collapse', fontSize: '12px' }}>
+      <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: size === '4x6' ? '6px' : '14px' }}>
+        <table style={{ width: T.totalsWidth, borderCollapse: 'collapse', fontSize: T.totalsFont }}>
           <tbody>
-            <Row label="Taxable Value" value={formatINR(taxableValue)} />
-            <Row label={`CGST (${halfRate}%)`} value={formatINR(cgst)} />
-            <Row label={`SGST (${halfRate}%)`} value={formatINR(sgst)} />
-            <Row label="Shipping" value={formatINR(shippingCost)} />
+            <Row pad={T.totalsPad} label="Taxable Value" value={formatINR(taxableValue)} />
+            <Row pad={T.totalsPad} label={`CGST (${halfRate}%)`} value={formatINR(cgst)} />
+            <Row pad={T.totalsPad} label={`SGST (${halfRate}%)`} value={formatINR(sgst)} />
+            <Row pad={T.totalsPad} label="Shipping" value={formatINR(shippingCost)} />
             {discount > 0 && (
               <Row
+                pad={T.totalsPad}
                 label={couponCode ? `Discount (${couponCode})` : 'Discount'}
                 value={`- ${formatINR(discount)}`}
                 valueColor="#1a7f37"
               />
             )}
             {Math.abs(roundOff) >= 0.01 && (
-              <Row label="Round Off" value={formatINR(roundOff)} />
+              <Row pad={T.totalsPad} label="Round Off" value={formatINR(roundOff)} />
             )}
             <tr>
               <td
                 style={{
-                  padding: '10px 10px',
+                  padding: T.grandPad,
                   fontWeight: 800,
-                  fontSize: '13px',
+                  fontSize: T.grandFont,
                   background: BRAND,
                   color: '#fff',
                   borderTopLeftRadius: '4px',
@@ -261,9 +332,9 @@ const InvoiceDocument = forwardRef<HTMLDivElement, Props>(function InvoiceDocume
               </td>
               <td
                 style={{
-                  padding: '10px 10px',
+                  padding: T.grandPad,
                   fontWeight: 800,
-                  fontSize: '13px',
+                  fontSize: T.grandFont,
                   textAlign: 'right',
                   background: BRAND,
                   color: '#fff',
@@ -281,22 +352,32 @@ const InvoiceDocument = forwardRef<HTMLDivElement, Props>(function InvoiceDocume
       {/* ===== Notes / Terms ===== */}
       <div
         style={{
-          marginTop: '22px',
+          marginTop: T.notesTop,
           borderTop: '1px dashed #e0d3c8',
-          paddingTop: '12px',
-          fontSize: '10.5px',
+          paddingTop: size === '4x6' ? '5px' : '12px',
+          fontSize: T.notesFont,
           color: '#6b5a51',
         }}
       >
-        <p style={{ margin: '0 0 4px', fontWeight: 700, color: INK }}>Notes &amp; Terms</p>
-        <ul style={{ margin: 0, paddingLeft: '16px' }}>
+        <p style={{ margin: '0 0 3px', fontWeight: 700, color: INK }}>Notes &amp; Terms</p>
+        <ul style={{ margin: 0, paddingLeft: size === '4x6' ? '10px' : '16px' }}>
           <li>All prices are inclusive of applicable GST. This is a computer-generated invoice.</li>
           <li>Sweets &amp; perishable food items are non-returnable once delivered.</li>
           <li>For any queries regarding this invoice, contact {company.email} or {company.phone}.</li>
         </ul>
-        <p style={{ margin: '14px 0 0', textAlign: 'center', fontWeight: 700, color: BRAND_DARK }}>
+        <p style={{ margin: size === '4x6' ? '6px 0 0' : '14px 0 0', textAlign: 'center', fontWeight: 700, color: BRAND_DARK }}>
           Thank you for shopping with {company.name}! &nbsp;•&nbsp; {company.website}
         </p>
+      </div>
+
+      {/* ===== Brand mark (right corner, below notes) ===== */}
+      <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: size === '4x6' ? '4px' : '10px' }}>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src="/bill.jpg"
+          alt="Since 1968"
+          style={{ width: T.markW, height: 'auto' }}
+        />
       </div>
     </div>
   );
@@ -306,15 +387,17 @@ function Row({
   label,
   value,
   valueColor,
+  pad,
 }: {
   label: string;
   value: string;
   valueColor?: string;
+  pad: string;
 }) {
   return (
     <tr style={{ borderBottom: '1px solid #f0e6dd' }}>
-      <td style={{ padding: '6px 10px', color: '#5b4a42' }}>{label}</td>
-      <td style={{ padding: '6px 10px', textAlign: 'right', fontWeight: 600, color: valueColor || INK }}>
+      <td style={{ padding: pad, color: '#5b4a42' }}>{label}</td>
+      <td style={{ padding: pad, textAlign: 'right', fontWeight: 600, color: valueColor || INK }}>
         {value}
       </td>
     </tr>
