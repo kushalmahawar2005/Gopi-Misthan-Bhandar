@@ -1,11 +1,11 @@
 'use client';
 
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { useCart } from '@/context/CartContext';
 import Image from 'next/image';
-import Link from 'next/link';
 import { FiX, FiMinus, FiPlus, FiShoppingBag } from 'react-icons/fi';
- 
+
 const Cart: React.FC = () => {
   const {
     cartItems,
@@ -13,9 +13,14 @@ const Cart: React.FC = () => {
     updateQuantity,
     getTotalPrice,
     getTotalItems,
+    getMaxQuantity,
+    cartNotice,
+    dismissCartNotice,
     isCartOpen,
     closeCart,
   } = useCart();
+
+  const router = useRouter();
 
   const [touchStart, setTouchStart] = useState<number | null>(null);
   const [touchEnd, setTouchEnd] = useState<number | null>(null);
@@ -45,6 +50,21 @@ const Cart: React.FC = () => {
       window.history.back();
     }
     closeCart();
+  };
+
+  /**
+   * Navigating straight to /checkout used to leave the pushed `cartOpen` entry
+   * on the stack, so Back from checkout landed on a phantom entry and the user
+   * had to press it twice. Pop our entry first, then navigate.
+   */
+  const handleCheckout = () => {
+    closeCart();
+    if (window.history.state?.cartOpen) {
+      window.history.back();
+      setTimeout(() => router.push('/checkout'), 0);
+      return;
+    }
+    router.push('/checkout');
   };
 
   // --- PROBLEM 2: Swipe Down to Close (Mobile Only) ---
@@ -109,6 +129,20 @@ const Cart: React.FC = () => {
             </button>
           </div>
 
+          {/* Price / availability changes picked up by revalidation */}
+          {cartNotice && (
+            <div className="mx-6 mt-4 flex items-start gap-3 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3">
+              <p className="flex-1 text-xs leading-relaxed text-amber-900">{cartNotice}</p>
+              <button
+                onClick={dismissCartNotice}
+                className="text-amber-700 hover:text-amber-900"
+                aria-label="Dismiss notice"
+              >
+                <FiX className="h-4 w-4" />
+              </button>
+            </div>
+          )}
+
           {/* Cart Items */}
           <div className="flex-1 p-6">
             {cartItems.length === 0 ? (
@@ -163,11 +197,19 @@ const Cart: React.FC = () => {
                         </span>
                         <button
                           onClick={() => updateQuantity(item.id, item.quantity + 1, item.selectedSize, item.selectedWeight)}
-                          className="p-1 border border-gray-300 rounded hover:bg-gray-100 transition-colors"
+                          disabled={item.quantity >= getMaxQuantity(item)}
+                          className="p-1 border border-gray-300 rounded hover:bg-gray-100 transition-colors disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-transparent"
                           aria-label="Increase quantity"
                         >
                           <FiPlus className="w-4 h-4 text-gray-600" />
                         </button>
+                        {item.quantity >= getMaxQuantity(item) && (
+                          <span className="text-[10px] text-gray-400">
+                            {typeof item.stock === 'number' && item.stock <= 10
+                              ? `Only ${item.stock} left`
+                              : 'Max limit'}
+                          </span>
+                        )}
                       </div>
                     </div>
 
@@ -200,13 +242,13 @@ const Cart: React.FC = () => {
                 </span>
               </div>
               <div className="relative z-20">
-                <Link
-                  href="/checkout"
+                <button
+                  type="button"
+                  onClick={handleCheckout}
                   className="block w-full bg-[#FE8E02] text-white py-4 md:py-3 px-6 rounded-xl md:rounded-lg font-bold font-general-sans hover:opacity-90 transition-all text-center shadow-lg active:scale-95"
-                  onClick={() => closeCart()}
                 >
                   PROCEED TO CHECKOUT
-                </Link>
+                </button>
               </div>
             </div>
           )}

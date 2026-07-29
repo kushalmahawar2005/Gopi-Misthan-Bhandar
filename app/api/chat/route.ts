@@ -155,35 +155,107 @@ function extractTokens(text: string): string[] {
     .filter((w) => w.length >= 3 && !STOPWORDS.has(w));
 }
 
+const PRODUCT_FIELDS = 'name slug description price image category subcategory sizes';
+
+/** Compare slugs/names ignoring case, spaces and punctuation ("dry-fruit" == "Dry Fruit"). */
+function normalizeKey(value: string): string {
+  return String(value).toLowerCase().replace(/[^a-z0-9]+/g, '');
+}
+
+/**
+ * If the query IS a category (chip taps send the raw slug, e.g. "dry-fruit"),
+ * return every slug that should be considered part of it. Returning null means
+ * "not a category" and the caller falls back to keyword search.
+ */
+async function resolveCategorySlugs(rawText: string): Promise<string[] | null> {
+  const key = normalizeKey(rawText);
+  if (!key) return null;
+
+  const categories = await Category.find({}).select('name slug subCategories').lean();
+
+  for (const category of categories as any[]) {
+    const subs = Array.isArray(category.subCategories) ? category.subCategories : [];
+
+    if (normalizeKey(category.slug || '') === key || normalizeKey(category.name || '') === key) {
+      return [category.slug, ...subs.map((s: any) => s.slug)].filter(Boolean);
+    }
+
+    for (const sub of subs) {
+      if (normalizeKey(sub.slug || '') === key || normalizeKey(sub.name || '') === key) {
+        return [sub.slug].filter(Boolean);
+      }
+    }
+  }
+
+  return null;
+}
+
 async function searchProducts(rawText: string): Promise<ChatProduct[]> {
   const maxPrice = parseMaxPrice(rawText);
-  const tokens = extractTokens(rawText);
+  const limit = maxPrice ? 40 : 8;
+  const base: any = { isActive: { $ne: false } };
 
-  const query: any = { isActive: { $ne: false } };
+  // 1. Exact category match wins. A category chip must return ONLY products
+  //    actually filed under it — never products that merely mention the word
+  //    somewhere in their description ("...fried in dry spices" is not a dry fruit).
+  const categorySlugs = await resolveCategorySlugs(rawText);
+  if (categorySlugs?.length) {
+    const products = await Product.find({
+      ...base,
+      $or: [{ category: { $in: categorySlugs } }, { subcategory: { $in: categorySlugs } }],
+    })
+      .select(PRODUCT_FIELDS)
+      .sort({ featured: -1, createdAt: -1 })
+      .limit(limit)
+      .lean();
 
-  // Match ANY keyword across name/description/category (so "kaju katli rate"
-  // still finds Kaju Katli via the "kaju"/"katli" tokens).
-  if (tokens.length) {
-    query.$or = tokens.flatMap((tok) => [
-      { name: { $regex: tok, $options: 'i' } },
-      { description: { $regex: tok, $options: 'i' } },
-      { category: { $regex: tok, $options: 'i' } },
-    ]);
+    return applyBudget(products.map(toChatProduct), maxPrice);
   }
 
-  const products = await Product.find(query)
-    .select('name slug description price image category sizes')
+  const tokens = extractTokens(rawText);
+  if (!tokens.length) {
+    const products = await Product.find(base)
+      .select(PRODUCT_FIELDS)
+      .sort({ featured: -1, createdAt: -1 })
+      .limit(limit)
+      .lean();
+    return applyBudget(products.map(toChatProduct), maxPrice);
+  }
+
+  // 2. Keyword match on name/category/subcategory — the high-confidence signal.
+  const strong = await Product.find({
+    ...base,
+    $or: tokens.flatMap((tok) => [
+      { name: { $regex: tok, $options: 'i' } },
+      { category: { $regex: tok, $options: 'i' } },
+      { subcategory: { $regex: tok, $options: 'i' } },
+    ]),
+  })
+    .select(PRODUCT_FIELDS)
     .sort({ featured: -1, createdAt: -1 })
-    .limit(maxPrice ? 40 : 8)
+    .limit(limit)
     .lean();
 
-  let chatProducts = products.map(toChatProduct);
+  const strongResults = applyBudget(strong.map(toChatProduct), maxPrice);
+  if (strongResults.length) return strongResults;
 
-  if (maxPrice) {
-    chatProducts = chatProducts.filter((p) => p.fromPrice <= maxPrice);
-  }
+  // 3. Only when nothing matched by name/category do we search descriptions,
+  //    so vague queries still get an answer without polluting precise ones.
+  const loose = await Product.find({
+    ...base,
+    $or: tokens.map((tok) => ({ description: { $regex: tok, $options: 'i' } })),
+  })
+    .select(PRODUCT_FIELDS)
+    .sort({ featured: -1, createdAt: -1 })
+    .limit(limit)
+    .lean();
 
-  return chatProducts.slice(0, 6);
+  return applyBudget(loose.map(toChatProduct), maxPrice);
+}
+
+function applyBudget(products: ChatProduct[], maxPrice: number | null): ChatProduct[] {
+  const filtered = maxPrice ? products.filter((p) => p.fromPrice <= maxPrice) : products;
+  return filtered.slice(0, 6);
 }
 
 /** Optional Gemini upgrade for free-text. Returns null if unavailable/unconfigured. */

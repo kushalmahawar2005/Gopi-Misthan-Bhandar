@@ -53,40 +53,38 @@ export async function POST(request: NextRequest) {
 
     await connectDB();
     const body = await request.json();
-    const { items, action, hasLocalCart } = body;
+    const { items, action } = body;
 
     if (action === 'sync') {
-      // Sync operation: merge local items with DB items
-      const dbCart = await Cart.findOne({ userId });
-      const dbItems = dbCart ? dbCart.items : [];
-      const shouldTrustLocal = Boolean(hasLocalCart);
+      // Login-time merge: union of the saved cart and whatever this browser had,
+      // keeping the larger quantity per line.
+      //
+      // An empty local cart must NEVER clear the saved cart. A fresh browser
+      // writes localStorage.cart = "[]" before the user object resolves, so
+      // trusting "local is empty" here used to delete the cart on every login
+      // from a new device. Emptying a cart is done through the normal (non-sync)
+      // save path instead, which is an explicit user action.
+      const dbCart = await Cart.findOne({ userId }).lean();
+      const dbItems: any[] = dbCart ? (dbCart as any).items || [] : [];
       const localItems = Array.isArray(items) ? items : [];
-      let merged = shouldTrustLocal && localItems.length === 0 ? [] : [...dbItems];
+      const merged = [...dbItems];
 
-      if (localItems.length > 0) {
-        localItems.forEach((localItem: any) => {
-          // Find if local item exists in DB cart (by ID + normalized variant)
-          const existsIndex = merged.findIndex((i: any) => isSameCartLine(i, localItem));
+      for (const localItem of localItems) {
+        const existsIndex = merged.findIndex((i: any) => isSameCartLine(i, localItem));
 
-          if (existsIndex === -1) {
-            merged.push(localItem);
-          } else {
-            // Keep the larger quantity or overwrite
-            if (localItem.quantity > merged[existsIndex].quantity) {
-              merged[existsIndex].quantity = localItem.quantity;
-            }
-          }
-        });
+        if (existsIndex === -1) {
+          merged.push(localItem);
+        } else if (Number(localItem?.quantity) > Number(merged[existsIndex]?.quantity)) {
+          merged[existsIndex] = { ...merged[existsIndex], quantity: Number(localItem.quantity) };
+        }
       }
 
-      const finalItems = shouldTrustLocal ? merged : dbItems;
-      
       const newCart = await Cart.findOneAndUpdate(
         { userId },
-        { items: finalItems },
+        { items: merged },
         { new: true, upsert: true }
       );
-      
+
       return NextResponse.json({ success: true, data: newCart.items }, { status: 200 });
     } else {
       // Normal overwrite operation (called on every cart update)

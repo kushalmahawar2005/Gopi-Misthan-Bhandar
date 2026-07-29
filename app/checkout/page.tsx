@@ -29,7 +29,14 @@ export default function CheckoutPage() {
     getTotalPrice,
     clearCart,
     openCart,
+    revalidateCart,
   } = useCart();
+
+  // Re-price against the catalogue before the customer commits, so the summary
+  // and the Razorpay amount can't disagree.
+  useEffect(() => {
+    revalidateCart();
+  }, [revalidateCart]);
 
   const [currentStep, setCurrentStep] = useState(1); // 1: Address, 2: Billing, 3: Payment
   const [formData, setFormData] = useState({

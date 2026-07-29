@@ -266,9 +266,7 @@ export default function ProductDetailPage() {
     setIsAdding(true);
     const productWithSize = createProductPayload();
     if (!productWithSize) return;
-    for (let i = 0; i < quantity; i++) {
-      addToCart(productWithSize, 1);
-    }
+    addToCart(productWithSize, quantity);
     setTimeout(() => setIsAdding(false), 500);
   };
 
@@ -277,9 +275,7 @@ export default function ProductDetailPage() {
     setIsBuying(true);
     const productWithSize = createProductPayload();
     if (!productWithSize) return;
-    for (let i = 0; i < quantity; i++) {
-      addToCart(productWithSize, 1);
-    }
+    addToCart(productWithSize, quantity);
     router.push('/checkout');
     setTimeout(() => setIsBuying(false), 500);
   };
