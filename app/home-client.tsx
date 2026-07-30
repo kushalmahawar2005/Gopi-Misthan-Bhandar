@@ -30,6 +30,8 @@ interface HomeClientProps {
   classicProducts: Product[];
   premiumProducts: Product[];
   savouryProducts: Product[];
+  comboProducts: Product[];
+  comboViewMoreLink: string;
   categories: Category[];
   instaBooks: InstagramPost[];
   galleryItems: any[];
@@ -41,6 +43,8 @@ export default function HomeClient({
   classicProducts,
   premiumProducts,
   savouryProducts,
+  comboProducts,
+  comboViewMoreLink,
   categories,
   instaBooks,
   galleryItems,
@@ -148,6 +152,25 @@ export default function HomeClient({
         >
           <ScrollAnimation>
             <InstaBookSection instaBooks={instaBooks} />
+          </ScrollAnimation>
+        </LazySection>
+      )}
+
+      {/* Combo Packs — sits right below the reels. Renders only once combo
+          products exist (any category/subcategory slug containing "combo"). */}
+      {comboProducts.length > 0 && (
+        <LazySection
+          fallback={<div className="h-80 w-full rounded-3xl bg-white/5" />}
+        >
+          <ScrollAnimation>
+            <div id="combo">
+              <ProductSection
+                title="Combo Packs"
+                subtitle="Value Packs, Handpicked Together"
+                products={comboProducts.slice(0, 4)}
+                viewMoreLink={comboViewMoreLink}
+              />
+            </div>
           </ScrollAnimation>
         </LazySection>
       )}

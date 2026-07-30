@@ -17,9 +17,10 @@ export const COMPANY = {
   phone: '+91 94259 22445',
   email: 'gopimisthan1968@gmail.com',
   website: 'www.gopimisthanbhandar.com',
-  // GSTIN is read from env so it stays configurable; falls back to the value
-  // already used on the admin print receipt.
-  gstin: process.env.NEXT_PUBLIC_GST_NUMBER || '23ABCDE1234F1Z5',
+  // GSTIN is read from env. There is deliberately no fallback: a placeholder
+  // GSTIN on a real tax invoice is worse than none, so the line is simply
+  // omitted until NEXT_PUBLIC_GST_NUMBER is set.
+  gstin: process.env.NEXT_PUBLIC_GST_NUMBER || '',
   logoPath: '/logo.png',
 } as const;
 

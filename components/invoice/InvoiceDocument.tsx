@@ -184,9 +184,11 @@ const InvoiceDocument = forwardRef<HTMLDivElement, Props>(function InvoiceDocume
             <p style={{ margin: '2px 0 0', fontSize: T.small, color: '#5b4a42' }}>
               {company.phone} &nbsp;•&nbsp; {company.email}
             </p>
-            <p style={{ margin: '2px 0 0', fontSize: T.small, color: '#5b4a42' }}>
-              <strong>GSTIN:</strong> {company.gstin}
-            </p>
+            {company.gstin && (
+              <p style={{ margin: '2px 0 0', fontSize: T.small, color: '#5b4a42' }}>
+                <strong>GSTIN:</strong> {company.gstin}
+              </p>
+            )}
           </div>
         </div>
 

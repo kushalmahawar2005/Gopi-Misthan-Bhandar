@@ -52,6 +52,12 @@ export interface IOrder extends Document {
   deliveryCharge?: number;
   selectedCourier?: string;
   selectedCourierId?: string;
+  // Post-payment fulfilment guards. Payment can be confirmed by either the
+  // /api/payment/verify call or the Razorpay webhook — whichever wins the race.
+  // These flags let each side effect run exactly once regardless of the order.
+  inventoryApplied?: boolean;
+  couponUsageApplied?: boolean;
+  shipmentRequestedAt?: Date | null;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -124,6 +130,9 @@ const OrderSchema = new Schema<IOrder>(
     deliveryCharge: { type: Number },
     selectedCourier: { type: String },
     selectedCourierId: { type: String },
+    inventoryApplied: { type: Boolean, default: false },
+    couponUsageApplied: { type: Boolean, default: false },
+    shipmentRequestedAt: { type: Date, default: null },
   },
   {
     timestamps: true,

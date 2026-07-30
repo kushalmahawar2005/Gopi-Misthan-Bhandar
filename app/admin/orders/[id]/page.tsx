@@ -140,27 +140,17 @@ export default function OrderDetails() {
                   Invoice PDF
                 </a>
 
-                {/* Shipping Label Actions */}
+                {/* Shipping label — NimbusPost ka official label */}
                 <Link
                   href={`/admin/orders/${order._id}/label`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex items-center gap-1.5 px-3 py-1.5 bg-purple-700 text-white rounded-lg hover:bg-purple-800 transition-colors text-xs font-semibold"
-                  title="Print 4x6 Thermal Shipping Label"
+                  title="NimbusPost Shipping Label"
                 >
                   <FiPrinter size={14} />
-                  Print Label
+                  Shipping Label
                 </Link>
-                <a
-                  href={`/api/orders/${order.orderNumber}/shipping-label`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center gap-1.5 px-3 py-1.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-xs font-semibold"
-                  title="Download Shipping Label PDF"
-                >
-                  <FiDownload size={14} />
-                  Label PDF
-                </a>
               </div>
             </div>
             <div className="space-y-2">

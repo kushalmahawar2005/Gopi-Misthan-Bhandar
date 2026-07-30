@@ -5,6 +5,7 @@ import Order from '@/models/Order';
 import { sendOrderConfirmationEmail } from '@/lib/email';
 import { sendOrderConfirmationSMS } from '@/lib/sms';
 import { getRequestAuth } from '@/lib/auth';
+import { markOrderPaidOnce, runPostPaymentFulfillment } from '@/lib/orderFulfillment';
 
 export async function POST(request: NextRequest) {
   try {
@@ -73,9 +74,10 @@ export async function POST(request: NextRequest) {
     const verification = await verifyPayment(order.razorpayOrderId, paymentId, signature);
 
     if (!verification.success) {
-      // Mark order as payment failed
-      order.paymentStatus = 'failed';
-      await order.save();
+      // Deliberately no write here. A bad signature proves nothing about the
+      // real payment, and anyone who owns the order could otherwise post junk
+      // to force their own order into a failed state. Razorpay's
+      // payment.failed webhook is the authority on failures.
       return NextResponse.json(
         { success: false, error: verification.error || 'Payment verification failed' },
         { status: 400 }
@@ -90,13 +92,14 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Only update if not already paid (webhook might have beaten us)
-    if (order.paymentStatus !== 'paid') {
-      order.paymentStatus = 'paid';
-      order.status = 'confirmed';
-      order.paymentId = paymentId;
-      await order.save();
-    }
+    // Mark paid if the webhook has not beaten us to it, then run fulfilment.
+    // Both paths call the same guarded helpers, so stock, coupon usage and the
+    // shipment happen exactly once regardless of which side arrives first.
+    await markOrderPaidOnce(String(order._id), paymentId);
+    await runPostPaymentFulfillment(String(order._id));
+
+    // Re-read so the response carries the fulfilled state (AWB, status, ...).
+    const updatedOrder = (await Order.findById(order._id)) || order;
 
     // Fire-and-forget: Send confirmation email & SMS
     // These are non-blocking - we don't wait for them
@@ -133,7 +136,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({
       success: true,
       message: 'Payment verified successfully',
-      order: order,
+      order: updatedOrder,
     });
   } catch (error: any) {
     console.error('Error verifying payment:', error);

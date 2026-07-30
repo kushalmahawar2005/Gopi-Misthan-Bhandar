@@ -15,6 +15,8 @@ type HomeData = {
   classicProducts: Product[];
   premiumProducts: Product[];
   savouryProducts: Product[];
+  comboProducts: Product[];
+  comboViewMoreLink: string;
   categories: Category[];
   instaBooks: InstagramPost[];
   galleryItems: Array<{
@@ -36,6 +38,8 @@ type HomeData = {
     isActive: boolean;
   }>;
 };
+
+const COMBO_SLUG_PATTERN = /combo/i;
 
 const toProduct = (product: any): Product => {
   const id = String(product._id);
@@ -146,6 +150,7 @@ async function getHomeData(): Promise<HomeData> {
       classicDocs,
       premiumDocs,
       savouryDocs,
+      comboDocs,
       allDocs,
       instaBookDocs,
       galleryDocs,
@@ -175,6 +180,16 @@ async function getHomeData(): Promise<HomeData> {
         .sort({ createdAt: -1 })
         .limit(8)
         .lean(),
+      // Combo packs — matches any category/subcategory slug containing "combo"
+      // (combo, combos, combo-packs...) so it works whatever the admin names it.
+      ProductModel.find({
+        $or: [{ category: COMBO_SLUG_PATTERN }, { subcategory: COMBO_SLUG_PATTERN }],
+        isActive: { $ne: false },
+      })
+        .select('name slug description price image images category subcategory featured isPremium isClassic sizes defaultWeight shelfLife deliveryTime stock giftBoxSubCategory giftBoxSize')
+        .sort({ createdAt: -1 })
+        .limit(4)
+        .lean(),
       ProductModel.find({})
         .select('name slug category subcategory')
         .limit(300)
@@ -197,7 +212,17 @@ async function getHomeData(): Promise<HomeData> {
     const classicFlagged = classicDocs.map(toProduct);
     const premiumFlagged = premiumDocs.map(toProduct);
     const savouryProducts = savouryDocs.map(toProduct);
+    const comboProducts = comboDocs.map(toProduct);
     const categoriesData = categoriesDocs.map(toCategory);
+
+    // "View All" should land on whatever slug the combo products actually use —
+    // combo can be a top-level category or a subcategory of another one.
+    const firstCombo = comboProducts[0];
+    const comboViewMoreLink = firstCombo
+      ? COMBO_SLUG_PATTERN.test(firstCombo.category)
+        ? `/products?category=${encodeURIComponent(firstCombo.category)}`
+        : `/products?subcategory=${encodeURIComponent(firstCombo.subcategory || '')}`
+      : '/products';
 
     const categoriesWithCounts = categoriesData.map((category) => {
       const subCategorySlugs = category.subCategories?.map((sub) => sub.slug) || [];
@@ -257,6 +282,8 @@ async function getHomeData(): Promise<HomeData> {
       classicProducts: classicFiltered.slice(0, 8),
       premiumProducts: premiumFiltered.slice(0, 8),
       savouryProducts: savouryProducts.slice(0, 8),
+      comboProducts,
+      comboViewMoreLink,
       categories: categoriesWithCounts,
       instaBooks: instaBookDocs.map(toInstaBook),
       galleryItems: galleryDocs.map(toGalleryItem),
@@ -270,6 +297,8 @@ async function getHomeData(): Promise<HomeData> {
       classicProducts: [],
       premiumProducts: [],
       savouryProducts: [],
+      comboProducts: [],
+      comboViewMoreLink: '/products',
       categories: [],
       instaBooks: [],
       galleryItems: [],

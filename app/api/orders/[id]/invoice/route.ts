@@ -183,8 +183,10 @@ export async function GET(
       hy += L.addrStep;
     }
     doc.text(`${COMPANY.phone}  •  ${COMPANY.email}`, textX, hy);
-    hy += L.addrStep;
-    doc.text(`GSTIN: ${COMPANY.gstin}`, textX, hy);
+    if (COMPANY.gstin) {
+      hy += L.addrStep;
+      doc.text(`GSTIN: ${COMPANY.gstin}`, textX, hy);
+    }
 
     // INVOICE label + meta (right)
     doc.setFont('helvetica', 'bold');

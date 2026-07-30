@@ -208,10 +208,12 @@ function OrderSuccessContent() {
               <FiCheckCircle className="w-10 h-10 md:w-14 md:h-14 text-white" />
             </div>
             <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-3">
-              Payment Successful!
+              {order && order.paymentStatus !== 'paid' ? 'Order Placed' : 'Payment Successful!'}
             </h1>
             <p className="text-lg md:text-xl text-white/90 mb-4">
-              Thank you for your order. We&apos;re preparing your sweets!
+              {order && order.paymentStatus !== 'paid'
+                ? 'We are confirming your payment with the bank. This usually takes a few moments.'
+                : "Thank you for your order. We're preparing your sweets!"}
             </p>
             <div className="inline-flex items-center gap-2 bg-white/20 backdrop-blur-sm rounded-full px-5 py-2.5">
               <span className="text-white/80 text-sm">Order ID:</span>

@@ -415,7 +415,7 @@ export default function AdminOrders() {
                               target="_blank"
                               rel="noopener noreferrer"
                               className="p-1.5 text-purple-600 hover:bg-purple-50 rounded transition-colors"
-                              title="Print 4x6 Shipping Label"
+                              title="Shipping Label (NimbusPost)"
                             >
                               <FiTag size={16} />
                             </Link>

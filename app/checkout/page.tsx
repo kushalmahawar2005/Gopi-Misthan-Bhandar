@@ -323,36 +323,54 @@ export default function CheckoutPage() {
         description: `Order #${createdOrderNumber}`,
         order_id: payData.orderId, 
         handler: async (r: any) => {
-          // Payment completed by user — now verify on server
-          try {
-            const verifyResp = await fetch('/api/payment/verify', { 
-              method: 'POST', 
-              headers: { 'Content-Type': 'application/json' }, 
-              body: JSON.stringify({ 
-                orderId: createdOrderNumber, 
-                paymentId: r.razorpay_payment_id, 
-                signature: r.razorpay_signature
-              }) 
+          // Payment completed by user — now verify on server.
+          // Network blips get retried before we fall back to the webhook,
+          // and the fallback never claims success outright: the success page
+          // reads the real payment status and shows a pending state until the
+          // webhook confirms.
+          const verifyOnce = async () => {
+            const verifyResp = await fetch('/api/payment/verify', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                orderId: createdOrderNumber,
+                paymentId: r.razorpay_payment_id,
+                signature: r.razorpay_signature,
+              }),
             });
-            const verifyResult = await verifyResp.json();
-            
-            if (verifyResult.success) {
-              // Payment verified! Clear cart and redirect to success
-              setIsRedirectingAfterPayment(true);
-              clearCart();
-              router.replace(`/checkout/success?orderId=${createdOrderNumber}&paymentId=${r.razorpay_payment_id}`);
-            } else {
-              // Verification failed — redirect to failed page
-              setIsRedirectingAfterPayment(true);
-              router.replace(`/checkout/failed?orderId=${createdOrderNumber}&reason=${encodeURIComponent(verifyResult.error || 'Payment verification failed')}`);
+            return verifyResp.json();
+          };
+
+          let verifyResult: any = null;
+          let networkFailed = false;
+
+          for (let attempt = 0; attempt < 3; attempt++) {
+            try {
+              verifyResult = await verifyOnce();
+              networkFailed = false;
+              break;
+            } catch {
+              networkFailed = true;
+              await new Promise((resolve) => setTimeout(resolve, 1000 * (attempt + 1)));
             }
-          } catch (verifyError) {
-            // Network error during verification — still redirect to success
-            // The webhook will handle the actual status update
-            setIsRedirectingAfterPayment(true);
+          }
+
+          setIsRedirectingAfterPayment(true);
+
+          if (!networkFailed && verifyResult?.success) {
             clearCart();
             router.replace(`/checkout/success?orderId=${createdOrderNumber}&paymentId=${r.razorpay_payment_id}`);
+            return;
           }
+
+          if (networkFailed) {
+            // Money may well have been captured — never show a failure here.
+            clearCart();
+            router.replace(`/checkout/success?orderId=${createdOrderNumber}&paymentId=${r.razorpay_payment_id}&pending=1`);
+            return;
+          }
+
+          router.replace(`/checkout/failed?orderId=${createdOrderNumber}&reason=${encodeURIComponent(verifyResult?.error || 'Payment verification failed')}`);
         },
         modal: {
           ondismiss: () => {
