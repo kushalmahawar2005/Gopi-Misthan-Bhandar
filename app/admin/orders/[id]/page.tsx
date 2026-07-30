@@ -118,23 +118,48 @@ export default function OrderDetails() {
           <div className="bg-white p-6 rounded-lg shadow">
             <div className="flex flex-wrap items-center gap-3 mb-4">
               <h2 className="text-xl font-bold">Order Information</h2>
-              <div className="flex gap-2 ml-auto">
+              <div className="flex flex-wrap gap-2 ml-auto">
+                {/* Invoice Actions */}
                 <Link
                   href={`/admin/orders/${order._id}/print`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center gap-2 px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors text-sm font-medium"
+                  className="flex items-center gap-1.5 px-3 py-1.5 bg-gray-700 text-white rounded-lg hover:bg-gray-800 transition-colors text-xs font-semibold"
+                  title="Print GST Invoice"
                 >
-                  <FiPrinter size={16} />
-                  Print Receipt
+                  <FiPrinter size={14} />
+                  Print Invoice
                 </Link>
                 <a
                   href={`/api/orders/${order.orderNumber}/invoice?size=4x6`}
                   download
-                  className="flex items-center gap-2 px-4 py-2 bg-[#F88E0C] text-white rounded-lg hover:bg-[#D87A0A] transition-colors text-sm font-medium"
+                  className="flex items-center gap-1.5 px-3 py-1.5 bg-[#F88E0C] text-white rounded-lg hover:bg-[#D87A0A] transition-colors text-xs font-semibold"
+                  title="Download GST Invoice PDF"
                 >
-                  <FiDownload size={16} />
-                  Download Invoice
+                  <FiDownload size={14} />
+                  Invoice PDF
+                </a>
+
+                {/* Shipping Label Actions */}
+                <Link
+                  href={`/admin/orders/${order._id}/label`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-1.5 px-3 py-1.5 bg-purple-700 text-white rounded-lg hover:bg-purple-800 transition-colors text-xs font-semibold"
+                  title="Print 4x6 Thermal Shipping Label"
+                >
+                  <FiPrinter size={14} />
+                  Print Label
+                </Link>
+                <a
+                  href={`/api/orders/${order.orderNumber}/shipping-label`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-1.5 px-3 py-1.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-xs font-semibold"
+                  title="Download Shipping Label PDF"
+                >
+                  <FiDownload size={14} />
+                  Label PDF
                 </a>
               </div>
             </div>

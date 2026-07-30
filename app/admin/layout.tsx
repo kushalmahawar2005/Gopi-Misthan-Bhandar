@@ -93,7 +93,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     return pathname.startsWith(href);
   };
 
-  const isPrintPage = pathname.endsWith('/print');
+  const isPrintPage = pathname.endsWith('/print') || pathname.endsWith('/label');
 
   if (isPrintPage) {
     return <main className="bg-white min-h-screen">{children}</main>;

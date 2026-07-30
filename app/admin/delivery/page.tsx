@@ -12,7 +12,9 @@ import {
   FiClock,
   FiMapPin,
   FiCheckCircle,
-  FiAlertCircle
+  FiAlertCircle,
+  FiPrinter,
+  FiTag
 } from 'react-icons/fi';
 import Link from 'next/link';
 
@@ -300,6 +302,16 @@ export default function ShippingManagementPage() {
                               {trackingLoading === shipment.awbNumber ? <FiRefreshCw className="animate-spin" /> : <FiInfo />}
                               Track
                             </button>
+                            <Link
+                              href={`/admin/orders/${shipment._id}/label`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="p-2 text-purple-600 hover:bg-purple-50 rounded-lg transition-colors flex items-center gap-1 text-xs font-bold"
+                              title="Print Shipping Label"
+                            >
+                              <FiTag size={14} />
+                              Label
+                            </Link>
                             <button
                               onClick={() => handleCancel(shipment._id)}
                               disabled={cancellingId === shipment._id}

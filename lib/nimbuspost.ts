@@ -328,4 +328,20 @@ export async function cancelShipment(awb: string) {
   }
 }
 
+/**
+ * Get Shipment Manifest / Shipping Label PDF URL from NimbusPost
+ */
+export async function getShipmentManifest(awbNumbers: string[]) {
+  try {
+    const response = await nimbusClient.post('/shipments/manifest', {
+      awbs: awbNumbers,
+    });
+    return response.data;
+  } catch (error: any) {
+    console.error('NimbusPost Manifest Error:', error.response?.data || error.message);
+    return { status: false, message: error.response?.data?.message || error.message };
+  }
+}
+
 export default nimbusClient;
+

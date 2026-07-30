@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useState, useRef, useCallback } from 'react';
-import { FiEye, FiPrinter } from 'react-icons/fi';
+import { FiEye, FiPrinter, FiTag, FiFileText, FiDownload } from 'react-icons/fi';
 import Link from 'next/link';
 
 interface Order {
@@ -393,22 +393,33 @@ export default function AdminOrders() {
                           )}
                         </td>
                         <td className="px-4 lg:px-6 py-4 whitespace-nowrap">
-                          <Link
-                            href={`/admin/orders/${order._id}`}
-                            className="p-2 text-primary-red hover:bg-red-50 rounded transition-colors inline-block"
-                            title="View Order"
-                          >
-                            <FiEye size={16} />
-                          </Link>
-                          <Link
-                            href={`/admin/orders/${order._id}/print`}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="p-2 text-[#F88E0C] hover:bg-orange-50 rounded transition-colors inline-block ml-2"
-                            title="Print Receipt"
-                          >
-                            <FiPrinter size={16} />
-                          </Link>
+                          <div className="flex items-center gap-1">
+                            <Link
+                              href={`/admin/orders/${order._id}`}
+                              className="p-1.5 text-primary-red hover:bg-red-50 rounded transition-colors"
+                              title="View Order Details"
+                            >
+                              <FiEye size={16} />
+                            </Link>
+                            <Link
+                              href={`/admin/orders/${order._id}/print`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="p-1.5 text-[#F88E0C] hover:bg-orange-50 rounded transition-colors"
+                              title="Print Invoice"
+                            >
+                              <FiPrinter size={16} />
+                            </Link>
+                            <Link
+                              href={`/admin/orders/${order._id}/label`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="p-1.5 text-purple-600 hover:bg-purple-50 rounded transition-colors"
+                              title="Print 4x6 Shipping Label"
+                            >
+                              <FiTag size={16} />
+                            </Link>
+                          </div>
                         </td>
                       </tr>
                     ))
@@ -443,10 +454,10 @@ export default function AdminOrders() {
                           {order.shipping.email}
                         </p>
                       </div>
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-1">
                         <Link
                           href={`/admin/orders/${order._id}`}
-                          className="p-2 text-[#F88E0C] hover:bg-orange-50 rounded transition-colors flex-shrink-0"
+                          className="p-1.5 text-primary-red hover:bg-red-50 rounded transition-colors flex-shrink-0"
                           title="View Order"
                         >
                           <FiEye size={18} />
@@ -455,10 +466,19 @@ export default function AdminOrders() {
                           href={`/admin/orders/${order._id}/print`}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="p-2 text-gray-600 hover:bg-gray-100 rounded transition-colors"
-                          title="Print Receipt"
+                          className="p-1.5 text-[#F88E0C] hover:bg-orange-50 rounded transition-colors"
+                          title="Print Invoice"
                         >
                           <FiPrinter size={18} />
+                        </Link>
+                        <Link
+                          href={`/admin/orders/${order._id}/label`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="p-1.5 text-purple-600 hover:bg-purple-50 rounded transition-colors"
+                          title="Print Shipping Label"
+                        >
+                          <FiTag size={18} />
                         </Link>
                       </div>
                     </div>
