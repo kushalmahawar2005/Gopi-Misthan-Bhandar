@@ -28,6 +28,14 @@ const MAX_QUANTITY_PER_LINE = 10;
 
 interface CartContextType {
   cartItems: CartItem[];
+  /**
+   * False until the cart is authoritative: read back from localStorage and, for
+   * a signed-in user, synced with /api/cart. Consumers that act on an empty
+   * cart (checkout redirecting to /products, for example) must wait for this,
+   * otherwise a direct visit or a refresh sees the initial empty array and
+   * bounces the customer out mid-checkout.
+   */
+  isCartReady: boolean;
   addToCart: (product: Product, quantity?: number) => void;
   removeFromCart: (productId: string, selectedSize?: string, selectedWeight?: string) => void;
   updateQuantity: (productId: string, quantity: number, selectedSize?: string, selectedWeight?: string) => void;
@@ -103,6 +111,9 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const { user } = useAuth();
 
   const [isInitialized, setIsInitialized] = useState(false);
+  // For a signed-in user the authoritative cart comes back from /api/cart, not
+  // localStorage. Until that first sync lands the cart may look empty.
+  const [hasSyncedWithServer, setHasSyncedWithServer] = useState(false);
   const isSyncing = useRef(false);
   // Tracks the last signed-in user so we can detect logout / account switch.
   const lastUserIdRef = useRef<string | null>(null);
@@ -257,6 +268,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
         console.error('Cart sync error:', err);
       } finally {
         isSyncing.current = false;
+        setHasSyncedWithServer(true);
       }
     };
 
@@ -346,6 +358,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
     <CartContext.Provider
       value={{
         cartItems,
+        isCartReady: isInitialized && (!currentUserId || hasSyncedWithServer),
         addToCart,
         removeFromCart,
         updateQuantity,

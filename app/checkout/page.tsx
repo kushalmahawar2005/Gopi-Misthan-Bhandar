@@ -26,6 +26,7 @@ export default function CheckoutPage() {
   const { user } = useAuth();
   const {
     cartItems,
+    isCartReady,
     getTotalPrice,
     clearCart,
     openCart,
@@ -90,10 +91,15 @@ export default function CheckoutPage() {
   const totalAmount = Math.max(0, subtotalAmount - appliedCouponDiscount + shippingAmount);
 
   useEffect(() => {
+    // Wait for the cart to come back from localStorage — otherwise a direct
+    // visit or a refresh on /checkout reads the initial empty array and kicks
+    // the customer out to /products.
+    if (!isCartReady) return;
+
     if (cartItems.length === 0 && !isPlacingOrder && !isRedirectingAfterPayment) {
       router.push('/products');
     }
-  }, [cartItems.length, isPlacingOrder, isRedirectingAfterPayment, router]);
+  }, [isCartReady, cartItems.length, isPlacingOrder, isRedirectingAfterPayment, router]);
 
   useEffect(() => {
     const script = document.createElement('script');
@@ -409,6 +415,14 @@ export default function CheckoutPage() {
       }
     }
   };
+
+  if (!isCartReady) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-[#FE8E02]" />
+      </div>
+    );
+  }
 
   if (cartItems.length === 0) return null;
 
