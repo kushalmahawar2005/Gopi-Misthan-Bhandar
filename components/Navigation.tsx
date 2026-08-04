@@ -236,15 +236,15 @@ const NavigationContent = () => {
                 }`}
             >
               <div className={`relative transition-[width,height] duration-500 ease-in-out ${isScrolled
-                ? 'w-[70px] h-[42px] md:w-[85px] md:h-[52px]'
-                : 'w-[106px] h-[66px] md:w-[138px] md:h-[74px] lg:w-[160px] lg:h-[85px]'
+                ? 'w-[46px] h-[46px] md:w-[56px] md:h-[56px]'
+                : 'w-[70px] h-[70px] md:w-[80px] md:h-[80px] lg:w-[92px] lg:h-[92px]'
                 }`}>
                 <Image
                   src="/logo.png"
                   alt="Gopi Misthan Bhandar Logo"
                   fill
                   className="object-contain"
-                  sizes="(max-width: 768px) 106px, (max-width: 1024px) 138px, 170px"
+                  sizes="(max-width: 768px) 70px, (max-width: 1024px) 80px, 92px"
                   priority
                 />
               </div>

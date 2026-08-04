@@ -73,13 +73,9 @@ const Footer = () => {
     <footer id="contact" className="w-full bg-[#FFF8F1] text-[#503223]">
       <div className="w-full px-5 sm:px-6 md:px-8 lg:px-12 pt-3 md:pt-4 pb-8 max-w-[1400px] mx-auto">
         <div className="flex items-center justify-center md:justify-between border-b border-[#e8d7c3] pb-6 md:pb-7">
-          <Link href="/" className="relative w-[210px] h-[60px] md:w-[250px] md:h-[72px] mx-auto md:mx-0">
+          <Link href="/" className="relative w-[84px] h-[84px] md:w-[100px] md:h-[100px] mx-auto md:mx-0">
             <Image src="/logo.png" alt="Gopi Misthan Bhandar" fill className="object-contain object-center md:object-left" />
           </Link>
-
-          <div className="hidden md:block relative w-[130px] h-[130px] opacity-80">
-            <Image src="/Main.png" alt="Gopi Logo" fill className="object-contain" />
-          </div>
         </div>
 
         <div className="md:hidden pt-7">
