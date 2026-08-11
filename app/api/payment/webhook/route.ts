@@ -27,7 +27,12 @@ export async function POST(req: Request) {
       .update(body)
       .digest('hex');
 
-    if (expectedSignature !== signature) {
+    const expectedBuffer = Buffer.from(expectedSignature, 'utf8');
+    const signatureBuffer = Buffer.from(signature, 'utf8');
+    if (
+      expectedBuffer.length !== signatureBuffer.length ||
+      !crypto.timingSafeEqual(expectedBuffer, signatureBuffer)
+    ) {
       console.error('Invalid signature detected for webhook event.');
       return NextResponse.json({ success: false, message: 'Invalid signature' }, { status: 400 });
     }
@@ -37,9 +42,14 @@ export async function POST(req: Request) {
     const event = JSON.parse(body);
 
     if (event.event === 'payment.captured' || event.event === 'order.paid') {
-      const payload = event.payload.payment?.entity || event.payload.order?.entity;
-      const razorpayOrderId = payload.order_id || payload.id;
-      const paymentId = payload.id;
+      const payment = event.payload?.payment?.entity;
+      const razorpayOrderId = payment?.order_id;
+      const paymentId = payment?.id;
+
+      if (!razorpayOrderId || !paymentId) {
+        console.error('Paid webhook did not contain payment and Razorpay order IDs.');
+        return NextResponse.json({ success: false, message: 'Invalid payment payload' }, { status: 400 });
+      }
 
       const order = await Order.findOne({ razorpayOrderId });
       if (!order) return NextResponse.json({ success: true });

@@ -1,8 +1,22 @@
 import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
 import { CartItem, calculateOrderAmount } from '@/lib/orderUtils';
+import { checkRateLimit } from '@/lib/rateLimit';
 
 export async function POST(request: NextRequest) {
+  const rateLimit = checkRateLimit({
+    request,
+    keyPrefix: 'coupon-validate',
+    maxRequests: 20,
+    windowMs: 60 * 1000,
+  });
+  if (!rateLimit.allowed) {
+    return NextResponse.json(
+      { success: false, error: 'Too many coupon attempts. Please try again shortly.' },
+      { status: 429, headers: { 'Retry-After': String(rateLimit.retryAfter) } }
+    );
+  }
+
   try {
     const body = await request.json();
     const rawCartItems = Array.isArray(body?.cartItems) ? body.cartItems : [];

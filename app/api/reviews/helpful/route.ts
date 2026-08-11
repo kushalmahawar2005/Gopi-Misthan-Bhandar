@@ -1,9 +1,23 @@
 import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
 import Review from '@/models/Review';
+import { checkRateLimit } from '@/lib/rateLimit';
 
 // POST mark review as helpful
 export async function POST(request: NextRequest) {
+  const rateLimit = checkRateLimit({
+    request,
+    keyPrefix: 'review-helpful',
+    maxRequests: 30,
+    windowMs: 60 * 60 * 1000,
+  });
+  if (!rateLimit.allowed) {
+    return NextResponse.json(
+      { success: false, error: 'Too many requests. Please try again later.' },
+      { status: 429, headers: { 'Retry-After': String(rateLimit.retryAfter) } }
+    );
+  }
+
   try {
     await connectDB();
     const body = await request.json();
@@ -34,4 +48,3 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ success: false, error: error.message }, { status: 500 });
   }
 }
-

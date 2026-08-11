@@ -60,11 +60,36 @@ export const calculateOrderAmount = async (
   courierCharge?: number
 ): Promise<CalculationResult> => {
   try {
+    if (!Array.isArray(cartItems) || cartItems.length === 0) {
+      return { success: false, finalAmount: 0, breakdown: { subtotal: 0, discount: 0, deliveryCharge: 0 }, error: 'Cart is empty or invalid' };
+    }
+
+    // Treat repeated product/weight rows as one line before checking stock.
+    // Without this, two individually-valid rows could oversell the same SKU.
+    const normalizedItems = new Map<string, CartItem>();
+    for (const item of cartItems) {
+      const productId = String(item?.productId || '').trim();
+      const quantity = Number(item?.quantity);
+      const weight = typeof item?.weight === 'string' ? item.weight.trim() : '';
+
+      if (!productId || !Number.isSafeInteger(quantity) || quantity < 1 || quantity > 100) {
+        return { success: false, finalAmount: 0, breakdown: { subtotal: 0, discount: 0, deliveryCharge: 0 }, error: 'Cart contains an invalid product quantity' };
+      }
+
+      const key = `${productId}:${weight}`;
+      const existing = normalizedItems.get(key);
+      const mergedQuantity = (existing?.quantity || 0) + quantity;
+      if (mergedQuantity > 100) {
+        return { success: false, finalAmount: 0, breakdown: { subtotal: 0, discount: 0, deliveryCharge: 0 }, error: 'Maximum quantity per product is 100' };
+      }
+      normalizedItems.set(key, { productId, quantity: mergedQuantity, weight });
+    }
+
     let subtotal = 0;
     const validatedProducts = [];
 
     // 1. Fetch products and check stock
-    for (const item of cartItems) {
+    for (const item of normalizedItems.values()) {
       const product = await Product.findById(item.productId);
       
       if (!product) {
@@ -78,11 +103,15 @@ export const calculateOrderAmount = async (
       // Find the correct price based on weight if sizes exist
       let itemPrice = product.price; // Default to base price
       
-      if (item.weight && product.sizes && product.sizes.length > 0) {
-        const matchingSize = product.sizes.find(s => s.weight === item.weight);
-        if (matchingSize) {
-          itemPrice = matchingSize.price;
+      if (product.sizes && product.sizes.length > 0) {
+        if (!item.weight) {
+          return { success: false, finalAmount: 0, breakdown: { subtotal: 0, discount: 0, deliveryCharge: 0 }, error: `Please select a size for ${product.name}` };
         }
+        const matchingSize = product.sizes.find(s => s.weight === item.weight);
+        if (!matchingSize) {
+          return { success: false, finalAmount: 0, breakdown: { subtotal: 0, discount: 0, deliveryCharge: 0 }, error: `Selected size is unavailable for ${product.name}` };
+        }
+        itemPrice = matchingSize.price;
       }
 
       const itemTotal = itemPrice * item.quantity;
@@ -201,4 +230,3 @@ export const calculateOrderAmount = async (
     return { success: false, finalAmount: 0, breakdown: { subtotal: 0, discount: 0, deliveryCharge: 0 }, error: error.message };
   }
 };
-

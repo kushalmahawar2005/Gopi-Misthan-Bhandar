@@ -3,6 +3,7 @@ import connectDB from '@/lib/mongodb';
 import Order from '@/models/Order';
 import { getRequestAuth } from '@/lib/auth';
 import { calculateOrderAmount } from '@/lib/orderUtils';
+import { checkRateLimit } from '@/lib/rateLimit';
 
 function parsePositiveInt(value: string | null, fallback: number): number {
   if (!value) return fallback;
@@ -93,6 +94,20 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         { success: false, error: 'Unauthorized. Login required to place order.' },
         { status: 401 }
+      );
+    }
+
+    const rateLimit = checkRateLimit({
+      request,
+      keyPrefix: 'order-create',
+      maxRequests: 5,
+      windowMs: 60 * 1000,
+      identifier: auth.user.id,
+    });
+    if (!rateLimit.allowed) {
+      return NextResponse.json(
+        { success: false, error: 'Too many order attempts. Please try again shortly.' },
+        { status: 429, headers: { 'Retry-After': String(rateLimit.retryAfter) } }
       );
     }
 

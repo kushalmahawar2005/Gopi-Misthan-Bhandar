@@ -1,14 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
 import InstaBook from '@/models/InstaBook';
-import { requireAdmin } from '@/lib/auth';
+import { getRequestAuth, requireAdmin } from '@/lib/auth';
 
 
 export async function GET(request: NextRequest) {
   try {
     await connectDB();
     const { searchParams } = new URL(request.url);
-    const all = searchParams.get('all') === 'true';
+    const allRequested = searchParams.get('all') === 'true';
+    const auth = allRequested ? await getRequestAuth(request) : null;
+    const all = Boolean(allRequested && auth?.isAuthenticated && auth.isAdmin);
     
     const query = all ? {} : { isActive: true };
     const instaBooks = await InstaBook.find(query)

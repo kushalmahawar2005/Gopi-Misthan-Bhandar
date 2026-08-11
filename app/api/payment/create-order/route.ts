@@ -7,6 +7,7 @@ import { getRequestAuth } from '@/lib/auth';
 import { checkServiceability } from '@/lib/nimbuspost';
 import { cleanupExpiredPendingOrders } from '@/lib/orderCleanup';
 import { parseWeightToKg } from '@/lib/weight';
+import { checkRateLimit } from '@/lib/rateLimit';
 
 const FALLBACK_COURIER_CHARGE = 60;
 
@@ -36,6 +37,20 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         { success: false, error: 'Unauthorized. Please login to continue.' },
         { status: 401 }
+      );
+    }
+
+    const rateLimit = checkRateLimit({
+      request,
+      keyPrefix: 'payment-create-order',
+      maxRequests: 5,
+      windowMs: 60 * 1000,
+      identifier: auth.user.id,
+    });
+    if (!rateLimit.allowed) {
+      return NextResponse.json(
+        { success: false, error: 'Too many payment attempts. Please try again shortly.' },
+        { status: 429, headers: { 'Retry-After': String(rateLimit.retryAfter) } }
       );
     }
 
@@ -213,5 +228,4 @@ export async function POST(request: NextRequest) {
     );
   }
 }
-
 

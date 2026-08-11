@@ -2,10 +2,15 @@ import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
 import WeddingEnquiry from '@/models/WeddingEnquiry';
 import { sendWeddingEnquiryEmails } from '@/lib/email';
+import { requireAdmin } from '@/lib/auth';
+import { checkRateLimit } from '@/lib/rateLimit';
 
 const sanitizeString = (value?: string) => (typeof value === 'string' ? value.trim() : undefined);
 
 export async function GET(request: NextRequest) {
+  const authError = await requireAdmin(request);
+  if (authError) return authError;
+
   try {
     await connectDB();
 
@@ -44,6 +49,19 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
+    const rateLimit = checkRateLimit({
+      request,
+      keyPrefix: 'wedding-enquiry',
+      maxRequests: 5,
+      windowMs: 60 * 60 * 1000,
+    });
+    if (!rateLimit.allowed) {
+      return NextResponse.json(
+        { success: false, error: 'Too many enquiries. Please try again later.' },
+        { status: 429, headers: { 'Retry-After': String(rateLimit.retryAfter) } }
+      );
+    }
+
     await connectDB();
 
     const body = await request.json();
@@ -115,5 +133,4 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ success: false, error: error.message }, { status: 500 });
   }
 }
-
 

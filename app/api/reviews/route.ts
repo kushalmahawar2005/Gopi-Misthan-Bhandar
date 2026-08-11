@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
 import Review from '@/models/Review';
 import { getRequestAuth } from '@/lib/auth';
+import User from '@/models/User';
+import { checkRateLimit } from '@/lib/rateLimit';
 
 // GET all reviews (with filters)
 export async function GET(request: NextRequest) {
@@ -100,13 +102,32 @@ export async function GET(request: NextRequest) {
 // POST create new review
 export async function POST(request: NextRequest) {
   try {
+    const auth = await getRequestAuth(request);
+    if (!auth.isAuthenticated || !auth.user?.id) {
+      return NextResponse.json({ success: false, error: 'Login required to submit a review' }, { status: 401 });
+    }
+
+    const rateLimit = checkRateLimit({
+      request,
+      keyPrefix: 'review-create',
+      maxRequests: 5,
+      windowMs: 60 * 60 * 1000,
+      identifier: auth.user.id,
+    });
+    if (!rateLimit.allowed) {
+      return NextResponse.json(
+        { success: false, error: 'Too many review submissions. Please try again later.' },
+        { status: 429, headers: { 'Retry-After': String(rateLimit.retryAfter) } }
+      );
+    }
+
     await connectDB();
     
     const body = await request.json();
-    const { productId, userId, userName, userEmail, rating, title, comment } = body;
+    const { productId, rating, title, comment } = body;
 
     // Validate required fields
-    if (!productId || !userId || !userName || !userEmail || !rating || !comment) {
+    if (!productId || !rating || !comment) {
       return NextResponse.json(
         { success: false, error: 'Missing required fields' },
         { status: 400 }
@@ -114,7 +135,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Check if user already reviewed this product
-    const existingReview = await Review.findOne({ productId, userId });
+    const existingReview = await Review.findOne({ productId, userId: auth.user.id });
     if (existingReview) {
       return NextResponse.json(
         { success: false, error: 'You have already reviewed this product' },
@@ -130,11 +151,16 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    const user = await User.findById(auth.user.id).select('name email').lean();
+    if (!user) {
+      return NextResponse.json({ success: false, error: 'User account not found' }, { status: 401 });
+    }
+
     const review = await Review.create({
       productId,
-      userId,
-      userName,
-      userEmail,
+      userId: auth.user.id,
+      userName: user.name,
+      userEmail: user.email,
       rating,
       title,
       comment,
@@ -146,4 +172,3 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ success: false, error: error.message }, { status: 500 });
   }
 }
-

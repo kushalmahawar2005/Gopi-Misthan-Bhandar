@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
 import TrendingBanner from '@/models/TrendingBanner';
-import { getRequestAuth } from '@/lib/auth';
+import { getRequestAuth, requireAdmin } from '@/lib/auth';
 
 // Get active trending banner (What's Trending)
 export async function GET(request: NextRequest) {
@@ -37,6 +37,9 @@ export async function GET(request: NextRequest) {
 
 // Create or update trending banner
 export async function POST(request: NextRequest) {
+  const authError = await requireAdmin(request);
+  if (authError) return authError;
+
   try {
     await connectDB();
 
@@ -146,4 +149,3 @@ export async function POST(request: NextRequest) {
     );
   }
 }
-

@@ -75,6 +75,12 @@ export const verifyPayment = async (orderId: string, paymentId: string, signatur
     if (generatedSignature === signature) {
       // Verify with Razorpay API
       const payment = await razorpay.payments.fetch(paymentId);
+      if (payment.order_id !== orderId) {
+        return { success: false, error: 'Payment does not belong to this order' };
+      }
+      if (payment.status !== 'captured') {
+        return { success: false, error: 'Payment has not been captured yet' };
+      }
       return { success: true, payment };
     } else {
       return { success: false, error: 'Invalid signature' };
@@ -84,4 +90,3 @@ export const verifyPayment = async (orderId: string, paymentId: string, signatur
     return { success: false, error: error.message };
   }
 };
-

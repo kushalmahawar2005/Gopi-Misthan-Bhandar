@@ -1,7 +1,21 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { checkServiceability } from '@/lib/nimbuspost';
+import { checkRateLimit } from '@/lib/rateLimit';
 
 export async function POST(req: NextRequest) {
+  const rateLimit = checkRateLimit({
+    request: req,
+    keyPrefix: 'delivery-check-pincode',
+    maxRequests: 20,
+    windowMs: 60 * 1000,
+  });
+  if (!rateLimit.allowed) {
+    return NextResponse.json(
+      { success: false, message: 'Too many requests. Please try again shortly.' },
+      { status: 429, headers: { 'Retry-After': String(rateLimit.retryAfter) } }
+    );
+  }
+
   try {
     const { pincode, weight, orderAmount } = await req.json();
 
@@ -56,10 +70,6 @@ export async function POST(req: NextRequest) {
 
       // Only return the absolute cheapest option as requested
       const topOptions = [cheapest];
-
-      console.log(`[Pincode Check] Weight: ${weightKg}kg, Order: ₹${orderAmount}, Discount Applied: ${applyDeliveryDiscount}`);
-      console.log(`[Pincode Check] Couriers:`, couriers.map((c: any) => `${c.name}: ${c.charge}`).join(', '));
-      console.log(`[Pincode Check] Selected: ${cheapest.name} @ ₹${cheapest.charge}`);
 
       return NextResponse.json({
         success: true,
