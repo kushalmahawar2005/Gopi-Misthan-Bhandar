@@ -93,7 +93,7 @@ environment variable — no code change or redeploy of the app logic required.
 
 | Variable | Value | Effect |
 |---|---|---|
-| `MAINTENANCE_MODE` | `true` | Every public page and API returns the maintenance page with HTTP `503` |
+| `MAINTENANCE_MODE` | `true` | Every public page and API returns the "Under Maintenance" notice with HTTP `503` |
 | `MAINTENANCE_BYPASS_TOKEN` | any secret string | Enables the preview bypass (optional) |
 
 **Turn it on:** set `MAINTENANCE_MODE=true` in Vercel (Production) and redeploy.
@@ -105,6 +105,10 @@ Still reachable while maintenance is on:
 - `/login` and `/api/auth/*` — so you can sign in to the admin panel
 - `/api/cron/*` — scheduled jobs keep running
 - `robots.txt`, `sitemap.xml` and everything in `/public`
+
+The notice is rendered straight from `middleware.ts` (a small inline HTML string),
+so it carries no site chrome — no header, chat widget or floating buttons — and
+never touches the database.
 
 **Previewing the real site:** visit `https://<site>/?bypass=<MAINTENANCE_BYPASS_TOKEN>`.
 That sets an httpOnly cookie for 7 days so you browse the live site normally while

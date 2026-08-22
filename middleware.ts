@@ -96,20 +96,52 @@ async function isValidCustomAdminToken(token: string): Promise<boolean> {
 }
 
 
-const MAINTENANCE_PATH = '/maintenance';
 const MAINTENANCE_BYPASS_COOKIE = 'gmb_maintenance_bypass';
 
 // Paths that must keep working while the site is under maintenance:
-// the maintenance page itself, admin (still auth-guarded below), the login
-// flow that admin redirects to, and the scheduled cron jobs.
+// admin (still auth-guarded below), the login flow that admin redirects to,
+// and the scheduled cron jobs.
 const MAINTENANCE_ALLOWED_PREFIXES = [
-  MAINTENANCE_PATH,
   '/admin',
   '/api/admin',
   '/api/auth',
   '/api/cron',
   '/login',
 ];
+
+// Served straight from the middleware so the page carries nothing but the
+// notice itself — no site chrome, chat widget or floating buttons from the
+// root layout, and a guaranteed 503 for search engines.
+const MAINTENANCE_HTML = `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Under Maintenance | Gopi Misthan Bhandar</title>
+<link rel="icon" href="/logo.png" type="image/png">
+<style>
+  *{ margin:0; padding:0; box-sizing:border-box; }
+  html,body{ height:100%; }
+  body{
+    display:flex; align-items:center; justify-content:center;
+    padding:24px; background:#FFF7EC; color:#331818;
+    font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  main{ text-align:center; }
+  img{ width:120px; height:auto; margin:0 auto 28px; display:block; }
+  h1{ font-size:clamp(28px,6vw,44px); font-weight:700; letter-spacing:-0.02em; }
+  span{ color:#FE8E02; }
+</style>
+</head>
+<body>
+<main>
+  <img src="/logo.png" alt="Gopi Misthan Bhandar">
+  <h1>Under <span>Maintenance</span></h1>
+</main>
+</body>
+</html>`;
 
 function isMaintenanceMode(): boolean {
   return process.env.MAINTENANCE_MODE === 'true';
@@ -157,14 +189,14 @@ function handleMaintenance(request: NextRequest): NextResponse | null {
     return null;
   }
 
-  const url = request.nextUrl.clone();
-  url.pathname = MAINTENANCE_PATH;
-  url.search = '';
-
-  const response = NextResponse.rewrite(url, { status: 503 });
-  response.headers.set('Retry-After', '3600');
-  response.headers.set('Cache-Control', 'no-store, must-revalidate');
-  return response;
+  return new NextResponse(MAINTENANCE_HTML, {
+    status: 503,
+    headers: {
+      'Content-Type': 'text/html; charset=utf-8',
+      'Retry-After': '3600',
+      'Cache-Control': 'no-store, must-revalidate',
+    },
+  });
 }
 
 export async function middleware(request: NextRequest) {
