@@ -85,3 +85,31 @@ npm start
 - [ ] Add checkout flow
 - [ ] Integrate payment gateway
 - [ ] Add admin panel
+
+## Maintenance Mode
+
+The whole storefront can be put behind an "Under Maintenance" page with an
+environment variable — no code change or redeploy of the app logic required.
+
+| Variable | Value | Effect |
+|---|---|---|
+| `MAINTENANCE_MODE` | `true` | Every public page and API returns the maintenance page with HTTP `503` |
+| `MAINTENANCE_BYPASS_TOKEN` | any secret string | Enables the preview bypass (optional) |
+
+**Turn it on:** set `MAINTENANCE_MODE=true` in Vercel (Production) and redeploy.
+**Turn it off:** set it to `false` (or delete it) and redeploy.
+
+Still reachable while maintenance is on:
+
+- `/admin` and `/api/admin` (still protected by the normal admin login)
+- `/login` and `/api/auth/*` — so you can sign in to the admin panel
+- `/api/cron/*` — scheduled jobs keep running
+- `robots.txt`, `sitemap.xml` and everything in `/public`
+
+**Previewing the real site:** visit `https://<site>/?bypass=<MAINTENANCE_BYPASS_TOKEN>`.
+That sets an httpOnly cookie for 7 days so you browse the live site normally while
+every other visitor keeps seeing the maintenance page. Clear the
+`gmb_maintenance_bypass` cookie to go back to the maintenance view.
+
+The page returns `503` + `Retry-After` (not `200`), which is what Google expects
+for temporary downtime — rankings are preserved instead of the pages being dropped.

@@ -95,8 +95,85 @@ async function isValidCustomAdminToken(token: string): Promise<boolean> {
   }
 }
 
+
+const MAINTENANCE_PATH = '/maintenance';
+const MAINTENANCE_BYPASS_COOKIE = 'gmb_maintenance_bypass';
+
+// Paths that must keep working while the site is under maintenance:
+// the maintenance page itself, admin (still auth-guarded below), the login
+// flow that admin redirects to, and the scheduled cron jobs.
+const MAINTENANCE_ALLOWED_PREFIXES = [
+  MAINTENANCE_PATH,
+  '/admin',
+  '/api/admin',
+  '/api/auth',
+  '/api/cron',
+  '/login',
+];
+
+function isMaintenanceMode(): boolean {
+  return process.env.MAINTENANCE_MODE === 'true';
+}
+
+function isMaintenanceAllowed(pathname: string): boolean {
+  return MAINTENANCE_ALLOWED_PREFIXES.some(
+    (prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`)
+  );
+}
+
+function hasMaintenanceBypass(request: NextRequest): boolean {
+  const secret = process.env.MAINTENANCE_BYPASS_TOKEN;
+  if (!secret) {
+    return false;
+  }
+  return request.cookies.get(MAINTENANCE_BYPASS_COOKIE)?.value === secret;
+}
+
+function handleMaintenance(request: NextRequest): NextResponse | null {
+  if (!isMaintenanceMode()) {
+    return null;
+  }
+
+  const { pathname, searchParams } = request.nextUrl;
+  const secret = process.env.MAINTENANCE_BYPASS_TOKEN;
+
+  // ?bypass=<token> drops a cookie so the team can browse the live site
+  // normally while everyone else keeps seeing the maintenance page.
+  if (secret && searchParams.get('bypass') === secret) {
+    const cleanUrl = request.nextUrl.clone();
+    cleanUrl.searchParams.delete('bypass');
+    const response = NextResponse.redirect(cleanUrl);
+    response.cookies.set(MAINTENANCE_BYPASS_COOKIE, secret, {
+      httpOnly: true,
+      sameSite: 'lax',
+      secure: process.env.NODE_ENV === 'production',
+      path: '/',
+      maxAge: 60 * 60 * 24 * 7,
+    });
+    return response;
+  }
+
+  if (isMaintenanceAllowed(pathname) || hasMaintenanceBypass(request)) {
+    return null;
+  }
+
+  const url = request.nextUrl.clone();
+  url.pathname = MAINTENANCE_PATH;
+  url.search = '';
+
+  const response = NextResponse.rewrite(url, { status: 503 });
+  response.headers.set('Retry-After', '3600');
+  response.headers.set('Cache-Control', 'no-store, must-revalidate');
+  return response;
+}
+
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
+
+  const maintenanceResponse = handleMaintenance(request);
+  if (maintenanceResponse) {
+    return maintenanceResponse;
+  }
 
   // Intercepts all requests to /admin/* and /api/admin/*
   if (pathname.startsWith('/admin') || pathname.startsWith('/api/admin')) {
@@ -134,8 +211,12 @@ export async function middleware(request: NextRequest) {
 
 export const config = {
   matcher: [
-    '/admin/:path*',
-    '/api/admin/:path*',
+    /*
+     * Match every request path except:
+     * - _next/static and _next/image (build output / optimizer)
+     * - any path containing a dot (files served from /public)
+     */
+    '/((?!_next/static|_next/image|.*\\..*).*)',
   ],
 };
 
