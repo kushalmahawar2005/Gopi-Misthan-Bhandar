@@ -202,7 +202,7 @@ const NavigationContent = () => {
           <div className={`flex items-center justify-between px-4 md:px-8 lg:px-12 relative ${isScrolled ? 'h-[55px] md:h-[65px]' : 'h-[90px] md:h-[115px]'}`}>
 
             {/* Left Section: Bulk Enquiry (hides on scroll) / Space for Logo (on scroll) */}
-            <div className="flex items-center gap-4 flex-1 md:flex-initial">
+            <div className="flex items-center gap-2 md:gap-4 flex-1 md:flex-initial">
               {/* Mobile hamburger */}
               <button
                 onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
@@ -211,6 +211,29 @@ const NavigationContent = () => {
               >
                 {isMobileMenuOpen ? <FiX className="w-6 h-6" /> : <FiMenu className="w-6 h-6" />}
               </button>
+
+              {/* Keep the mobile logo in the header flow so it cannot overlap the store action. */}
+              <Link
+                href="/"
+                className={`relative z-20 flex-shrink-0 transition-[left,transform] duration-500 ease-in-out md:absolute md:top-1/2 md:transform-gpu md:will-change-transform ${isScrolled
+                  ? 'md:left-8 md:-translate-y-1/2 md:translate-x-0 lg:left-12'
+                  : 'md:left-1/2 md:-translate-x-1/2 md:-translate-y-1/2'
+                  }`}
+              >
+                <div className={`relative transition-[width,height] duration-500 ease-in-out ${isScrolled
+                  ? 'w-[44px] h-[44px] md:w-[56px] md:h-[56px]'
+                  : 'w-[54px] h-[54px] md:w-[80px] md:h-[80px] lg:w-[92px] lg:h-[92px]'
+                  }`}>
+                  <Image
+                    src="/logo.png"
+                    alt="Gopi Misthan Bhandar Logo"
+                    fill
+                    className="object-contain"
+                    sizes="(max-width: 768px) 54px, (max-width: 1024px) 80px, 92px"
+                    priority
+                  />
+                </div>
+              </Link>
 
               {/* Desktop: Bulk Enquiry - hidden instantly on scroll */}
               {!isScrolled && (
@@ -229,29 +252,6 @@ const NavigationContent = () => {
               )}
             </div>
 
-            {/* Logo: Snaps directly from center to left without transition */}
-            <Link
-              href="/"
-              className={`absolute top-1/2 z-20 transition-[left,transform] duration-500 ease-in-out transform-gpu will-change-transform ${isScrolled
-                ? 'left-1/2 md:left-8 lg:left-12 -translate-y-1/2 -translate-x-1/2 md:translate-x-0'
-                : 'left-1/2 -translate-x-1/2 -translate-y-1/2'
-                }`}
-            >
-              <div className={`relative transition-[width,height] duration-500 ease-in-out ${isScrolled
-                ? 'w-[46px] h-[46px] md:w-[56px] md:h-[56px]'
-                : 'w-[70px] h-[70px] md:w-[80px] md:h-[80px] lg:w-[92px] lg:h-[92px]'
-                }`}>
-                <Image
-                  src="/logo.png"
-                  alt="Gopi Misthan Bhandar Logo"
-                  fill
-                  className="object-contain"
-                  sizes="(max-width: 768px) 70px, (max-width: 1024px) 80px, 92px"
-                  priority
-                />
-              </div>
-            </Link>
-
             {/* Scrolled Navigation Items: Only visible on scroll in the center */}
             <div className={`hidden lg:flex items-center justify-center gap-3 xl:gap-4 transition-all duration-500 transform-gpu will-change-transform absolute left-[140px] lg:left-[150px] right-[460px] xl:right-[470px] overflow-hidden ${isScrolled ? 'opacity-100 translate-y-0 pointer-events-auto' : 'opacity-0 translate-y-4 pointer-events-none'
               }`}>
@@ -269,7 +269,7 @@ const NavigationContent = () => {
             </div>
 
             {/* Right Section: icons + Search */}
-            <div className="flex items-center gap-2 md:gap-4 ml-auto">
+            <div className="flex items-center gap-1 sm:gap-2 md:gap-4 ml-auto">
               {/* Desktop Search */}
               <div className="hidden md:flex items-center w-32 xl:w-44 relative flex-shrink-0">
                 <div className="relative w-full">
@@ -350,10 +350,12 @@ const NavigationContent = () => {
                     href={STORE_MAPS_URL}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1.5 rounded-md border border-[#FE8E02]/40 px-3 py-2 text-sm font-semibold text-[#8a6525] hover:bg-orange-50 transition-colors"
+                    aria-label="Visit our Store"
+                    className="inline-flex items-center gap-1 rounded-md border border-[#FE8E02]/40 px-2 sm:px-3 py-2 text-xs sm:text-sm font-semibold text-[#8a6525] hover:bg-orange-50 transition-colors"
                   >
                     <FiMapPin className="h-4 w-4" />
-                    Visit our Store
+                    <span className="sm:hidden">Store</span>
+                    <span className="hidden sm:inline">Visit our Store</span>
                   </a>
                 )}
 
