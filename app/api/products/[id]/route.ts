@@ -1,3 +1,4 @@
+import { invalidateCatalogue } from '@/lib/catalogueCache';
 import { NextRequest, NextResponse } from 'next/server';
 import mongoose from 'mongoose';
 import connectDB from '@/lib/mongodb';
@@ -91,6 +92,8 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
       return NextResponse.json({ success: false, error: 'Product not found' }, { status: 404 });
     }
 
+    invalidateCatalogue();
+
     return NextResponse.json({ success: true, data: product }, { status: 200 });
   } catch (error: any) {
     return NextResponse.json({ success: false, error: error.message }, { status: 500 });
@@ -112,6 +115,8 @@ export async function DELETE(request: NextRequest, { params }: { params: { id: s
     if (!product) {
       return NextResponse.json({ success: false, error: 'Product not found' }, { status: 404 });
     }
+
+    invalidateCatalogue();
 
     return NextResponse.json({ success: true, data: {} }, { status: 200 });
   } catch (error: any) {

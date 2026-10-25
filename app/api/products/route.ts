@@ -1,3 +1,4 @@
+import { invalidateCatalogue } from '@/lib/catalogueCache';
 import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
 import Product from '@/models/Product';
@@ -93,7 +94,7 @@ export async function GET(request: NextRequest) {
       {
         status: 200,
         headers: {
-          'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=300',
+          'Cache-Control': isAdmin === 'true' ? 'private, no-store' : 'public, s-maxage=60, stale-while-revalidate=300',
         },
       }
     );
@@ -135,6 +136,8 @@ export async function POST(request: NextRequest) {
     }
     
     const product = await Product.create(body);
+
+    invalidateCatalogue();
 
     return NextResponse.json({ success: true, data: product }, { status: 201 });
   } catch (error: any) {

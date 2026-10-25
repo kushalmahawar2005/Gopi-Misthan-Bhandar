@@ -1,3 +1,4 @@
+import { invalidateCatalogue } from '@/lib/catalogueCache';
 import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
 import Category from '@/models/Category';
@@ -65,6 +66,8 @@ export async function POST(
     });
 
     await category.save();
+
+    invalidateCatalogue();
 
     return NextResponse.json({ success: true, data: category.subCategories[category.subCategories.length - 1] }, { status: 201 });
   } catch (error: any) {

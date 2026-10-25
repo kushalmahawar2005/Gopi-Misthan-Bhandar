@@ -1,3 +1,4 @@
+import { invalidateCatalogue } from '@/lib/catalogueCache';
 import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
 import Category from '@/models/Category';
@@ -78,6 +79,8 @@ export async function PUT(
 
     await category.save();
 
+    invalidateCatalogue();
+
     return NextResponse.json({ success: true, data: category.subCategories[subcategoryIndex] }, { status: 200 });
   } catch (error: any) {
     return NextResponse.json({ success: false, error: error.message }, { status: 500 });
@@ -115,6 +118,8 @@ export async function DELETE(
 
     category.subCategories.splice(subcategoryIndex, 1);
     await category.save();
+
+    invalidateCatalogue();
 
     return NextResponse.json({ success: true, data: {} }, { status: 200 });
   } catch (error: any) {

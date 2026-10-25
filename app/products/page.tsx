@@ -1,3 +1,4 @@
+import { unstable_cache } from 'next/cache';
 import ProductsClient from './products-client';
 import connectDB from '@/lib/mongodb';
 import ProductModel from '@/models/Product';
@@ -91,15 +92,8 @@ interface ProductsPageProps {
   };
 }
 
-async function getProductsData(searchParams: ProductsPageProps['searchParams']) {
-  const categorySlug = normalizeCategorySlug(searchParams?.category);
-  const subcategorySlug = (searchParams?.subcategory || 'all').trim().toLowerCase();
-  const search = (searchParams?.search || '').trim();
-  const rawSort = (searchParams?.sort || 'default') as SortOption;
-  const sort: SortOption = VALID_SORTS.includes(rawSort) ? rawSort : 'default';
-  const pageNum = Math.max(1, parseInt(searchParams?.page || '1', 10) || 1);
-
-  try {
+// Cache only successful, serializable public catalogue results. Search stays uncached.
+async function loadCatalogue(categorySlug: string, subcategorySlug: string, search: string, pageNum: number) {
     await connectDB();
 
     const query: Record<string, any> = { isActive: { $ne: false } }; // Only show active products on frontend
@@ -147,8 +141,25 @@ async function getProductsData(searchParams: ProductsPageProps['searchParams']) 
       initialCategorySlug: categorySlug,
       initialSubCategorySlug: subcategorySlug,
       initialSearch: search,
-      initialSort: sort,
     };
+}
+
+const getCachedCatalogue = unstable_cache(loadCatalogue, ['public-catalogue-v1'], {
+  revalidate: 60,
+  tags: ['catalogue'],
+});
+
+async function getProductsData(searchParams: ProductsPageProps['searchParams']) {
+  const categorySlug = normalizeCategorySlug(searchParams?.category);
+  const subcategorySlug = (searchParams?.subcategory || 'all').trim().toLowerCase();
+  const search = (searchParams?.search || '').trim();
+  const rawSort = (searchParams?.sort || 'default') as SortOption;
+  const sort: SortOption = VALID_SORTS.includes(rawSort) ? rawSort : 'default';
+  const pageNum = Math.max(1, parseInt(searchParams?.page || '1', 10) || 1);
+
+  try {
+    const load = search ? loadCatalogue : getCachedCatalogue;
+    return { ...await load(categorySlug, subcategorySlug, search, pageNum), initialSort: sort };
   } catch (error) {
     console.error('Error loading products page data:', error);
     return {

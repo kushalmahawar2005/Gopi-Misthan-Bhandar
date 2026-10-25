@@ -7,7 +7,7 @@ import FloatingContactButtons from '@/components/FloatingContactButtons'
 import ChatBot from '@/components/ChatBot'
 import MobileBottomNav from '@/components/MobileBottomNav'
 import SmoothScroll from '@/components/SmoothScroll'
-import TrendingBannerModal from '@/components/TrendingBannerModal'
+import DeferredPromotion from '@/components/DeferredPromotion'
 import NextAuthSessionProvider from '@/components/NextAuthSessionProvider'
 import Script from 'next/script'
 import { ONLINE_ORDERS_ENABLED } from '@/lib/siteMode'
@@ -136,8 +136,6 @@ export default function RootLayout({
           href="https://fonts.googleapis.com/css2?family=Averia+Serif+Libre:wght@300;400;700&family=Inder&family=Inter:wght@300;400;500;600;700;800;900&family=Jost:ital,wght@0,100..900;1,100..900&family=Roboto+Slab:wght@300;400;500;600;700&family=Sora:wght@100..800&display=swap"
           rel="stylesheet"
         />
-        {/* Local font - self-hosted (no external request) */}
-        <link href="/fonts/GeneralSans_Complete/Fonts/WEB/css/general-sans.css" rel="stylesheet" />
         <link rel="icon" href="/logo.png" type="image/png" />
         <link rel="shortcut icon" href="/logo.png" type="image/png" />
         <link rel="manifest" href="/manifest.json" />
@@ -256,7 +254,7 @@ export default function RootLayout({
                 {children}
                 <FloatingContactButtons />
                 <ChatBot />
-                <TrendingBannerModal />
+                <DeferredPromotion />
                 {/* <MobileBottomNav /> */}
               </CartProvider>
             </WishlistProvider>

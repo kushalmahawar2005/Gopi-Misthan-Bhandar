@@ -1,3 +1,4 @@
+import { invalidateCatalogue } from '@/lib/catalogueCache';
 import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
 import Category from '@/models/Category';
@@ -37,6 +38,8 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
       return NextResponse.json({ success: false, error: 'Category not found' }, { status: 404 });
     }
 
+    invalidateCatalogue();
+
     return NextResponse.json({ success: true, data: category }, { status: 200 });
   } catch (error: any) {
     return NextResponse.json({ success: false, error: error.message }, { status: 500 });
@@ -57,6 +60,8 @@ export async function DELETE(request: NextRequest, { params }: { params: { id: s
     if (!category) {
       return NextResponse.json({ success: false, error: 'Category not found' }, { status: 404 });
     }
+
+    invalidateCatalogue();
 
     return NextResponse.json({ success: true, data: {} }, { status: 200 });
   } catch (error: any) {

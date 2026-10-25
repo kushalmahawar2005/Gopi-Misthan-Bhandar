@@ -1,8 +1,7 @@
 'use client';
 
-import React, { useState, useMemo, useEffect, useRef, Suspense } from 'react';
+import React, { useState, useMemo, useEffect, useTransition, Suspense } from 'react';
 import { useSearchParams, useRouter, usePathname } from 'next/navigation';
-import { fetchProducts, PaginatedProductResponse } from '@/lib/api';
 import ProductCard from '@/components/ProductCard';
 import ProductListCard from '@/components/ProductListCard';
 import Header from '@/components/Header';
@@ -57,87 +56,25 @@ function ProductsContent({
   const [products, setProducts] = useState<Product[]>(initialProducts);
   const [categories, setCategories] = useState<Category[]>(initialCategories);
   const [pagination, setPagination] = useState(initialPagination);
-  const [loading, setLoading] = useState(false);
-  const isFirstMount = useRef(true);
+  const [loading, startTransition] = useTransition();
 
-  const normalizeCategorySlug = (value: string) => {
-    if (value === 'bakery-items') return 'bakery';
-    return value;
-  };
-
-  // Sync state with URL params
+  // App Router delivers updated data for category/search/page URL changes.
   useEffect(() => {
-    const search = searchParams.get('search') || '';
-    setSearchQuery(search);
-
-    const rawCategory = searchParams.get('category') || 'all';
-    const category = normalizeCategorySlug(rawCategory);
-
-    if (rawCategory !== category) {
-      const params = new URLSearchParams(searchParams.toString());
-      if (category === 'all') {
-        params.delete('category');
-      } else {
-        params.set('category', category);
-      }
-      router.replace(`${pathname}?${params.toString()}`);
-      return;
-    }
-
-    setSelectedCategory(category);
-
-    const subcategory = searchParams.get('subcategory') || 'all';
-    setSelectedSubCategory(subcategory);
-
-    const page = parseInt(searchParams.get('page') || '1');
-    const sort = (searchParams.get('sort') as SortOption) || 'default';
-    setSortBy(sort);
-
-    if (isFirstMount.current) {
-      isFirstMount.current = false;
-      return;
-    }
-
-    loadProducts(page, category === 'all' ? undefined : category, subcategory === 'all' ? undefined : subcategory, search);
-  }, [searchParams, router, pathname]);
-
-  const loadProducts = async (page: number, category?: string, subcategory?: string, search?: string) => {
-    setLoading(true);
-    try {
-      const data = await fetchProducts({
-        page,
-        limit: 12,
-        category: category,
-        subcategory: subcategory,
-        search: search,
-      }) as PaginatedProductResponse;
-
-      if (data && data.products) {
-        setProducts(data.products);
-        setPagination({
-          totalCount: data.totalCount,
-          totalPages: data.totalPages,
-          currentPage: data.currentPage,
-        });
-
-        if (data.products.length > 0 && maxPrice === 10000) {
-          const max = Math.max(...data.products.map(p => p.price));
-          const roundedMax = Math.ceil(max / 1000) * 1000;
-          setMaxPrice(roundedMax);
-          setPriceRange([0, roundedMax]);
-        }
-      }
-    } catch (error) {
-      console.error('Error loading products:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
+    setProducts(initialProducts);
+    setCategories(initialCategories);
+    setPagination(initialPagination);
+    setSelectedCategory(initialCategorySlug);
+    setSelectedSubCategory(initialSubCategorySlug);
+    setSearchQuery(initialSearch);
+    setSortBy(initialSort);
+    setMaxPrice(initialMaxPrice);
+  }, [initialProducts, initialCategories, initialPagination, initialCategorySlug,
+    initialSubCategorySlug, initialSearch, initialSort, initialMaxPrice]);
 
   const handlePageChange = (page: number) => {
     const params = new URLSearchParams(searchParams.toString());
     params.set('page', page.toString());
-    router.push(`${pathname}?${params.toString()}`);
+    startTransition(() => router.push(`${pathname}?${params.toString()}`));
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
@@ -166,7 +103,7 @@ function ProductsContent({
       else params.set('sort', updates.sort);
     }
 
-    router.push(`${pathname}?${params.toString()}`);
+    startTransition(() => router.push(`${pathname}?${params.toString()}`));
   };
 
   const processedProducts = useMemo(() => {

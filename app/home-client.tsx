@@ -1,5 +1,6 @@
 'use client';
 
+import { ONLINE_ORDERS_ENABLED } from '@/lib/siteMode';
 import React from 'react';
 import dynamic from 'next/dynamic';
 import Header from '@/components/Header';
@@ -55,7 +56,7 @@ export default function HomeClient({
       <h1 className="sr-only">Gopi Misthan Bhandar Neemuch - Traditional Indian Sweets Since 1968</h1>
       <Header />
       <Navigation />
-      <Cart />
+      {ONLINE_ORDERS_ENABLED && <Cart />}
       <HeroSection />
 
       {featuredProducts.length > 0 && (
