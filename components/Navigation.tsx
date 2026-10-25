@@ -23,6 +23,15 @@ import { useWishlist } from '@/context/WishlistContext';
 import { fetchProducts, fetchCategories } from '@/lib/api';
 import { Category } from '@/types';
 
+// Only the active-category indicator depends on URL search params. Keep the
+// header itself outside that Suspense boundary so its logo renders on the server.
+function NavigationQuerySync({ onCategoryChange }: { onCategoryChange: (category: string) => void }) {
+  const searchParams = useSearchParams();
+  const category = searchParams.get('category') || '';
+  useEffect(() => onCategoryChange(category), [category, onCategoryChange]);
+  return null;
+}
+
 const NavigationContent = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false); // mobile modal
@@ -31,7 +40,7 @@ const NavigationContent = () => {
   const [categories, setCategories] = useState<Category[]>([]);
   const [hoveredCategory, setHoveredCategory] = useState<string | null>(null);
   const pathname = usePathname();
-  const searchParams = useSearchParams();
+  const [activeCategory, setActiveCategory] = useState('');
   const router = useRouter();
   const { openCart, getTotalItems } = useCart();
   const { user, isAuthenticated, logout } = useAuth();
@@ -132,7 +141,6 @@ const NavigationContent = () => {
     if (href === '/') return pathname === '/';
     if (href.startsWith('/products?category=')) {
       const targetCategory = href.split('category=')[1]?.split('&')[0] || '';
-      const activeCategory = searchParams.get('category') || '';
       return pathname === '/products' && targetCategory === activeCategory;
     }
     return pathname.includes(href.replace('#', ''));
@@ -191,6 +199,9 @@ const NavigationContent = () => {
 
   return (
     <>
+      <Suspense fallback={null}>
+        <NavigationQuerySync onCategoryChange={setActiveCategory} />
+      </Suspense>
       <nav
         id="main-nav"
         className={`bg-white w-full border-b border-[#d6cec6] z-50 transition-shadow duration-300 ease-out sticky top-0 left-0 right-0 ${isScrolled ? 'py-0 shadow-md' : 'py-0'}`}
@@ -762,20 +773,6 @@ const NavigationContent = () => {
   );
 };
 
-function NavigationFallback() {
-  return (
-    <nav id="main-nav" className="bg-white w-full border-b border-[#d6cec6] z-50 sticky top-0 left-0 right-0">
-      <div className="max-w-[1700px] mx-auto">
-        <div className="h-[90px] md:h-[115px]" />
-      </div>
-    </nav>
-  );
-}
-
 export default function Navigation() {
-  return (
-    <Suspense fallback={<NavigationFallback />}>
-      <NavigationContent />
-    </Suspense>
-  );
+  return <NavigationContent />;
 }

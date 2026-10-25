@@ -132,7 +132,7 @@ supabase/migrations/            # SQL migration files
 - [x] Diwali showcase hero on the homepage using an existing Gopi product photo, with a catalogue CTA and responsive layout
 - [x] Protected routes (dashboard, menu, settings) — redirect to /login if no JWT
 
-- [x] Storefront speed: static Diwali hero with one responsive priority image, on-demand chat/enquiry panels, deferred promotion, cached catalogue reads with admin invalidation, and no duplicate catalogue fetch on filter/page navigation.
+- [x] Storefront speed: server-rendered header/logo and static Diwali hero with one responsive priority image, on-demand chat/enquiry panels, deferred promotion, cached catalogue reads with admin invalidation, and no duplicate catalogue fetch on filter/page navigation.
 
 ## What's Pending
 

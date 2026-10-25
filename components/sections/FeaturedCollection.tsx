@@ -51,7 +51,7 @@ const FeaturedProductCard: React.FC<{ product: Product }> = ({ product }) => {
                 : 'opacity-100'
               }
             `}
-            priority
+            loading="lazy"
             sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
           />
 
