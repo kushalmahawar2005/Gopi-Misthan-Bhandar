@@ -4,6 +4,7 @@ import Product from '@/models/Product';
 import Order from '@/models/Order';
 import Category from '@/models/Category';
 import { checkRateLimit } from '@/lib/rateLimit';
+import { ONLINE_ORDERS_ENABLED } from '@/lib/siteMode';
 
 /**
  * Storefront chatbot backend.
@@ -48,7 +49,7 @@ const t = (lang: Lang, hi: string, en: string) => (lang === 'en' ? en : hi);
 const DEFAULT_SUGGESTIONS = [
   { label: '🍬 Browse Sweets', action: 'categories' },
   { label: '⭐ Bestsellers', action: 'bestsellers' },
-  { label: '📦 Track Order', action: 'track:init' },
+  ...(ONLINE_ORDERS_ENABLED ? [{ label: '📦 Track Order', action: 'track:init' }] : []),
   { label: '🚚 Delivery Info', action: 'delivery' },
 ];
 
@@ -72,8 +73,12 @@ function detectLang(text: string): Lang {
 const FAQ: { test: RegExp; hi: string; en: string }[] = [
   {
     test: /\b(cod|cash on delivery|payment|pay|upi|card|netbanking|razorpay|online pay)\b/i,
-    hi: '💳 Online payment (UPI, cards, netbanking via Razorpay) accept karte hain. Cash on Delivery select areas mein available hai — checkout par pincode daalne se pata chal jaayega.',
-    en: '💳 We accept online payment (UPI, cards, netbanking via Razorpay). Cash on Delivery is available in select areas — enter your pincode at checkout to check.',
+    hi: ONLINE_ORDERS_ENABLED
+      ? '💳 Online payment (UPI, cards, netbanking via Razorpay) accept karte hain. Cash on Delivery select areas mein available hai — checkout par pincode daalne se pata chal jaayega.'
+      : '💳 Abhi website par online order aur payment available nahi hai. Products ke baare mein WhatsApp par poochhein ya Neemuch store visit karein.',
+    en: ONLINE_ORDERS_ENABLED
+      ? '💳 We accept online payment (UPI, cards, netbanking via Razorpay). Cash on Delivery is available in select areas — enter your pincode at checkout to check.'
+      : '💳 Online ordering and payment are currently unavailable on the website. Enquire about products on WhatsApp or visit our Neemuch store.',
   },
   {
     test: /\b(refund|return|cancel|cancellation|wapas|paisa wapas|replace)\b/i,
@@ -82,13 +87,21 @@ const FAQ: { test: RegExp; hi: string; en: string }[] = [
   },
   {
     test: /\b(offer|discount|coupon|code|sale|deal)\b/i,
-    hi: '🎉 Coupon codes time-time par chalte hain. Checkout par "Coupon" box mein code daalein. Bulk/wedding orders ke liye special pricing — Bulk Enquiry karein.',
-    en: '🎉 We run coupon codes from time to time. Enter a code in the "Coupon" box at checkout. For bulk/wedding orders we offer special pricing — use Bulk Enquiry.',
+    hi: ONLINE_ORDERS_ENABLED
+      ? '🎉 Coupon codes time-time par chalte hain. Checkout par "Coupon" box mein code daalein. Bulk/wedding orders ke liye special pricing — Bulk Enquiry karein.'
+      : '🎉 Bulk, wedding ya festive hampers ke liye special pricing jaanne ko WhatsApp par enquiry karein ya Neemuch store visit karein.',
+    en: ONLINE_ORDERS_ENABLED
+      ? '🎉 We run coupon codes from time to time. Enter a code in the "Coupon" box. For bulk/wedding orders we offer special pricing — use Bulk Enquiry.'
+      : '🎉 For bulk, wedding or festive hamper pricing, enquire on WhatsApp or visit our Neemuch store.',
   },
   {
     test: /\b(open|timing|hours|kab khulta|kitne baje|kab tak)\b/i,
-    hi: '🕙 Hum Monday–Saturday, 10:00 AM se 9:00 PM tak khule rehte hain. Online order 24x7 le sakte hain!',
-    en: '🕙 We\'re open Monday–Saturday, 10:00 AM to 9:00 PM. Online orders are accepted 24x7!',
+    hi: ONLINE_ORDERS_ENABLED
+      ? '🕙 Hum Monday–Saturday, 10:00 AM se 9:00 PM tak khule rehte hain. Online order 24x7 le sakte hain!'
+      : '🕙 Hum Monday–Saturday, 10:00 AM se 9:00 PM tak khule rehte hain. Neemuch store par aaiye ya WhatsApp par enquiry karein.',
+    en: ONLINE_ORDERS_ENABLED
+      ? '🕙 We\'re open Monday–Saturday, 10:00 AM to 9:00 PM. Online orders are accepted 24x7!'
+      : '🕙 We\'re open Monday–Saturday, 10:00 AM to 9:00 PM. Visit our Neemuch store or enquire on WhatsApp.',
   },
   {
     test: /\b(bulk|wedding|shaadi|corporate|hamper|wholesale|gifting|festival)\b/i,
@@ -272,9 +285,9 @@ async function tryGeminiReply(
 
   const shopFacts = `Shop facts (use when relevant):
 - ${SHOP_NAME} — Tilak Marg, Neemuch (M.P.), serving since 1968. Phone: ${SUPPORT_PHONE}.
-- 100% vegetarian Indian sweets, namkeen & gift hampers. Pan-India delivery.
-- Payments: UPI, cards, netbanking (Razorpay); COD in select pincodes.
-- Store hours: Mon–Sat, 10am–9pm. Online orders 24x7.
+- 100% vegetarian Indian sweets, namkeen & gift hampers.
+- ${ONLINE_ORDERS_ENABLED ? 'Pan-India delivery; payments via UPI, cards, netbanking or COD in select pincodes.' : 'The website is a product catalogue; customers can enquire on WhatsApp or visit the Neemuch store. Do not claim online ordering, checkout, payment, or delivery is available.'}
+- Store hours: Mon–Sat, 10am–9pm.${ONLINE_ORDERS_ENABLED ? ' Online orders 24x7.' : ''}
 - Shelf life 15–60 days depending on product. Bulk/wedding/corporate gifting available.
 - Order tracking: customer needs order number + registered phone.`;
 
@@ -373,8 +386,12 @@ async function handleAction(
       return {
         reply: t(
           lang,
-          '🚚 Hum pure India mein deliver karte hain. Sweets 60 din tak fresh rehti hain. Order confirm hone ke baad tracking link mil jaayega. Pincode-wise delivery time checkout par dikhta hai.',
-          "🚚 We deliver across India. Our sweets stay fresh up to 60 days. You'll get a tracking link once your order is confirmed. Pincode-wise delivery time shows at checkout."
+          ONLINE_ORDERS_ENABLED
+            ? '🚚 Hum pure India mein deliver karte hain. Sweets 60 din tak fresh rehti hain. Order confirm hone ke baad tracking link mil jaayega. Pincode-wise delivery time checkout par dikhta hai.'
+            : '🏬 Website par abhi online delivery order nahi le rahe. Neemuch store visit karein ya WhatsApp par product availability poochhein.',
+          ONLINE_ORDERS_ENABLED
+            ? "🚚 We deliver across India. Our sweets stay fresh up to 60 days. You'll get a tracking link once your order is confirmed. Pincode-wise delivery time shows at checkout."
+            : '🏬 The website is currently a product catalogue and does not take delivery orders. Visit our Neemuch store or enquire about availability on WhatsApp.'
         ),
         suggestions: DEFAULT_SUGGESTIONS,
         source: 'rules',

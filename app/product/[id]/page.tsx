@@ -26,6 +26,7 @@ import {
   FiTwitter,
 } from 'react-icons/fi';
 import { Product } from '@/types';
+import { ONLINE_ORDERS_ENABLED, STORE_MAPS_URL } from '@/lib/siteMode';
 
 type LightweightProduct = Pick<Product, 'id' | 'slug' | 'name' | 'price' | 'image' | 'category' | 'images'>;
 
@@ -735,7 +736,7 @@ export default function ProductDetailPage() {
                 </p>
               )}
 
-              {/* Qty + Add to Cart + Buy Now */}
+              {ONLINE_ORDERS_ENABLED ? (
               <div className="flex flex-wrap items-stretch gap-3">
                 <div className="inline-flex h-[48px] items-center justify-between rounded-md border border-[#d8c7b5] bg-white px-1 w-[110px]">
                   <button
@@ -774,23 +775,37 @@ export default function ProductDetailPage() {
                   {isBuying ? 'Redirecting...' : 'Buy Now'}
                 </button>
               </div>
+              ) : (
+                <div className="flex flex-col gap-3">
+                  <a
+                    href={STORE_MAPS_URL}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex h-12 w-full items-center justify-center rounded-md bg-[#b58a3a] px-5 text-sm font-semibold uppercase tracking-[0.08em] text-white transition hover:bg-[#9d742f]"
+                  >
+                    Visit our Store
+                  </a>
+                </div>
+              )}
 
               {/* Delivery info line */}
               <p className="text-sm leading-relaxed text-[#6f5d4e]">
-                Same-day dispatch from Neemuch.{' '}
-                Expected delivery time across India:{' '}
-                <span className="font-medium text-[#3f3228]">{product.deliveryTime || '3-5 Working Days'}</span>.
+                {ONLINE_ORDERS_ENABLED ? (
+                  <>Same-day dispatch from Neemuch. Expected delivery time across India: <span className="font-medium text-[#3f3228]">{product.deliveryTime || '3-5 Working Days'}</span>.</>
+                ) : (
+                  <>Online payment system coming soon. For bulk enquiries, use the Bulk Enquiry option above.</>
+                )}
               </p>
 
               {/* Payment icons */}
-              <div className="relative h-9 w-full max-w-[320px]">
+              {ONLINE_ORDERS_ENABLED && <div className="relative h-9 w-full max-w-[320px]">
                 <Image
                   src="/visa.svg"
                   alt="Accepted payment methods: Visa, Mastercard, RuPay, UPI"
                   fill
                   className="object-contain object-left"
                 />
-              </div>
+              </div>}
 
               {/* Accordions */}
               <div className="space-y-2 pt-1">

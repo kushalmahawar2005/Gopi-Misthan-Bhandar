@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { FiChevronDown, FiFacebook, FiInstagram, FiYoutube } from 'react-icons/fi';
+import { ONLINE_ORDERS_ENABLED } from '@/lib/siteMode';
 
 type MobileFooterSectionKey = 'range' | 'about' | 'legal';
 
@@ -46,7 +47,7 @@ const Footer = () => {
     { label: 'Our Story', href: '/#about' },
     { label: 'Contact Us', href: '/#contact' },
     { label: 'Login', href: '/login' },
-    { label: 'Track Your Order', href: '/orders' },
+    ...(ONLINE_ORDERS_ENABLED ? [{ label: 'Track Your Order', href: '/orders' }] : []),
   ];
 
   const legalLinks = [
@@ -247,7 +248,7 @@ const Footer = () => {
         </div>
       </div>
 
-      <div className="border-t border-[#ead9c6] bg-white/70">
+      {ONLINE_ORDERS_ENABLED && <div className="border-t border-[#ead9c6] bg-white/70">
         <div className="max-w-[1400px] mx-auto px-4 md:px-8 lg:px-12 py-5 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div>
             <p className="text-[20px] md:text-[22px] font-roboto text-[#503223] mb-2">Payment Methods</p>
@@ -274,7 +275,7 @@ const Footer = () => {
             </div>
           </div>
         </div>
-      </div>
+      </div>}
 
       {(fssaiLicense || gstNumber) && (
         <div className="border-t border-[#ead9c6] bg-white">

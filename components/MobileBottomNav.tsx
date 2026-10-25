@@ -4,10 +4,20 @@ import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
-import { FiHome, FiUser, FiShoppingBag, FiHeart, FiShoppingCart } from 'react-icons/fi';
+import { FiHome, FiUser, FiShoppingBag, FiHeart, FiShoppingCart, FiMapPin } from 'react-icons/fi';
 import { useCart } from '@/context/CartContext';
 import { useWishlist } from '@/context/WishlistContext';
 import { useAuth } from '@/context/AuthContext';
+import { ONLINE_ORDERS_ENABLED, STORE_MAPS_URL } from '@/lib/siteMode';
+import type { IconType } from 'react-icons';
+
+type MobileNavItem = {
+  label: string;
+  href: string;
+  icon: IconType;
+  badge: number;
+  onClick?: (event: React.MouseEvent) => void;
+};
 
 const MobileBottomNav = () => {
   const pathname = usePathname();
@@ -23,7 +33,7 @@ const MobileBottomNav = () => {
     return null;
   }
 
-  const navItems = [
+  const navItems: MobileNavItem[] = [
     {
       label: 'Home',
       href: '/',
@@ -48,16 +58,23 @@ const MobileBottomNav = () => {
       icon: FiHeart,
       badge: wishlistCount,
     },
-    {
-      label: 'Cart',
-      href: '#',
-      icon: FiShoppingCart,
-      badge: cartCount,
-      onClick: (e: React.MouseEvent) => {
-        e.preventDefault();
-        openCart();
-      },
-    },
+    ONLINE_ORDERS_ENABLED
+      ? {
+          label: 'Cart',
+          href: '#',
+          icon: FiShoppingCart,
+          badge: cartCount,
+          onClick: (e: React.MouseEvent) => {
+            e.preventDefault();
+            openCart();
+          },
+        }
+      : {
+          label: 'Visit Store',
+          href: STORE_MAPS_URL,
+          icon: FiMapPin,
+          badge: 0,
+        },
   ];
 
   const isActive = (href: string) => {

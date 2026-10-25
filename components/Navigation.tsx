@@ -14,7 +14,9 @@ import {
   FiHeart,
   FiShoppingBag,
   FiChevronDown,
+  FiMapPin,
 } from 'react-icons/fi';
+import { ONLINE_ORDERS_ENABLED, STORE_MAPS_URL } from '@/lib/siteMode';
 import { useCart } from '@/context/CartContext';
 import { useAuth } from '@/context/AuthContext';
 import { useWishlist } from '@/context/WishlistContext';
@@ -251,14 +253,14 @@ const NavigationContent = () => {
             </Link>
 
             {/* Scrolled Navigation Items: Only visible on scroll in the center */}
-            <div className={`hidden lg:flex items-center justify-center gap-6 lg:gap-8 xl:gap-10 transition-all duration-500 transform-gpu will-change-transform absolute left-[150px] lg:left-[160px] right-[320px] xl:right-[380px] ${isScrolled ? 'opacity-100 translate-y-0 pointer-events-auto' : 'opacity-0 translate-y-4 pointer-events-none'
+            <div className={`hidden lg:flex items-center justify-center gap-3 xl:gap-4 transition-all duration-500 transform-gpu will-change-transform absolute left-[140px] lg:left-[150px] right-[460px] xl:right-[470px] overflow-hidden ${isScrolled ? 'opacity-100 translate-y-0 pointer-events-auto' : 'opacity-0 translate-y-4 pointer-events-none'
               }`}>
               {navItems.map((item) => (
                 <Link
                   key={`scrolled-${item.label}`}
                   href={item.href}
                   onClick={() => setIsMobileMenuOpen(false)}
-                  className={`text-[13px] xl:text-[15px] font-flama-condensed tracking-[0.15em] uppercase transition-colors font-semibold py-2 hover:text-[#FE8E02] whitespace-nowrap ${isActive(item.href) ? 'text-[#FE8E02]' : 'text-[#503223]'
+                  className={`text-[11px] xl:text-[12px] font-flama-condensed tracking-[0.1em] uppercase transition-colors font-semibold py-2 hover:text-[#FE8E02] whitespace-nowrap ${isActive(item.href) ? 'text-[#FE8E02]' : 'text-[#503223]'
                     }`}
                 >
                   {item.label}
@@ -269,7 +271,7 @@ const NavigationContent = () => {
             {/* Right Section: icons + Search */}
             <div className="flex items-center gap-2 md:gap-4 ml-auto">
               {/* Desktop Search */}
-              <div className="hidden md:flex items-center w-32 xl:w-44 relative">
+              <div className="hidden md:flex items-center w-32 xl:w-44 relative flex-shrink-0">
                 <div className="relative w-full">
                   <div className="relative flex items-center">
                     <input
@@ -343,6 +345,18 @@ const NavigationContent = () => {
                   </Link>
                 )}
 
+                {!ONLINE_ORDERS_ENABLED && (
+                  <a
+                    href={STORE_MAPS_URL}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1.5 rounded-md border border-[#FE8E02]/40 px-3 py-2 text-sm font-semibold text-[#8a6525] hover:bg-orange-50 transition-colors"
+                  >
+                    <FiMapPin className="h-4 w-4" />
+                    Visit our Store
+                  </a>
+                )}
+
                 <Link
                   href={isAuthenticated ? '/profile' : '/login'}
                   className="p-1.5 text-[#FE8E02] hover:opacity-70 transition-opacity"
@@ -366,18 +380,20 @@ const NavigationContent = () => {
                 </Link>
 
 
-                <button
-                  onClick={openCart}
-                  className="relative p-1.5 text-[#FE8E02] hover:opacity-70 transition-opacity"
-                  title="Shopping cart"
-                >
-                  <FiShoppingBag className="w-5 h-5 md:w-6 md:h-6" />
-                  {cartItemsCount > 0 && (
-                    <span className="absolute top-1 right-1 bg-[#FE8E02] text-white text-[9px] rounded-full w-3.5 h-3.5 flex items-center justify-center font-bold">
-                      {cartItemsCount > 9 ? '9+' : cartItemsCount}
-                    </span>
-                  )}
-                </button>
+                {ONLINE_ORDERS_ENABLED && (
+                  <button
+                    onClick={openCart}
+                    className="relative p-1.5 text-[#FE8E02] hover:opacity-70 transition-opacity"
+                    title="Shopping cart"
+                  >
+                    <FiShoppingBag className="w-5 h-5 md:w-6 md:h-6" />
+                    {cartItemsCount > 0 && (
+                      <span className="absolute top-1 right-1 bg-[#FE8E02] text-white text-[9px] rounded-full w-3.5 h-3.5 flex items-center justify-center font-bold">
+                        {cartItemsCount > 9 ? '9+' : cartItemsCount}
+                      </span>
+                    )}
+                  </button>
+                )}
               </div>
             </div>
           </div>

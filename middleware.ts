@@ -207,6 +207,24 @@ export async function middleware(request: NextRequest) {
     return maintenanceResponse;
   }
 
+  // Keep order placement unavailable while the public site is used as a
+  // catalogue. Deep links to checkout return to products, and server-side
+  // order/payment creation is blocked as well as the UI.
+  if (process.env.NEXT_PUBLIC_ONLINE_ORDERS_ENABLED !== 'true') {
+    if (pathname === '/checkout' || pathname.startsWith('/checkout/')) {
+      return NextResponse.redirect(new URL('/products', request.url));
+    }
+
+    const isOrderCreation = pathname === '/api/orders' && request.method === 'POST';
+    const isPaymentCreation =
+      (pathname === '/api/payment/create-order' || pathname === '/api/payment/verify') &&
+      request.method === 'POST';
+
+    if (isOrderCreation || isPaymentCreation) {
+      return new NextResponse(null, { status: 404 });
+    }
+  }
+
   // Intercepts all requests to /admin/* and /api/admin/*
   if (pathname.startsWith('/admin') || pathname.startsWith('/api/admin')) {
 

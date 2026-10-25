@@ -129,6 +129,7 @@ supabase/migrations/            # SQL migration files
 - [x] Menu Builder at `/menu`: categories CRUD with drag reorder, items CRUD with image upload to `menu-images` bucket, optimistic updates, validation
 - [x] Customer Storefront wired to live menu data: tenant filter, in-stock filter, category grouping, Featured Dishes from bestsellers
 - [x] Storefront UI v2: hero with CTAs + delivery info strip, premium menu cards with quantity stepper, About/Reviews/Visit sections, footer, mobile sticky cart bar
+- [x] Diwali showcase hero on the homepage using an existing Gopi product photo, with a catalogue CTA and responsive layout
 - [x] Protected routes (dashboard, menu, settings) — redirect to /login if no JWT
 
 ## What's Pending

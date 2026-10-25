@@ -10,6 +10,7 @@ import SmoothScroll from '@/components/SmoothScroll'
 import TrendingBannerModal from '@/components/TrendingBannerModal'
 import NextAuthSessionProvider from '@/components/NextAuthSessionProvider'
 import Script from 'next/script'
+import { ONLINE_ORDERS_ENABLED } from '@/lib/siteMode'
 
 const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://gopimisthanbhandar.com';
 const FSSAI_LICENSE = process.env.NEXT_PUBLIC_FSSAI_LICENSE || '';
@@ -27,10 +28,14 @@ const SAME_AS_EXTRA = [
 export const metadata: Metadata = {
   metadataBase: new URL(BASE_URL),
   title: {
-    default: 'Buy Indian Sweets Online — Mithai, Namkeen & Gift Boxes | Gopi Misthan Bhandar',
+    default: ONLINE_ORDERS_ENABLED
+      ? 'Buy Indian Sweets Online — Mithai, Namkeen & Gift Boxes | Gopi Misthan Bhandar'
+      : 'Indian Sweets, Namkeen & Gift Boxes | Gopi Misthan Bhandar',
     template: '%s | Gopi Misthan Bhandar',
   },
-  description: 'Order authentic Indian sweets online — Kaju Katli, Soan Papdi, Motichoor Ladoo, Milk Cake, Rasgulla, Gulab Jamun, Bikaneri Bhujia, Namkeen & premium dry-fruit gift hampers. Fresh, handcrafted mithai with 60-day shelf life. Pan-India delivery from Gopi Misthan Bhandar Neemuch since 1968.',
+  description: ONLINE_ORDERS_ENABLED
+    ? 'Order authentic Indian sweets online — Kaju Katli, Soan Papdi, Motichoor Ladoo, Milk Cake, Rasgulla, Gulab Jamun, Bikaneri Bhujia, Namkeen & premium dry-fruit gift hampers. Fresh, handcrafted mithai with 60-day shelf life. Pan-India delivery from Gopi Misthan Bhandar Neemuch since 1968.'
+    : 'Explore authentic Indian sweets, Kaju Katli, Soan Papdi, Motichoor Ladoo, Bikaneri Bhujia, Namkeen and premium gift hampers. Visit Gopi Misthan Bhandar in Neemuch or enquire on WhatsApp.',
   authors: [{ name: 'Gopi Misthan Bhandar' }],
   creator: 'Gopi Misthan Bhandar',
   publisher: 'Gopi Misthan Bhandar',
@@ -44,8 +49,12 @@ export const metadata: Metadata = {
     locale: 'en_IN',
     url: BASE_URL,
     siteName: 'Gopi Misthan Bhandar',
-    title: 'Buy Indian Sweets, Mithai & Gift Boxes Online | Gopi Misthan Bhandar',
-    description: 'Kaju Katli, Soan Papdi, Motichoor Ladoo, Milk Cake, Bhujia, Sev & premium gift hampers — fresh, handcrafted, pan-India delivery from Neemuch since 1968.',
+    title: ONLINE_ORDERS_ENABLED
+      ? 'Buy Indian Sweets, Mithai & Gift Boxes Online | Gopi Misthan Bhandar'
+      : 'Indian Sweets, Mithai & Gift Boxes | Gopi Misthan Bhandar',
+    description: ONLINE_ORDERS_ENABLED
+      ? 'Kaju Katli, Soan Papdi, Motichoor Ladoo, Milk Cake, Bhujia, Sev & premium gift hampers — fresh, handcrafted, pan-India delivery from Neemuch since 1968.'
+      : 'Explore Kaju Katli, Soan Papdi, Motichoor Ladoo, Bhujia, Sev and premium gift hampers at Gopi Misthan Bhandar, Neemuch.',
     images: [
       {
         url: '/Hamper.jpg',
@@ -57,8 +66,12 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Buy Indian Sweets Online — Mithai, Namkeen & Gift Boxes',
-    description: 'Kaju Katli, Soan Papdi, Motichoor Ladoo, Milk Cake, Bhujia & dry-fruit hampers. Pan-India delivery from Gopi Misthan Bhandar Neemuch.',
+    title: ONLINE_ORDERS_ENABLED
+      ? 'Buy Indian Sweets Online — Mithai, Namkeen & Gift Boxes'
+      : 'Indian Sweets, Namkeen & Gift Boxes | Gopi Misthan Bhandar',
+    description: ONLINE_ORDERS_ENABLED
+      ? 'Kaju Katli, Soan Papdi, Motichoor Ladoo, Milk Cake, Bhujia & dry-fruit hampers. Pan-India delivery from Gopi Misthan Bhandar Neemuch.'
+      : 'Explore traditional sweets, namkeen and gift hampers from Gopi Misthan Bhandar in Neemuch.',
     images: ['/Hamper.jpg'],
   },
   robots: {

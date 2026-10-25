@@ -117,3 +117,15 @@ every other visitor keeps seeing the maintenance page. Clear the
 
 The page returns `503` + `Retry-After` (not `200`), which is what Google expects
 for temporary downtime — rankings are preserved instead of the pages being dropped.
+
+## Catalogue Mode (online ordering off)
+
+The public storefront defaults to catalogue mode. Visitors can browse products,
+open product details, use WhatsApp enquiry, and get directions to the Neemuch
+store. Cart and checkout actions are hidden, direct checkout links return to the
+catalogue, and order/payment creation endpoints are unavailable.
+
+To enable online ordering, set `NEXT_PUBLIC_ONLINE_ORDERS_ENABLED=true` in the
+deployment environment and redeploy. Leave it unset or set it to `false` to keep
+catalogue mode active. `NEXT_PUBLIC_WHATSAPP_NUMBER` controls the product enquiry
+number; it defaults to the shop's existing WhatsApp contact.

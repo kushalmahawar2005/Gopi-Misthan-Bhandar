@@ -7,6 +7,7 @@ import Link from 'next/link';
 import { useCart } from '@/context/CartContext';
 import { useWishlist } from '@/context/WishlistContext';
 import { FiChevronDown, FiHeart } from 'react-icons/fi';
+import { ONLINE_ORDERS_ENABLED } from '@/lib/siteMode';
 
 
 interface ProductCardProps {
@@ -14,7 +15,7 @@ interface ProductCardProps {
   showAddToCart?: boolean;
 }
 
-const ProductCard: React.FC<ProductCardProps> = ({ product, showAddToCart = true }) => {
+const ProductCard: React.FC<ProductCardProps> = ({ product, showAddToCart = ONLINE_ORDERS_ENABLED }) => {
   const { addToCart } = useCart();
   const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
   const [isHovered, setIsHovered] = useState(false);

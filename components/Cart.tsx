@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useCart } from '@/context/CartContext';
 import Image from 'next/image';
 import { FiX, FiMinus, FiPlus, FiShoppingBag } from 'react-icons/fi';
+import { ONLINE_ORDERS_ENABLED } from '@/lib/siteMode';
 
 const Cart: React.FC = () => {
   const {
@@ -89,7 +90,7 @@ const Cart: React.FC = () => {
     setTouchEnd(null);
   };
 
-  if (!isCartOpen) return null;
+  if (!ONLINE_ORDERS_ENABLED || !isCartOpen) return null;
 
   return (
     <>
