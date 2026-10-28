@@ -11,6 +11,7 @@ import DeferredPromotion from '@/components/DeferredPromotion'
 import NextAuthSessionProvider from '@/components/NextAuthSessionProvider'
 import Script from 'next/script'
 import { ONLINE_ORDERS_ENABLED } from '@/lib/siteMode'
+import { Analytics } from '@vercel/analytics/next'
 
 const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://gopimisthanbhandar.com';
 const FSSAI_LICENSE = process.env.NEXT_PUBLIC_FSSAI_LICENSE || '';
@@ -260,6 +261,7 @@ export default function RootLayout({
             </WishlistProvider>
           </AuthProvider>
         </NextAuthSessionProvider>
+        <Analytics />
       </body>
     </html>
   )
